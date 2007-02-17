@@ -1,0 +1,96 @@
+{
+    APPLICATIONICON = Calendar.tiff;
+    APP_DOCUMENT_BASED = NO;
+    APP_TYPE = GORM;
+    CLASS_FILES = (
+	AppController.m,
+	LocalStore.m,
+	AppointmentEditor.m,
+	CalendarView.m,
+	"Appointment+Agenda.m",
+	StoreManager.m,
+	DayView.m
+    );
+    COMPILEROPTIONS = "";
+    CPPOPTIONS = "";
+    CREATION_DATE = "2007-01-08 21:35:48 +0100";
+    DOCU_FILES = (
+    );
+    FRAMEWORKS = (
+    );
+    HEADER_FILES = (
+	AppController.h,
+	AgendaStore.h,
+	LocalStore.h,
+	AppointmentEditor.h,
+	CalendarView.h,
+	"Appointment+Agenda.h",
+	StoreManager.h,
+	DayView.h
+    );
+    IMAGES = (
+	Calendar.tiff
+    );
+    INSTALLDIR = "$(HOME)/GNUstep";
+    INTERFACES = (
+	Agenda.gorm,
+	Appointment.gorm
+    );
+    LANGUAGE = English;
+    LAST_EDITING = "2007-02-15 23:49:32 +0100";
+    LIBRARIES = (
+	"gnustep-base",
+	"gnustep-gui",
+	ChronographerSource
+    );
+    LINKEROPTIONS = "";
+    LOCALIZED_RESOURCES = (
+    );
+    MAININTERFACE = Agenda.gorm;
+    MAKEFILEDIR = "$(GNUSTEP_MAKEFILES)";
+    OBJC_COMPILEROPTIONS = "";
+    OTHER_RESOURCES = (
+    );
+    OTHER_SOURCES = (
+	SimpleAgenda.m
+    );
+    PC_WINDOWS = {
+	ProjectBrowser = "{x = 0; y = 0; width = 631; height = 223}";
+	ProjectWindow = "226 74 864 906 0 0  1280 1024 ";
+	ShowToolbar = NO;
+    };
+    PRINCIPAL_CLASS = NSApplication;
+    PROJECT_AUTHORS = (
+	"Philippe Roussel <p.o.roussel@free.fr>"
+    );
+    PROJECT_COPYRIGHT = "Copyright (C) 2007";
+    PROJECT_COPYRIGHT_DESC = "Released under GPL Version 2";
+    PROJECT_CREATOR = "Philippe Roussel";
+    PROJECT_DESCRIPTION = "Simple agenda and calendar application";
+    PROJECT_DOCUMENTTYPES = (
+    );
+    PROJECT_GROUP = "No group avaliable!";
+    PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
+    PROJECT_NAME = SimpleAgenda;
+    PROJECT_RELEASE = 0.7;
+    PROJECT_SUMMARY = "No summary avaliable!";
+    PROJECT_TYPE = Application;
+    PROJECT_URL = "";
+    SEARCH_HEADER_DIRS = (
+    );
+    SEARCH_LIB_DIRS = (
+	"/opt/gnustep/Local/Library/Libraries"
+    );
+    SUBPROJECTS = (
+    );
+    SUPPORTING_FILES = (
+	GNUmakefile.preamble,
+	GNUmakefile,
+	GNUmakefile.postamble,
+	AgendaInfo.plist
+    );
+    USER_LANGUAGES = (
+	French,
+	English
+    );
+}

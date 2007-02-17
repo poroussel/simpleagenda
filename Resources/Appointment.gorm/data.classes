@@ -1,0 +1,26 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AppointmentEditor = {
+	Actions = (
+	    "cancel:",
+	    "validate:"
+	);
+	Outlets = (
+	    description,
+	    title,
+	    duration,
+	    repeat,
+	    endDate,
+	    durationText,
+	    endDateStepper
+	);
+	Super = NSWindowController;
+    };
+    FirstResponder = {
+	Actions = (
+	    "newAction:",
+	    "validate:"
+	);
+	Super = NSObject;
+    };
+}

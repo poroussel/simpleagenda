@@ -1,0 +1,59 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AppController = {
+	Actions = (
+	    "showPrefPanel:",
+	    "addAppointment:",
+	    "delAppointment:"
+	);
+	Outlets = (
+	    calendar,
+	    dayView
+	);
+	Super = NSObject;
+    };
+    CalendarView = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSBox;
+    };
+    DayView = {
+	Actions = (
+	    "setDataSource:",
+	    "setDelegate:"
+	);
+	Outlets = (
+	    _dataSource,
+	    _delegate,
+	    _width
+	);
+	Super = NSView;
+    };
+    DayViewController = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "addAppointment:",
+	    "createOrEditAnAppointment:",
+	    "delAppointment:",
+	    "orderFrontFontPanel:",
+	    "setDataSource:",
+	    "setDelegate:",
+	    "showPrefPanel:",
+	    "updateDate:",
+	    "updateView:"
+	);
+	Super = NSObject;
+    };
+}
