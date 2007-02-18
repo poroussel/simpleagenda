@@ -8,6 +8,8 @@
 - (NSEnumerator *)scheduledAppointmentsForDayView;
 @end
 
+@class AppointmentView;
+
 @interface DayView : NSView
 {
   id <DayViewDataSource> _dataSource;
@@ -17,7 +19,7 @@
   int _firstH;
   int _lastH;
   NSDictionary *_textAttributes;
-  Appointment *_selected;
+  AppointmentView *_selected;
 }
 
 - (id)initWithFrame:(NSRect)frameRect;

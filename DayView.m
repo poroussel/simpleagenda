@@ -183,6 +183,7 @@
   while ((apt = [enumerator nextObject]))
     [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
 					      appointment:apt]];
+  _selected = nil;
   [self setNeedsDisplay:YES];
 }
 
@@ -201,7 +202,9 @@
 	[delegate doubleClickOnAppointment:[aptv appointment]];
       return;
     }
+    [_selected setSelected:NO];
     [aptv setSelected:YES];
+    _selected = aptv;
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
       mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
@@ -214,7 +217,6 @@
 	  [self display];
 	break;
       case NSLeftMouseUp:
-	[aptv setSelected:NO];
 	keepOn = NO;
 	break;
       default:
@@ -249,7 +251,7 @@
 
 - (Appointment *)selectedAppointment
 {
-  return nil;
+  return [_selected appointment];
 }
 
 @end
