@@ -188,7 +188,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 /* DayView Delegate methods */
 
-- (void)actionForAppointment:(Appointment *)apt
+- (void)doubleClickOnAppointment:(Appointment *)apt
 {
   [self _editAppointment:apt];
 }

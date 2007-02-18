@@ -197,8 +197,8 @@
   if ([hit class] == [AppointmentView class]) {
     AppointmentView *aptv = hit;
     if ([theEvent clickCount] > 1) {
-      if ([delegate respondsToSelector:@selector(actionForAppointment:)])
-	[delegate actionForAppointment:[aptv appointment]];
+      if ([delegate respondsToSelector:@selector(doubleClickOnAppointment:)])
+	[delegate doubleClickOnAppointment:[aptv appointment]];
       return;
     }
     [aptv setSelected:YES];

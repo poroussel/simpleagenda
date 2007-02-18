@@ -29,6 +29,6 @@
 
 @interface NSObject (DayViewDelegate)
 
-- (void)actionForAppointment:(Appointment *)apt;
+- (void)doubleClickOnAppointment:(Appointment *)apt;
 
 @end
