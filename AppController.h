@@ -16,6 +16,7 @@
   NSMutableSet *_cache;
   NSUserDefaults *_defaults;
 }
+
 - (void)showPrefPanel:(id)sender;
 - (void)addAppointment:(id)sender;
 - (void)delAppointment:(id)sender;

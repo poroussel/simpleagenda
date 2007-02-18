@@ -99,6 +99,7 @@
     _width = frameRect.size.width;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
+    [self reloadData];
   }
   return self;
 }
@@ -131,8 +132,6 @@
 - (void)drawRect:(NSRect)rect
 {
   int h, start;
-  _firstH = [_dataSource firstHour];
-  _lastH = [_dataSource lastHour];
 
   [[NSColor controlBackgroundColor] set];
   NSFrameRect(rect);
@@ -173,11 +172,14 @@
   AppointmentView *aptv;
   Appointment *apt;
 
+  _firstH = [_dataSource firstHourForDayView];
+  _lastH = [_dataSource lastHourForDayView];
+
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject]))
     [aptv removeFromSuperview];
 
-  enumerator = [_dataSource scheduledAppointments];
+  enumerator = [_dataSource scheduledAppointmentsForDayView];
   while ((apt = [enumerator nextObject]))
     [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
 					      appointment:apt]];

@@ -88,6 +88,11 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   [NSBundle loadNibNamed:@"Appointment" owner:editor];
 }
 
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
+{
+  [self updateView];
+}
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
   [_cache release];
@@ -166,17 +171,17 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 }
 
 /* DayViewDataSource methods */
-- (int)firstHour
+- (int)firstHourForDayView
 {
   return _firstHour;
 }
 
-- (int)lastHour
+- (int)lastHourForDayView
 {
   return _lastHour;
 }
 
-- (NSEnumerator *)scheduledAppointments
+- (NSEnumerator *)scheduledAppointmentsForDayView
 {
   return [_cache objectEnumerator];
 }

@@ -3,9 +3,9 @@
 #import <AppKit/AppKit.h>
 
 @protocol DayViewDataSource
-- (int)firstHour;
-- (int)lastHour;
-- (NSEnumerator *)scheduledAppointments;
+- (int)firstHourForDayView;
+- (int)lastHourForDayView;
+- (NSEnumerator *)scheduledAppointmentsForDayView;
 @end
 
 @interface DayView : NSView
