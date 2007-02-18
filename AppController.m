@@ -6,6 +6,11 @@
 #import "StoreManager.h"
 #import "AppController.h"
 
+NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
+{
+  return [[a startDate] compare:[b startDate]];
+}
+
 @implementation AppController
 
 - (void)initDefaults
@@ -97,7 +102,8 @@
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = _firstHour * 60;
-  NSEnumerator *enumerator = [_cache objectEnumerator];
+  NSArray *sorted = [[_cache allObjects] sortedArrayUsingFunction:sortAppointments context:nil];
+  NSEnumerator *enumerator = [sorted objectEnumerator];
   Appointment *apt;
 
   while ((apt = [enumerator nextObject])) {
@@ -105,7 +111,9 @@
       return minute;
     minute = [[apt startDate] minuteOfDay] + [apt duration];
   }
-  return minute;
+  if (minute < _lastHour * 60)
+    return minute;
+  return _firstHour * 60;
 }
 
 - (Appointment *)createEmptyAppointment
