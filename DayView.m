@@ -187,6 +187,13 @@
   [self setNeedsDisplay:YES];
 }
 
+- (void)_selectAppointmentView:(AppointmentView *)aptv
+{
+  [_selected setSelected:NO];
+  [aptv setSelected:YES];
+  _selected = aptv;
+}
+
 - (void)mouseDown:(NSEvent *)theEvent
 {
   int minutes;
@@ -202,9 +209,7 @@
 	[delegate doubleClickOnAppointment:[aptv appointment]];
       return;
     }
-    [_selected setSelected:NO];
-    [aptv setSelected:YES];
-    _selected = aptv;
+    [self _selectAppointmentView:aptv];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
       mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
@@ -247,6 +252,15 @@
       break;
     }
   }
+}
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  NSView *hit = [self hitTest:[self convertPoint:[theEvent locationInWindow] fromView:nil]];
+
+  if ([hit class] == [AppointmentView class])
+    [self _selectAppointmentView:(AppointmentView *)hit];
+  return nil;
 }
 
 - (Appointment *)selectedAppointment
