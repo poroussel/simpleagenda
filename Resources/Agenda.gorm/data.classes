@@ -23,12 +23,10 @@
     };
     DayView = {
 	Actions = (
-	    "setDataSource:",
-	    "setDelegate:"
 	);
 	Outlets = (
 	    _dataSource,
-	    _delegate,
+	    delegate,
 	    _width
 	);
 	Super = NSView;
