@@ -2,16 +2,17 @@
     ApplicationDescription = "Simple agenda and calendar application";
     ApplicationIcon = Calendar.tiff;
     ApplicationName = SimpleAgenda;
-    ApplicationRelease = 0.7;
+    ApplicationRelease = 0.8;
     Authors = (
 	"Philippe Roussel <p.o.roussel@free.fr>"
     );
     Copyright = "Copyright (C) 2007";
     CopyrightDescription = "Released under GPL Version 2";
-    FullVersionID = 0.7;
+    FullVersionID = 0.8;
     NSExecutable = SimpleAgenda;
     NSIcon = Calendar.tiff;
     NSMainNibFile = Agenda.gorm;
     NSPrincipalClass = NSApplication;
     NSRole = Application;
+    URL = "http://coyote.octets.fr/pub/gnustep/";
 }
