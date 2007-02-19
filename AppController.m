@@ -196,11 +196,26 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date andConstrain:NO];
       [[_sm defaultStore] addAppointment:new];
+      [new release];
     }
     [date release];
     [self updateCache];
   }
 }
+
+- (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
+{
+  SEL action = [menuItem action];
+  if (action == @selector(copy:) ||
+      action == @selector(cut:) ||
+      action == @selector(paste:) ||
+      action == @selector(editAppointment:) ||
+      action == @selector(delAppointment:)) {
+    return [dayView selectedAppointment] != nil;
+  }
+  return YES;
+}
+
 
 /* CalendarView delegate method */
 - (void)dateChanged:(Date *)newDate
