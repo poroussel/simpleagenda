@@ -52,7 +52,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   return self;
 }
 
-- (void)updateView
+- (void)updateCache
 {
   NSArray *array;
   Date *start = [[calendar date] copy];
@@ -70,7 +70,6 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
     [_cache addObjectsFromArray:array];
   }
   
-  NSLog(@"Show data for %@ => %d apt", [start description], [_cache count]);
   [start release];
   [end release];
   [dayView reloadData];
@@ -79,7 +78,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 - (void)userDefaultsChanged:(NSNotification *)notification
 {
   [self initDefaults];
-  [self updateView];
+  [self updateCache];
 }
 
 - (void)awakeFromNib
@@ -90,7 +89,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-  [self updateView];
+  [self updateCache];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -139,7 +138,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 {
   if ([editor editAppointment:apt]) {
     [[_sm defaultStore] updateAppointment:apt];
-    [self updateView];
+    [self updateCache];
   }    
 }
 
@@ -149,7 +148,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
   if ([editor editAppointment:apt]) {
     [[_sm defaultStore] addAppointment:apt];
-    [self updateView];
+    [self updateCache];
   }    
   [apt release];
 }
@@ -168,7 +167,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
   if (apt) {
     [[_sm defaultStore] delAppointment: apt];
-    [self updateView];
+    [self updateCache];
   }
 }
 
@@ -199,14 +198,15 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
       [[_sm defaultStore] addAppointment:new];
     }
     [date release];
-    [self updateView];
+    [self updateCache];
   }
 }
 
 /* CalendarView delegate method */
 - (void)dateChanged:(Date *)newDate
 {
-  [self updateView];
+  [self updateCache];
+  NSLog(@"Show data for %@ => %d apt", [newDate description], [_cache count]);
 }
 
 /* DayViewDataSource methods */
