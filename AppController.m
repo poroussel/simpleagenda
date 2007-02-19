@@ -172,6 +172,37 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   }
 }
 
+- (void)copy:(id)sender
+{
+  _selection = [dayView selectedAppointment];
+  _deleteSelection = NO;
+}
+
+- (void)cut:(id)sender
+{
+  _selection = [dayView selectedAppointment];
+  _deleteSelection = YES;
+}
+
+- (void)paste:(id)sender
+{
+  if (_selection) {
+    Date *date = [[calendar date] copy];
+    if (_deleteSelection) {
+      [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
+      [_selection setStartDate:date andConstrain:NO];
+      [[_sm defaultStore] updateAppointment:_selection];
+    } else {
+      Appointment *new = [_selection copy];
+      [date setMinute:[self _sensibleStartForDuration:[new duration]]];
+      [new setStartDate:date andConstrain:NO];
+      [[_sm defaultStore] addAppointment:new];
+    }
+    [date release];
+    [self updateView];
+  }
+}
+
 /* CalendarView delegate method */
 - (void)dateChanged:(Date *)newDate
 {

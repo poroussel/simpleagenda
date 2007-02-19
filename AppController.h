@@ -15,6 +15,8 @@
   StoreManager *_sm;
   NSMutableSet *_cache;
   NSUserDefaults *_defaults;
+  Appointment *_selection;
+  BOOL _deleteSelection;
 }
 
 - (void)showPrefPanel:(id)sender;
