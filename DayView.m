@@ -228,6 +228,8 @@
 	break;
       }
     }
+    if ([delegate respondsToSelector:@selector(modifyAppointment:)])
+      [delegate modifyAppointment:[aptv appointment]];
     return;
   }
 

@@ -247,4 +247,10 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   [self _editAppointment:apt];
 }
 
+- (void)modifyAppointment:(Appointment *)apt
+{
+  [[_sm defaultStore] updateAppointment:apt];
+  [self updateCache];
+}
+
 @end
