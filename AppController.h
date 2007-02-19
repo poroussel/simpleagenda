@@ -19,6 +19,7 @@
 
 - (void)showPrefPanel:(id)sender;
 - (void)addAppointment:(id)sender;
+- (void)editAppointment:(id)sender;
 - (void)delAppointment:(id)sender;
 - (void)applicationWillTerminate:(NSNotification *)aNotification;
 - (void)awakeFromNib;

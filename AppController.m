@@ -154,6 +154,14 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   [apt release];
 }
 
+- (void)editAppointment:(id)sender
+{
+  Appointment *apt = [dayView selectedAppointment];
+
+  if (apt)
+    [self _editAppointment:apt];
+}
+
 - (void)delAppointment:(id)sender
 {
   Appointment *apt = [dayView selectedAppointment];

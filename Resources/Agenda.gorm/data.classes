@@ -4,6 +4,7 @@
 	Actions = (
 	    "showPrefPanel:",
 	    "addAppointment:",
+	    "editAppointment:",
 	    "delAppointment:"
 	);
 	Outlets = (
@@ -45,6 +46,7 @@
 	    "addAppointment:",
 	    "createOrEditAnAppointment:",
 	    "delAppointment:",
+	    "editAppointment:",
 	    "orderFrontFontPanel:",
 	    "setDataSource:",
 	    "setDelegate:",
