@@ -216,10 +216,10 @@
 
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	  minutes = [aptv _deltaToMinute:[theEvent deltaY]];
-	  [[[aptv appointment] startDate] changeMinuteBy:-minutes];
-	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
-	  [self display];
+	minutes = [aptv _deltaToMinute:[theEvent deltaY]];
+	[[[aptv appointment] startDate] changeMinuteBy:-minutes];
+	[aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
+	[self display];
 	break;
       case NSLeftMouseUp:
 	keepOn = NO;
@@ -231,6 +231,7 @@
     return;
   }
 
+  /* FIXME : this code doesn't work */
   NSPoint start = mouseLoc;
   while (keepOn) {
     theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask |
