@@ -68,7 +68,7 @@
   NSFrameRect(rect);
   [_yellow set];
   NSRectFill(NSMakeRect(rect.origin.x, rect.origin.y + 1, rect.size.width - 1, rect.size.height));
-  [label drawAtPoint:NSMakePoint(16, rect.size.height - 24) withAttributes:_textAttributes];
+  [label drawInRect:NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8) withAttributes:_textAttributes];
   if (_selected) {
     [[NSColor darkGrayColor] set];
     NSFrameRect(rect);
