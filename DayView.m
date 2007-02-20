@@ -97,7 +97,6 @@
 {
   self = [super initWithFrame:frameRect];
   if (self) {
-    NSLog(@"DayView initWithFrame");
     _height = frameRect.size.height;
     _width = frameRect.size.width;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
@@ -121,6 +120,11 @@
 - (int)_minuteToPosition:(int)minutes
 {
   return _height - [self _minuteToSize:minutes - (_firstH * 60)] - 1;
+}
+
+- (int)_positionToMinute:(float)position
+{
+  return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / _height;
 }
 
 - (NSRect)_frameForAppointment:(Appointment *)apt
@@ -147,13 +151,11 @@
     [hour drawInRect:NSMakeRect(4, start - 20, 80, 16) withAttributes:_textAttributes];
   }
   if (_startPt.x != _endPt.x && _startPt.y != _endPt.y) {
-    float minx, miny, maxx, maxy;
+    float miny, maxy;
 
-    minx = min(_startPt.x, _endPt.x);
     miny = min(_startPt.y, _endPt.y);
-    maxx = max(_startPt.x, _endPt.x);
     maxy = max(_startPt.y, _endPt.y);
-    NSFrameRect(NSMakeRect(minx, miny, maxx - minx, maxy - miny));
+    NSFrameRect(NSMakeRect(40, miny, rect.size.width - 56, maxy - miny));
   }
 }
 
@@ -216,12 +218,12 @@
 
   if ([hit class] == [AppointmentView class]) {
     AppointmentView *aptv = hit;
+    [self _selectAppointmentView:aptv];
     if ([theEvent clickCount] > 1) {
       if ([delegate respondsToSelector:@selector(doubleClickOnAppointment:)])
 	[delegate doubleClickOnAppointment:[aptv appointment]];
       return;
     }
-    [self _selectAppointmentView:aptv];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
       mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
@@ -258,6 +260,13 @@
       break;
     }
     [self display];
+  }
+  /* If pointer is inside DayView, create a new appointment */
+  if ([self mouse:mouseLoc inRect:[self bounds]]) {
+    int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
+    int end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
+    if ([delegate respondsToSelector:@selector(createAppointmentFrom:to:)])
+      [delegate createAppointmentFrom:start to:end];
   }
   _startPt = _endPt = NSMakePoint(0, 0);
   [self display];

@@ -252,4 +252,22 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   [[_sm defaultStore] updateAppointment:apt];
 }
 
+- (void)createAppointmentFrom:(int)start to:(int)end
+{
+  Date *date = [[calendar date] copy];
+  Appointment *apt = [Appointment new];
+  if (apt) {
+    [date setMinute:start];
+    [apt setDuration:end - start];
+    [apt setStartDate:date andConstrain:NO];
+    [apt setTitle:@"edit title..."];
+    if ([editor editAppointment:apt]) {
+      [[_sm defaultStore] addAppointment:apt];
+      [self updateCache];
+    }    
+  }
+  [date release];
+  [apt release];
+}
+
 @end

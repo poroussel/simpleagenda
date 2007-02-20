@@ -35,5 +35,6 @@
 
 - (void)doubleClickOnAppointment:(Appointment *)apt;
 - (void)modifyAppointment:(Appointment *)apt;
+- (void)createAppointmentFrom:(int)start to:(int)end;
 
 @end
