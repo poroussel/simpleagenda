@@ -18,6 +18,8 @@
   int _width;
   int _firstH;
   int _lastH;
+  NSPoint _startPt;
+  NSPoint _endPt;
   NSDictionary *_textAttributes;
   AppointmentView *_selected;
 }

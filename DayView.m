@@ -4,6 +4,9 @@
 #import <ChronographerSource/Appointment.h>
 #import "DayView.h"
 
+#define max(x,y) (x > y) ? x : y
+#define min(x,y) (x < y) ? x : y
+
 @interface AppointmentView : NSView
 {
   Appointment *_apt;
@@ -143,6 +146,15 @@
     NSFrameRect(NSMakeRect(0, start, rect.size.width, 1));
     [hour drawInRect:NSMakeRect(4, start - 20, 80, 16) withAttributes:_textAttributes];
   }
+  if (_startPt.x != _endPt.x && _startPt.y != _endPt.y) {
+    float minx, miny, maxx, maxy;
+
+    minx = min(_startPt.x, _endPt.x);
+    miny = min(_startPt.y, _endPt.y);
+    maxx = max(_startPt.x, _endPt.x);
+    maxy = max(_startPt.y, _endPt.y);
+    NSFrameRect(NSMakeRect(minx, miny, maxx - minx, maxy - miny));
+  }
 }
 
 - (id)dataSource
@@ -198,7 +210,7 @@
 {
   int minutes;
   BOOL keepOn = YES;
-  BOOL isInside = YES;
+  BOOL modified = NO;
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   NSView *hit = [self hitTest:mouseLoc];
 
@@ -219,6 +231,7 @@
 	minutes = [aptv _deltaToMinute:[theEvent deltaY]];
 	[[[aptv appointment] startDate] changeMinuteBy:-minutes];
 	[aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
+	modified = YES;
 	[self display];
 	break;
       case NSLeftMouseUp:
@@ -228,33 +241,26 @@
 	break;
       }
     }
-    if ([delegate respondsToSelector:@selector(modifyAppointment:)])
+    if (modified && [delegate respondsToSelector:@selector(modifyAppointment:)])
       [delegate modifyAppointment:[aptv appointment]];
     return;
   }
 
-  /* FIXME : this code doesn't work */
-  NSPoint start = mouseLoc;
+  _startPt = mouseLoc;
   while (keepOn) {
-    theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask |
-			      NSLeftMouseDraggedMask];
-    mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    isInside = [self mouse:mouseLoc inRect:[self bounds]];
-
+    theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+    _endPt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
     switch ([theEvent type]) {
-    case NSLeftMouseDragged:
-      if (isInside) {
-	NSRectFill(NSMakeRect(start.x, start.y, mouseLoc.x - start.x, start.y - mouseLoc.y));
-      }
-      break;
     case NSLeftMouseUp:
-      NSRectFill(NSMakeRect(start.x, start.y, mouseLoc.x - start.x, start.y - mouseLoc.y));
       keepOn = NO;
       break;
     default:
       break;
     }
+    [self display];
   }
+  _startPt = _endPt = NSMakePoint(0, 0);
+  [self display];
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
