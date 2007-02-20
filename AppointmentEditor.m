@@ -13,8 +13,8 @@
   int ret;
 
   [title setStringValue:[data title]];
-  [duration setIntValue:[data duration] / 60];
-  [durationText setIntValue:[data duration] / 60];
+  [duration setFloatValue:[data duration] / 60.0];
+  [durationText setFloatValue:[data duration] / 60.0];
   [repeat selectItemAtIndex:[data interval]];
 
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
@@ -26,7 +26,7 @@
     Date *end = [[data startDate] copy];
     [end changeYearBy:10];
     [data setTitle:[title stringValue]];
-    [data setDuration:[duration intValue] * 60];
+    [data setDuration:[duration floatValue] * 60.0];
     [data setInterval:[repeat indexOfSelectedItem]];
     [data setEndDate:end];
     [data setDescriptionText:[[description textStorage] copy]];
