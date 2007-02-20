@@ -7,6 +7,14 @@
 
 @implementation Appointment(Agenda)
 
+- (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
+{
+  [self init];
+  [self setStartDate:start andConstrain:NO];
+  [self setTitle:aTitle];
+  return self;
+}
+
 - (BOOL)startsBetween:(Date *)start and:(Date *)end
 {
   /* FIXME : do something for recurrent appointments */

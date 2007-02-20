@@ -5,6 +5,7 @@
 #import "AppointmentEditor.h"
 #import "StoreManager.h"
 #import "AppController.h"
+#import "Appointment+Agenda.h"
 
 NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 {
@@ -120,20 +121,6 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   return _firstHour * 60;
 }
 
-- (Appointment *)createEmptyAppointment
-{
-  Date *date = [[calendar date] copy];
-  Appointment *apt = [Appointment new];
-  if (apt) {
-    [date setMinute:[self _sensibleStartForDuration:60]];
-    [apt setDuration:60];
-    [apt setStartDate:date andConstrain:NO];
-    [apt setTitle:@"edit title..."];
-  }
-  [date release];
-  return apt;
-}
-
 - (void)_editAppointment:(Appointment *)apt
 {
   if ([editor editAppointment:apt]) {
@@ -144,12 +131,16 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 - (void)addAppointment:(id)sender
 {
-  Appointment *apt = [self createEmptyAppointment];
-
-  if ([editor editAppointment:apt]) {
+  Date *date = [[calendar date] copy];
+  [date setMinute:[self _sensibleStartForDuration:60]];
+  Appointment *apt = [[Appointment alloc] initWithStartDate:date 
+					  duration:60
+					  title:@"edit title..."];
+  if (apt && [editor editAppointment:apt]) {
     [[_sm defaultStore] addAppointment:apt];
     [self updateCache];
-  }    
+  }
+  [date release];
   [apt release];
 }
 
@@ -255,17 +246,14 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 - (void)createAppointmentFrom:(int)start to:(int)end
 {
   Date *date = [[calendar date] copy];
-  Appointment *apt = [Appointment new];
-  if (apt) {
-    [date setMinute:start];
-    [apt setDuration:end - start];
-    [apt setStartDate:date andConstrain:NO];
-    [apt setTitle:@"edit title..."];
-    if ([editor editAppointment:apt]) {
-      [[_sm defaultStore] addAppointment:apt];
-      [self updateCache];
-    }    
-  }
+  [date setMinute:start];
+  Appointment *apt = [[Appointment alloc] initWithStartDate:date 
+					  duration:end - start 
+					  title:@"edit title..."];
+  if (apt && [editor editAppointment:apt]) {
+    [[_sm defaultStore] addAppointment:apt];
+    [self updateCache];
+  }    
   [date release];
   [apt release];
 }
