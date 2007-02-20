@@ -262,7 +262,7 @@
     [self display];
   }
   /* If pointer is inside DayView, create a new appointment */
-  if ([self mouse:mouseLoc inRect:[self bounds]]) {
+  if ([self mouse:_endPt inRect:[self bounds]]) {
     int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
     int end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
     if ([delegate respondsToSelector:@selector(createAppointmentFrom:to:)])
