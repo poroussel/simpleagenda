@@ -12,6 +12,7 @@
   [self init];
   [self setStartDate:start andConstrain:NO];
   [self setTitle:aTitle];
+  [self setDuration:minutes];
   return self;
 }
 
