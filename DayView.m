@@ -4,9 +4,9 @@
 #import <ChronographerSource/Appointment.h>
 #import "DayView.h"
 
-#define max(x,y) (x > y) ? x : y
-#define min(x,y) (x < y) ? x : y
-#define abs(x) (x < 0) ? -x : x
+#define max(x,y) ((x) > (y)) ? (x) : (y)
+#define min(x,y) ((x) < (y)) ? (x) : (y)
+#define abs(x) ((x) < 0) ? (-x) : (x)
 
 @interface AppointmentView : NSView
 {
@@ -72,6 +72,8 @@
   NSFrameRect(rect);
   [_yellow set];
   NSRectFill(NSMakeRect(rect.origin.x, rect.origin.y + 1, rect.size.width - 1, rect.size.height));
+  [_darkYellow set];
+  NSRectFill(NSMakeRect(rect.origin.x, rect.origin.y, rect.size.width, 6));
   [label drawInRect:NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8) withAttributes:_textAttributes];
   if (_selected) {
     [[NSColor darkGrayColor] set];
@@ -82,11 +84,6 @@
 - (Appointment *)appointment
 {
   return _apt;
-}
-
-- (int)_deltaToMinute:(float)delta
-{
-  return [_apt duration] * delta / [self frame].size.height;
 }
 
 @end
@@ -126,6 +123,11 @@
 - (int)_positionToMinute:(float)position
 {
   return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / _height;
+}
+
+- (int)_deltaToMinute:(float)delta
+{
+  return ((_lastH - _firstH + 1) * 60) * delta / _height;
 }
 
 - (NSRect)_frameForAppointment:(Appointment *)apt
@@ -216,22 +218,54 @@
   BOOL modified = NO;
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   NSView *hit = [self hitTest:mouseLoc];
+  NSRect frame;
+  BOOL inResize;
 
   if ([hit class] == [AppointmentView class]) {
     AppointmentView *aptv = hit;
     [self _selectAppointmentView:aptv];
+
     if ([theEvent clickCount] > 1) {
       if ([delegate respondsToSelector:@selector(doubleClickOnAppointment:)])
 	[delegate doubleClickOnAppointment:[aptv appointment]];
       return;
     }
+
+    frame = [aptv frame];
+    inResize = [self mouse:mouseLoc inRect:NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)];
+    if (inResize) {
+      [[NSCursor resizeUpDownCursor] push];
+      while (keepOn) {
+	theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+
+	switch ([theEvent type]) {
+	case NSLeftMouseDragged:
+	  minutes = [self _deltaToMinute:[theEvent deltaY]];
+	  [[aptv appointment] setDuration:[[aptv appointment] duration] - minutes];
+	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
+	  modified = YES;
+	  [self display];
+	  break;
+	case NSLeftMouseUp:
+	  keepOn = NO;
+	  break;
+	default:
+	  break;
+	}
+      }
+      [NSCursor pop];
+      return;
+    }
+
+    [[NSCursor openHandCursor] push];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
       mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	minutes = [aptv _deltaToMinute:[theEvent deltaY]];
+	minutes = [self _deltaToMinute:[theEvent deltaY]];
 	[[[aptv appointment] startDate] changeMinuteBy:-minutes];
 	[aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
 	modified = YES;
@@ -244,12 +278,14 @@
 	break;
       }
     }
+    [NSCursor pop];
     if (modified && [delegate respondsToSelector:@selector(modifyAppointment:)])
       [delegate modifyAppointment:[aptv appointment]];
     return;
   }
 
   _startPt = _endPt = mouseLoc;
+  [[NSCursor crosshairCursor] push];
   while (keepOn) {
     theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
     _endPt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
@@ -262,6 +298,7 @@
     }
     [self display];
   }
+  [NSCursor pop];
   /* If pointer is inside DayView, create a new appointment */
   if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
     int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
