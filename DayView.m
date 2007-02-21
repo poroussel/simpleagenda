@@ -6,6 +6,7 @@
 
 #define max(x,y) (x > y) ? x : y
 #define min(x,y) (x < y) ? x : y
+#define abs(x) (x < 0) ? -x : x
 
 @interface AppointmentView : NSView
 {
@@ -248,7 +249,7 @@
     return;
   }
 
-  _startPt = mouseLoc;
+  _startPt = _endPt = mouseLoc;
   while (keepOn) {
     theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
     _endPt = [self convertPoint:[theEvent locationInWindow] fromView:nil];
@@ -262,7 +263,7 @@
     [self display];
   }
   /* If pointer is inside DayView, create a new appointment */
-  if ([self mouse:_endPt inRect:[self bounds]]) {
+  if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
     int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
     int end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
     if ([delegate respondsToSelector:@selector(createAppointmentFrom:to:)])
