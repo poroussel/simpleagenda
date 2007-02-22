@@ -26,6 +26,10 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
     [_defaults setInteger:18 forKey:@"lastHour"];
   _lastHour = [_defaults integerForKey:@"lastHour"];
 
+  if ([_defaults objectForKey:@"minimumStep"] == nil)
+    [_defaults setInteger:15 forKey:@"minimumStep"];
+  _minimumStep = [_defaults integerForKey:@"minimumStep"];
+
   if ([_defaults objectForKey:@"stores"] == nil) {
     NSDictionary *dict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
 				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
@@ -224,6 +228,11 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 - (int)lastHourForDayView
 {
   return _lastHour;
+}
+
+- (int)minimumStepForDayView
+{
+  return _minimumStep;
 }
 
 - (NSEnumerator *)scheduledAppointmentsForDayView

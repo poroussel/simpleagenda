@@ -12,6 +12,7 @@
   AppointmentEditor *editor;
   int _firstHour;
   int _lastHour;
+  int _minimumStep;
   StoreManager *_sm;
   NSMutableSet *_cache;
   NSUserDefaults *_defaults;

@@ -5,6 +5,7 @@
 @protocol DayViewDataSource
 - (int)firstHourForDayView;
 - (int)lastHourForDayView;
+- (int)minimumStepForDayView;
 - (NSEnumerator *)scheduledAppointmentsForDayView;
 @end
 
