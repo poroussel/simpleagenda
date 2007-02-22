@@ -136,7 +136,7 @@
   
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
-  return NSMakeRect(48, start - size, 180, size);
+  return NSMakeRect(40, start - size, [self frame].size.width - 56, size);
 }
 
 - (void)drawRect:(NSRect)rect
