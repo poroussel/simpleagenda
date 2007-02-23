@@ -255,6 +255,8 @@
 	}
       }
       [NSCursor pop];
+      if (modified && [delegate respondsToSelector:@selector(modifyAppointment:)])
+	[delegate modifyAppointment:[aptv appointment]];
       return;
     }
 
