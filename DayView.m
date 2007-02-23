@@ -8,12 +8,15 @@
 #define min(x,y) ((x) < (y)) ? (x) : (y)
 #define abs(x) ((x) < 0) ? (-x) : (x)
 
+#define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
+#define TextRect(rect) NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8)
+
 @interface AppointmentView : NSView
 {
   Appointment *_apt;
   NSDictionary *_textAttributes;
-  NSColor *_yellow;
-  NSColor *_darkYellow;
+  NSColor *_color;
+  NSColor *_darkColor;
   BOOL _selected;
 }
 
@@ -31,11 +34,11 @@
     _selected = NO;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
-    _yellow = [[NSColor yellowColor] copy];
-    _darkYellow = RETAIN([NSColor colorWithCalibratedRed:[_yellow redComponent] - 0.3
-				  green:[_yellow greenComponent] - 0.3
-				  blue:[_yellow blueComponent] - 0.3
-				  alpha:[_yellow alphaComponent]]);
+    _color = [[NSColor yellowColor] copy];
+    _darkColor = RETAIN([NSColor colorWithCalibratedRed:[_color redComponent] - 0.3
+				  green:[_color greenComponent] - 0.3
+				  blue:[_color blueComponent] - 0.3
+				  alpha:[_color alphaComponent]]);
   }
   return self;
 }
@@ -43,8 +46,8 @@
 - (void)dealloc
 {
   RELEASE(_textAttributes);
-  RELEASE(_yellow);
-  RELEASE(_darkYellow);
+  RELEASE(_color);
+  RELEASE(_darkColor);
   [super dealloc];
 }
 
@@ -68,15 +71,13 @@
 			      [start hourOfDay],
 			      [start minuteOfHour],
 			      [_apt title]];
-  [_darkYellow set];
-  NSFrameRect(rect);
-  [_yellow set];
-  NSRectFill(NSMakeRect(rect.origin.x, rect.origin.y + 1, rect.size.width - 1, rect.size.height));
-  [_darkYellow set];
-  NSRectFill(NSMakeRect(rect.origin.x, rect.origin.y, rect.size.width, 6));
-  [label drawInRect:NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8) withAttributes:_textAttributes];
+  [_color set];
+  NSRectFill(rect);
+  [_darkColor set];
+  NSRectFill(RedimRect(rect));
+  [label drawInRect:TextRect(rect) withAttributes:_textAttributes];
   if (_selected) {
-    [[NSColor darkGrayColor] set];
+    [[NSColor grayColor] set];
     NSFrameRect(rect);
   }
 }
@@ -158,6 +159,7 @@
 
     miny = min(_startPt.y, _endPt.y);
     maxy = max(_startPt.y, _endPt.y);
+    [[NSColor grayColor] set];
     NSFrameRect(NSMakeRect(40, miny, rect.size.width - 56, maxy - miny));
   }
 }
@@ -232,7 +234,7 @@
     }
 
     frame = [aptv frame];
-    inResize = [self mouse:mouseLoc inRect:NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)];
+    inResize = [self mouse:mouseLoc inRect:RedimRect(frame)];
     if (inResize) {
       [[NSCursor resizeUpDownCursor] push];
       while (keepOn) {
