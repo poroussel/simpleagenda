@@ -1,5 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import <AppKit/AppKit.h>
 #import <ChronographerSource/Date.h>
 #import <ChronographerSource/Appointment.h>
 
@@ -13,6 +14,8 @@
 - (BOOL)modified;
 - (void)write;
 - (NSString *)description;
+- (NSColor *)color;
+- (void)setColor:(NSColor *)color;
 @end
 
 @interface NSObject (AgendaStoreDelegate)

@@ -10,6 +10,7 @@
   NSString *_filename;
   NSString *_globalPath;
   NSString *_globalFile;
+  NSColor *_color;
 }
 
 @end
