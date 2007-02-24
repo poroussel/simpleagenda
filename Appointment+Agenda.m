@@ -7,7 +7,7 @@
 
 @implementation Appointment(Agenda)
 
-- (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
+- (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle
 {
   [self init];
   [self setStartDate:start andConstrain:NO];
