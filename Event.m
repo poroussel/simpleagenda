@@ -74,5 +74,15 @@
   return NO;
 }
 
+- (id)store
+{
+  return _store;
+}
+
+- (void)setStore:(id)store
+{
+  _store = store;
+}
+
 @end
 

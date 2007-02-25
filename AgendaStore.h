@@ -13,8 +13,8 @@
 - (BOOL)modified;
 - (void)write;
 - (NSString *)description;
-- (NSColor *)color;
-- (void)setColor:(NSColor *)color;
+- (NSColor *)eventColor;
+- (void)setEventColor:(NSColor *)color;
 @end
 
 @interface NSObject (AgendaStoreDelegate)

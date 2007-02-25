@@ -1,5 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import "AgendaStore.h"
 #import "DayView.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
@@ -32,7 +33,7 @@
     _selected = NO;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
-    _color = [[NSColor yellowColor] copy];
+    _color = RETAIN([[apt store] eventColor]);
     _darkColor = RETAIN([NSColor colorWithCalibratedRed:[_color redComponent] - 0.3
 				  green:[_color greenComponent] - 0.3
 				  blue:[_color blueComponent] - 0.3
@@ -44,8 +45,8 @@
 - (void)dealloc
 {
   RELEASE(_textAttributes);
-  RELEASE(_color);
   RELEASE(_darkColor);
+  RELEASE(_color);
   [super dealloc];
 }
 
