@@ -13,7 +13,7 @@
   self = [super init];
   if (self) {
     _filename = [params objectForKey:@"storeFilename"];
-    _color = RETAIN([params objectForKey:@"storeColor"]);
+    _color = [params objectForKey:@"storeColor"];
     if (_color == nil)
       _color = [NSColor yellowColor];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
