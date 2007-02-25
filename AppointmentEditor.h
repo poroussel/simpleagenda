@@ -1,5 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import "Event.h"
+
 @interface AppointmentEditor : NSObject
 {
   id window;
@@ -12,7 +14,7 @@
   id endDateStepper;
 }
 
-- (BOOL)editAppointment:(Appointment *)data;
+- (BOOL)editAppointment:(Event *)data;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 

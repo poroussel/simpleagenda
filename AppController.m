@@ -5,9 +5,9 @@
 #import "AppointmentEditor.h"
 #import "StoreManager.h"
 #import "AppController.h"
-#import "Appointment+Agenda.h"
+#import "Event.h"
 
-NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
+NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   return [[a startDate] compare:[b startDate]];
 }
@@ -113,7 +113,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   int minute = _firstHour * 60;
   NSArray *sorted = [[_cache allObjects] sortedArrayUsingFunction:sortAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
-  Appointment *apt;
+  Event *apt;
 
   while ((apt = [enumerator nextObject])) {
     if (minute + duration <= [[apt startDate] minuteOfDay])
@@ -125,7 +125,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
   return _firstHour * 60;
 }
 
-- (void)_editAppointment:(Appointment *)apt
+- (void)_editAppointment:(Event *)apt
 {
   if ([editor editAppointment:apt]) {
     [[_sm defaultStore] updateAppointment:apt];
@@ -137,7 +137,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 {
   Date *date = [[calendar date] copy];
   [date setMinute:[self _sensibleStartForDuration:60]];
-  Appointment *apt = [[Appointment alloc] initWithStartDate:date 
+  Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
   if (apt && [editor editAppointment:apt]) {
@@ -150,7 +150,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 - (void)editAppointment:(id)sender
 {
-  Appointment *apt = [dayView selectedAppointment];
+  Event *apt = [dayView selectedAppointment];
 
   if (apt)
     [self _editAppointment:apt];
@@ -158,7 +158,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 - (void)delAppointment:(id)sender
 {
-  Appointment *apt = [dayView selectedAppointment];
+  Event *apt = [dayView selectedAppointment];
 
   if (apt) {
     [[_sm defaultStore] delAppointment: apt];
@@ -187,7 +187,7 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
       [_selection setStartDate:date andConstrain:NO];
       [[_sm defaultStore] updateAppointment:_selection];
     } else {
-      Appointment *new = [_selection copy];
+      Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date andConstrain:NO];
       [[_sm defaultStore] addAppointment:new];
@@ -242,12 +242,12 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 
 /* DayView Delegate methods */
 
-- (void)doubleClickOnAppointment:(Appointment *)apt
+- (void)doubleClickOnAppointment:(Event *)apt
 {
   [self _editAppointment:apt];
 }
 
-- (void)modifyAppointment:(Appointment *)apt
+- (void)modifyAppointment:(Event *)apt
 {
   [[_sm defaultStore] updateAppointment:apt];
 }
@@ -256,9 +256,9 @@ NSComparisonResult sortAppointments(Appointment *a, Appointment *b, void *data)
 {
   Date *date = [[calendar date] copy];
   [date setMinute:start];
-  Appointment *apt = [[Appointment alloc] initWithStartDate:date 
-					  duration:end - start 
-					  title:@"edit title..."];
+  Event *apt = [[Event alloc] initWithStartDate:date 
+			      duration:end - start 
+			      title:@"edit title..."];
   if (apt && [editor editAppointment:apt]) {
     [[_sm defaultStore] addAppointment:apt];
     [self updateCache];

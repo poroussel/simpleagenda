@@ -1,7 +1,5 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import <ChronographerSource/Date.h>
-#import <ChronographerSource/Appointment.h>
 #import "DayView.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
@@ -13,20 +11,20 @@
 
 @interface AppointmentView : NSView
 {
-  Appointment *_apt;
+  Event *_apt;
   NSDictionary *_textAttributes;
   NSColor *_color;
   NSColor *_darkColor;
   BOOL _selected;
 }
 
-- (Appointment *)appointment;
+- (Event *)appointment;
 
 @end
 
 @implementation AppointmentView
 
-- (id)initWithFrame:(NSRect)frameRect appointment:(Appointment *)apt;
+- (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
 {
   self = [super initWithFrame:frameRect];
   if (self) {
@@ -82,7 +80,7 @@
   }
 }
 
-- (Appointment *)appointment
+- (Event *)appointment
 {
   return _apt;
 }
@@ -131,7 +129,7 @@
   return ((_lastH - _firstH + 1) * 60) * delta / _height;
 }
 
-- (NSRect)_frameForAppointment:(Appointment *)apt
+- (NSRect)_frameForAppointment:(Event *)apt
 {
   int size, start;
   
@@ -189,7 +187,7 @@
 {
   NSEnumerator *enumerator;
   AppointmentView *aptv;
-  Appointment *apt;
+  Event *apt;
 
   _firstH = [_dataSource firstHourForDayView];
   _lastH = [_dataSource lastHourForDayView];
@@ -323,7 +321,7 @@
   return nil;
 }
 
-- (Appointment *)selectedAppointment
+- (Event *)selectedAppointment
 {
   return [_selected appointment];
 }

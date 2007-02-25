@@ -7,9 +7,9 @@
 	LocalStore.m,
 	AppointmentEditor.m,
 	CalendarView.m,
-	"Appointment+Agenda.m",
 	StoreManager.m,
-	DayView.m
+	DayView.m,
+	Event.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -24,9 +24,9 @@
 	LocalStore.h,
 	AppointmentEditor.h,
 	CalendarView.h,
-	"Appointment+Agenda.h",
 	StoreManager.h,
-	DayView.h
+	DayView.h,
+	Event.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -37,7 +37,7 @@
 	Appointment.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-02-22 00:08:41 +0100";
+    LAST_EDITING = "2007-02-25 00:36:42 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -56,7 +56,7 @@
     );
     PC_WINDOWS = {
 	ProjectBrowser = "{x = 0; y = 0; width = 631; height = 223}";
-	ProjectWindow = "157 68 864 906 0 0  1280 1024 ";
+	ProjectWindow = "271 60 864 906 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;

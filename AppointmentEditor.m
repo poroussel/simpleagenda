@@ -1,14 +1,12 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
-#import <ChronographerSource/Appointment.h>
-#import <ChronographerSource/Date.h>
 #import "AppointmentEditor.h"
 
 @implementation AppointmentEditor
 
 
--(BOOL)editAppointment:(Appointment *)data
+-(BOOL)editAppointment:(Event *)data
 {
   int ret;
 

@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import "Event.h"
 
 @protocol DayViewDataSource
 - (int)firstHourForDayView;
@@ -28,14 +29,14 @@
 - (id)initWithFrame:(NSRect)frameRect;
 - (void)drawRect:(NSRect)rect;
 - (void)reloadData;
-- (Appointment *)selectedAppointment;
+- (Event *)selectedAppointment;
 
 @end
 
 @interface NSObject (DayViewDelegate)
 
-- (void)doubleClickOnAppointment:(Appointment *)apt;
-- (void)modifyAppointment:(Appointment *)apt;
+- (void)doubleClickOnAppointment:(Event *)apt;
+- (void)modifyAppointment:(Event *)apt;
 - (void)createAppointmentFrom:(int)start to:(int)end;
 
 @end

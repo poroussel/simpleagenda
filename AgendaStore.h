@@ -1,15 +1,14 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
-#import <ChronographerSource/Date.h>
-#import <ChronographerSource/Appointment.h>
+#import "Event.h"
 
 @protocol AgendaStore <NSObject>
 + (id)storeWithParameters:(NSDictionary *)params forManager:(id)manager;
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
-- (void)addAppointment:(Appointment *)app;
-- (void)delAppointment:(Appointment *)date;
-- (void)updateAppointment:(Appointment *)app;
+- (void)addAppointment:(Event *)evt;
+- (void)delAppointment:(Event *)evt;
+- (void)updateAppointment:(Event *)evt;
 - (BOOL)isWritable;
 - (BOOL)modified;
 - (void)write;

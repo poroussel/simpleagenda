@@ -4,6 +4,7 @@
 #import "AppointmentEditor.h"
 #import "CalendarView.h"
 #import "DayView.h"
+#import "Event.h"
 
 @interface AppController : NSObject <DayViewDataSource>
 {
@@ -16,7 +17,7 @@
   StoreManager *_sm;
   NSMutableSet *_cache;
   NSUserDefaults *_defaults;
-  Appointment *_selection;
+  Event *_selection;
   BOOL _deleteSelection;
 }
 

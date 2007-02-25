@@ -37,9 +37,9 @@ AgendaStore.h \
 LocalStore.h \
 AppointmentEditor.h \
 CalendarView.h \
-Appointment+Agenda.h \
 StoreManager.h \
-DayView.h
+DayView.h \
+Event.h
 
 #
 # Class files
@@ -49,9 +49,9 @@ AppController.m \
 LocalStore.m \
 AppointmentEditor.m \
 CalendarView.m \
-Appointment+Agenda.m \
 StoreManager.m \
-DayView.m
+DayView.m \
+Event.m
 
 #
 # Other sources

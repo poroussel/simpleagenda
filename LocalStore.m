@@ -1,8 +1,6 @@
 #import <AppKit/AppKit.h>
-#import <ChronographerSource/Date.h>
-#import <ChronographerSource/Appointment.h>
-#import "Appointment+Agenda.h"
 #import "LocalStore.h"
+#import "Event.h"
 
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
@@ -29,7 +27,18 @@
 	NSLog(@"Created directory %@", _globalPath);
     }
     if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
-      NSSet *savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];
+      /*
+       * Code needed to translate old Appointment objects to Events
+       * To be replaced shortly by
+       * [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile]
+       */
+      NSData *data = [NSData dataWithContentsOfFile:_globalFile];
+      NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+      [unarchiver setClass:[Event class] forClassName:@"Appointment"];
+      NSSet *savedData = RETAIN([unarchiver decodeObjectForKey: @"root"]);
+      [unarchiver finishDecoding];
+      [unarchiver release];
+
       if (savedData) {
 	[_set unionSet: savedData];
 	NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_set count]);
@@ -58,7 +67,7 @@
 {
   NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:1];
   NSEnumerator *enumerator = [_set objectEnumerator];
-  Appointment *apt;
+  Event *apt;
 
   while ((apt = [enumerator nextObject])) {
     if ([apt startsBetween:start and:end])
@@ -67,21 +76,21 @@
   return array;
 }
 
--(void)addAppointment:(Appointment *)app
+-(void)addAppointment:(Event *)app
 {
   NSLog(@"add appointment %@ on %@", [app title], [[app startDate] description]);
   [_set addObject:app];
   _modified = YES;
 }
 
--(void)delAppointment:(Appointment *)app
+-(void)delAppointment:(Event *)app
 {
   NSLog(@"delete appointment %@ on %@", [app title], [[app startDate] description]);
   [_set removeObject:app];
   _modified = YES;
 }
 
--(void)updateAppointment:(Appointment *)app
+-(void)updateAppointment:(Event *)app
 {
   NSLog(@"update appointment %@ on %@", [app title], [[app startDate] description]);
   _modified = YES;
