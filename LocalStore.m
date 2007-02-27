@@ -13,9 +13,9 @@
   self = [super init];
   if (self) {
     _filename = [params objectForKey:@"storeFilename"];
-    _color = [params objectForKey:@"storeColor"];
+    _color = RETAIN([params objectForKey:@"storeColor"]);
     if (_color == nil)
-      _color = [NSColor yellowColor];
+      _color = RETAIN([NSColor yellowColor]);
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, _filename, nil]] retain];
     _modified = NO;
@@ -65,6 +65,7 @@
     [self write];
   [_set release];
   [_globalFile release];
+  [_color release];
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;

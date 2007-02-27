@@ -33,7 +33,7 @@
     _selected = NO;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
-    _color = RETAIN([[apt store] eventColor]);
+    _color = [[apt store] eventColor];
     _darkColor = RETAIN([NSColor colorWithCalibratedRed:[_color redComponent] - 0.3
 				  green:[_color greenComponent] - 0.3
 				  blue:[_color blueComponent] - 0.3
@@ -46,7 +46,6 @@
 {
   RELEASE(_textAttributes);
   RELEASE(_darkColor);
-  RELEASE(_color);
   [super dealloc];
 }
 
