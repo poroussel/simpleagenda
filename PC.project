@@ -10,7 +10,8 @@
 	StoreManager.m,
 	DayView.m,
 	Event.m,
-	PreferencesController.m
+	PreferencesController.m,
+	HourFormatter.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -28,7 +29,8 @@
 	StoreManager.h,
 	DayView.h,
 	Event.h,
-	PreferencesController.h
+	PreferencesController.h,
+	HourFormatter.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -40,7 +42,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-02-28 23:47:35 +0100";
+    LAST_EDITING = "2007-03-02 00:04:09 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -59,7 +61,7 @@
     );
     PC_WINDOWS = {
 	ProjectBrowser = "{x = 0; y = 0; width = 631; height = 223}";
-	ProjectWindow = "271 63 864 906 0 0  1280 1024 ";
+	ProjectWindow = "271 64 864 906 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;

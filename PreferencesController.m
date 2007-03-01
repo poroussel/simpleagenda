@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "PreferencesController.h"
+#import "HourFormatter.h"
 
 @implementation PreferencesController
 
@@ -37,6 +38,9 @@
     if (![NSBundle loadNibNamed:@"Preferences" owner:self])
       return nil;
     [self initDefaults];
+    HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
+    [[dayStartText cell] setFormatter:formatter];
+    [[dayEndText cell] setFormatter:formatter];
   }
   return self;
 }

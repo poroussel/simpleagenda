@@ -41,7 +41,8 @@ CalendarView.h \
 StoreManager.h \
 DayView.h \
 Event.h \
-PreferencesController.h
+PreferencesController.h \
+HourFormatter.h
 
 #
 # Class files
@@ -54,7 +55,8 @@ CalendarView.m \
 StoreManager.m \
 DayView.m \
 Event.m \
-PreferencesController.m
+PreferencesController.m \
+HourFormatter.m
 
 #
 # Other sources
