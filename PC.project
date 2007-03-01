@@ -9,7 +9,8 @@
 	CalendarView.m,
 	StoreManager.m,
 	DayView.m,
-	Event.m
+	Event.m,
+	PreferencesController.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -26,7 +27,8 @@
 	CalendarView.h,
 	StoreManager.h,
 	DayView.h,
-	Event.h
+	Event.h,
+	PreferencesController.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -34,10 +36,11 @@
     INSTALLDIR = "$(HOME)/GNUstep";
     INTERFACES = (
 	Agenda.gorm,
-	Appointment.gorm
+	Appointment.gorm,
+	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-02-25 00:36:42 +0100";
+    LAST_EDITING = "2007-02-28 23:47:35 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -56,7 +59,7 @@
     );
     PC_WINDOWS = {
 	ProjectBrowser = "{x = 0; y = 0; width = 631; height = 223}";
-	ProjectWindow = "271 60 864 906 0 0  1280 1024 ";
+	ProjectWindow = "271 63 864 906 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;

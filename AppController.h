@@ -5,19 +5,17 @@
 #import "CalendarView.h"
 #import "DayView.h"
 #import "Event.h"
+#import "PreferencesController.h"
 
 @interface AppController : NSObject <DayViewDataSource>
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
   AppointmentEditor *editor;
-  int _firstHour;
-  int _lastHour;
-  int _minimumStep;
   StoreManager *_sm;
   NSMutableSet *_cache;
-  NSUserDefaults *_defaults;
   Event *_selection;
+  PreferencesController *_pc;
   BOOL _deleteSelection;
 }
 

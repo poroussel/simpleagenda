@@ -25,6 +25,7 @@ SimpleAgenda_LIBRARIES_DEPEND_UPON += -lChronographerSource
 SimpleAgenda_RESOURCE_FILES = \
 Resources/Agenda.gorm \
 Resources/Appointment.gorm \
+Resources/Preferences.gorm \
 Resources/Calendar.tiff 
 
 
@@ -39,7 +40,8 @@ AppointmentEditor.h \
 CalendarView.h \
 StoreManager.h \
 DayView.h \
-Event.h
+Event.h \
+PreferencesController.h
 
 #
 # Class files
@@ -51,7 +53,8 @@ AppointmentEditor.m \
 CalendarView.m \
 StoreManager.m \
 DayView.m \
-Event.m
+Event.m \
+PreferencesController.m
 
 #
 # Other sources

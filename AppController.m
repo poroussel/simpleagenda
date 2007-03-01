@@ -6,6 +6,7 @@
 #import "StoreManager.h"
 #import "AppController.h"
 #import "Event.h"
+#import "PreferencesController.h"
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
@@ -14,44 +15,17 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController
 
-- (void)initDefaults
-{
-  _defaults = [NSUserDefaults standardUserDefaults];
-
-  if ([_defaults objectForKey:@"firstHour"] == nil)
-    [_defaults setInteger:9 forKey:@"firstHour"];
-  _firstHour = [_defaults integerForKey:@"firstHour"];
-
-  if ([_defaults objectForKey:@"lastHour"] == nil)
-    [_defaults setInteger:18 forKey:@"lastHour"];
-  _lastHour = [_defaults integerForKey:@"lastHour"];
-
-  if ([_defaults objectForKey:@"minimumStep"] == nil)
-    [_defaults setInteger:15 forKey:@"minimumStep"];
-  _minimumStep = [_defaults integerForKey:@"minimumStep"];
-
-  if ([_defaults objectForKey:@"stores"] == nil) {
-    NSDictionary *dict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
-				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
-    NSArray *array = [NSArray arrayWithObject:dict];
-    [_defaults setObject:array forKey:@"stores"];
-  }
-
-  if ([_defaults objectForKey:@"defaultStore"] == nil)
-    [_defaults setObject:@"Personal Agenda" forKey:@"defaultStore"];
-}
-
 - (id)init
 {
   self = [super init];
   if (self) {
-    [self initDefaults];
+    _pc = [[PreferencesController alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
 
-    _sm = [[StoreManager alloc] initWithStores:[_defaults objectForKey:@"stores"]
-				withDefault:[_defaults objectForKey:@"defaultStore"]];
+    _sm = [[StoreManager alloc] initWithStores:[_pc objectForKey:@"stores"]
+				withDefault:[_pc objectForKey:@"defaultStore"]];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
   }
   return self;
@@ -65,8 +39,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   NSEnumerator *enumerator;
   id <AgendaStore> store;
 
-  [start setMinute:_firstHour * 60];
-  [end setMinute:(_lastHour + 1) * 60];
+  [start setMinute:[self firstHourForDayView] * 60];
+  [end setMinute:([self lastHourForDayView] + 1) * 60];
 
   [_cache removeAllObjects];
   enumerator = [_sm objectEnumerator];
@@ -82,7 +56,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)userDefaultsChanged:(NSNotification *)notification
 {
-  [self initDefaults];
   [self updateCache];
 }
 
@@ -99,18 +72,21 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_cache release];
   [_sm release];
   [editor release];
+  [_pc release];
 }
 
 - (void)showPrefPanel:(id)sender
 {
+  [_pc showPreferences];
 }
 
 - (int)_sensibleStartForDuration:(int)duration
 {
-  int minute = _firstHour * 60;
+  int minute = [self firstHourForDayView] * 60;
   NSArray *sorted = [[_cache allObjects] sortedArrayUsingFunction:sortAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
@@ -120,9 +96,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       return minute;
     minute = [[apt startDate] minuteOfDay] + [apt duration];
   }
-  if (minute < _lastHour * 60)
+  if (minute < [self lastHourForDayView] * 60)
     return minute;
-  return _firstHour * 60;
+  return [self firstHourForDayView] * 60;
 }
 
 - (void)_editAppointment:(Event *)apt
@@ -222,17 +198,17 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 /* DayViewDataSource methods */
 - (int)firstHourForDayView
 {
-  return _firstHour;
+  return [_pc integerForKey:@"firstHour"];
 }
 
 - (int)lastHourForDayView
 {
-  return _lastHour;
+  return [_pc integerForKey:@"lastHour"];
 }
 
 - (int)minimumStepForDayView
 {
-  return _minimumStep;
+  return [_pc integerForKey:@"minimumStep"];
 }
 
 - (NSEnumerator *)scheduledAppointmentsForDayView
