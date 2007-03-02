@@ -70,9 +70,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [self updateCache];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  return NSTerminateNow;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)aNotification
+{
   [_cache release];
   [_sm release];
   [editor release];
