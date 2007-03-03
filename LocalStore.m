@@ -85,6 +85,7 @@
 {
   NSLog(@"add appointment %@ on %@", [app title], [[app startDate] description]);
   [_set addObject:app];
+  [app setStore:self];
   _modified = YES;
 }
 
