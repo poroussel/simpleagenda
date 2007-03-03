@@ -73,15 +73,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  return NSTerminateNow;
-}
-
-- (void)applicationWillTerminate:(NSNotification *)aNotification
-{
   [_cache release];
   [_sm release];
-  [editor release];
   [_pc release];
+  [editor release];
+  return NSTerminateNow;
 }
 
 - (void)showPrefPanel:(id)sender
