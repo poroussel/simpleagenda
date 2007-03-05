@@ -35,6 +35,7 @@
   [coder encodeInt:frequency forKey:@"frequency"];
   [coder encodeInt:duration forKey:@"duration"];
   [coder encodeInt:scheduleLevel forKey:@"scheduleLevel"];
+  [coder encodeObject:location forKey:@"location"];
 }
 
 -(id)initWithCoder:(NSCoder *)coder
@@ -47,6 +48,7 @@
   frequency = [coder decodeIntForKey:@"frequency"];
   duration = [coder decodeIntForKey:@"duration"];
   scheduleLevel = [coder decodeIntForKey:@"scheduleLevel"];
+  location = [[coder decodeObjectForKey:@"location"] retain];
   return self;
 }
 
@@ -61,6 +63,12 @@
   [self setTitle:aTitle];
   [self setDuration:minutes];
   return self;
+}
+
+- (void)dealloc
+{
+  [location release];
+  [super dealloc];
 }
 
 - (BOOL)startsBetween:(Date *)start and:(Date *)end
@@ -82,6 +90,16 @@
 - (void)setStore:(id)store
 {
   _store = store;
+}
+
+- (NSString *)location
+{
+  return location;
+}
+
+- (void)setLocation:(NSString *)aLocation
+{
+  ASSIGN(location, aLocation);
 }
 
 @end

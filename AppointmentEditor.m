@@ -21,6 +21,7 @@
   [duration setFloatValue:[data duration] / 60.0];
   [durationText setFloatValue:[data duration] / 60.0];
   [repeat selectItemAtIndex:[data interval]];
+  [location setStringValue:[data location]];
 
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
   [[description textStorage] appendAttributedString:[data descriptionText]];
@@ -35,6 +36,7 @@
     [data setInterval:[repeat indexOfSelectedItem]];
     [data setEndDate:end];
     [data setDescriptionText:[[description textStorage] copy]];
+    [data setLocation:[location stringValue]];
     [end release];
     return YES;
   }

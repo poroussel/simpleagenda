@@ -12,6 +12,7 @@
   id repeat;
   id endDate;
   id endDateStepper;
+  id location;
 }
 
 - (BOOL)editAppointment:(Event *)data;

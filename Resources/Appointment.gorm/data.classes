@@ -12,7 +12,8 @@
 	    repeat,
 	    endDate,
 	    durationText,
-	    endDateStepper
+	    endDateStepper,
+	    location
 	);
 	Super = NSWindowController;
     };
