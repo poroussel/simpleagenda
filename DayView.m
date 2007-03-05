@@ -221,6 +221,7 @@
   NSRect frame;
   BOOL inResize;
 
+  [[self window] makeFirstResponder:self];
   if ([hit class] == [AppointmentView class]) {
     AppointmentView *aptv = hit;
     [self _selectAppointmentView:aptv];
@@ -326,4 +327,35 @@
   return [_selected appointment];
 }
 
+- (void)keyDown:(NSEvent *)theEvent
+{
+    [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+}
+
+- (void)moveUp:(id)sender
+{
+  if (_selected != nil) {
+    [[[_selected appointment] startDate] changeMinuteBy:-[_dataSource minimumStepForDayView]];
+    [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
+    [delegate modifyAppointment:[_selected appointment]];
+    [self display];
+  }
+}
+
+- (void)moveDown:(id)sender
+{
+  if (_selected != nil) {
+    [[[_selected appointment] startDate] changeMinuteBy:-[_dataSource minimumStepForDayView]];
+    [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
+    [delegate modifyAppointment:[_selected appointment]];
+    [self display];
+  }
+}
+
+- (BOOL)acceptsFirstResponder
+{
+  return YES;
+}
+
 @end
+
