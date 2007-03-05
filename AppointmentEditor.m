@@ -26,6 +26,8 @@
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
   [[description textStorage] appendAttributedString:[data descriptionText]];
 
+  [window makeFirstResponder:title];
+
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
