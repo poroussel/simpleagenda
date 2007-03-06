@@ -1,0 +1,10 @@
+In no particular order :
+
+ - fix bugs
+ - multiple agendas
+ - better user preferences
+ - other backends (iCal, CalDAV etc)
+ - recurrent events
+ - alerts and user notification
+ - remove ChronographerSource dependency ?
+
