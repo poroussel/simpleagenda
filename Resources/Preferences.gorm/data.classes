@@ -1,0 +1,22 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "savePreferences:"
+	);
+	Super = NSObject;
+    };
+    PreferencesController = {
+	Actions = (
+	    "savePreferences:"
+	);
+	Outlets = (
+	    panel,
+	    dayStart,
+	    dayEnd,
+	    dayStartText,
+	    dayEndText
+	);
+	Super = NSObject;
+    };
+}
