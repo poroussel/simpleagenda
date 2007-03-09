@@ -4,6 +4,7 @@
 #import <AppKit/AppKit.h>
 #import "AppointmentEditor.h"
 #import "HourFormatter.h"
+#import "AgendaStore.h"
 
 @implementation AppointmentEditor
 
@@ -13,8 +14,10 @@
   [[durationText cell] setFormatter:formatter];
 }
 
--(BOOL)editAppointment:(Event *)data
+-(BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm
 {
+  NSEnumerator *list = [sm objectEnumerator];
+  id <AgendaStore> aStore;
   int ret;
 
   [title setStringValue:[data title]];
@@ -28,6 +31,13 @@
 
   [window makeFirstResponder:title];
 
+  if (![data store])
+    [data setStore:[sm defaultStore]];
+  [store removeAllItems];
+  while ((aStore = [list nextObject]))
+    [store addItemWithTitle:[aStore description]];
+  [store selectItemWithTitle:[[data store] description]];
+
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
@@ -39,6 +49,13 @@
     [data setEndDate:end];
     [data setDescriptionText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
+
+    aStore = [sm storeForName:[store titleOfSelectedItem]];
+    /* FIXME : do something if store changed */
+    if ([[data store] contains:data])
+      [aStore updateAppointment:data];
+    else
+      [aStore addAppointment:data];
     [end release];
     return YES;
   }

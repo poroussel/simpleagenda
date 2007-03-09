@@ -3,16 +3,18 @@
 #import <ChronographerSource/Date.h>
 #import <ChronographerSource/Appointment.h>
 
+@protocol AgendaStore;
+
 @interface Event : Appointment
 {
-  id _store;
+  id <AgendaStore> _store;
   NSString *location;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
 - (BOOL)startsBetween:(Date *)start and:(Date *)end;
-- (id)store;
-- (void)setStore:(id)store;
+- (id <AgendaStore>)store;
+- (void)setStore:(id <AgendaStore>)store;
 - (NSString *)location;
 - (void)setLocation:(NSString *)aLocation;
 

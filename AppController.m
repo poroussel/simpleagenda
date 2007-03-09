@@ -104,10 +104,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)_editAppointment:(Event *)apt
 {
-  if ([editor editAppointment:apt]) {
-    [[_sm defaultStore] updateAppointment:apt];
+  if ([editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
-  }    
 }
 
 - (void)addAppointment:(id)sender
@@ -117,10 +115,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
-  if (apt && [editor editAppointment:apt]) {
-    [[_sm defaultStore] addAppointment:apt];
+  if (apt && [editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
-  }
   [date release];
   [apt release];
 }
@@ -236,10 +232,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 			      duration:end - start 
 			      title:@"edit title..."];
-  if (apt && [editor editAppointment:apt]) {
-    [[_sm defaultStore] addAppointment:apt];
+  if (apt && [editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
-  }    
   [date release];
   [apt release];
 }

@@ -14,6 +14,7 @@
   if (self) {
     _filename = [params objectForKey:@"storeFilename"];
     _color = RETAIN([params objectForKey:@"storeColor"]);
+    _name = RETAIN([params objectForKey:@"storeName"]);
     if (_color == nil)
       _color = RETAIN([NSColor yellowColor]);
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
@@ -66,6 +67,7 @@
   [_set release];
   [_globalFile release];
   [_color release];
+  [_name release];
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
@@ -102,6 +104,13 @@
   _modified = YES;
 }
 
+- (BOOL)contains:(Event *)evt
+{
+  if ([_set member:evt])
+    return YES;
+  return NO;
+}
+
 -(BOOL)isWritable
 {
   return YES;
@@ -120,7 +129,7 @@
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"LocalStore in %@", _globalFile];
+  return _name;
 }
 
 - (NSColor *)eventColor

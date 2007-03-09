@@ -82,12 +82,12 @@
   return NO;
 }
 
-- (id)store
+- (id <AgendaStore>)store
 {
   return _store;
 }
 
-- (void)setStore:(id)store
+- (void)setStore:(id <AgendaStore>)store
 {
   _store = store;
 }

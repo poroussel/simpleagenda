@@ -9,6 +9,7 @@
 - (void)addAppointment:(Event *)evt;
 - (void)delAppointment:(Event *)evt;
 - (void)updateAppointment:(Event *)evt;
+- (BOOL)contains:(Event *)evt;
 - (BOOL)isWritable;
 - (BOOL)modified;
 - (void)write;

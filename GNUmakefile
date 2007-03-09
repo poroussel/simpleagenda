@@ -11,7 +11,6 @@ VERSION = 0.13
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff
-GNUSTEP_INSTALLATION_DIR = $(HOME)/GNUstep
 
 
 #
