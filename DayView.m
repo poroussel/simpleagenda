@@ -345,7 +345,7 @@
 - (void)moveDown:(id)sender
 {
   if (_selected != nil) {
-    [[[_selected appointment] startDate] changeMinuteBy:-[_dataSource minimumStepForDayView]];
+    [[[_selected appointment] startDate] changeMinuteBy:[_dataSource minimumStepForDayView]];
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
     [delegate modifyAppointment:[_selected appointment]];
     [self display];
