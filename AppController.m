@@ -134,7 +134,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [dayView selectedAppointment];
 
   if (apt) {
-    [[_sm defaultStore] delAppointment: apt];
+    [[apt store] delAppointment: apt];
     [self updateCache];
   }
 }
@@ -158,12 +158,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
       [_selection setStartDate:date andConstrain:NO];
-      [[_sm defaultStore] updateAppointment:_selection];
+      [[_selection store] updateAppointment:_selection];
     } else {
       Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date andConstrain:NO];
-      [[_sm defaultStore] addAppointment:new];
+      [[_selection store] addAppointment:new];
       [new release];
     }
     [date release];
@@ -222,7 +222,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)modifyAppointment:(Event *)apt
 {
-  [[_sm defaultStore] updateAppointment:apt];
+  [[apt store] updateAppointment:apt];
 }
 
 - (void)createAppointmentFrom:(int)start to:(int)end
