@@ -8,10 +8,17 @@
 
 @implementation AppointmentEditor
 
-- (void)awakeFromNib
+
+-(id)init
 {
-  HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
-  [[durationText cell] setFormatter:formatter];
+  self = [super init];
+  if (self) {
+    if (![NSBundle loadNibNamed:@"Appointment" owner:self])
+      return nil;
+    HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
+    [[durationText cell] setFormatter:formatter];
+  }
+  return self;
 }
 
 -(BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm

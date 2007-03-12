@@ -23,6 +23,5 @@
 - (void)addAppointment:(id)sender;
 - (void)editAppointment:(id)sender;
 - (void)delAppointment:(id)sender;
-- (void)awakeFromNib;
 
 @end

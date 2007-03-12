@@ -19,7 +19,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   self = [super init];
   if (self) {
-    _pc = [[PreferencesController alloc] init];
+    _pc = [PreferencesController new];
+    editor = [AppointmentEditor new];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
@@ -57,12 +58,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)userDefaultsChanged:(NSNotification *)notification
 {
   [self updateCache];
-}
-
-- (void)awakeFromNib
-{
-  editor = [AppointmentEditor new];
-  [NSBundle loadNibNamed:@"Appointment" owner:editor];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
