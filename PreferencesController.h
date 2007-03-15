@@ -7,8 +7,10 @@
   IBOutlet id panel;
   IBOutlet id dayStart;
   IBOutlet id dayEnd;
+  IBOutlet id minStep;
   IBOutlet id dayStartText;
   IBOutlet id dayEndText;
+  IBOutlet id minStepText;
   NSUserDefaults *_defaults;
 }
 

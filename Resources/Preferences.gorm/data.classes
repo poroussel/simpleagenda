@@ -15,7 +15,9 @@
 	    dayStart,
 	    dayEnd,
 	    dayStartText,
-	    dayEndText
+	    dayEndText,
+	    minStep,
+	    minStepText
 	);
 	Super = NSObject;
     };

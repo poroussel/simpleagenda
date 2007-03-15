@@ -70,7 +70,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_cache release];
   [_sm release];
-  [_pc release];
+  /* FIXME : the following line makes it go boom */
+  /* [_pc release]; */
   [editor release];
   return NSTerminateNow;
 }
