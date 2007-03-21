@@ -49,7 +49,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   if (self) {
     [self initDefaults];
     _sm = [StoreManager new];
-    _pc = [PreferencesController new];
+    _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     _editor = [AppointmentEditor new];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)

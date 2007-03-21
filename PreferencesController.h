@@ -1,6 +1,8 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import "AgendaStore.h"
+#import "StoreManager.h"
 
 @interface PreferencesController : NSObject
 {
@@ -13,12 +15,16 @@
   IBOutlet id minStepText;
   IBOutlet id storePopUp;
   IBOutlet id storeColor;
-  IBOutlet id storeEdit;
-  IBOutlet id storeDelete;
   NSUserDefaults *_defaults;
+  StoreManager *_sm;
 }
 
--(id)init;
+-(id)initWithStoreManager:(StoreManager *)sm;
 -(void)showPreferences;
+
+-(void)editStore:(id)sender;
+-(void)deleteStore:(id)sender;
+-(void)selectStore:(id)sender;
+-(void)changeColor:(id)sender;
 
 @end

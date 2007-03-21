@@ -2,13 +2,19 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     FirstResponder = {
 	Actions = (
-	    "savePreferences:"
+	    "deleteStore:",
+	    "editStore:",
+	    "setColor:",
+	    "selectStore:"
 	);
 	Super = NSObject;
     };
     PreferencesController = {
 	Actions = (
-	    "savePreferences:"
+	    "editStore:",
+	    "deleteStore:",
+	    "selectStore:",
+	    "changeColor:"
 	);
 	Outlets = (
 	    panel,
@@ -18,9 +24,7 @@
 	    dayEndText,
 	    minStep,
 	    minStepText,
-	    storeDelete,
 	    storeColor,
-	    storeEdit,
 	    storePopUp
 	);
 	Super = NSObject;
