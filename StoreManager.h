@@ -6,6 +6,7 @@
   id _defaultStore;
 }
 
+- (id)init;
 - (id)initWithStores:(NSArray *)array withDefault:(NSString *)name;
 - (id <AgendaStore>)storeForName:(NSString *)name;
 - (void)setDefaultStore:(NSString *)name;

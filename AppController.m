@@ -48,14 +48,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   self = [super init];
   if (self) {
     [self initDefaults];
+    _sm = [StoreManager new];
     _pc = [PreferencesController new];
     _editor = [AppointmentEditor new];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
-
-    _sm = [[StoreManager alloc] initWithStores:[_defaults objectForKey:@"stores"]
-				withDefault:[_defaults objectForKey:@"defaultStore"]];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
   }
   return self;

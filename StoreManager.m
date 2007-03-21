@@ -13,7 +13,8 @@
   NSDictionary *dict;
   NSEnumerator *enumerator;
 
-  if ([self init] != nil) {
+  self = [super init];
+  if (self) {
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [array objectEnumerator];
     while ((dict = [enumerator nextObject])) {
@@ -25,6 +26,12 @@
     [self setDefaultStore:name];
   }
   return self;
+}
+
+- (id)init
+{
+  return [self initWithStores:[[NSUserDefaults standardUserDefaults] objectForKey:@"stores"] 
+	       withDefault:[[NSUserDefaults standardUserDefaults] objectForKey:@"defaultStore"]];
 }
 
 - (void)dealloc

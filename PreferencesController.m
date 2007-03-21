@@ -49,6 +49,7 @@
   [_defaults setInteger:[dayStart intValue] forKey:@"firstHour"];
   [_defaults setInteger:[dayEnd intValue] forKey:@"lastHour"];
   [_defaults setInteger:[minStep doubleValue] * 60 forKey:@"minimumStep"];
+  [_defaults synchronize];
 }
 
 
