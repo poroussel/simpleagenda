@@ -22,8 +22,6 @@
 -(id)initWithStoreManager:(StoreManager *)sm;
 -(void)showPreferences;
 
--(void)editStore:(id)sender;
--(void)deleteStore:(id)sender;
 -(void)selectStore:(id)sender;
 -(void)changeColor:(id)sender;
 

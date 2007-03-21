@@ -63,14 +63,6 @@
 }
 
 
--(void)editStore:(id)sender
-{
-}
-
--(void)deleteStore:(id)sender
-{
-}
-
 -(void)selectStore:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];

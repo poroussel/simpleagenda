@@ -2,8 +2,6 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     FirstResponder = {
 	Actions = (
-	    "deleteStore:",
-	    "editStore:",
 	    "setColor:",
 	    "selectStore:"
 	);
@@ -11,8 +9,6 @@
     };
     PreferencesController = {
 	Actions = (
-	    "editStore:",
-	    "deleteStore:",
 	    "selectStore:",
 	    "changeColor:"
 	);
