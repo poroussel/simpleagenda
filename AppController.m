@@ -15,18 +15,47 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController
 
+- (void)initDefaults
+{
+  _defaults = [NSUserDefaults standardUserDefaults];
+
+  if ([_defaults objectForKey:@"firstHour"] == nil)
+    [_defaults setInteger:9 forKey:@"firstHour"];
+
+  if ([_defaults objectForKey:@"lastHour"] == nil)
+    [_defaults setInteger:18 forKey:@"lastHour"];
+
+  if ([_defaults objectForKey:@"minimumStep"] == nil)
+    [_defaults setInteger:15 forKey:@"minimumStep"];
+
+  if ([_defaults objectForKey:@"stores"] == nil) {
+    NSDictionary *dict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
+				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
+    NSArray *array = [NSArray arrayWithObject:dict];
+//     NSDictionary *priv = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Private", @"Private Agenda", nil]
+//     				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
+//     NSArray *array = [NSArray arrayWithObjects:dict, priv, nil];
+    [_defaults setObject:array forKey:@"stores"];
+  }
+  if ([_defaults objectForKey:@"defaultStore"] == nil)
+    [_defaults setObject:@"Personal Agenda" forKey:@"defaultStore"];
+  [_defaults synchronize];
+  
+}
+
 - (id)init
 {
   self = [super init];
   if (self) {
+    [self initDefaults];
     _pc = [PreferencesController new];
-    editor = [AppointmentEditor new];
+    _editor = [AppointmentEditor new];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
 
-    _sm = [[StoreManager alloc] initWithStores:[_pc objectForKey:@"stores"]
-				withDefault:[_pc objectForKey:@"defaultStore"]];
+    _sm = [[StoreManager alloc] initWithStores:[_defaults objectForKey:@"stores"]
+				withDefault:[_defaults objectForKey:@"defaultStore"]];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
   }
   return self;
@@ -72,7 +101,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_sm release];
   /* FIXME : the following line makes it go boom */
   /* [_pc release]; */
-  [editor release];
+  [_editor release];
+  [_defaults release];
   return NSTerminateNow;
 }
 
@@ -100,7 +130,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)_editAppointment:(Event *)apt
 {
-  if ([editor editAppointment:apt withStoreManager:_sm])
+  if ([_editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
 }
 
@@ -111,7 +141,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
-  if (apt && [editor editAppointment:apt withStoreManager:_sm])
+  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
   [date release];
   [apt release];
@@ -191,17 +221,17 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 /* DayViewDataSource methods */
 - (int)firstHourForDayView
 {
-  return [_pc integerForKey:@"firstHour"];
+  return [_defaults integerForKey:@"firstHour"];
 }
 
 - (int)lastHourForDayView
 {
-  return [_pc integerForKey:@"lastHour"];
+  return [_defaults integerForKey:@"lastHour"];
 }
 
 - (int)minimumStepForDayView
 {
-  return [_pc integerForKey:@"minimumStep"];
+  return [_defaults integerForKey:@"minimumStep"];
 }
 
 - (NSEnumerator *)scheduledAppointmentsForDayView
@@ -228,7 +258,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 			      duration:end - start 
 			      title:@"edit title..."];
-  if (apt && [editor editAppointment:apt withStoreManager:_sm])
+  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
     [self updateCache];
   [date release];
   [apt release];

@@ -11,11 +11,13 @@
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
-  AppointmentEditor *editor;
+
+  PreferencesController *_pc;
+  AppointmentEditor *_editor;
+  NSUserDefaults *_defaults;
   StoreManager *_sm;
   NSMutableSet *_cache;
   Event *_selection;
-  PreferencesController *_pc;
   BOOL _deleteSelection;
 }
 

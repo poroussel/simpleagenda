@@ -18,9 +18,7 @@
   NSUserDefaults *_defaults;
 }
 
--(id)initWithStoreManager:(StoreManager *)sm
+-(id)init;
 -(void)showPreferences;
--(int)integerForKey:(NSString *)key;
--(id)objectForKey:(NSString *)key;
 
 @end
