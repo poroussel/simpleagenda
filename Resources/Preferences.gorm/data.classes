@@ -17,7 +17,11 @@
 	    dayStartText,
 	    dayEndText,
 	    minStep,
-	    minStepText
+	    minStepText,
+	    storeDelete,
+	    storeColor,
+	    storeEdit,
+	    storePopUp
 	);
 	Super = NSObject;
     };

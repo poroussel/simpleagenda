@@ -11,10 +11,14 @@
   IBOutlet id dayStartText;
   IBOutlet id dayEndText;
   IBOutlet id minStepText;
+  IBOutlet id storePopUp;
+  IBOutlet id storeColor;
+  IBOutlet id storeEdit;
+  IBOutlet id storeDelete;
   NSUserDefaults *_defaults;
 }
 
--(id)init;
+-(id)initWithStoreManager:(StoreManager *)sm
 -(void)showPreferences;
 -(int)integerForKey:(NSString *)key;
 -(id)objectForKey:(NSString *)key;
