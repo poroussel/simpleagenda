@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #import "LocalStore.h"
 #import "Event.h"
+#import "defines.h"
 
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
@@ -13,8 +14,8 @@
   self = [super init];
   if (self) {
     _filename = [params objectForKey:@"storeFilename"];
-    _color = RETAIN([params objectForKey:@"storeColor"]);
-    _name = RETAIN([params objectForKey:@"storeName"]);
+    _color = RETAIN([params objectForKey:ST_COLOR]);
+    _name = RETAIN([params objectForKey:ST_NAME]);
     if (_color == nil)
       _color = RETAIN([NSColor yellowColor]);
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];

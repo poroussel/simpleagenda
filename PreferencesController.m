@@ -2,6 +2,7 @@
 
 #import "PreferencesController.h"
 #import "HourFormatter.h"
+#import "defines.h"
 
 @implementation PreferencesController
 
@@ -33,9 +34,9 @@
 {
   NSEnumerator *list = [_sm objectEnumerator];
   id <AgendaStore> aStore;
-  int start = [_defaults integerForKey:@"firstHour"];
-  int end = [_defaults integerForKey:@"lastHour"];
-  int step = [_defaults integerForKey:@"minimumStep"];
+  int start = [_defaults integerForKey:FIRST_HOUR];
+  int end = [_defaults integerForKey:LAST_HOUR];
+  int step = [_defaults integerForKey:MIN_STEP];
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -71,9 +72,9 @@
 -(void)changeStart:(id)sender
 {
   int value = [dayStart intValue];
-  if (value != [_defaults integerForKey:@"firstHour"]) {
+  if (value != [_defaults integerForKey:FIRST_HOUR]) {
     [dayStartText setIntValue:value];
-    [_defaults setInteger:value forKey:@"firstHour"];
+    [_defaults setInteger:value forKey:FIRST_HOUR];
     [_defaults synchronize];
   }
 }
@@ -81,9 +82,9 @@
 -(void)changeEnd:(id)sender
 {
   int value = [dayEnd intValue];
-  if (value != [_defaults integerForKey:@"lastHour"]) {
+  if (value != [_defaults integerForKey:LAST_HOUR]) {
     [dayEndText setIntValue:value];
-    [_defaults setInteger:value forKey:@"lastHour"];
+    [_defaults setInteger:value forKey:LAST_HOUR];
     [_defaults synchronize];
   }
 }
@@ -91,9 +92,9 @@
 -(void)changeStep:(id)sender
 {
   double value = [minStep doubleValue];
-  if (value * 60 != [_defaults integerForKey:@"minimumStep"]) {
+  if (value * 60 != [_defaults integerForKey:MIN_STEP]) {
     [minStepText setDoubleValue:value];
-    [_defaults setInteger:value * 60 forKey:@"minimumStep"];
+    [_defaults setInteger:value * 60 forKey:MIN_STEP];
     [_defaults synchronize];
   }
 }

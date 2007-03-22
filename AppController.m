@@ -7,6 +7,7 @@
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
+#import "defines.h"
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
@@ -19,14 +20,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   _defaults = [NSUserDefaults standardUserDefaults];
 
-  if ([_defaults objectForKey:@"firstHour"] == nil)
-    [_defaults setInteger:9 forKey:@"firstHour"];
+  if ([_defaults objectForKey:FIRST_HOUR] == nil)
+    [_defaults setInteger:9 forKey:FIRST_HOUR];
 
-  if ([_defaults objectForKey:@"lastHour"] == nil)
-    [_defaults setInteger:18 forKey:@"lastHour"];
+  if ([_defaults objectForKey:LAST_HOUR] == nil)
+    [_defaults setInteger:18 forKey:LAST_HOUR];
 
-  if ([_defaults objectForKey:@"minimumStep"] == nil)
-    [_defaults setInteger:15 forKey:@"minimumStep"];
+  if ([_defaults objectForKey:MIN_STEP] == nil)
+    [_defaults setInteger:15 forKey:MIN_STEP];
 
   if ([_defaults objectForKey:@"stores"] == nil) {
     NSDictionary *dict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
@@ -219,17 +220,17 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 /* DayViewDataSource methods */
 - (int)firstHourForDayView
 {
-  return [_defaults integerForKey:@"firstHour"];
+  return [_defaults integerForKey:FIRST_HOUR];
 }
 
 - (int)lastHourForDayView
 {
-  return [_defaults integerForKey:@"lastHour"];
+  return [_defaults integerForKey:LAST_HOUR];
 }
 
 - (int)minimumStepForDayView
 {
-  return [_defaults integerForKey:@"minimumStep"];
+  return [_defaults integerForKey:MIN_STEP];
 }
 
 - (NSEnumerator *)scheduledAppointmentsForDayView

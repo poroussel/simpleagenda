@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
+#import "defines.h"
 
 @implementation StoreManager
 
@@ -18,10 +19,10 @@
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [array objectEnumerator];
     while ((dict = [enumerator nextObject])) {
-      NSLog(@"Adding %@ to StoreManager", [dict objectForKey:@"storeClass"]);
-      storeClass = NSClassFromString([dict objectForKey:@"storeClass"]);
+      NSLog(@"Adding %@ to StoreManager", [dict objectForKey:ST_CLASS]);
+      storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
       store = [storeClass storeWithParameters:dict forManager:self];
-      [_stores setObject:store forKey:[dict objectForKey:@"storeName"]];
+      [_stores setObject:store forKey:[dict objectForKey:ST_NAME]];
     }
     [self setDefaultStore:name];
   }
@@ -30,8 +31,8 @@
 
 - (id)init
 {
-  return [self initWithStores:[[NSUserDefaults standardUserDefaults] objectForKey:@"stores"] 
-	       withDefault:[[NSUserDefaults standardUserDefaults] objectForKey:@"defaultStore"]];
+  return [self initWithStores:[[NSUserDefaults standardUserDefaults] objectForKey:STORES] 
+	       withDefault:[[NSUserDefaults standardUserDefaults] objectForKey:ST_DEFAULT]];
 }
 
 - (void)dealloc
