@@ -2,15 +2,21 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     FirstResponder = {
 	Actions = (
-	    "setColor:",
-	    "selectStore:"
+	    "changeEnd:",
+	    "changeStart:",
+	    "changeStep:",
+	    "selectStore:",
+	    "setColor:"
 	);
 	Super = NSObject;
     };
     PreferencesController = {
 	Actions = (
 	    "selectStore:",
-	    "changeColor:"
+	    "changeColor:",
+	    "changeEnd:",
+	    "changeStart:",
+	    "changeStep:"
 	);
 	Outlets = (
 	    panel,

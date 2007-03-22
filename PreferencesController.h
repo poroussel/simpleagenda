@@ -24,5 +24,8 @@
 
 -(void)selectStore:(id)sender;
 -(void)changeColor:(id)sender;
+-(void)changeStart:(id)sender;
+-(void)changeEnd:(id)sender;
+-(void)changeStep:(id)sender;
 
 @end

@@ -54,16 +54,6 @@
   [panel makeKeyAndOrderFront:self];
 }
 
--(void)windowWillClose:(NSNotification *)aNotification
-{
-  [_defaults setInteger:[dayStart intValue] forKey:@"firstHour"];
-  [_defaults synchronize];
-  [_defaults setInteger:[dayEnd intValue] forKey:@"lastHour"];
-  [_defaults synchronize];
-  [_defaults setInteger:[minStep doubleValue] * 60 forKey:@"minimumStep"];
-  [_defaults synchronize];
-}
-
 
 -(void)selectStore:(id)sender
 {
@@ -76,6 +66,36 @@
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setEventColor:[storeColor color]];
   [_defaults synchronize];
+}
+
+-(void)changeStart:(id)sender
+{
+  int value = [dayStart intValue];
+  if (value != [_defaults integerForKey:@"firstHour"]) {
+    [dayStartText setIntValue:value];
+    [_defaults setInteger:value forKey:@"firstHour"];
+    [_defaults synchronize];
+  }
+}
+
+-(void)changeEnd:(id)sender
+{
+  int value = [dayEnd intValue];
+  if (value != [_defaults integerForKey:@"lastHour"]) {
+    [dayEndText setIntValue:value];
+    [_defaults setInteger:value forKey:@"lastHour"];
+    [_defaults synchronize];
+  }
+}
+
+-(void)changeStep:(id)sender
+{
+  double value = [minStep doubleValue];
+  if (value * 60 != [_defaults integerForKey:@"minimumStep"]) {
+    [minStepText setDoubleValue:value];
+    [_defaults setInteger:value * 60 forKey:@"minimumStep"];
+    [_defaults synchronize];
+  }
 }
 
 @end
