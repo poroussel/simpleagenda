@@ -52,10 +52,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     _editor = [AppointmentEditor new];
+    _cache = [[NSMutableSet alloc] initWithCapacity:16];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
-    _cache = [[NSMutableSet alloc] initWithCapacity:16];
   }
   return self;
 }
@@ -97,10 +97,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_cache release];
-  [_sm release];
-  /* FIXME : the following line makes it go boom */
-  /* [_pc release]; */
   [_editor release];
+  [_pc release];
+  [_sm release];
   [_defaults release];
   return NSTerminateNow;
 }
