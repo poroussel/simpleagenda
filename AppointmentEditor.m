@@ -25,6 +25,7 @@
 {
   NSEnumerator *list = [sm objectEnumerator];
   id <AgendaStore> aStore;
+  id <AgendaStore> originalStore;
   int ret;
 
   [title setStringValue:[data title]];
@@ -38,8 +39,10 @@
 
   [window makeFirstResponder:title];
 
-  if (![data store])
+  originalStore = [data store];
+  if (!originalStore)
     [data setStore:[sm defaultStore]];
+    
   [store removeAllItems];
   while ((aStore = [list nextObject]))
     [store addItemWithTitle:[aStore description]];
@@ -58,11 +61,15 @@
     [data setLocation:[location stringValue]];
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
-    /* FIXME : do something if store changed */
-    if ([[data store] contains:data])
-      [aStore updateAppointment:data];
-    else
+
+    if (!originalStore)
       [aStore addAppointment:data];
+    else if (originalStore == aStore)
+      [aStore updateAppointment:data];
+    else {
+      [originalStore delAppointment:data];
+      [aStore addAppointment:data];
+    }
     [end release];
     return YES;
   }
