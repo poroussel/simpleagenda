@@ -7,6 +7,7 @@
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
+#import "UserDefaults.h"
 #import "defines.h"
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
@@ -16,46 +17,27 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController
 
-- (void)initDefaults
+- (NSDictionary *)defaults
 {
-  _defaults = [NSUserDefaults standardUserDefaults];
-
-  if ([_defaults objectForKey:FIRST_HOUR] == nil)
-    [_defaults setInteger:9 forKey:FIRST_HOUR];
-
-  if ([_defaults objectForKey:LAST_HOUR] == nil)
-    [_defaults setInteger:18 forKey:LAST_HOUR];
-
-  if ([_defaults objectForKey:MIN_STEP] == nil)
-    [_defaults setInteger:15 forKey:MIN_STEP];
-
-  if ([_defaults objectForKey:@"stores"] == nil) {
-    NSDictionary *dict = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
-				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
-    NSArray *array = [NSArray arrayWithObject:dict];
-//     NSDictionary *priv = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Private", @"Private Agenda", nil]
-//     				       forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
-//     NSArray *array = [NSArray arrayWithObjects:dict, priv, nil];
-    [_defaults setObject:array forKey:@"stores"];
-  }
-  if ([_defaults objectForKey:@"defaultStore"] == nil)
-    [_defaults setObject:@"Personal Agenda" forKey:@"defaultStore"];
-  [_defaults synchronize];
-  
+  NSDictionary *dict = [NSDictionary 
+			 dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
+			 forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
+  return dict;
 }
 
 - (id)init
 {
   self = [super init];
   if (self) {
-    [self initDefaults];
+    _defaults = [UserDefaults sharedInstance];
+    [_defaults setHardDefaults:[self defaults]];
+    [_defaults registerClient:self forKey:FIRST_HOUR];
+    [_defaults registerClient:self forKey:LAST_HOUR];
+    [_defaults registerClient:self forKey:MIN_STEP];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     _editor = [AppointmentEditor new];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-					  selector:@selector(userDefaultsChanged:)
-					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
   }
   return self;
 }
@@ -83,7 +65,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [dayView reloadData];
 }
 
-- (void)userDefaultsChanged:(NSNotification *)notification
+
+- (void)defaultDidChanged:(NSString *)name
 {
   [self updateCache];
 }
@@ -95,11 +78,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_cache release];
   [_editor release];
   [_pc release];
   [_sm release];
+  [_defaults unregisterClient:self];
   [_defaults release];
   return NSTerminateNow;
 }

@@ -41,7 +41,8 @@ StoreManager.h \
 DayView.h \
 Event.h \
 PreferencesController.h \
-HourFormatter.h
+HourFormatter.h \
+UserDefaults.h
 
 #
 # Class files
@@ -55,7 +56,8 @@ StoreManager.m \
 DayView.m \
 Event.m \
 PreferencesController.m \
-HourFormatter.m
+HourFormatter.m \
+UserDefaults.m
 
 #
 # Other sources

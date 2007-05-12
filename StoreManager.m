@@ -3,11 +3,26 @@
 #import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
+#import "UserDefaults.h"
 #import "defines.h"
 
 @implementation StoreManager
 
-- (id)initWithStores:(NSArray *)array withDefault:(NSString *)name
+UserDefaults *defaults;
+
+- (NSDictionary *)defaults
+{
+  NSDictionary *local = [NSDictionary
+			  dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
+			  forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
+  NSArray *array = [NSArray arrayWithObject:local];
+  NSDictionary *dict = [NSDictionary 
+			 dictionaryWithObjects:[NSArray arrayWithObjects:[NSArray arrayWithObjects:@"LocalStore", nil], array, @"Personal Agenda", nil]
+			 forKeys:[NSArray arrayWithObjects:STORE_CLASSES, STORES, ST_DEFAULT, nil]];
+  return dict;
+}
+
+- (id)init
 {
   Class <AgendaStore> storeClass;
   id <AgendaStore> store;
@@ -16,29 +31,32 @@
 
   self = [super init];
   if (self) {
+    defaults = [UserDefaults sharedInstance];
+    [defaults setHardDefaults:[self defaults]];
+    NSArray *storeArray = [defaults objectForKey:STORES];
+    NSString *defaultStore = [defaults objectForKey:ST_DEFAULT];
+
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
-    enumerator = [array objectEnumerator];
+    enumerator = [storeArray objectEnumerator];
     while ((dict = [enumerator nextObject])) {
       NSLog(@"Adding %@ to StoreManager", [dict objectForKey:ST_CLASS]);
       storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
       store = [storeClass storeWithParameters:dict forManager:self];
       [_stores setObject:store forKey:[dict objectForKey:ST_NAME]];
     }
-    [self setDefaultStore:name];
+    [self setDefaultStore:defaultStore];
   }
   return self;
-}
-
-- (id)init
-{
-  return [self initWithStores:[[NSUserDefaults standardUserDefaults] objectForKey:STORES] 
-	       withDefault:[[NSUserDefaults standardUserDefaults] objectForKey:ST_DEFAULT]];
 }
 
 - (void)dealloc
 {
   [_stores release];
   [super dealloc];
+}
+
+- (void)defaultDidChanged:(NSString *)name
+{
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name

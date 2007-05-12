@@ -6,15 +6,16 @@
 #import "DayView.h"
 #import "Event.h"
 #import "PreferencesController.h"
+#import "UserDefaults.h"
 
-@interface AppController : NSObject <DayViewDataSource>
+@interface AppController : NSObject <DayViewDataSource, DefaultsConsumer>
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
 
   PreferencesController *_pc;
   AppointmentEditor *_editor;
-  NSUserDefaults *_defaults;
+  UserDefaults *_defaults;
   StoreManager *_sm;
   NSMutableSet *_cache;
   Event *_selection;

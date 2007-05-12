@@ -11,7 +11,8 @@
 	DayView.m,
 	Event.m,
 	PreferencesController.m,
-	HourFormatter.m
+	HourFormatter.m,
+	UserDefaults.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -30,7 +31,8 @@
 	DayView.h,
 	Event.h,
 	PreferencesController.h,
-	HourFormatter.h
+	HourFormatter.h,
+	UserDefaults.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -42,7 +44,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-03-23 16:04:13 +0100";
+    LAST_EDITING = "2007-04-15 23:22:27 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

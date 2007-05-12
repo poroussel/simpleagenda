@@ -14,7 +14,7 @@
       return nil;
 
     _sm = RETAIN(sm);
-    _defaults = [NSUserDefaults standardUserDefaults];
+    _defaults = [UserDefaults sharedInstance];
     HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];
@@ -26,7 +26,6 @@
 -(void)dealloc
 {
   RELEASE(_sm);
-  [_defaults release];
   [super dealloc];
 }
 
@@ -66,7 +65,6 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setEventColor:[storeColor color]];
-  [_defaults synchronize];
 }
 
 -(void)changeStart:(id)sender
@@ -75,7 +73,6 @@
   if (value != [_defaults integerForKey:FIRST_HOUR]) {
     [dayStartText setIntValue:value];
     [_defaults setInteger:value forKey:FIRST_HOUR];
-    [_defaults synchronize];
   }
 }
 
@@ -85,7 +82,6 @@
   if (value != [_defaults integerForKey:LAST_HOUR]) {
     [dayEndText setIntValue:value];
     [_defaults setInteger:value forKey:LAST_HOUR];
-    [_defaults synchronize];
   }
 }
 
@@ -95,7 +91,6 @@
   if (value * 60 != [_defaults integerForKey:MIN_STEP]) {
     [minStepText setDoubleValue:value];
     [_defaults setInteger:value * 60 forKey:MIN_STEP];
-    [_defaults synchronize];
   }
 }
 
