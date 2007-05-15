@@ -30,8 +30,8 @@
   if (self) {
     _apt = apt;
     _selected = NO;
-    _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
-					   forKey:NSForegroundColorAttributeName]);
+    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
+				     forKey:NSForegroundColorAttributeName] retain];
     [[UserDefaults sharedInstance] registerClient:self forKey:[[apt store] description]];
   }
   return self;
@@ -40,7 +40,7 @@
 - (void)dealloc
 {
   [[UserDefaults sharedInstance] unregisterClient:self];
-  RELEASE(_textAttributes);
+  [_textAttributes release];
   [super dealloc];
 }
 
@@ -102,8 +102,8 @@
   if (self) {
     _height = frameRect.size.height;
     _width = frameRect.size.width;
-    _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
-					   forKey:NSForegroundColorAttributeName]);
+    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
+				     forKey:NSForegroundColorAttributeName] retain];
     [self reloadData];
   }
   return self;
@@ -111,10 +111,11 @@
 
 - (void)dealloc
 {
-  RELEASE(_textAttributes);
+  [_textAttributes release];
   [super dealloc];
 }
 
+/* FIXME : the following could probably be simplified... */
 - (int)_minuteToSize:(int)minutes
 {
   return minutes * _height / ((_lastH - _firstH + 1) * 60);
