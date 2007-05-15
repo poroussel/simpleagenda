@@ -4,7 +4,7 @@
 #import "Event.h"
 
 @protocol AgendaStore <NSObject>
-+ (id)storeWithParameters:(NSDictionary *)params forManager:(id)manager;
++ (id)storeNamed:(NSString *)name forManager:(id)manager;
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
 - (void)addAppointment:(Event *)evt;
 - (void)delAppointment:(Event *)evt;

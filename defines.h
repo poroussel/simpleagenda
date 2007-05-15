@@ -9,5 +9,5 @@
 #define STORES @"stores"
 #define ST_DEFAULT @"defaultStore"
 #define ST_CLASS @"storeClass"
-#define ST_NAME @"storeName"
+#define ST_FILE @"storeFilename"
 #define ST_COLOR @"storeColor"

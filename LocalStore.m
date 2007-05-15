@@ -1,21 +1,23 @@
 #import <AppKit/AppKit.h>
 #import "LocalStore.h"
 #import "Event.h"
+#import "UserDefaults.h"
 #import "defines.h"
 
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
 @implementation LocalStore
 
-- (id)initWithParameters:(NSDictionary *)params forManager:(id)manager
+- (id)initWithName:(NSString *)name forManager:(id)manager
 {
   BOOL isDir;
 
   self = [super init];
   if (self) {
+    NSDictionary *params = [[UserDefaults sharedInstance] objectForKey:name];
     _filename = [params objectForKey:@"storeFilename"];
     _color = RETAIN([params objectForKey:ST_COLOR]);
-    _name = RETAIN([params objectForKey:ST_NAME]);
+    _name = RETAIN(name);
     if (_color == nil)
       _color = RETAIN([NSColor yellowColor]);
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
@@ -54,10 +56,9 @@
   return self;
 }
 
-+ (id)storeWithParameters:(NSDictionary *)params forManager:(id)manager
++ (id)storeNamed:(NSString *)name forManager:(id)manager
 {
-  
-  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithParameters: params 
+  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name 
 								  forManager:manager]);
 }
 

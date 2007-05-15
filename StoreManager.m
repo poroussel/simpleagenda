@@ -8,17 +8,18 @@
 
 @implementation StoreManager
 
+#define DEFAULT_AGENDA @"Personal Agenda"
+
 UserDefaults *defaults;
 
 - (NSDictionary *)defaults
 {
   NSDictionary *local = [NSDictionary
-			  dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", @"Personal Agenda", nil]
-			  forKeys:[NSArray arrayWithObjects:@"storeClass", @"storeFilename", @"storeName", nil]];
-  NSArray *array = [NSArray arrayWithObject:local];
+			  dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", nil]
+			  forKeys:[NSArray arrayWithObjects:ST_CLASS, ST_FILE, nil]];
   NSDictionary *dict = [NSDictionary 
-			 dictionaryWithObjects:[NSArray arrayWithObjects:[NSArray arrayWithObjects:@"LocalStore", nil], array, @"Personal Agenda", nil]
-			 forKeys:[NSArray arrayWithObjects:STORE_CLASSES, STORES, ST_DEFAULT, nil]];
+			 dictionaryWithObjects:[NSArray arrayWithObjects: [NSArray arrayWithObject:DEFAULT_AGENDA], local, DEFAULT_AGENDA, nil]
+			 forKeys:[NSArray arrayWithObjects: STORES, DEFAULT_AGENDA, ST_DEFAULT, nil]];
   return dict;
 }
 
@@ -26,6 +27,7 @@ UserDefaults *defaults;
 {
   Class <AgendaStore> storeClass;
   id <AgendaStore> store;
+  NSString *stname;
   NSDictionary *dict;
   NSEnumerator *enumerator;
 
@@ -38,11 +40,14 @@ UserDefaults *defaults;
 
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [storeArray objectEnumerator];
-    while ((dict = [enumerator nextObject])) {
-      NSLog(@"Adding %@ to StoreManager", [dict objectForKey:ST_CLASS]);
-      storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
-      store = [storeClass storeWithParameters:dict forManager:self];
-      [_stores setObject:store forKey:[dict objectForKey:ST_NAME]];
+    while ((stname = [enumerator nextObject])) {
+      NSLog(@"Adding %@ to StoreManager", stname);
+      dict = [defaults objectForKey:stname];
+      if (dict) {
+	storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
+	store = [storeClass storeNamed:stname forManager:self];
+	[_stores setObject:store forKey:stname];
+      }
     }
     [self setDefaultStore:defaultStore];
   }
