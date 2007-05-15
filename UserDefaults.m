@@ -69,7 +69,7 @@ static UserDefaults *singleton;
   NSString *key;
 
   while ((key = [enumerator nextObject])) {
-    if ([def objectForKey:key] == nil)
+    if ([_defaults objectForKey:key] == nil)
       [_defaults setObject:[def objectForKey:key] forKey:key];
   }
 }
