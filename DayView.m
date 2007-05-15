@@ -14,8 +14,6 @@
 {
   Event *_apt;
   NSDictionary *_textAttributes;
-  NSColor *_color;
-  NSColor *_darkColor;
   BOOL _selected;
 }
 
@@ -33,11 +31,6 @@
     _selected = NO;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
-    _color = [[apt store] eventColor];
-    _darkColor = RETAIN([NSColor colorWithCalibratedRed:[_color redComponent] - 0.3
-				  green:[_color greenComponent] - 0.3
-				  blue:[_color blueComponent] - 0.3
-				  alpha:[_color alphaComponent]]);
   }
   return self;
 }
@@ -45,7 +38,6 @@
 - (void)dealloc
 {
   RELEASE(_textAttributes);
-  RELEASE(_darkColor);
   [super dealloc];
 }
 
@@ -69,9 +61,15 @@
 			      [start hourOfDay],
 			      [start minuteOfHour],
 			      [_apt title]];
-  [_color set];
+  NSColor *color = [[_apt store] eventColor];
+  NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
+				green:[color greenComponent] - 0.3
+				blue:[color blueComponent] - 0.3
+				alpha:[color alphaComponent]];
+
+  [color set];
   NSRectFill(rect);
-  [_darkColor set];
+  [darkColor set];
   NSRectFill(RedimRect(rect));
   [label drawInRect:TextRect(rect) withAttributes:_textAttributes];
   if (_selected) {

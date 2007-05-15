@@ -10,18 +10,21 @@
 
 - (id)initWithName:(NSString *)name forManager:(id)manager
 {
+  NSString *filename;
   BOOL isDir;
 
   self = [super init];
   if (self) {
-    NSDictionary *params = [[UserDefaults sharedInstance] objectForKey:name];
-    _filename = [params objectForKey:@"storeFilename"];
-    _color = RETAIN([params objectForKey:ST_COLOR]);
-    _name = RETAIN(name);
-    if (_color == nil)
-      _color = RETAIN([NSColor yellowColor]);
+    _name = [name copy];
+    _params = [NSMutableDictionary new];
+    [_params addEntriesFromDictionary:[[UserDefaults sharedInstance] objectForKey:name]];
+
+    if (![self eventColor])
+      [self setEventColor:[NSColor yellowColor]];
+
+    filename = [_params objectForKey:@"storeFilename"];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
-    _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, _filename, nil]] retain];
+    _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
     _manager = manager;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
@@ -68,8 +71,8 @@
     [self write];
   [_set release];
   [_globalFile release];
-  [_color release];
   [_name release];
+  [_params release];
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
@@ -136,12 +139,19 @@
 
 - (NSColor *)eventColor
 {
-  return _color;
+  NSColor *aColor = nil;
+  NSData *theData =[_params objectForKey:ST_COLOR];
+
+  if (theData)
+    aColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
+  return aColor;
 }
 
 - (void)setEventColor:(NSColor *)color
 {
-  ASSIGN(_color, color);
+  NSData *data = [NSArchiver archivedDataWithRootObject:color];
+  [_params setObject:data forKey:ST_COLOR];
+  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
 }
 
 
