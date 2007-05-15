@@ -2,6 +2,7 @@
 
 #import "AgendaStore.h"
 #import "DayView.h"
+#import "UserDefaults.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
 #define min(x,y) ((x) < (y)) ? (x) : (y)
@@ -10,7 +11,7 @@
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
 #define TextRect(rect) NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8)
 
-@interface AppointmentView : NSView
+@interface AppointmentView : NSView <DefaultsConsumer>
 {
   Event *_apt;
   NSDictionary *_textAttributes;
@@ -31,14 +32,21 @@
     _selected = NO;
     _textAttributes = RETAIN([NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 					   forKey:NSForegroundColorAttributeName]);
+    [[UserDefaults sharedInstance] registerClient:self forKey:[[apt store] description]];
   }
   return self;
 }
 
 - (void)dealloc
 {
+  [[UserDefaults sharedInstance] unregisterClient:self];
   RELEASE(_textAttributes);
   [super dealloc];
+}
+
+- (void)defaultDidChanged:(NSString *)name
+{
+  [self setNeedsDisplay:YES];
 }
 
 - (BOOL)selected
