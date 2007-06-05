@@ -65,10 +65,11 @@
 - (void)drawRect:(NSRect)rect
 {
   NSCalendarDate *start = [[_apt startDate] calendarDate];
-  NSString *label = [NSString stringWithFormat:@"%2dh%0.2d : %@",
+  NSString *label = [NSString stringWithFormat:@"%2dh%0.2d : %@\n\n%@",
 			      [start hourOfDay],
 			      [start minuteOfHour],
-			      [_apt title]];
+			      [_apt title],
+			      [[_apt descriptionText] string]];
   NSColor *color = [[_apt store] eventColor];
   NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
 				green:[color greenComponent] - 0.3
