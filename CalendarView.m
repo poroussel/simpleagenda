@@ -9,6 +9,7 @@
 
 - (void)dealloc
 {
+  [_dayTimer invalidate];
   delegate = nil;
   [boldFont release];
   [normalFont release];
@@ -106,11 +107,18 @@
 
     [self setDate: date];
     [self setTitlePosition:NSBelowTop];
+
+    Date *now = [Date now];
+    [now changeMinuteBy:1];
+    [now incrementDay];
+    [now setMinute:0];
+    _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate] interval:86400 target:self selector:@selector(dayChanged) userInfo:nil repeats:YES];
+    [now release];
+    [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
 
 }
-
 
 - (void)updateTitle
 {
@@ -137,10 +145,7 @@
   Date *firstWeek;
   Date *today;
 
-  today = [[Date alloc] init];
-
   [self clearSelectedDay];
-
   for (row = 1; row < 7; row++) {
     for (column = 1; column < 8; column++) {
       [[matrix cellAtRow: row column: column] setStringValue: @""];
@@ -149,9 +154,12 @@
     }
   }
 
+  today = [[Date alloc] init];
+  [today setMinute:0];
   firstWeek = [[Date alloc] init];
   [firstWeek setDate: date];
   [firstWeek setDay: 1];
+  [firstWeek setMinute:0];
   week = [firstWeek weekOfYear];
   row = 1;
   column = [firstWeek weekday];
@@ -178,6 +186,11 @@
   [self setSelectedDay];
   [firstWeek release];
   [today release];
+}
+
+- (void)dayChanged:(NSTimer *)timer
+{
+  [self updateView];
 }
 
 - (void)selectMonth: (id)sender

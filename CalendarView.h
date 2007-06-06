@@ -12,6 +12,7 @@
 	NSFont *normalFont;
 	NSFont *boldFont;
 	IBOutlet id delegate;
+        NSTimer *_dayTimer;
 }
 
 - (id)initWithFrame:(NSRect)frame;
