@@ -63,8 +63,9 @@
 
 -(void)changeColor:(id)sender
 {
+  NSColor *rgb = [[storeColor color] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
-  [store setEventColor:[storeColor color]];
+  [store setEventColor:rgb];
 }
 
 -(void)changeStart:(id)sender
