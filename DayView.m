@@ -9,7 +9,7 @@
 #define abs(x) ((x) < 0) ? (-x) : (x)
 
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
-#define TextRect(rect) NSMakeRect(4, 4, rect.size.width - 8, rect.size.height - 8)
+#define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y + 4, rect.size.width - 8, rect.size.height - 8)
 
 @interface AppointmentView : NSView <DefaultsConsumer>
 {
