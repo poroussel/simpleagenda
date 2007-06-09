@@ -112,7 +112,11 @@
     [now changeMinuteBy:1];
     [now incrementDay];
     [now setMinute:0];
-    _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate] interval:86400 target:self selector:@selector(dayChanged) userInfo:nil repeats:YES];
+    _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate] 
+				 interval:86400 target:self 
+				 selector:@selector(dayChanged:) 
+				 userInfo:nil 
+				 repeats:YES];
     [now release];
     [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
   }
