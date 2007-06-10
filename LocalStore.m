@@ -22,7 +22,7 @@
     if (![self eventColor])
       [self setEventColor:[NSColor yellowColor]];
 
-    filename = [_params objectForKey:@"storeFilename"];
+    filename = [_params objectForKey:ST_FILE];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
