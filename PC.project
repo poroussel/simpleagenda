@@ -12,7 +12,8 @@
 	Event.m,
 	PreferencesController.m,
 	HourFormatter.m,
-	UserDefaults.m
+	UserDefaults.m,
+	iCalStore.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -32,7 +33,8 @@
 	Event.h,
 	PreferencesController.h,
 	HourFormatter.h,
-	UserDefaults.h
+	UserDefaults.h,
+	iCalStore.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -44,11 +46,12 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-06-06 22:36:27 +0200";
+    LAST_EDITING = "2007-06-09 15:08:25 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
-	ChronographerSource
+	ChronographerSource,
+	ical
     );
     LINKEROPTIONS = "";
     LOCALIZED_RESOURCES = (
@@ -62,8 +65,8 @@
 	SimpleAgenda.m
     );
     PC_WINDOWS = {
-	ProjectBrowser = "{x = 0; y = 0; width = 631; height = 223}";
-	ProjectWindow = "271 65 864 906 0 0  1280 1024 ";
+	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 187}";
+	ProjectWindow = "215 22 864 978 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;
@@ -86,7 +89,8 @@
     SEARCH_HEADER_DIRS = (
     );
     SEARCH_LIB_DIRS = (
-	"/opt/gnustep/Local/Library/Libraries"
+	"/opt/gnustep/Local/Library/Libraries",
+	"/usr/local/lib"
     );
     SUBPROJECTS = (
     );

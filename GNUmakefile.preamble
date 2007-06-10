@@ -12,11 +12,11 @@ ADDITIONAL_OBJCFLAGS +=
 ADDITIONAL_CFLAGS += 
 
 # Additional flags to pass to the linker
-ADDITIONAL_LDFLAGS +=  -lChronographerSource 
+ADDITIONAL_LDFLAGS +=  -lChronographerSource -lical 
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += 
 
 # Additional library directories the linker should search
-ADDITIONAL_LIB_DIRS += -L/opt/gnustep/Local/Library/Libraries 
+ADDITIONAL_LIB_DIRS += -L/opt/gnustep/Local/Library/Libraries -L/usr/local/lib 
 

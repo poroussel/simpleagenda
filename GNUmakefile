@@ -16,7 +16,7 @@ SimpleAgenda_APPLICATION_ICON = Calendar.tiff
 #
 # Libraries
 #
-SimpleAgenda_LIBRARIES_DEPEND_UPON += -lChronographerSource 
+SimpleAgenda_LIBRARIES_DEPEND_UPON += -lChronographerSource -lical 
 
 #
 # Resource files
@@ -42,7 +42,8 @@ DayView.h \
 Event.h \
 PreferencesController.h \
 HourFormatter.h \
-UserDefaults.h
+UserDefaults.h \
+iCalStore.h
 
 #
 # Class files
@@ -57,7 +58,8 @@ DayView.m \
 Event.m \
 PreferencesController.m \
 HourFormatter.m \
-UserDefaults.m
+UserDefaults.m \
+iCalStore.m
 
 #
 # Other sources

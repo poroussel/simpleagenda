@@ -8,7 +8,7 @@
 
 @implementation StoreManager
 
-#define DEFAULT_AGENDA @"Personal Agenda"
+#define PERSONAL_AGENDA @"Personal Agenda"
 
 UserDefaults *defaults;
 
@@ -18,8 +18,8 @@ UserDefaults *defaults;
 			  dictionaryWithObjects:[NSArray arrayWithObjects:@"LocalStore", @"Personal", nil]
 			  forKeys:[NSArray arrayWithObjects:ST_CLASS, ST_FILE, nil]];
   NSDictionary *dict = [NSDictionary 
-			 dictionaryWithObjects:[NSArray arrayWithObjects: [NSArray arrayWithObject:DEFAULT_AGENDA], local, DEFAULT_AGENDA, nil]
-			 forKeys:[NSArray arrayWithObjects: STORES, DEFAULT_AGENDA, ST_DEFAULT, nil]];
+			 dictionaryWithObjects:[NSArray arrayWithObjects: [NSArray arrayWithObject:PERSONAL_AGENDA], local, PERSONAL_AGENDA, nil]
+			 forKeys:[NSArray arrayWithObjects: STORES, PERSONAL_AGENDA, ST_DEFAULT, nil]];
   return dict;
 }
 
