@@ -41,6 +41,10 @@
     }
     _name = [name copy];
     _modified = NO;
+    if ([_params objectForKey:ST_URL])
+      _writable = *(BOOL *)[_params objectForKey:ST_URL];
+    else
+      _writable = YES;
     [self read]; 
   }
   return self;
