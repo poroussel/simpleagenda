@@ -4,6 +4,17 @@
 #import "UserDefaults.h"
 #import "defines.h"
 
+@implementation Event(iCalendar)
+
+- (id)initWithICalComponent:(icalcomponent *)ic
+{
+  [self init];
+  return self;
+}
+
+
+@end
+
 @implementation iCalStore
 
 - (void)read
@@ -11,19 +22,22 @@
   NSData *data = [_url resourceDataUsingCache:NO];
   NSString *text;
   icalcomponent *ic;
+  int number;
 
   if (data) {
     text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     if (text) {
       _icomp = icalparser_parse_string([text cString]);
       if (_icomp) {
-	ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT);
-	while (ic) {
-	  ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT);
+	for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
+	     ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
 	}
       }
-    }
-  }
+      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], number);
+    } else
+      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  } else
+    NSLog(@"No data read from %@", [_url absoluteString]);
 }
 
 - (id)initWithName:(NSString *)name forManager:(id)manager
