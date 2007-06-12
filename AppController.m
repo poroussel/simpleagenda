@@ -229,7 +229,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)doubleClickOnAppointment:(Event *)apt
 {
-  [self _editAppointment:apt];
+  /*
+   * FIXME : we should allow to view appointment's 
+   * details even if it's read only
+   */
+  if ([[apt store] isWritable])
+    [self _editAppointment:apt];
 }
 
 - (void)modifyAppointment:(Event *)apt
