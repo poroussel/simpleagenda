@@ -36,6 +36,7 @@
   int start = [_defaults integerForKey:FIRST_HOUR];
   int end = [_defaults integerForKey:LAST_HOUR];
   int step = [_defaults integerForKey:MIN_STEP];
+  NSString *defaultStore = [_defaults objectForKey:ST_DEFAULT];
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -50,6 +51,14 @@
     [storePopUp addItemWithTitle:[aStore description]];
   [storePopUp selectItemAtIndex:0];
   [self selectStore:self];
+
+  list = [_sm objectEnumerator];
+  [defaultStorePopUp removeAllItems];
+  while ((aStore = [list nextObject])) {
+    if ([aStore isWritable])
+      [defaultStorePopUp addItemWithTitle:[aStore description]];
+  }
+  [defaultStorePopUp selectItemWithTitle:defaultStore];
 
   [panel makeKeyAndOrderFront:self];
 }
@@ -93,6 +102,12 @@
     [minStepText setDoubleValue:value];
     [_defaults setInteger:value * 60 forKey:MIN_STEP];
   }
+}
+
+-(void)selectDefaultStore:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[defaultStorePopUp titleOfSelectedItem]];
+  [_defaults setObject:[store description] forKey:ST_DEFAULT];
 }
 
 @end

@@ -35,6 +35,7 @@ UserDefaults *defaults;
   if (self) {
     defaults = [UserDefaults sharedInstance];
     [defaults setHardDefaults:[self defaults]];
+    [defaults registerClient:self forKey:ST_DEFAULT];
     NSArray *storeArray = [defaults objectForKey:STORES];
     NSString *defaultStore = [defaults objectForKey:ST_DEFAULT];
 
@@ -62,6 +63,7 @@ UserDefaults *defaults;
 
 - (void)defaultDidChanged:(NSString *)name
 {
+  [self setDefaultStore:[[UserDefaults sharedInstance] objectForKey:ST_DEFAULT]];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name

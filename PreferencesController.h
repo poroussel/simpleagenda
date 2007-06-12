@@ -16,6 +16,7 @@
   IBOutlet id minStepText;
   IBOutlet id storePopUp;
   IBOutlet id storeColor;
+  IBOutlet id defaultStorePopUp;
   UserDefaults *_defaults;
   StoreManager *_sm;
 }
@@ -28,5 +29,6 @@
 -(void)changeStart:(id)sender;
 -(void)changeEnd:(id)sender;
 -(void)changeStep:(id)sender;
+-(void)selectDefaultStore:(id)sender;
 
 @end
