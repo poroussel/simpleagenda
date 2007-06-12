@@ -5,6 +5,7 @@
 @interface iCalStore : NSObject <AgendaStore>
 {
   NSMutableDictionary *_params;
+  NSMutableSet *_set;
   NSString *_name;
   NSURL *_url;
   BOOL _modified;

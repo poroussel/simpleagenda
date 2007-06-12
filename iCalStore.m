@@ -8,10 +8,41 @@
 
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
-  [self init];
-  return self;
-}
+  icalproperty *prop;
+  icalproperty *pstart;
+  icalproperty *pend;
+  struct icaltimetype start;
+  struct icaltimetype end;
+  struct icaldurationtype  diff;
+  Date *date;
 
+  [self init];
+  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop)
+    goto init_error;
+  [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop)]];
+
+  pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
+  if (!pstart)
+    goto init_error;
+  start = icalproperty_get_dtstart(pstart);
+  date = [[Date alloc] init];
+  [date setDateToTime_t:icaltime_as_timet(start)];
+  [self setStartDate:date andConstrain:NO];
+
+  pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
+  if (!pend)
+    goto init_error;
+  end = icalproperty_get_dtend(pend);
+  diff = icaltime_subtract(end, start);
+  [self setDuration:icaldurationtype_as_int(diff) / 60];
+  return self;
+
+ init_error:
+  NSLog(@"Error creating Event from iCal component");
+  [self release];
+  return nil;
+}
 
 @end
 
@@ -21,6 +52,7 @@
 {
   NSData *data = [_url resourceDataUsingCache:NO];
   NSString *text;
+  Event *ev;
   icalcomponent *ic;
   int number;
 
@@ -31,8 +63,11 @@
       if (_icomp) {
 	for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
 	     ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
+	  ev = [[Event alloc] initWithICalComponent:ic];
+	  [_set addObject:ev];
 	}
       }
+      [_set makeObjectsPerform:@selector(setStore:) withObject:self];
       NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], number);
     } else
       NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
@@ -58,7 +93,8 @@
     if ([_params objectForKey:ST_URL])
       _writable = *(BOOL *)[_params objectForKey:ST_URL];
     else
-      _writable = YES;
+      _writable = NO;
+    _set = [[NSMutableSet alloc] initWithCapacity:128];
     [self read]; 
   }
   return self;
@@ -76,6 +112,7 @@
     [self write];
   if (_icomp)
     icalcomponent_free(_icomp);
+  [_set release];
   [_url release];
   [_params release];
   [_name release];
@@ -83,7 +120,15 @@
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end
 {
-  return nil;
+  NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:1];
+  NSEnumerator *enumerator = [_set objectEnumerator];
+  Event *apt;
+
+  while ((apt = [enumerator nextObject])) {
+    if ([apt startsBetween:start and:end])
+      [array addObject:apt];
+  }
+  return array;
 }
 
 - (void)addAppointment:(Event *)evt
@@ -100,7 +145,7 @@
 
 - (BOOL)contains:(Event *)evt
 {
-  return YES;
+  return NO;
 }
 
 - (BOOL)isWritable

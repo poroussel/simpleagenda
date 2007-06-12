@@ -34,14 +34,19 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [_defaults registerClient:self forKey:FIRST_HOUR];
     [_defaults registerClient:self forKey:LAST_HOUR];
     [_defaults registerClient:self forKey:MIN_STEP];
-    _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     _editor = [AppointmentEditor new];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
+    _sm = [StoreManager new];
   }
   return self;
 }
 
+/* 
+ * FIXME : is there a good reason to 'cache'
+ * events in there ? Each store can probably 
+ * do it better and only if needed
+ */
 - (void)updateCache
 {
   NSArray *array;
