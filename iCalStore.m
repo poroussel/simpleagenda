@@ -61,6 +61,7 @@
     if (text) {
       _icomp = icalparser_parse_string([text cString]);
       if (_icomp) {
+	[_set removeAllObjects];
 	for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
 	     ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
 	  ev = [[Event alloc] initWithICalComponent:ic];
@@ -96,6 +97,18 @@
       _writable = NO;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
     [self read]; 
+
+    if (![_url isFileURL]) {
+      if ([_params objectForKey:ST_REFRESH])
+	_minutesBeforeRefresh = [[_params objectForKey:ST_REFRESH] intValue];
+      else
+	_minutesBeforeRefresh = 1;
+      _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
+				       interval:_minutesBeforeRefresh * 60
+				       target:self selector:@selector(refreshData:) 
+				       userInfo:nil repeats:YES];
+      [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+    }
   }
   return self;
 }
@@ -108,6 +121,7 @@
 
 - (void)dealloc
 {
+  [_refreshTimer invalidate];
   if (_modified && [self isWritable])
     [self write];
   if (_icomp)
@@ -116,6 +130,13 @@
   [_url release];
   [_params release];
   [_name release];
+}
+
+- (void)refreshData:(NSTimer *)timer
+{
+  /* FIXME : only refresh if data changed (using ical timestamps ?) */
+  [self read];
+  /* FIXME : force a screen update with [StoreManager dataChanged:self] */
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end

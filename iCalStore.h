@@ -12,6 +12,7 @@
   BOOL _writable;
   int _minutesBeforeRefresh;
   icalcomponent *_icomp;
+  NSTimer *_refreshTimer;
 }
 
 @end

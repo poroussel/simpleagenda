@@ -13,3 +13,4 @@
 #define ST_COLOR @"storeColor"
 #define ST_URL @"storeURL"
 #define ST_RW @"storeWritable"
+#define ST_REFRESH @"storeRefresh"
