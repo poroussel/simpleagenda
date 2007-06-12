@@ -90,8 +90,8 @@
     }
     _name = [name copy];
     _modified = NO;
-    if ([_params objectForKey:ST_URL])
-      _writable = *(BOOL *)[_params objectForKey:ST_URL];
+    if ([_params objectForKey:ST_RW])
+      _writable = *(BOOL *)[_params objectForKey:ST_RW];
     else
       _writable = NO;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
