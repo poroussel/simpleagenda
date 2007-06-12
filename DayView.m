@@ -64,17 +64,25 @@
 
 - (void)drawRect:(NSRect)rect
 {
+  NSString *label;
   NSCalendarDate *start = [[_apt startDate] calendarDate];
-  NSString *label = [NSString stringWithFormat:@"%2dh%0.2d : %@\n\n%@",
-			      [start hourOfDay],
-			      [start minuteOfHour],
-			      [_apt title],
-			      [[_apt descriptionText] string]];
   NSColor *color = [[_apt store] eventColor];
   NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
 				green:[color greenComponent] - 0.3
 				blue:[color blueComponent] - 0.3
 				alpha:[color alphaComponent]];
+
+  if ([_apt descriptionText])
+    label = [NSString stringWithFormat:@"%2dh%0.2d : %@\n\n%@",
+		      [start hourOfDay],
+		      [start minuteOfHour],
+		      [_apt title],
+		      [[_apt descriptionText] string]];
+  else
+    label = [NSString stringWithFormat:@"%2dh%0.2d : %@",
+		      [start hourOfDay],
+		      [start minuteOfHour],
+		      [_apt title]];
 
   [color set];
   NSRectFill(rect);
