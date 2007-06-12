@@ -13,6 +13,7 @@
   int _minutesBeforeRefresh;
   icalcomponent *_icomp;
   NSTimer *_refreshTimer;
+  id _delegate;
 }
 
 @end

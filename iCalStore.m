@@ -80,6 +80,7 @@
 {
   self = [super init];
   if (self) {
+    _delegate = manager;
     _params = [NSMutableDictionary new];
     [_params addEntriesFromDictionary:[[UserDefaults sharedInstance] objectForKey:name]];
     _url = [[NSURL alloc] initWithString:[_params objectForKey:ST_URL]];
@@ -136,7 +137,8 @@
 {
   /* FIXME : only refresh if data changed (using ical timestamps ?) */
   [self read];
-  /* FIXME : force a screen update with [StoreManager dataChanged:self] */
+  if ([_delegate respondsToSelector:@selector(dataChanged:)])
+    [_delegate dataChanged:self];
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end

@@ -86,6 +86,10 @@ UserDefaults *defaults;
   return [_stores objectEnumerator];
 }
 
+@end
+
+@implementation StoreManager(AgendaStoreDelegate)
+
 - (void)dataChanged:(id <AgendaStore>)store
 {
   NSLog(@"Data changed in %@", [store description]);
