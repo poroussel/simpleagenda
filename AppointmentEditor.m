@@ -44,8 +44,10 @@
     [data setStore:[sm defaultStore]];
     
   [store removeAllItems];
-  while ((aStore = [list nextObject]))
-    [store addItemWithTitle:[aStore description]];
+  while ((aStore = [list nextObject])) {
+    if ([aStore isWritable])
+      [store addItemWithTitle:[aStore description]];
+  }
   [store selectItemWithTitle:[[data store] description]];
 
   ret = [NSApp runModalForWindow:window];
