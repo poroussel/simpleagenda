@@ -165,7 +165,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)paste:(id)sender
 {
-  if (_selection) {
+  if (_selection && [[_selection store] isWritable]) {
     Date *date = [[calendar date] copy];
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
