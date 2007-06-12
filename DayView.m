@@ -248,6 +248,9 @@
       return;
     }
 
+    if (![[[aptv appointment] store] isWritable])
+      return;
+
     frame = [aptv frame];
     inResize = [self mouse:mouseLoc inRect:RedimRect(frame)];
     if (inResize) {
