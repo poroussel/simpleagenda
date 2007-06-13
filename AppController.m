@@ -201,7 +201,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)dateChanged:(Date *)newDate
 {
   [self updateCache];
-  NSLog(@"Show data for %@ => %d apt", [newDate description], [_cache count]);
+  //NSLog(@"Show data for %@ => %d apt", [newDate description], [_cache count]);
 }
 
 /* DayViewDataSource methods */

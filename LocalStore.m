@@ -90,7 +90,7 @@
 
 -(void)addAppointment:(Event *)app
 {
-  NSLog(@"add appointment %@ on %@", [app title], [[app startDate] description]);
+  //NSLog(@"add appointment %@ on %@", [app title], [[app startDate] description]);
   [_set addObject:app];
   [app setStore:self];
   _modified = YES;
@@ -98,14 +98,14 @@
 
 -(void)delAppointment:(Event *)app
 {
-  NSLog(@"delete appointment %@ on %@", [app title], [[app startDate] description]);
+  //NSLog(@"delete appointment %@ on %@", [app title], [[app startDate] description]);
   [_set removeObject:app];
   _modified = YES;
 }
 
 -(void)updateAppointment:(Event *)app
 {
-  NSLog(@"update appointment %@ on %@", [app title], [[app startDate] description]);
+  //NSLog(@"update appointment %@ on %@", [app title], [[app startDate] description]);
   _modified = YES;
 }
 
