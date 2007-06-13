@@ -37,18 +37,7 @@
 	NSLog(@"Created directory %@", _globalPath);
     }
     if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
-      /*
-       * Code needed to translate old Appointment objects to Events
-       * To be replaced shortly by
-       * [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile]
-       */
-      NSData *data = [NSData dataWithContentsOfFile:_globalFile];
-      NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
-      [unarchiver setClass:[Event class] forClassName:@"Appointment"];
-      NSSet *savedData = RETAIN([unarchiver decodeObjectForKey: @"root"]);
-      [unarchiver finishDecoding];
-      [unarchiver release];
-
+      NSSet *savedData =  [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
       if (savedData) {
 	[savedData makeObjectsPerform:@selector(setStore:) withObject:self];
 	[_set unionSet: savedData];
