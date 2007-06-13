@@ -103,7 +103,7 @@
       if ([_params objectForKey:ST_REFRESH])
 	_minutesBeforeRefresh = [[_params objectForKey:ST_REFRESH] intValue];
       else
-	_minutesBeforeRefresh = 1;
+	_minutesBeforeRefresh = 15;
       _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				       interval:_minutesBeforeRefresh * 60
 				       target:self selector:@selector(refreshData:) 
