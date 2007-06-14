@@ -6,8 +6,17 @@ In no particular order :
 
 * recurrent events
 
-* alerts and user notification
+* alerts and user notification (visual, by mail etc)
 
-* remove ChronographerSource dependency and use libical for local stores ?
+* remove ChronographerSource dependency and use libical for local
+   stores ?
+
+* redo user defaults, current code is ugly
+
+* snap events to defined time intervals
+
+* use configure to detect libical ?
+
+* use bundles for backend ?
 
 Want to help out ? Contact me at p.o.roussel@free.fr
