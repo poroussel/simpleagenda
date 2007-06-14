@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <GNUstepBase/GSXML.h>
 #import <ical.h>
 #import "iCalStore.h"
 #import "UserDefaults.h"
@@ -46,34 +47,94 @@
 
 @end
 
+
 @implementation iCalStore
 
-- (void)read
+- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
-  NSData *data = [_url resourceDataUsingCache:NO];
+  GSXMLNode *inter;
+
+  while (node) {
+    if ([node type] == [GSXMLNode typeFromDescription:@"XML_ELEMENT_NODE"] && 
+	[@"getlastmodified" isEqualToString:[node name]])
+      return node;
+    if ([node firstChild]) {
+      inter = [self getLastModifiedElement:[node firstChild]];
+      if (inter)
+	return inter;
+    }
+    node = [node next];
+  }
+  return nil;
+}
+
+- (NSDate *)getLastModified
+{
+  GSXMLParser *parser;
+  GSXMLNode *node;
+  NSDate *date;
+
+  [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
+  parser = [GSXMLParser parserWithData:[_url resourceDataUsingCache:NO]];
+  if ([parser parse]) {
+    node = [self getLastModifiedElement:[[parser document] root]];
+    date = [NSDate dateWithNaturalLanguageString:[node content]];
+    return date;
+  }
+  return nil;
+}
+
+- (BOOL)needsRefresh
+{
+  NSDate *lm = [self getLastModified];
+
+  if (!_lastModified) {
+    if (lm)
+      _lastModified = [lm copy];
+    return YES;
+  }
+  if (!lm)
+    return YES;
+  if ([_lastModified compare:lm] == NSOrderedAscending) {
+    [_lastModified release];
+    _lastModified = [lm copy];
+    return YES;
+  }
+  return NO;
+}
+
+- (BOOL)read
+{
+  NSData *data;
   NSString *text;
   Event *ev;
   icalcomponent *ic;
   int number;
 
-  if (data) {
-    text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    if (text) {
-      _icomp = icalparser_parse_string([text cString]);
-      if (_icomp) {
-	[_set removeAllObjects];
-	for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
-	     ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
-	  ev = [[Event alloc] initWithICalComponent:ic];
-	  [_set addObject:ev];
+  if ([self needsRefresh]) {
+    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
+    data = [_url resourceDataUsingCache:NO];
+    if (data) {
+      text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+      if (text) {
+	_icomp = icalparser_parse_string([text cString]);
+	if (_icomp) {
+	  [_set removeAllObjects];
+	  for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
+	       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
+	    ev = [[Event alloc] initWithICalComponent:ic];
+	    [_set addObject:ev];
+	  }
 	}
-      }
-      [_set makeObjectsPerform:@selector(setStore:) withObject:self];
-      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], number);
+	[_set makeObjectsPerform:@selector(setStore:) withObject:self];
+	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], number);
+      } else
+	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
     } else
-      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-  } else
-    NSLog(@"No data read from %@", [_url absoluteString]);
+      NSLog(@"No data read from %@", [_url absoluteString]);
+    return YES;
+  }
+  return NO;
 }
 
 - (id)initWithName:(NSString *)name forManager:(id)manager
@@ -92,6 +153,7 @@
     }
     _name = [name copy];
     _modified = NO;
+    _lastModified = nil;
     if ([_params objectForKey:ST_RW])
       _writable = *(BOOL *)[_params objectForKey:ST_RW];
     else
@@ -103,7 +165,7 @@
       if ([_params objectForKey:ST_REFRESH])
 	_minutesBeforeRefresh = [[_params objectForKey:ST_REFRESH] intValue];
       else
-	_minutesBeforeRefresh = 15;
+	_minutesBeforeRefresh = 1;
       _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				       interval:_minutesBeforeRefresh * 60
 				       target:self selector:@selector(refreshData:) 
@@ -131,14 +193,15 @@
   [_url release];
   [_params release];
   [_name release];
+  [_lastModified release];
 }
 
 - (void)refreshData:(NSTimer *)timer
 {
-  /* FIXME : only refresh if data changed (using ical timestamps ?) */
-  [self read];
-  if ([_delegate respondsToSelector:@selector(dataChanged:)])
-    [_delegate dataChanged:self];
+  if ([self read]) {
+    if ([_delegate respondsToSelector:@selector(dataChanged:)])
+      [_delegate dataChanged:self];
+  }
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end

@@ -8,6 +8,7 @@
   NSMutableSet *_set;
   NSString *_name;
   NSURL *_url;
+  NSDate *_lastModified;
   BOOL _modified;
   BOOL _writable;
   int _minutesBeforeRefresh;

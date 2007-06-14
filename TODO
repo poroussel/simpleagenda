@@ -1,8 +1,8 @@
 In no particular order :
 
-* iCalendar write support
+* iCalendar write support (almost there, the networking part is working)
 
-* better user preferences
+* better user preferences (agenda creation/deletion)
 
 * recurrent events
 
