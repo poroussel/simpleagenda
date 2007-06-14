@@ -18,6 +18,6 @@
 - (void)setEventColor:(NSColor *)color;
 @end
 
-@interface NSObject (AgendaStoreDelegate)
+@interface NSObject(AgendaStoreDelegate)
 - (void)dataChanged:(id <AgendaStore>)agenda;
 @end

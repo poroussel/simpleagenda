@@ -38,6 +38,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
+    [_sm setDelegate:self];
   }
   return self;
 }
@@ -225,7 +226,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   return [_cache objectEnumerator];
 }
 
-/* DayView Delegate methods */
+@end
+
+
+@implementation AppController(DayViewDelegate)
 
 - (void)doubleClickOnAppointment:(Event *)apt
 {
@@ -253,6 +257,15 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [self updateCache];
   [date release];
   [apt release];
+}
+
+@end
+
+@implementation AppController(StoreManagerDelegate)
+
+- (void)dataChanged
+{
+  [self updateCache];
 }
 
 @end

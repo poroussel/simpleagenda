@@ -88,6 +88,11 @@ UserDefaults *defaults;
   return [_stores objectEnumerator];
 }
 
+- (void)setDelegate:(id)delegate;
+{
+  _delegate = delegate;
+}
+
 @end
 
 @implementation StoreManager(AgendaStoreDelegate)
@@ -95,7 +100,8 @@ UserDefaults *defaults;
 - (void)dataChanged:(id <AgendaStore>)store
 {
   NSLog(@"Data changed in %@", [store description]);
-  /* FIXME : do something, like tell the application about the change */
+  if ([_delegate respondsToSelector:@selector(dataChanged)])
+    [_delegate dataChanged];
 }
 
 @end

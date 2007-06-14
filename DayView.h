@@ -33,7 +33,7 @@
 
 @end
 
-@interface NSObject (DayViewDelegate)
+@interface NSObject(DayViewDelegate)
 
 - (void)doubleClickOnAppointment:(Event *)apt;
 - (void)modifyAppointment:(Event *)apt;

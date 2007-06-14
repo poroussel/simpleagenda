@@ -8,7 +8,6 @@ In no particular order :
 
 * alerts and user notification
 
-* remove ChronographerSource dependency and use libical for local
-  stores ?
+* remove ChronographerSource dependency and use libical for local stores ?
 
 Want to help out ? Contact me at p.o.roussel@free.fr
