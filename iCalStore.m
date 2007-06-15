@@ -140,7 +140,8 @@
 	  for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
 	       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
 	    ev = [[Event alloc] initWithICalComponent:ic];
-	    [_set addObject:ev];
+	    if (ev)
+	      [_set addObject:ev];
 	  }
 	}
 	[_set makeObjectsPerform:@selector(setStore:) withObject:self];
