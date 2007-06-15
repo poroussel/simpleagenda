@@ -67,7 +67,6 @@
 
 - (void)dealloc
 {
-  RELEASE(_store);
   RELEASE(location);
   [super dealloc];
 }
@@ -90,7 +89,7 @@
 
 - (void)setStore:(id <AgendaStore>)store
 {
-  ASSIGN(_store, store);
+  _store = store;
 }
 
 - (NSString *)location
