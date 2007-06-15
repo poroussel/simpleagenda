@@ -73,13 +73,18 @@
   GSXMLParser *parser;
   GSXMLNode *node;
   NSDate *date;
+  NSData *data;
 
   [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
-  parser = [GSXMLParser parserWithData:[_url resourceDataUsingCache:NO]];
-  if ([parser parse]) {
-    node = [self getLastModifiedElement:[[parser document] root]];
-    date = [NSDate dateWithNaturalLanguageString:[node content]];
-    return date;
+  data = [_url resourceDataUsingCache:NO];
+  if (data) {
+    parser = [GSXMLParser parserWithData:data];
+    [data release];
+    if ([parser parse]) {
+      node = [self getLastModifiedElement:[[parser document] root]];
+      date = [NSDate dateWithNaturalLanguageString:[node content]];
+      return date;
+    }
   }
   return nil;
 }
