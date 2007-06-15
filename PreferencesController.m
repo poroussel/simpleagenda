@@ -13,7 +13,7 @@
     if (![NSBundle loadNibNamed:@"Preferences" owner:self])
       return nil;
 
-    _sm = RETAIN(sm);
+    ASSIGN(_sm, sm);
     _defaults = [UserDefaults sharedInstance];
     HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
     [[dayStartText cell] setFormatter:formatter];
@@ -23,7 +23,7 @@
   return self;
 }
 
--(void)dealloc
+- (void)dealloc
 {
   RELEASE(_sm);
   [super dealloc];

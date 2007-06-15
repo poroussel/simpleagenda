@@ -56,12 +56,12 @@
 
 - (void)dealloc
 {
-  if (_modified)
-    [self write];
+  [self write];
   [_set release];
   [_globalFile release];
   [_name release];
   [_params release];
+  [super dealloc];
 }
 
 - (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
@@ -71,7 +71,7 @@
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
-    if ([apt startsBetween:start and:end])
+    if ([apt intersectsWith:start and:end])
       [array addObject:apt];
   }
   return array;
@@ -117,8 +117,11 @@
 
 - (void)write
 {
-  NSLog(@"LocalStore written to %@", _globalFile);
-  [NSKeyedArchiver archiveRootObject:_set toFile:_globalFile];
+  if (_modified) {
+    [NSKeyedArchiver archiveRootObject:_set toFile:_globalFile];
+    NSLog(@"LocalStore written to %@", _globalFile);
+    _modified = NO;
+  }
 }
 
 - (NSString *)description

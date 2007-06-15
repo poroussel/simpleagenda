@@ -67,19 +67,20 @@
 
 - (void)dealloc
 {
-  [location release];
+  RELEASE(_store);
+  RELEASE(location);
   [super dealloc];
 }
 
-- (BOOL)startsBetween:(Date *)start and:(Date *)end
+/* FIXME : do something for recurrent appointments */
+/* FIXME : return the intersection ? */
+- (BOOL)intersectsWith:(Date *)start and:(Date *)end
 {
-  /* FIXME : do something for recurrent appointments */
-  if ([startDate isEqual:start] == YES)
-    return YES;
-  if ([startDate compare:start] == NSOrderedDescending && [startDate compare:end] == NSOrderedAscending) {
-    return YES;
-  }
-  return NO;
+  if ([startDate compare:end] == NSOrderedDescending)
+    return NO;
+  if ([endDate compare:start] == NSOrderedAscending)
+    return NO;
+  return YES;
 }
 
 - (id <AgendaStore>)store
@@ -89,7 +90,7 @@
 
 - (void)setStore:(id <AgendaStore>)store
 {
-  _store = store;
+  ASSIGN(_store, store);
 }
 
 - (NSString *)location

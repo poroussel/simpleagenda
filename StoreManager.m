@@ -57,6 +57,9 @@ UserDefaults *defaults;
 
 - (void)dealloc
 {
+  [defaults unregisterClient:self];
+  RELEASE(_defaultStore);
+  RELEASE(_delegate);
   [_stores release];
   [super dealloc];
 }
@@ -75,7 +78,7 @@ UserDefaults *defaults;
 {
   id st = [self storeForName:name];
   if (st != nil)
-    _defaultStore = st;
+    ASSIGN(_defaultStore, st);
 }
 
 - (id <AgendaStore>)defaultStore
@@ -90,7 +93,17 @@ UserDefaults *defaults;
 
 - (void)setDelegate:(id)delegate;
 {
-  _delegate = delegate;
+  ASSIGN(_delegate, delegate);
+}
+
+- (void)synchronise
+{
+  NSEnumerator *enumerator;
+  id <AgendaStore> store;
+
+  enumerator = [_stores objectEnumerator];
+  while ((store = [enumerator nextObject]))
+    [store write];
 }
 
 @end

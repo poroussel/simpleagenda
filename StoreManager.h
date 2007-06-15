@@ -14,6 +14,7 @@
 - (id <AgendaStore>)defaultStore;
 - (NSEnumerator *)objectEnumerator;
 - (void)setDelegate:(id)delegate;
+- (void)synchronise;
 
 @end
 

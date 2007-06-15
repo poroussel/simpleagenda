@@ -37,8 +37,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _editor = [AppointmentEditor new];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
     _sm = [StoreManager new];
-    _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     [_sm setDelegate:self];
+    _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
   }
   return self;
 }
@@ -82,15 +82,20 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [self updateCache];
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
+- (void)applicationWillTerminate:(NSNotification*)aNotification
 {
+  [_pc release];
+  /* 
+   * Ugly workaround : [_sm release] should force the
+   * modified stores to synchronise their data but it 
+   * doesn't work. We're leaking a object reference.
+   */
+  [_sm synchronise];
+  [_sm release];
   [_cache release];
   [_editor release];
-  [_pc release];
-  [_sm release];
   [_defaults unregisterClient:self];
   [_defaults release];
-  return NSTerminateNow;
 }
 
 - (void)showPrefPanel:(id)sender

@@ -202,8 +202,7 @@
 - (void)dealloc
 {
   [_refreshTimer invalidate];
-  if (_modified && [self isWritable])
-    [self write];
+  [self write];
   if (_icomp)
     icalcomponent_free(_icomp);
   [_set release];
@@ -211,6 +210,7 @@
   [_params release];
   [_name release];
   [_lastModified release];
+  [super dealloc];
 }
 
 - (void)refreshData:(NSTimer *)timer
@@ -228,7 +228,7 @@
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
-    if ([apt startsBetween:start and:end])
+    if ([apt intersectsWith:start and:end])
       [array addObject:apt];
   }
   return array;
@@ -266,12 +266,14 @@
   NSData *data;
   char *text;
   
-  if ([self isWritable] && _icomp) {
+  if ([self isWritable] && _icomp && _modified) {
     text = icalcomponent_as_ical_string(_icomp);
     data = [NSData dataWithBytes:text length:strlen(text)];
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-    if ([_url setResourceData:data])
+    if ([_url setResourceData:data]) {
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
+      _modified = NO;
+    }
   }
 }
 

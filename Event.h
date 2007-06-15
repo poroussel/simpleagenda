@@ -12,7 +12,7 @@
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
-- (BOOL)startsBetween:(Date *)start and:(Date *)end;
+- (BOOL)intersectsWith:(Date *)start and:(Date *)end;
 - (id <AgendaStore>)store;
 - (void)setStore:(id <AgendaStore>)store;
 - (NSString *)location;
