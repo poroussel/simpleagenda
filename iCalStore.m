@@ -124,7 +124,6 @@
   NSString *text;
   Event *ev;
   icalcomponent *ic;
-  int number;
 
   if ([self needsRefresh]) {
     [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
@@ -137,15 +136,15 @@
 	_icomp = icalparser_parse_string([text cString]);
 	if (_icomp) {
 	  [_set removeAllObjects];
-	  for (number = 0, ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
-	       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT), number++) {
+	  for (ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
+	       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT)) {
 	    ev = [[Event alloc] initWithICalComponent:ic];
 	    if (ev)
 	      [_set addObject:ev];
 	  }
 	}
 	[_set makeObjectsPerform:@selector(setStore:) withObject:self];
-	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], number);
+	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_set count]);
       } else
 	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
     } else
