@@ -117,6 +117,8 @@
     if (data) {
       text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
       if (text) {
+	if (_icomp)
+	  icalcomponent_free(_icomp);
 	_icomp = icalparser_parse_string([text cString]);
 	if (_icomp) {
 	  [_set removeAllObjects];
