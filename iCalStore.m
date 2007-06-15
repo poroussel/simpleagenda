@@ -19,23 +19,34 @@
 
   [self init];
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop)
+  if (!prop) {
+    NSLog(@"No summary");
     goto init_error;
+  }
   [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop)]];
 
   pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
-  if (!pstart)
+  if (!pstart) {
+    NSLog(@"No start date");
     goto init_error;
+  }
   start = icalproperty_get_dtstart(pstart);
   date = [[Date alloc] init];
   [date setDateToTime_t:icaltime_as_timet(start)];
   [self setStartDate:date andConstrain:NO];
 
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
-  if (!pend)
-    goto init_error;
-  end = icalproperty_get_dtend(pend);
-  diff = icaltime_subtract(end, start);
+  if (!pend) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+    if (!prop) {
+      NSLog(@"No end date and no duration");
+      goto init_error;
+    }
+    diff = icalproperty_get_duration(prop);
+  } else {
+    end = icalproperty_get_dtend(pend);
+    diff = icaltime_subtract(end, start);
+  }
   [self setDuration:icaldurationtype_as_int(diff) / 60];
   return self;
 
@@ -79,7 +90,6 @@
   data = [_url resourceDataUsingCache:NO];
   if (data) {
     parser = [GSXMLParser parserWithData:data];
-    [data release];
     if ([parser parse]) {
       node = [self getLastModifiedElement:[[parser document] root]];
       date = [NSDate dateWithNaturalLanguageString:[node content]];
