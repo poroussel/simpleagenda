@@ -67,14 +67,14 @@
   [super dealloc];
 }
 
-- (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
+- (NSArray *)scheduledAppointmentsFor:(Date *)day
 {
   NSMutableArray *array = [[NSMutableArray alloc] initWithCapacity:1];
   NSEnumerator *enumerator = [_set objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
-    if ([apt intersectsWith:start and:end])
+    if ([apt isScheduledForDay:day])
       [array addObject:apt];
   }
   return array;

@@ -5,7 +5,7 @@
 
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
-- (NSArray *)scheduledAppointmentsFrom:(Date *)start to:(Date *)end;
+- (NSArray *)scheduledAppointmentsFor:(Date *)day;
 - (void)addAppointment:(Event *)evt;
 - (void)delAppointment:(Event *)evt;
 - (void)updateAppointment:(Event *)evt;

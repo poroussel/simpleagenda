@@ -51,25 +51,18 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)updateCache
 {
   NSArray *array;
-  Date *start = [[calendar date] copy];
-  Date *end = [[calendar date] copy];
+  Date *day = [calendar date];
   NSEnumerator *enumerator;
   id <AgendaStore> store;
-
-  [start setMinute:[self firstHourForDayView] * 60];
-  [end setMinute:([self lastHourForDayView] + 1) * 60];
 
   [_cache removeAllObjects];
   enumerator = [_sm objectEnumerator];
   while ((store = [enumerator nextObject])) {
     if ([store displayed]) {
-      array = [store scheduledAppointmentsFrom:start to:end];
+      array = [store scheduledAppointmentsFor:day];
       [_cache addObjectsFromArray:array];
     }
-  }
-  
-  [start release];
-  [end release];
+  }  
   [dayView reloadData];
 }
 

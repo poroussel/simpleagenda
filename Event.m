@@ -71,18 +71,20 @@
   [super dealloc];
 }
 
-/* FIXME : do something for recurrent appointments */
-/* FIXME : return the intersection ? */
-- (BOOL)intersectsWith:(Date *)start and:(Date *)end
+- (BOOL)isScheduledForDay:(Date *)day
 {
-  int diff;
-
-  if ([startDate compare:end] == NSOrderedDescending)
+  if (!day || [day daysUntil:startDate] > 0 || [day daysSince:endDate] > 0)
     return NO;
-  diff = [startDate minutesUntil:start];
-  if (diff > duration)
-    return NO;
-  return YES;
+  switch (interval) {
+  case RI_NONE:
+    return YES;
+  case RI_YEARLY:
+    return ((([startDate dayOfMonth] == [day dayOfMonth]) &&
+	     ([startDate monthOfYear] == [day monthOfYear])) &&
+	    ((frequency == 1) ||
+	     (([startDate yearsUntil: day] % frequency) == 0)));
+  }
+  return NO;
 }
 
 - (id <AgendaStore>)store
