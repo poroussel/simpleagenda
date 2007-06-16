@@ -133,7 +133,7 @@
       if (text) {
 	if (_icomp)
 	  icalcomponent_free(_icomp);
-	_icomp = icalparser_parse_string([text cString]);
+	_icomp = icalparser_parse_string([text cStringUsingEncoding:NSUTF8StringEncoding]);
 	if (_icomp) {
 	  [_set removeAllObjects];
 	  for (ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
