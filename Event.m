@@ -75,9 +75,12 @@
 /* FIXME : return the intersection ? */
 - (BOOL)intersectsWith:(Date *)start and:(Date *)end
 {
+  int diff;
+
   if ([startDate compare:end] == NSOrderedDescending)
     return NO;
-  if ([endDate compare:start] == NSOrderedAscending)
+  diff = [startDate minutesUntil:start];
+  if (diff > duration)
     return NO;
   return YES;
 }
