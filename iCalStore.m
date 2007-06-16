@@ -24,7 +24,7 @@
     NSLog(@"No summary");
     goto init_error;
   }
-  [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop)]];
+  [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop) encoding:NSUTF8StringEncoding]];
 
   pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
   if (!pstart) {
