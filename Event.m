@@ -71,6 +71,10 @@
   [super dealloc];
 }
 
+/*
+ * Code adapted from ChronographerSource Appointment:isScheduledFor
+ * I don't understand the first three lines of their version
+ */
 - (BOOL)isScheduledForDay:(Date *)day
 {
   if (!day || [day daysUntil:startDate] > 0 || [day daysSince:endDate] > 0)
@@ -78,6 +82,17 @@
   switch (interval) {
   case RI_NONE:
     return YES;
+  case RI_DAILY:
+    return ((frequency == 1) ||
+	    ([startDate daysUntil: day] % frequency) == 0);
+  case RI_WEEKLY:
+    return (([startDate weekday] == [day weekday]) &&
+	    ((frequency == 1) ||
+	     (([startDate weeksUntil: day] % frequency) == 0)));
+  case RI_MONTHLY:
+    return (([startDate dayOfMonth] == [day dayOfMonth]) &&
+	    ((frequency == 1) ||
+	     (([startDate monthsUntil: day] % frequency) == 0)));
   case RI_YEARLY:
     return ((([startDate dayOfMonth] == [day dayOfMonth]) &&
 	     ([startDate monthOfYear] == [day monthOfYear])) &&

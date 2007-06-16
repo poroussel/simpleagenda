@@ -1,6 +1,5 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import <math.h>
 #import <AppKit/AppKit.h>
 #import "AppointmentEditor.h"
 #import "HourFormatter.h"
@@ -53,12 +52,19 @@
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
-    Date *end = [[data startDate] copy];
-    [end changeYearBy:10];
     [data setTitle:[title stringValue]];
     [data setDuration:[duration floatValue] * 60.0];
     [data setInterval:[repeat indexOfSelectedItem]];
-    [data setEndDate:end];
+    if ([repeat indexOfSelectedItem] == 0)
+      [data setEndDate:[data startDate]];
+    else {
+      /* FIXME : don't force 10 years validity for recurrent events */
+      Date *end = [[data startDate] copy];
+      [end changeYearBy:10];
+      [data setEndDate:end];
+      [data setFrequency:1];
+      [end release];
+    }
     [data setDescriptionText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
 
@@ -72,7 +78,6 @@
       [originalStore delAppointment:data];
       [aStore addAppointment:data];
     }
-    [end release];
     return YES;
   }
   return NO;

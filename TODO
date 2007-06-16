@@ -4,8 +4,6 @@ In no particular order :
 
 * better user preferences (agenda creation/deletion)
 
-* recurrent events
-
 * alerts and user notification (visual, by mail etc)
 
 * remove ChronographerSource dependency and use libical for local
