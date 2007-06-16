@@ -42,12 +42,15 @@ UserDefaults *defaults;
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [storeArray objectEnumerator];
     while ((stname = [enumerator nextObject])) {
-      NSLog(@"Adding %@ to StoreManager", stname);
       dict = [defaults objectForKey:stname];
       if (dict) {
 	storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
 	store = [storeClass storeNamed:stname forManager:self];
-	[_stores setObject:store forKey:stname];
+	if (store) {
+	  [_stores setObject:store forKey:stname];
+	  NSLog(@"Added %@ to StoreManager", stname);
+	} else
+	  NSLog(@"Unable to initialize store %@", stname);
       }
     }
     [self setDefaultStore:defaultStore];
