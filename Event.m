@@ -102,5 +102,10 @@
   ASSIGN(location, aLocation);
 }
 
+- (NSString *)description
+{
+  return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self title], [self startDate], [self duration]];
+}
+
 @end
 
