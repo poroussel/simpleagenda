@@ -156,6 +156,8 @@
 
 - (id)initWithName:(NSString *)name forManager:(id)manager
 {
+  NSString *location;
+
   self = [super init];
   if (self) {
     _delegate = manager;
@@ -164,9 +166,24 @@
     _url = [[NSURL alloc] initWithString:[_params objectForKey:ST_URL]];
     if (_url == nil) {
       NSLog(@"%@ isn't a valid url", [_params objectForKey:ST_URL]);
-      [_params release];
       [self release];
       return nil;
+    }
+    if ([_url resourceDataUsingCache:NO] == nil) {
+      location = [_url propertyForKey:@"Location"];
+      if (!location) {
+	NSLog(@"Couldn't read data from %@", [_params objectForKey:ST_URL]);
+	[self release];
+	return nil;
+      }
+      _url = [_url initWithString:location];
+      if (_url)
+	NSLog(@"%@ redirected to %@", name, location);
+      else {
+	NSLog(@"%@ isn't a valid url", location);
+	[self release];
+	return nil;
+      }
     }
     _name = [name copy];
     _modified = NO;
@@ -182,7 +199,7 @@
       if ([_params objectForKey:ST_REFRESH])
 	_minutesBeforeRefresh = [[_params objectForKey:ST_REFRESH] intValue];
       else
-	_minutesBeforeRefresh = 30;
+	_minutesBeforeRefresh = 60;
       _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				       interval:_minutesBeforeRefresh * 60
 				       target:self selector:@selector(refreshData:) 
