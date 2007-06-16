@@ -14,7 +14,8 @@
   icalproperty *pend;
   struct icaltimetype start;
   struct icaltimetype end;
-  struct icaldurationtype  diff;
+  struct icaldurationtype diff;
+  struct icalrecurrencetype rec;
   Date *date;
 
   [self init];
@@ -34,6 +35,7 @@
   date = [[Date alloc] init];
   [date setDateToTime_t:icaltime_as_timet(start)];
   [self setStartDate:date andConstrain:NO];
+  [self setEndDate:date];
 
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
   if (!pend) {
@@ -48,6 +50,37 @@
     diff = icaltime_subtract(end, start);
   }
   [self setDuration:icaldurationtype_as_int(diff) / 60];
+
+  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
+  if (prop) {
+    rec = icalproperty_get_rrule(prop);
+    [date changeYearBy:10];
+    switch (rec.freq) {
+    case ICAL_DAILY_RECURRENCE:
+      [self setInterval:RI_DAILY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_WEEKLY_RECURRENCE:
+      [self setInterval:RI_WEEKLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_MONTHLY_RECURRENCE:
+      [self setInterval:RI_MONTHLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_YEARLY_RECURRENCE:
+      [self setInterval:RI_YEARLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    default:
+      NSLog(@"todo");
+      break;
+    }
+  }
   return self;
 
  init_error:
