@@ -49,6 +49,7 @@ UserDefaults *defaults;
 	if (store) {
 	  [_stores setObject:store forKey:stname];
 	  NSLog(@"Added %@ to StoreManager", stname);
+	  [defaults registerClient:self forKey:[store description]];
 	} else
 	  NSLog(@"Unable to initialize store %@", stname);
       }
@@ -70,6 +71,8 @@ UserDefaults *defaults;
 - (void)defaultDidChanged:(NSString *)name
 {
   [self setDefaultStore:[[UserDefaults sharedInstance] objectForKey:ST_DEFAULT]];
+  if ([_delegate respondsToSelector:@selector(dataChanged)])
+    [_delegate dataChanged];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name

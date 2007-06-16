@@ -17,6 +17,7 @@
   IBOutlet id storePopUp;
   IBOutlet id storeColor;
   IBOutlet id defaultStorePopUp;
+  IBOutlet id storeDisplay;
   UserDefaults *_defaults;
   StoreManager *_sm;
 }
@@ -30,5 +31,6 @@
 -(void)changeEnd:(id)sender;
 -(void)changeStep:(id)sender;
 -(void)selectDefaultStore:(id)sender;
+-(void)toggleDisplay:(id)sender;
 
 @end

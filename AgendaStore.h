@@ -16,6 +16,8 @@
 - (NSString *)description;
 - (NSColor *)eventColor;
 - (void)setEventColor:(NSColor *)color;
+- (BOOL)displayed;
+- (void)setDisplayed:(BOOL)state;
 @end
 
 @interface NSObject(AgendaStoreDelegate)

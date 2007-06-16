@@ -11,6 +11,7 @@
   NSString *_globalPath;
   NSString *_globalFile;
   NSString *_name;
+  BOOL _displayed;
 }
 
 @end

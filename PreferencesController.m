@@ -68,6 +68,7 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [storeColor setColor:[store eventColor]];
+  [storeDisplay setState:[store displayed]];
 }
 
 -(void)changeColor:(id)sender
@@ -108,6 +109,12 @@
 {
   id <AgendaStore> store = [_sm storeForName:[defaultStorePopUp titleOfSelectedItem]];
   [_defaults setObject:[store description] forKey:ST_DEFAULT];
+}
+
+-(void)toggleDisplay:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setDisplayed:[storeDisplay state]];
 }
 
 @end

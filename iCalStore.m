@@ -189,10 +189,14 @@
     _modified = NO;
     _lastModified = nil;
     if ([_params objectForKey:ST_RW])
-      _writable = *(BOOL *)[_params objectForKey:ST_RW];
+      _writable = [[_params objectForKey:ST_RW] boolValue];
     else
       _writable = NO;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
+    if ([_params objectForKey:ST_DISPLAY])
+      _displayed = [[_params objectForKey:ST_DISPLAY] boolValue];
+    else
+      _displayed = YES;
     [self read]; 
 
     if (![_url isFileURL]) {
@@ -317,6 +321,18 @@
 {
   NSData *data = [NSArchiver archivedDataWithRootObject:color];
   [_params setObject:data forKey:ST_COLOR];
+  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
+}
+
+- (BOOL)displayed
+{
+  return _displayed;
+}
+
+- (void)setDisplayed:(BOOL)state
+{
+  _displayed = state;
+  [_params setValue:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
   [[UserDefaults sharedInstance] setObject:_params forKey:_name];
 }
 

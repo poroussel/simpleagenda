@@ -32,14 +32,12 @@
     _selected = NO;
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 				     forKey:NSForegroundColorAttributeName] retain];
-    [[UserDefaults sharedInstance] registerClient:self forKey:[[apt store] description]];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  [[UserDefaults sharedInstance] unregisterClient:self];
   [_textAttributes release];
   [super dealloc];
 }

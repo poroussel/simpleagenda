@@ -14,3 +14,4 @@
 #define ST_URL @"storeURL"
 #define ST_RW @"storeWritable"
 #define ST_REFRESH @"storeRefresh"
+#define ST_DISPLAY @"storeDisplay"

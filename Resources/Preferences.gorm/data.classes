@@ -5,6 +5,7 @@
 	    "changeEnd:",
 	    "changeStart:",
 	    "changeStep:",
+	    "toggleDisplay:",
 	    "selectDefaultStore:",
 	    "selectStore:",
 	    "setColor:"
@@ -18,7 +19,8 @@
 	    "changeEnd:",
 	    "changeStart:",
 	    "changeStep:",
-	    "selectDefaultStore:"
+	    "selectDefaultStore:",
+	    "toggleDisplay:"
 	);
 	Outlets = (
 	    panel,
@@ -30,7 +32,8 @@
 	    minStepText,
 	    storeColor,
 	    storePopUp,
-	    defaultStorePopUp
+	    defaultStorePopUp,
+	    storeDisplay
 	);
 	Super = NSObject;
     };

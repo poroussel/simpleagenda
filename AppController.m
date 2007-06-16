@@ -62,8 +62,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_cache removeAllObjects];
   enumerator = [_sm objectEnumerator];
   while ((store = [enumerator nextObject])) {
-    array = [store scheduledAppointmentsFrom:start to:end];
-    [_cache addObjectsFromArray:array];
+    if ([store displayed]) {
+      array = [store scheduledAppointmentsFrom:start to:end];
+      [_cache addObjectsFromArray:array];
+    }
   }
   
   [start release];

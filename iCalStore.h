@@ -11,6 +11,7 @@
   NSDate *_lastModified;
   BOOL _modified;
   BOOL _writable;
+  BOOL _displayed;
   int _minutesBeforeRefresh;
   icalcomponent *_icomp;
   NSTimer *_refreshTimer;
