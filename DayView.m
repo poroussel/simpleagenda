@@ -2,7 +2,6 @@
 
 #import "AgendaStore.h"
 #import "DayView.h"
-#import "UserDefaults.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
 #define min(x,y) ((x) < (y)) ? (x) : (y)
@@ -11,7 +10,7 @@
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y + 4, rect.size.width - 8, rect.size.height - 8)
 
-@interface AppointmentView : NSView <DefaultsConsumer>
+@interface AppointmentView : NSView
 {
   Event *_apt;
   NSDictionary *_textAttributes;
@@ -40,11 +39,6 @@
 {
   [_textAttributes release];
   [super dealloc];
-}
-
-- (void)defaultDidChanged:(NSString *)name
-{
-  [self setNeedsDisplay:YES];
 }
 
 - (BOOL)selected
