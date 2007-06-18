@@ -1,6 +1,9 @@
 In no particular order :
 
-* iCalendar write support (almost there, the networking part is working)
+* iCalendar write support (almost there, the networking part is
+   working)
+
+* support iCalendar VTODO components ?
 
 * better user preferences (agenda creation/deletion)
 
@@ -10,11 +13,5 @@ In no particular order :
    stores
 
 * redo user defaults, current code is ugly
-
-* snap events to defined time intervals
-
-* use configure to detect libical ?
-
-* use bundles for backend ?
 
 Want to help out ? Contact me at p.o.roussel@free.fr
