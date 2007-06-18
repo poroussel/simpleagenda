@@ -7,7 +7,7 @@ In no particular order :
 * alerts and user notification (visual, by mail etc)
 
 * remove ChronographerSource dependency and use libical for local
-   stores ?
+   stores
 
 * redo user defaults, current code is ugly
 
