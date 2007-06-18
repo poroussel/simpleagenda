@@ -130,11 +130,6 @@
   return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / _height;
 }
 
-- (int)_deltaToMinute:(float)delta
-{
-  return ((_lastH - _firstH + 1) * 60) * delta / _height;
-}
-
 - (NSRect)_frameForAppointment:(Event *)apt
 {
   int size, start;
@@ -225,6 +220,7 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+  int start;
   int diff;
   int minutes;
   BOOL keepOn = YES;
@@ -252,14 +248,15 @@
     inResize = [self mouse:mouseLoc inRect:RedimRect(frame)];
     if (inResize) {
       [[NSCursor resizeUpDownCursor] push];
+      start = [[[aptv appointment] startDate] minuteOfDay];
       while (keepOn) {
 	theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 	mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 
 	switch ([theEvent type]) {
 	case NSLeftMouseDragged:
-	  minutes = [self _deltaToMinute:[theEvent deltaY]];
-	  [[aptv appointment] setDuration:[[aptv appointment] duration] - minutes];
+	  minutes = [self _positionToMinute:mouseLoc.y];
+	  [[aptv appointment] setDuration:[self _roundMinutes:minutes - start]];
 	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
 	  modified = YES;
 	  [self display];
