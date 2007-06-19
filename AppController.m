@@ -183,13 +183,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
   SEL action = [menuItem action];
-  if (action == @selector(copy:) ||
-      action == @selector(cut:) ||
-      action == @selector(paste:) ||
-      action == @selector(editAppointment:) ||
-      action == @selector(delAppointment:)) {
+  if (action == @selector(copy:) || action == @selector(cut:) ||
+      action == @selector(editAppointment:) || action == @selector(delAppointment:))
     return [dayView selectedAppointment] != nil;
-  }
+  if (action == @selector(paste:))
+    return _selection != nil;
   return YES;
 }
 
