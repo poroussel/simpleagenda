@@ -9,7 +9,8 @@
 	);
 	Outlets = (
 	    calendar,
-	    dayView
+	    dayView,
+	    summary
 	);
 	Super = NSObject;
     };

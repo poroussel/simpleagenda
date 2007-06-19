@@ -43,7 +43,8 @@ Event.h \
 PreferencesController.h \
 HourFormatter.h \
 UserDefaults.h \
-iCalStore.h
+iCalStore.h \
+AppointmentCache.h
 
 #
 # Class files
@@ -59,7 +60,8 @@ Event.m \
 PreferencesController.m \
 HourFormatter.m \
 UserDefaults.m \
-iCalStore.m
+iCalStore.m \
+AppointmentCache.m
 
 #
 # Other sources

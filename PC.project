@@ -13,7 +13,8 @@
 	PreferencesController.m,
 	HourFormatter.m,
 	UserDefaults.m,
-	iCalStore.m
+	iCalStore.m,
+	AppointmentCache.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -34,7 +35,8 @@
 	PreferencesController.h,
 	HourFormatter.h,
 	UserDefaults.h,
-	iCalStore.h
+	iCalStore.h,
+	AppointmentCache.h
     );
     IMAGES = (
 	Calendar.tiff
@@ -46,7 +48,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-06-18 17:17:17 +0200";
+    LAST_EDITING = "2007-06-19 11:02:10 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

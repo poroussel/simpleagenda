@@ -12,6 +12,7 @@
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
+  IBOutlet NSOutlineView *summary;
 
   PreferencesController *_pc;
   AppointmentEditor *_editor;
@@ -20,6 +21,8 @@
   NSMutableSet *_cache;
   Event *_selection;
   BOOL _deleteSelection;
+  AppointmentCache *_today;
+  AppointmentCache *_tomorrow;
 }
 
 - (void)showPrefPanel:(id)sender;

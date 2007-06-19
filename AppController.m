@@ -4,6 +4,7 @@
 #import "LocalStore.h"
 #import "AppointmentEditor.h"
 #import "StoreManager.h"
+#import "AppointmentCache.h"
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
@@ -27,6 +28,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (id)init
 {
+  Date *date;
+
   self = [super init];
   if (self) {
     _defaults = [UserDefaults sharedInstance];
@@ -39,6 +42,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _sm = [StoreManager new];
     [_sm setDelegate:self];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
+
+    date = [Date new];
+    _today = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    [_today setTitle:@"Today"];
+    [date incrementDay];
+    _tomorrow = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    [_tomorrow setTitle:@"Tomorrow"];
+    [date release];
   }
   return self;
 }
@@ -64,6 +75,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     }
   }  
   [dayView reloadData];
+  [summary reloadData];
 }
 
 
@@ -75,10 +87,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
   [self updateCache];
+  [summary sizeToFit];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
+  [_tomorrow release];
+  [_today release];
   [_pc release];
   /* 
    * Ugly workaround : [_sm release] should force the
@@ -198,14 +213,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 }
 
 
-/* CalendarView delegate method */
-- (void)dateChanged:(Date *)newDate
-{
-  [self updateCache];
-  //NSLog(@"Show data for %@ => %d apt", [newDate description], [_cache count]);
-}
+/* DayViewDataSource protocol */
 
-/* DayViewDataSource methods */
 - (int)firstHourForDayView
 {
   return [_defaults integerForKey:FIRST_HOUR];
@@ -228,6 +237,51 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @end
 
+@implementation AppController(NSOutlineViewDataSource)
+
+- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+{
+  if (item == nil)
+    return 2;
+  if ([item class] == [AppointmentCache class])
+    return [item count];
+  return 0;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+{
+  return YES;
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+{
+  if (item == nil) {
+    if (index == 0)
+      return _today;
+    return _tomorrow;
+  }
+  return [[item array] objectAtIndex:index];
+}
+
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+{
+  if ([@"title" isEqual:[tableColumn identifier]])
+    return [item title];
+  if ([item respondsToSelector:@selector(startDate)])
+    return [[item startDate] description];
+  return @"";
+}
+
+@end
+
+@implementation AppController(CalendarView)
+
+- (void)dateChanged:(Date *)newDate
+{
+  [self updateCache];
+}
+
+@end
 
 @implementation AppController(DayViewDelegate)
 
@@ -269,3 +323,4 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 }
 
 @end
+
