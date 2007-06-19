@@ -18,9 +18,9 @@
   AppointmentEditor *_editor;
   UserDefaults *_defaults;
   StoreManager *_sm;
-  NSMutableSet *_cache;
   Event *_selection;
   BOOL _deleteSelection;
+  AppointmentCache *_current;
   AppointmentCache *_today;
   AppointmentCache *_tomorrow;
 }

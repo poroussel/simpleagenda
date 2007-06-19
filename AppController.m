@@ -38,12 +38,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [_defaults registerClient:self forKey:LAST_HOUR];
     [_defaults registerClient:self forKey:MIN_STEP];
     _editor = [AppointmentEditor new];
-    _cache = [[NSMutableSet alloc] initWithCapacity:16];
     _sm = [StoreManager new];
     [_sm setDelegate:self];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
 
     date = [Date new];
+    _current = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
     _today = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
     [_today setTitle:@"Today"];
     [date incrementDay];
@@ -54,39 +54,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   return self;
 }
 
-/* 
- * FIXME : is there a good reason to 'cache'
- * events in there ? Each store can probably 
- * do it better and only if needed
- */
-- (void)updateCache
-{
-  NSArray *array;
-  Date *day = [calendar date];
-  NSEnumerator *enumerator;
-  id <AgendaStore> store;
-
-  [_cache removeAllObjects];
-  enumerator = [_sm objectEnumerator];
-  while ((store = [enumerator nextObject])) {
-    if ([store displayed]) {
-      array = [store scheduledAppointmentsFor:day];
-      [_cache addObjectsFromArray:array];
-    }
-  }  
-  [dayView reloadData];
-  [summary reloadData];
-}
-
-
 - (void)defaultDidChanged:(NSString *)name
 {
-  [self updateCache];
+  [dayView reloadData];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-  [self updateCache];
+  [dayView reloadData];
   [summary sizeToFit];
 }
 
@@ -94,6 +69,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   [_tomorrow release];
   [_today release];
+  [_current release];
   [_pc release];
   /* 
    * Ugly workaround : [_sm release] should force the
@@ -102,7 +78,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
    */
   [_sm synchronise];
   [_sm release];
-  [_cache release];
   [_editor release];
   [_defaults unregisterClient:self];
   [_defaults release];
@@ -116,7 +91,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [self firstHourForDayView] * 60;
-  NSArray *sorted = [[_cache allObjects] sortedArrayUsingFunction:sortAppointments context:nil];
+  NSArray *sorted = [[_current array] sortedArrayUsingFunction:sortAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
 
@@ -132,8 +107,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)_editAppointment:(Event *)apt
 {
-  if ([_editor editAppointment:apt withStoreManager:_sm])
-    [self updateCache];
+  if ([_editor editAppointment:apt withStoreManager:_sm]) {
+    [dayView reloadData];
+    [summary reloadData];
+  }
 }
 
 - (void)addAppointment:(id)sender
@@ -143,8 +120,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
-    [self updateCache];
+  if (apt && [_editor editAppointment:apt withStoreManager:_sm]) {
+    [dayView reloadData];
+    [summary reloadData];
+  }
   [date release];
   [apt release];
 }
@@ -163,7 +142,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
   if (apt) {
     [[apt store] delAppointment: apt];
-    [self updateCache];
+    [dayView reloadData];
+    [summary reloadData];
   }
 }
 
@@ -195,7 +175,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       [new release];
     }
     [date release];
-    [self updateCache];
+    [dayView reloadData];
+    [summary reloadData];
   }
 }
 
@@ -232,7 +213,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (NSEnumerator *)scheduledAppointmentsForDayView
 {
-  return [_cache objectEnumerator];
+  return [_current enumerator];
 }
 
 @end
@@ -278,11 +259,15 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {
-  [self updateCache];
+  [_current setFrom:date to:date];
+  [dayView reloadData];
 }
 
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 {
+  [_today setFrom:date to:date];
+  [date incrementDay];
+  [_tomorrow setFrom:date to:date];
   [summary reloadData];
 }
 
@@ -303,6 +288,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)modifyAppointment:(Event *)apt
 {
   [[apt store] updateAppointment:apt];
+  [summary reloadData];
 }
 
 - (void)createAppointmentFrom:(int)start to:(int)end
@@ -312,8 +298,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 			      duration:end - start 
 			      title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
-    [self updateCache];
+  if (apt && [_editor editAppointment:apt withStoreManager:_sm]) {
+    [dayView reloadData];
+    [summary reloadData];
+  }
   [date release];
   [apt release];
 }
@@ -324,7 +312,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)dataChangedInStoreManager:(StoreManager *)sm
 {
-  [self updateCache];
+  [dayView reloadData];
+  [summary reloadData];
 }
 
 @end
