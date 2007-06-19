@@ -194,9 +194,11 @@
 
 - (void)dayChanged:(NSTimer *)timer
 {
+  Date *today = [Date new];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:currentDateChanged:)])
-    [delegate calendarView:self currentDateChanged:date];
+    [delegate calendarView:self currentDateChanged:today];
+  [today release];
 }
 
 - (void)selectMonth: (id)sender
