@@ -269,7 +269,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     return [item title];
   if ([item respondsToSelector:@selector(startDate)])
     return [[item startDate] description];
-  return @"";
+  return [NSString stringWithFormat:@"%d item(s)", [item count]];
 }
 
 @end
