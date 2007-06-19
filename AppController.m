@@ -276,9 +276,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController(CalendarView)
 
-- (void)dateChanged:(Date *)newDate
+- (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {
   [self updateCache];
+}
+
+- (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
+{
+  [summary reloadData];
 }
 
 @end
@@ -317,7 +322,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController(StoreManagerDelegate)
 
-- (void)dataChanged
+- (void)dataChangedInStoreManager:(StoreManager *)sm
 {
   [self updateCache];
 }

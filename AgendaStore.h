@@ -21,5 +21,5 @@
 @end
 
 @interface NSObject(AgendaStoreDelegate)
-- (void)dataChanged:(id <AgendaStore>)agenda;
+- (void)dataChangedInStore:(id <AgendaStore>)agenda;
 @end

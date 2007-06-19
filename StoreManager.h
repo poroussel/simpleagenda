@@ -19,5 +19,5 @@
 @end
 
 @interface NSObject(StoreManagerDelegate)
-- (void)dataChanged;
+- (void)dataChangedInStoreManager:(StoreManager *)sm;
 @end

@@ -139,8 +139,8 @@
   [[matrix cellWithTag: [date dayOfMonth]] setFont: boldFont];
   [self updateTitle];
 
-  if ([delegate respondsToSelector:@selector(dateChanged:)])
-    [delegate dateChanged:date];
+  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
+    [delegate calendarView:self selectedDateChanged:date];
 }
 
 - (void)updateView
@@ -195,6 +195,8 @@
 - (void)dayChanged:(NSTimer *)timer
 {
   [self updateView];
+  if ([delegate respondsToSelector:@selector(calendarView:currentDateChanged:)])
+    [delegate calendarView:self currentDateChanged:date];
 }
 
 - (void)selectMonth: (id)sender

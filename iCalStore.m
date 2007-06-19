@@ -270,8 +270,8 @@
 - (void)refreshData:(NSTimer *)timer
 {
   if ([self read]) {
-    if ([_delegate respondsToSelector:@selector(dataChanged:)])
-      [_delegate dataChanged:self];
+    if ([_delegate respondsToSelector:@selector(dataChangedInStore:)])
+      [_delegate dataChangedInStore:self];
   }
 }
 

@@ -71,8 +71,8 @@ UserDefaults *defaults;
 - (void)defaultDidChanged:(NSString *)name
 {
   [self setDefaultStore:[[UserDefaults sharedInstance] objectForKey:ST_DEFAULT]];
-  if ([_delegate respondsToSelector:@selector(dataChanged)])
-    [_delegate dataChanged];
+  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
+    [_delegate dataChangedInStoreManager:self];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name
@@ -116,11 +116,11 @@ UserDefaults *defaults;
 
 @implementation StoreManager(AgendaStoreDelegate)
 
-- (void)dataChanged:(id <AgendaStore>)store
+- (void)dataChangedInStore:(id <AgendaStore>)store
 {
   NSLog(@"Data changed in %@", [store description]);
-  if ([_delegate respondsToSelector:@selector(dataChanged)])
-    [_delegate dataChanged];
+  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
+    [_delegate dataChangedInStoreManager:self];
 }
 
 @end
