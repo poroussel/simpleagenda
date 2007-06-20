@@ -6,6 +6,33 @@
 
 @implementation AppointmentCache
 
+- (void)populateFrom:(id <AgendaStore>)source
+{
+  NSArray *array;
+  NSEnumerator *enumerator;
+  id <AgendaStore> store;
+  Event *event;
+
+  if (source == nil) {
+    [_cache removeAllObjects];
+    enumerator = [_sm objectEnumerator];
+    while ((store = [enumerator nextObject])) {
+      if ([store displayed]) {
+	array = [store scheduledAppointmentsFor:_start];
+	[_cache addObjectsFromArray:array];
+      }
+    } 
+  } else if ([source displayed]) {
+    enumerator = [_cache objectEnumerator];
+    while ((event = [enumerator nextObject])) {
+      if ([source isEqual:[event store]])
+	[_cache removeObject:event];
+    }
+    array = [source scheduledAppointmentsFor:_start];
+    [_cache addObjectsFromArray:array];
+  }
+}
+
 - (id)initwithStoreManager:(StoreManager *)sm 
 		      from:(Date *)start 
 			to:(Date *)end
@@ -16,13 +43,18 @@
     _start = [start copy];
     _end = [end copy];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
-    [self refresh];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					  selector:@selector(dataChanged:) 
+					  name:SADataChangedInStore 
+					  object:nil];
+    [self populateFrom:nil];
   }
   return self;
 }
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_cache release];
   [_start release];
   [_end release];
@@ -35,6 +67,7 @@
   [_end release];
   _start = [start copy];
   _end = [end copy];
+  [self populateFrom:nil];
 }
 
 - (void)setTitle:(NSString *)title
@@ -47,38 +80,37 @@
   return _title;
 }
 
-- (void)refresh
+- (void)dataChanged:(NSNotification *)not
 {
-  NSArray *array;
-  NSEnumerator *enumerator;
-  id <AgendaStore> store;
-
-  [_cache removeAllObjects];
-  enumerator = [_sm objectEnumerator];
-  while ((store = [enumerator nextObject])) {
-    if ([store displayed]) {
-      array = [store scheduledAppointmentsFor:_start];
-      [_cache addObjectsFromArray:array];
-    }
-  }  
+  NSLog(@"Data changed in %@", [[not object] description]);
+  [self populateFrom:[not object]];
+  if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
+    [_delegate dataChangedInCache:self];
 }
 
 - (NSEnumerator *)enumerator
 {
-  [self refresh];
   return [_cache objectEnumerator];
 }
 
 - (NSArray *)array
 {
-  [self refresh];
   return [NSArray arrayWithArray:[_cache allObjects]];
 }
 
 - (unsigned int)count
 {
-  [self refresh];
   return [_cache count];
+}
+
+- (void)setDelegate:(id)delegate
+{
+  _delegate = delegate;
+}
+
+- (id)delegate
+{
+  return _delegate;
 }
 
 @end

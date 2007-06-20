@@ -39,11 +39,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [_defaults registerClient:self forKey:MIN_STEP];
     _editor = [AppointmentEditor new];
     _sm = [StoreManager new];
-    [_sm setDelegate:self];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
 
     date = [Date new];
     _current = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    [_current setDelegate:self];
     _today = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
     [_today setTitle:@"Today"];
     [date incrementDay];
@@ -107,10 +107,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)_editAppointment:(Event *)apt
 {
-  if ([_editor editAppointment:apt withStoreManager:_sm]) {
-    [dayView reloadData];
-    [summary reloadData];
-  }
+  [_editor editAppointment:apt withStoreManager:_sm];
 }
 
 - (void)addAppointment:(id)sender
@@ -140,11 +137,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   Event *apt = [dayView selectedAppointment];
 
-  if (apt) {
+  if (apt)
     [[apt store] delAppointment: apt];
-    [dayView reloadData];
-    [summary reloadData];
-  }
 }
 
 - (void)copy:(id)sender
@@ -175,8 +169,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       [new release];
     }
     [date release];
-    [dayView reloadData];
-    [summary reloadData];
   }
 }
 
@@ -286,7 +278,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)modifyAppointment:(Event *)apt
 {
   [[apt store] updateAppointment:apt];
-  [summary reloadData];
 }
 
 - (void)createAppointmentFrom:(int)start to:(int)end
@@ -306,13 +297,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @end
 
-@implementation AppController(StoreManagerDelegate)
+@implementation AppController(AppointmentCacheDelegate)
 
-- (void)dataChangedInStoreManager:(StoreManager *)sm
+- (void)dataChangedInCache:(AppointmentCache *)ac
 {
   [dayView reloadData];
   [summary reloadData];
 }
 
 @end
-

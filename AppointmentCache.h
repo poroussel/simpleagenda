@@ -7,6 +7,7 @@
   Date *_end;
   NSMutableSet *_cache;
   NSString *_title;
+  id _delegate;
 }
 
 - (id)initwithStoreManager:(StoreManager *)sm  
@@ -15,10 +16,14 @@
 - (void)setFrom:(Date *)start to:(Date *)end;
 - (void)setTitle:(NSString *)title;
 - (NSString *)title;
-- (void)refresh;
 - (NSEnumerator *)enumerator;
 - (NSArray *)array;
 - (unsigned int)count;
+- (void)setDelegate:(id)delegate;
+- (id)delegate;
 
 @end
 
+@interface NSObject(AppointmentCacheDelegate)
+- (void)dataChangedInCache:(AppointmentCache *)ac;
+@end

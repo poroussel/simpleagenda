@@ -269,10 +269,8 @@
 
 - (void)refreshData:(NSTimer *)timer
 {
-  if ([self read]) {
-    if ([_delegate respondsToSelector:@selector(dataChangedInStore:)])
-      [_delegate dataChangedInStore:self];
-  }
+  if ([self read])
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (NSArray *)scheduledAppointmentsFor:(Date *)day

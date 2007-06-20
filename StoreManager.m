@@ -63,7 +63,6 @@ UserDefaults *defaults;
 {
   [defaults unregisterClient:self];
   RELEASE(_defaultStore);
-  RELEASE(_delegate);
   [_stores release];
   [super dealloc];
 }
@@ -71,8 +70,6 @@ UserDefaults *defaults;
 - (void)defaultDidChanged:(NSString *)name
 {
   [self setDefaultStore:[[UserDefaults sharedInstance] objectForKey:ST_DEFAULT]];
-  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
-    [_delegate dataChangedInStoreManager:self];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name
@@ -97,11 +94,6 @@ UserDefaults *defaults;
   return [_stores objectEnumerator];
 }
 
-- (void)setDelegate:(id)delegate;
-{
-  ASSIGN(_delegate, delegate);
-}
-
 - (void)synchronise
 {
   NSEnumerator *enumerator;
@@ -110,17 +102,6 @@ UserDefaults *defaults;
   enumerator = [_stores objectEnumerator];
   while ((store = [enumerator nextObject]))
     [store write];
-}
-
-@end
-
-@implementation StoreManager(AgendaStoreDelegate)
-
-- (void)dataChangedInStore:(id <AgendaStore>)store
-{
-  NSLog(@"Data changed in %@", [store description]);
-  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
-    [_delegate dataChangedInStoreManager:self];
 }
 
 @end

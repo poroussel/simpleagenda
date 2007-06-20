@@ -3,6 +3,8 @@
 #import <AppKit/AppKit.h>
 #import "Event.h"
 
+#define SADataChangedInStore @"DataDidChangedInStore"
+
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
 - (NSArray *)scheduledAppointmentsFor:(Date *)day;
@@ -18,8 +20,4 @@
 - (void)setEventColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
-@end
-
-@interface NSObject(AgendaStoreDelegate)
-- (void)dataChangedInStore:(id <AgendaStore>)agenda;
 @end

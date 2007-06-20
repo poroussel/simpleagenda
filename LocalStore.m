@@ -82,23 +82,23 @@
 
 -(void)addAppointment:(Event *)app
 {
-  //NSLog(@"add appointment %@ on %@", [app title], [[app startDate] description]);
   [_set addObject:app];
   [app setStore:self];
   _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 -(void)delAppointment:(Event *)app
 {
-  //NSLog(@"delete appointment %@ on %@", [app title], [[app startDate] description]);
   [_set removeObject:app];
   _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 -(void)updateAppointment:(Event *)app
 {
-  //NSLog(@"update appointment %@ on %@", [app title], [[app startDate] description]);
   _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (BOOL)contains:(Event *)evt
