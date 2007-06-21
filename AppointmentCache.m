@@ -82,7 +82,6 @@
 
 - (void)dataChanged:(NSNotification *)not
 {
-  NSLog(@"Data changed in %@", [[not object] description]);
   [self populateFrom:[not object]];
   if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
     [_delegate dataChangedInCache:self];
