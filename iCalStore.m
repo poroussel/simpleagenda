@@ -32,7 +32,7 @@
     goto init_error;
   }
   start = icalproperty_get_dtstart(pstart);
-  date = [[Date alloc] init];
+  date = [Date new];
   [date setDateToTime_t:icaltime_as_timet(start)];
   [self setStartDate:date andConstrain:NO];
   [self setEndDate:date];
@@ -81,6 +81,7 @@
       break;
     }
   }
+  [date release];
   return self;
 
  init_error:

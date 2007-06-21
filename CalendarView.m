@@ -103,13 +103,12 @@
     [self addSubview: matrix];
 
     delegate = nil;
-    date = [[Date alloc] init];
+    date = [Date new];
 
     [self setDate: date];
     [self setTitlePosition:NSBelowTop];
 
-    Date *now = [Date now];
-    [now changeMinuteBy:1];
+    Date *now = [Date new];
     [now incrementDay];
     [now setMinute:0];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate] 
@@ -158,9 +157,9 @@
     }
   }
 
-  today = [[Date alloc] init];
+  today = [Date new];
   [today setMinute:0];
-  firstWeek = [[Date alloc] init];
+  firstWeek = [Date new];
   [firstWeek setDate: date];
   [firstWeek setDay: 1];
   [firstWeek setMinute:0];
