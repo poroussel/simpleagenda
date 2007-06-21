@@ -65,7 +65,7 @@
 				blue:[color blueComponent] - 0.3
 				alpha:[color alphaComponent]];
 
-  if ([_apt duration] == 1440)
+  if ([_apt allDay])
     title = [NSString stringWithFormat:@"All day : %@", [_apt title]];
   else
     title = [NSString stringWithFormat:@"%2dh%0.2d : %@", [start hourOfDay], [start minuteOfHour], [_apt title]];
@@ -77,7 +77,8 @@
   [color set];
   NSRectFill(rect);
   [darkColor set];
-  NSRectFill(RedimRect(rect));
+  if (![_apt allDay])
+    NSRectFill(RedimRect(rect));
   [label drawInRect:TextRect(rect) withAttributes:_textAttributes];
   if (_selected) {
     [[NSColor grayColor] set];
@@ -133,7 +134,9 @@
 - (NSRect)_frameForAppointment:(Event *)apt
 {
   int size, start;
-  
+
+  if ([apt allDay])
+    return NSMakeRect(40, 0, [self frame].size.width - 56, [self frame].size.height);
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
   return NSMakeRect(40, start - size, [self frame].size.width - 56, size);
@@ -242,6 +245,8 @@
     }
 
     if (![[[aptv appointment] store] isWritable])
+      return;
+    if ([[aptv appointment] allDay])
       return;
 
     frame = [aptv frame];

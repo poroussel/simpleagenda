@@ -32,6 +32,7 @@
   [durationText setFloatValue:[data duration] / 60.0];
   [repeat selectItemAtIndex:[data interval]];
   [location setStringValue:[data location]];
+  [allDay setState:[data allDay]];
 
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
   [[description textStorage] appendAttributedString:[data descriptionText]];
@@ -67,6 +68,7 @@
     }
     [data setDescriptionText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
+    [data setAllDay:[allDay state]];
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
 

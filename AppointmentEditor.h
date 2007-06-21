@@ -15,6 +15,7 @@
   id endDateStepper;
   id location;
   id store;
+  id allDay;
 }
 
 - (BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm;

@@ -35,7 +35,8 @@
   [coder encodeInt:frequency forKey:@"frequency"];
   [coder encodeInt:duration forKey:@"duration"];
   [coder encodeInt:scheduleLevel forKey:@"scheduleLevel"];
-  [coder encodeObject:location forKey:@"location"];
+  [coder encodeObject:_location forKey:@"location"];
+  [coder encodeBool:_allDay forKey:@"allDay"];
 }
 
 -(id)initWithCoder:(NSCoder *)coder
@@ -48,7 +49,11 @@
   frequency = [coder decodeIntForKey:@"frequency"];
   duration = [coder decodeIntForKey:@"duration"];
   scheduleLevel = [coder decodeIntForKey:@"scheduleLevel"];
-  location = [[coder decodeObjectForKey:@"location"] retain];
+  _location = [[coder decodeObjectForKey:@"location"] retain];
+  if ([coder containsValueForKey:@"allDay"])
+    _allDay = [coder decodeBoolForKey:@"allDay"];
+  else
+    _allDay = NO;
   return self;
 }
 
@@ -63,12 +68,6 @@
   [self setTitle:aTitle];
   [self setDuration:minutes];
   return self;
-}
-
-- (void)dealloc
-{
-  RELEASE(location);
-  [super dealloc];
 }
 
 /*
@@ -114,17 +113,33 @@
 
 - (NSString *)location
 {
-  return location;
+  return _location;
 }
 
-- (void)setLocation:(NSString *)aLocation
+- (void)setLocation:(NSString *)location
 {
-  ASSIGN(location, aLocation);
+  _location = location;
+}
+
+- (BOOL)allDay
+{
+  return _allDay;
+}
+
+- (void)setAllDay:(BOOL)allDay
+{
+  _allDay = allDay;
 }
 
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self title], [self startDate], [self duration]];
+}
+
+- (void)setDuration:(int)newDuration
+{
+  [super setDuration:newDuration];
+  [self setAllDay:(newDuration == 1440)];
 }
 
 @end

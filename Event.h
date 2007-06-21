@@ -8,7 +8,8 @@
 @interface Event : Appointment
 {
   id <AgendaStore> _store;
-  NSString *location;
+  NSString *_location;
+  BOOL _allDay;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
@@ -17,5 +18,7 @@
 - (void)setStore:(id <AgendaStore>)store;
 - (NSString *)location;
 - (void)setLocation:(NSString *)aLocation;
+- (BOOL)allDay;
+- (void)setAllDay:(BOOL)allDay;
 
 @end
