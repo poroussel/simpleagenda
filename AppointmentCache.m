@@ -17,12 +17,10 @@
     [_cache removeAllObjects];
     enumerator = [_sm objectEnumerator];
     while ((store = [enumerator nextObject])) {
-      if ([store displayed]) {
-	array = [store scheduledAppointmentsFor:_start];
-	[_cache addObjectsFromArray:array];
-      }
+      array = [store scheduledAppointmentsFor:_start];
+      [_cache addObjectsFromArray:array];
     } 
-  } else if ([source displayed]) {
+  } else {
     enumerator = [_cache objectEnumerator];
     while ((event = [enumerator nextObject])) {
       if ([source isEqual:[event store]])
@@ -46,6 +44,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					  selector:@selector(dataChanged:) 
 					  name:SADataChangedInStore 
+					  object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					  selector:@selector(parametersChanged:) 
+					  name:SADefaultsChangedforStore 
 					  object:nil];
     [self populateFrom:nil];
   }
@@ -88,6 +90,12 @@
 - (void)dataChanged:(NSNotification *)not
 {
   [self populateFrom:[not object]];
+  if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
+    [_delegate dataChangedInCache:self];
+}
+
+- (void)parametersChanged:(NSNotification *)not
+{
   if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
     [_delegate dataChangedInCache:self];
 }

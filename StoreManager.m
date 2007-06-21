@@ -49,7 +49,7 @@ UserDefaults *defaults;
 	if (store) {
 	  [_stores setObject:store forKey:stname];
 	  NSLog(@"Added %@ to StoreManager", stname);
-	  [defaults registerClient:self forKey:[store description]];
+	  [defaults registerClient:store forKey:[store description]];
 	} else
 	  NSLog(@"Unable to initialize store %@", stname);
       }

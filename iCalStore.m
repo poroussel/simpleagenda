@@ -368,4 +368,9 @@
   [[UserDefaults sharedInstance] setObject:_params forKey:_name];
 }
 
+- (void)defaultDidChanged:(NSString *)name
+{
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADefaultsChangedforStore object:self];
+}
+
 @end

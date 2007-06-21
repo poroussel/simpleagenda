@@ -2,10 +2,12 @@
 
 #import <AppKit/AppKit.h>
 #import "Event.h"
+#import "UserDefaults.h"
 
 #define SADataChangedInStore @"DataDidChangedInStore"
+#define SADefaultsChangedforStore @"DefaultsChangedforStore"
 
-@protocol AgendaStore <NSObject>
+@protocol AgendaStore <NSObject, DefaultsConsumer>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
 - (NSArray *)scheduledAppointmentsFor:(Date *)day;
 - (void)addAppointment:(Event *)evt;
@@ -20,4 +22,5 @@
 - (void)setEventColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
+- (void)defaultDidChanged:(NSString *)name;
 @end

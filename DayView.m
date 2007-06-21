@@ -207,9 +207,11 @@
     [aptv removeFromSuperview];
 
   enumerator = [_dataSource scheduledAppointmentsForDayView];
-  while ((apt = [enumerator nextObject]))
-    [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
-					      appointment:apt]];
+  while ((apt = [enumerator nextObject])) {
+    if ([[apt store] displayed])
+      [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
+						appointment:apt]];
+  }
   _selected = nil;
   [self setNeedsDisplay:YES];
 }
