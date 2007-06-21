@@ -22,5 +22,4 @@
 - (void)setEventColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
-- (void)defaultDidChanged:(NSString *)name;
 @end
