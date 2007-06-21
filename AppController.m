@@ -238,9 +238,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   if ([@"title" isEqual:[tableColumn identifier]])
     return [item title];
-  if ([item respondsToSelector:@selector(startDate)])
-    return [[item startDate] description];
-  return [NSString stringWithFormat:@"%d item(s)", [item count]];
+  return [item details];
 }
 
 @end

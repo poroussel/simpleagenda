@@ -20,5 +20,6 @@
 - (void)setLocation:(NSString *)aLocation;
 - (BOOL)allDay;
 - (void)setAllDay:(BOOL)allDay;
+- (NSString *)details;
 
 @end

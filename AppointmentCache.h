@@ -16,6 +16,7 @@
 - (void)setFrom:(Date *)start to:(Date *)end;
 - (void)setTitle:(NSString *)title;
 - (NSString *)title;
+- (NSString *)details;
 - (NSEnumerator *)enumerator;
 - (NSArray *)array;
 - (unsigned int)count;

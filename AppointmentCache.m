@@ -80,6 +80,11 @@
   return _title;
 }
 
+- (NSString *)details
+{
+  return [NSString stringWithFormat:@"%d item(s)", [self count]];;
+}
+
 - (void)dataChanged:(NSNotification *)not
 {
   [self populateFrom:[not object]];

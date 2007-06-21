@@ -142,5 +142,13 @@
   [self setAllDay:(newDuration == 1440)];
 }
 
+- (NSString *)details
+{
+  if ([self allDay])
+    return @"all day";
+  int h = [self duration] / 60; 
+  return [NSString stringWithFormat:@"%dh%02d", h, [self duration] - h * 60];
+}
+
 @end
 
