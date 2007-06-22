@@ -9,7 +9,7 @@
 
 @protocol AgendaStore <NSObject, DefaultsConsumer>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
-- (NSArray *)scheduledAppointmentsFor:(Date *)day;
+- (NSEnumerator *)enumerator;
 - (void)addAppointment:(Event *)evt;
 - (void)delAppointment:(Event *)evt;
 - (void)updateAppointment:(Event *)evt;

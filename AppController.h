@@ -23,6 +23,7 @@
   AppointmentCache *_current;
   AppointmentCache *_today;
   AppointmentCache *_tomorrow;
+  AppointmentCache *_soon;
 }
 
 - (void)showPrefPanel:(id)sender;

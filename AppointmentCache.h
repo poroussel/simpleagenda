@@ -5,15 +5,17 @@
   StoreManager *_sm;
   Date *_start;
   Date *_end;
+  int _duration;
   NSMutableSet *_cache;
   NSString *_title;
   id _delegate;
 }
 
 - (id)initwithStoreManager:(StoreManager *)sm  
-		      from:(Date *)start 
-			to:(Date *)end;
-- (void)setFrom:(Date *)start to:(Date *)end;
+		      date:(Date *)date 
+		  duration:(int)days;
+- (void)setDate:(Date *)date;
+- (void)setDuration:(int)duration;
 - (void)setTitle:(NSString *)title;
 - (NSString *)title;
 - (NSString *)details;

@@ -101,6 +101,19 @@
   return NO;
 }
 
+- (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end
+{
+  int nd;
+  Date *work = [start copy];
+
+  for (nd = 0; nd < [start daysUntil:end] + 1; nd++) {
+    if ([self isScheduledForDay:work])
+      return YES;
+    [work incrementDay];
+  }
+  return NO;
+}
+
 - (id <AgendaStore>)store
 {
   return _store;
@@ -146,8 +159,8 @@
 {
   if ([self allDay])
     return @"all day";
-  int h = [self duration] / 60; 
-  return [NSString stringWithFormat:@"%dh%02d", h, [self duration] - h * 60];
+  int h = [[self startDate] minuteOfDay] / 60; 
+  return [NSString stringWithFormat:@"%dh%02d", h, [[self startDate] minuteOfDay] - h * 60];
 }
 
 @end

@@ -8,8 +8,8 @@
 
 - (void)populateFrom:(id <AgendaStore>)source
 {
-  NSArray *array;
   NSEnumerator *enumerator;
+  NSEnumerator *eventEnumerator;
   id <AgendaStore> store;
   Event *event;
 
@@ -17,8 +17,11 @@
     [_cache removeAllObjects];
     enumerator = [_sm objectEnumerator];
     while ((store = [enumerator nextObject])) {
-      array = [store scheduledAppointmentsFor:_start];
-      [_cache addObjectsFromArray:array];
+      eventEnumerator = [store enumerator];
+      while ((event = [eventEnumerator nextObject])) {
+	if ([event isScheduledBetweenDay:_start andDay:_end])
+	  [_cache addObject:event];
+      }
     } 
   } else {
     enumerator = [_cache objectEnumerator];
@@ -26,20 +29,25 @@
       if ([source isEqual:[event store]])
 	[_cache removeObject:event];
     }
-    array = [source scheduledAppointmentsFor:_start];
-    [_cache addObjectsFromArray:array];
+    eventEnumerator = [source enumerator];
+    while ((event = [eventEnumerator nextObject])) {
+      if ([event isScheduledBetweenDay:_start andDay:_end])
+	[_cache addObject:event];
+    }
   }
 }
 
 - (id)initwithStoreManager:(StoreManager *)sm 
-		      from:(Date *)start 
-			to:(Date *)end
+		      date:(Date *)date
+		  duration:(int)days
 {
   self = [super init];
   if (self) {
     _sm = sm;
-    _start = [start copy];
-    _end = [end copy];
+    _duration = days;
+    _start = [date copy];
+    _end = [date copy];
+    [_end changeDayBy:days - 1];
     _cache = [[NSMutableSet alloc] initWithCapacity:16];
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					  selector:@selector(dataChanged:) 
@@ -63,12 +71,22 @@
   [super dealloc];
 }
 
-- (void)setFrom:(Date *)start to:(Date *)end
+- (void)setDate:(Date *)date;
 {
   [_start release];
   [_end release];
-  _start = [start copy];
-  _end = [end copy];
+  _start = [date copy];
+  _end = [date copy];
+  [_end changeDayBy:_duration - 1];
+  [self populateFrom:nil];
+}
+
+- (void)setDuration:(int)days;
+{
+  _duration = days;
+  [_end release];
+  _end = [_start copy];
+  [_end changeDayBy:days - 1];
   [self populateFrom:nil];
 }
 

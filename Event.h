@@ -13,7 +13,7 @@
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
-- (BOOL)isScheduledForDay:(Date *)day;
+- (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end;
 - (id <AgendaStore>)store;
 - (void)setStore:(id <AgendaStore>)store;
 - (NSString *)location;

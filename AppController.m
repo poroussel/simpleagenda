@@ -42,13 +42,16 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
 
     date = [Date new];
-    _current = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    _current = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
     [_current setDelegate:self];
-    _today = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    _today = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
     [_today setTitle:@"Today"];
     [date incrementDay];
-    _tomorrow = [[AppointmentCache alloc] initwithStoreManager:_sm from:date to:date];
+    _tomorrow = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
     [_tomorrow setTitle:@"Tomorrow"];
+    [date incrementDay];
+    _soon = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:3];
+    [_soon setTitle:@"Soon"];
     [date release];
   }
   return self;
@@ -67,6 +70,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
+  [_soon release];
   [_tomorrow release];
   [_today release];
   [_current release];
@@ -213,7 +217,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
   if (item == nil)
-    return 2;
+    return 3;
   if ([item class] == [AppointmentCache class])
     return [item count];
   return 0;
@@ -229,7 +233,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   if (item == nil) {
     if (index == 0)
       return _today;
-    return _tomorrow;
+    if (index == 1)
+      return _tomorrow;
+    return _soon;
   }
   return [[item array] objectAtIndex:index];
 }
@@ -247,15 +253,17 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {
-  [_current setFrom:date to:date];
+  [_current setDate:date];
   [dayView reloadData];
 }
 
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 {
-  [_today setFrom:date to:date];
+  [_today setDate:date];
   [date incrementDay];
-  [_tomorrow setFrom:date to:date];
+  [_tomorrow setDate:date];
+  [date incrementDay];
+  [_soon setDate:date];
   [summary reloadData];
 }
 
