@@ -12,7 +12,9 @@ static UserDefaults *singleton;
 
 + (UserDefaults *)sharedInstance
 {
-  return singleton ? singleton : [[self new] autorelease];
+  if (singleton == nil)
+    singleton = [[UserDefaults alloc] init];
+  return singleton;
 }
 
 - (void)notifyListenerForKey:(NSString *)key
@@ -40,9 +42,8 @@ static UserDefaults *singleton;
 
 - (id)init
 {
-  if (singleton)
-    [self release];
-  else if ((self = singleton = [[super init] retain])) {
+  self = [super init];
+  if (self) {
     _cpkey = [NSMutableDictionary new];
     _defaults = [NSUserDefaults standardUserDefaults];
     if ([_defaults objectForKey:VERSION] == nil)
@@ -52,7 +53,7 @@ static UserDefaults *singleton;
 					  selector:@selector(userDefaultsChanged:)
 					  name:@"NSUserDefaultsDidChangeNotification" object:nil];
   }
-  return singleton;
+  return self;
 }
 
 - (void)dealloc
