@@ -59,7 +59,6 @@ static UserDefaults *singleton;
 - (void)dealloc
 {
   [_defaults synchronize];
-  [_defaults release];
   [_cpkey release];
 }
 
