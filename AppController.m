@@ -218,7 +218,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   if (item == nil)
     return 3;
-  if ([item class] == [AppointmentCache class])
+  if ([item isKindOf:[AppointmentCache class]])
     return [item count];
   return 0;
 }
