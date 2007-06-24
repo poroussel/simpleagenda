@@ -236,7 +236,7 @@
   BOOL inResize;
 
   [[self window] makeFirstResponder:self];
-  if ([hit class] == [AppointmentView class]) {
+  if ([hit isKindOfClass:[AppointmentView class]]) {
     AppointmentView *aptv = hit;
     [self _selectAppointmentView:aptv];
 
@@ -337,7 +337,7 @@
 {
   NSView *hit = [self hitTest:[self convertPoint:[theEvent locationInWindow] fromView:nil]];
 
-  if ([hit class] == [AppointmentView class])
+  if ([hit isKindOfClass:[AppointmentView class]])
     [self _selectAppointmentView:(AppointmentView *)hit];
   return nil;
 }
