@@ -104,8 +104,8 @@ static UserDefaults *singleton;
   else {
     keys = [NSMutableSet new];
     [keys addObject:client];
-    [_cpkey setObject:keys forKey:key];
   }
+  [_cpkey setObject:keys forKey:key];
 }
 
 - (void)unregisterClient:(id <DefaultsConsumer>)client
