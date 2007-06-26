@@ -70,6 +70,14 @@
   return self;
 }
 
+- (void)dealloc
+{
+  [super dealloc];
+  RELEASE(_store);
+  RELEASE(_location);
+  RELEASE(_externalRef);
+}
+
 /*
  * Code adapted from ChronographerSource Appointment:isScheduledFor
  * I don't understand the first three lines of their version
@@ -121,7 +129,7 @@
 
 - (void)setStore:(id <AgendaStore>)store
 {
-  _store = store;
+  ASSIGN(_store, store);
 }
 
 - (NSString *)location
@@ -131,7 +139,7 @@
 
 - (void)setLocation:(NSString *)location
 {
-  _location = location;
+  ASSIGN(_location, location);
 }
 
 - (BOOL)allDay
@@ -142,6 +150,16 @@
 - (void)setAllDay:(BOOL)allDay
 {
   _allDay = allDay;
+}
+
+- (id)externalRef
+{
+  return _externalRef;
+}
+
+- (void)setExternalRef:(id)externalRef
+{
+  ASSIGN(_externalRef, externalRef);
 }
 
 - (NSString *)description

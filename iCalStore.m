@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
 #import <ical.h>
+#import "Event.h"
 #import "iCalStore.h"
 #import "defines.h"
 

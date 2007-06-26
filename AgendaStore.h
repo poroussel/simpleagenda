@@ -1,9 +1,10 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
-#import "Event.h"
 
 #define SADataChangedInStore @"DataDidChangedInStore"
+
+@class Event;
 
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;

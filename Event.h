@@ -2,14 +2,14 @@
 
 #import <ChronographerSource/Date.h>
 #import <ChronographerSource/Appointment.h>
-
-@protocol AgendaStore;
+#import "AgendaStore.h"
 
 @interface Event : Appointment
 {
   id <AgendaStore> _store;
   NSString *_location;
   BOOL _allDay;
+  id _externalRef;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
@@ -20,6 +20,8 @@
 - (void)setLocation:(NSString *)aLocation;
 - (BOOL)allDay;
 - (void)setAllDay:(BOOL)allDay;
+- (id)externalRef;
+- (void)setExternalRef:(id)externalRef;
 - (NSString *)details;
 
 @end
