@@ -15,7 +15,6 @@
 
   PreferencesController *_pc;
   AppointmentEditor *_editor;
-  ConfigManager *_config;
   StoreManager *_sm;
   Event *_selection;
   BOOL _deleteSelection;
