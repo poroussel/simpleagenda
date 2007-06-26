@@ -10,7 +10,8 @@
     _cpkey = [NSMutableDictionary new];
     _dict = [NSMutableDictionary new];
     _defaults = [NSMutableDictionary new];
-    [_dict setDictionary:[[NSUserDefaults standardUserDefaults] persistentDomainForName:@"SimpleAgenda"]];
+    [_dict setDictionary:[[NSUserDefaults standardUserDefaults] 
+			   persistentDomainForName:[[NSProcessInfo processInfo] processName]]];
   }
   return self;
 }
