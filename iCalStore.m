@@ -105,6 +105,23 @@
 
 @implementation iCalStore
 
+- (icalcomponent *)getComponentForEvent:(Event *)evt
+{
+  NSString *uid = [evt externalRef];
+  icalcomponent *ic;
+  icalproperty *prop;
+
+  for (ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
+       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT)) {
+    prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
+    if (prop) {
+      if ([uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
+	return ic;
+    }
+  }
+  return NULL;
+}
+
 - (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
   GSXMLNode *inter;
@@ -235,7 +252,7 @@
       _writable = [[_config objectForKey:ST_RW] boolValue];
     else
       _writable = NO;
-    _set = [[NSMutableSet alloc] initWithCapacity:128];
+    _set = [[NSMutableSet alloc] initWithCapacity:32];
     if ([_config objectForKey:ST_DISPLAY])
       _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
@@ -244,7 +261,7 @@
 
     if (![_url isFileURL]) {
       if ([_config objectForKey:ST_REFRESH])
-	_minutesBeforeRefresh = [[_config objectForKey:ST_REFRESH] intValue];
+	_minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
       else
 	_minutesBeforeRefresh = 60;
       _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
@@ -292,12 +309,31 @@
 {
 }
 
+/*
+ * FIXME : we should probably write asynchronously on
+ * every change or every x minutes.
+ * Do we need to read before writing ?
+ */
 - (void)delAppointment:(Event *)evt
 {
+  icalcomponent *ic = [self getComponentForEvent:evt];
+  if (!ic) {
+    NSLog(@"iCalendar component not found");
+    return;
+  }
+  [_set removeObject:evt];
+  _modified = YES;
+  icalcomponent_remove_component(_icomp, ic);
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (void)updateAppointment:(Event *)evt
 {
+  icalcomponent *ic = [self getComponentForEvent:evt];
+  if (!ic) {
+    NSLog(@"iCalendar component not found");
+    return;
+  }
 }
 
 - (BOOL)contains:(Event *)evt
