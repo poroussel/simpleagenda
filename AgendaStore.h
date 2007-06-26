@@ -4,7 +4,6 @@
 #import "Event.h"
 
 #define SADataChangedInStore @"DataDidChangedInStore"
-#define SADefaultsChangedforStore @"DefaultsChangedforStore"
 
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;

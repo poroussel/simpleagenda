@@ -53,10 +53,6 @@
 					  selector:@selector(dataChanged:) 
 					  name:SADataChangedInStore 
 					  object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					  selector:@selector(parametersChanged:) 
-					  name:SADefaultsChangedforStore 
-					  object:nil];
     [self populateFrom:nil];
   }
   return self;
@@ -108,12 +104,6 @@
 - (void)dataChanged:(NSNotification *)not
 {
   [self populateFrom:[not object]];
-  if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
-    [_delegate dataChangedInCache:self];
-}
-
-- (void)parametersChanged:(NSNotification *)not
-{
   if ([_delegate respondsToSelector:@selector(dataChangedInCache:)])
     [_delegate dataChangedInCache:self];
 }
