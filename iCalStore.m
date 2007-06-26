@@ -18,7 +18,17 @@
   struct icalrecurrencetype rec;
   Date *date;
 
-  [self init];
+  self = [self init];
+  if (self == nil)
+    return nil;
+
+  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
+  if (!prop) {
+    NSLog(@"No UID");
+    goto init_error;
+  }
+  [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+    
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
   if (!prop) {
     NSLog(@"No summary");
@@ -354,7 +364,7 @@
 - (void)setDisplayed:(BOOL)state
 {
   _displayed = state;
-  [_config setValue:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
+  [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
 
 @end
