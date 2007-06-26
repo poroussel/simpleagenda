@@ -12,6 +12,4 @@ In no particular order :
 * remove ChronographerSource dependency and use libical for local
    stores
 
-* redo user defaults, current code is ugly
-
 Want to help out ? Contact me at p.o.roussel@free.fr
