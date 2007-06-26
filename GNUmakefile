@@ -44,7 +44,8 @@ PreferencesController.h \
 HourFormatter.h \
 UserDefaults.h \
 iCalStore.h \
-AppointmentCache.h
+AppointmentCache.h \
+ConfigManager.h
 
 #
 # Class files
@@ -59,9 +60,9 @@ DayView.m \
 Event.m \
 PreferencesController.m \
 HourFormatter.m \
-UserDefaults.m \
 iCalStore.m \
-AppointmentCache.m
+AppointmentCache.m \
+ConfigManager.m
 
 #
 # Other sources

@@ -1,8 +1,8 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "UserDefaults.h"
+#import "ConfigManager.h"
 
-@interface StoreManager : NSObject <DefaultsConsumer>
+@interface StoreManager : NSObject <ConfigListener>
 {
   NSMutableDictionary *_stores;
   id _defaultStore;

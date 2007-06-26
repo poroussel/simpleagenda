@@ -1,15 +1,12 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
-#import "LocalStore.h"
 #import "AppointmentEditor.h"
 #import "StoreManager.h"
 #import "AppointmentCache.h"
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
-#import "UserDefaults.h"
-#import "defines.h"
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
@@ -18,25 +15,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController
 
-- (NSDictionary *)defaults
-{
-  NSDictionary *dict = [NSDictionary 
-			 dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
-			 forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
-  return dict;
-}
-
 - (id)init
 {
   Date *date;
 
   self = [super init];
   if (self) {
-    _defaults = [UserDefaults sharedInstance];
-    [_defaults setHardDefaults:[self defaults]];
-    [_defaults registerClient:self forKey:FIRST_HOUR];
-    [_defaults registerClient:self forKey:LAST_HOUR];
-    [_defaults registerClient:self forKey:MIN_STEP];
     _editor = [AppointmentEditor new];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
@@ -55,11 +39,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [date release];
   }
   return self;
-}
-
-- (void)defaultDidChanged:(NSString *)name
-{
-  [dayView reloadData];
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
@@ -83,8 +62,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_sm synchronise];
   [_sm release];
   [_editor release];
-  [_defaults unregisterClient:self];
-  [_defaults release];
 }
 
 - (void)showPrefPanel:(id)sender
@@ -94,7 +71,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (int)_sensibleStartForDuration:(int)duration
 {
-  int minute = [self firstHourForDayView] * 60;
+  int minute = [dayView firstHour] * 60;
   NSArray *sorted = [[_current array] sortedArrayUsingFunction:sortAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
@@ -104,9 +81,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       return minute;
     minute = [[apt startDate] minuteOfDay] + [apt duration];
   }
-  if (minute < [self lastHourForDayView] * 60)
+  if (minute < [dayView lastHour] * 60)
     return minute;
-  return [self firstHourForDayView] * 60;
+  return [dayView firstHour] * 60;
 }
 
 - (void)_editAppointment:(Event *)apt
@@ -189,21 +166,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 
 /* DayViewDataSource protocol */
-
-- (int)firstHourForDayView
-{
-  return [_defaults integerForKey:FIRST_HOUR];
-}
-
-- (int)lastHourForDayView
-{
-  return [_defaults integerForKey:LAST_HOUR];
-}
-
-- (int)minimumStepForDayView
-{
-  return [_defaults integerForKey:MIN_STEP];
-}
 
 - (NSEnumerator *)scheduledAppointmentsForDayView
 {

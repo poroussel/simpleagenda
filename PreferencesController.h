@@ -3,7 +3,6 @@
 #import <AppKit/AppKit.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
-#import "UserDefaults.h"
 
 @interface PreferencesController : NSObject
 {
@@ -18,7 +17,6 @@
   IBOutlet id storeColor;
   IBOutlet id defaultStorePopUp;
   IBOutlet id storeDisplay;
-  UserDefaults *_defaults;
   StoreManager *_sm;
 }
 

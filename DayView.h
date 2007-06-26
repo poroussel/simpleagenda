@@ -1,18 +1,16 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import "ConfigManager.h"
 #import "Event.h"
 
 @protocol DayViewDataSource
-- (int)firstHourForDayView;
-- (int)lastHourForDayView;
-- (int)minimumStepForDayView;
 - (NSEnumerator *)scheduledAppointmentsForDayView;
 @end
 
 @class AppointmentView;
 
-@interface DayView : NSView
+@interface DayView : NSView <ConfigListener>
 {
   id <DayViewDataSource> _dataSource;
   IBOutlet id delegate;
@@ -20,6 +18,7 @@
   int _width;
   int _firstH;
   int _lastH;
+  int _minStep;
   NSPoint _startPt;
   NSPoint _endPt;
   NSDictionary *_textAttributes;
@@ -30,6 +29,9 @@
 - (void)drawRect:(NSRect)rect;
 - (void)reloadData;
 - (Event *)selectedAppointment;
+- (int)firstHour;
+- (int)lastHour;
+- (int)minimumStep;
 
 @end
 

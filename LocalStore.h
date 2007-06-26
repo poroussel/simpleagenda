@@ -1,11 +1,12 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "AgendaStore.h"
+#import "ConfigManager.h"
 
 @interface LocalStore : NSObject <AgendaStore>
 {
   id _manager;
-  NSMutableDictionary *_params;
+  ConfigManager *_config;
   NSMutableSet *_set;
   BOOL _modified;
   NSString *_globalPath;

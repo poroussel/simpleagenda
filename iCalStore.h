@@ -1,10 +1,11 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "AgendaStore.h"
+#import "ConfigManager.h"
 
 @interface iCalStore : NSObject <AgendaStore>
 {
-  NSMutableDictionary *_params;
+  ConfigManager *_config;
   NSMutableSet *_set;
   NSString *_name;
   NSURL *_url;

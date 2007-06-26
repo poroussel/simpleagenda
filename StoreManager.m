@@ -3,14 +3,12 @@
 #import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
-#import "UserDefaults.h"
+#import "ConfigManager.h"
 #import "defines.h"
 
 @implementation StoreManager
 
 #define PERSONAL_AGENDA @"Personal Agenda"
-
-UserDefaults *defaults;
 
 - (NSDictionary *)defaults
 {
@@ -33,23 +31,22 @@ UserDefaults *defaults;
 
   self = [super init];
   if (self) {
-    defaults = [UserDefaults sharedInstance];
-    [defaults setHardDefaults:[self defaults]];
-    [defaults registerClient:self forKey:ST_DEFAULT];
-    NSArray *storeArray = [defaults objectForKey:STORES];
-    NSString *defaultStore = [defaults objectForKey:ST_DEFAULT];
+    [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+    [[ConfigManager globalConfig] registerClient:self forKey:ST_DEFAULT];
+    NSArray *storeArray = [[ConfigManager globalConfig] objectForKey:STORES];
+    NSString *defaultStore = [[ConfigManager globalConfig] objectForKey:ST_DEFAULT];
 
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [storeArray objectEnumerator];
     while ((stname = [enumerator nextObject])) {
-      dict = [defaults objectForKey:stname];
+      dict = [[ConfigManager globalConfig] objectForKey:stname];
       if (dict) {
 	storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
 	store = [storeClass storeNamed:stname forManager:self];
 	if (store) {
 	  [_stores setObject:store forKey:stname];
 	  NSLog(@"Added %@ to StoreManager", stname);
-	  [defaults registerClient:store forKey:[store description]];
+	  //	  [[ConfigManager globalConfig] registerClient:store forKey:[store description]];
 	} else
 	  NSLog(@"Unable to initialize store %@", stname);
       }
@@ -61,15 +58,15 @@ UserDefaults *defaults;
 
 - (void)dealloc
 {
-  [defaults unregisterClient:self];
+  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_defaultStore);
   [_stores release];
   [super dealloc];
 }
 
-- (void)defaultDidChanged:(NSString *)name
+- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
-  [self setDefaultStore:[[UserDefaults sharedInstance] objectForKey:ST_DEFAULT]];
+  [self setDefaultStore:[[ConfigManager globalConfig] objectForKey:ST_DEFAULT]];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name

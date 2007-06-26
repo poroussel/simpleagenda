@@ -2,6 +2,8 @@
 
 #import "AgendaStore.h"
 #import "DayView.h"
+#import "ConfigManager.h"
+#import "defines.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
 #define min(x,y) ((x) < (y)) ? (x) : (y)
@@ -96,10 +98,26 @@
 
 @implementation DayView
 
+- (NSDictionary *)defaults
+{
+  NSDictionary *dict = [NSDictionary 
+			 dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
+			 forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
+  return dict;
+}
+
 - (id)initWithFrame:(NSRect)frameRect
 {
   self = [super initWithFrame:frameRect];
   if (self) {
+    ConfigManager *config = [ConfigManager globalConfig];
+    [config registerDefaults:[self defaults]];
+    [config registerClient:self forKey:FIRST_HOUR];
+    [config registerClient:self forKey:LAST_HOUR];
+    [config registerClient:self forKey:MIN_STEP];
+    _firstH = [config integerForKey:FIRST_HOUR];
+    _lastH = [config integerForKey:LAST_HOUR];
+    _minStep = [config integerForKey:MIN_STEP];
     _height = frameRect.size.height;
     _width = frameRect.size.width;
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
@@ -144,8 +162,7 @@
 
 - (int)_roundMinutes:(int)minutes
 {
-  int step = [_dataSource minimumStepForDayView];
-  return minutes / step * step;
+  return minutes / _minStep * _minStep;
 }
 
 - (void)drawRect:(NSRect)rect
@@ -195,19 +212,20 @@
 
 - (void)reloadData
 {
+  ConfigManager *config = [ConfigManager globalConfig];
   NSEnumerator *enumerator;
   AppointmentView *aptv;
   Event *apt;
 
-  _firstH = [_dataSource firstHourForDayView];
-  _lastH = [_dataSource lastHourForDayView];
-
   enumerator = [[self subviews] objectEnumerator];
-  while ((aptv = [enumerator nextObject]))
+  while ((aptv = [enumerator nextObject])) {
+    [config unregisterClient:self forKey:[[[aptv appointment] store] description]];
     [aptv removeFromSuperview];
+  }
 
   enumerator = [_dataSource scheduledAppointmentsForDayView];
   while ((apt = [enumerator nextObject])) {
+    [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed])
       [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
 						appointment:apt]];
@@ -355,7 +373,7 @@
 - (void)moveUp:(id)sender
 {
   if (_selected != nil) {
-    [[[_selected appointment] startDate] changeMinuteBy:-[_dataSource minimumStepForDayView]];
+    [[[_selected appointment] startDate] changeMinuteBy:-_minStep];
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
     [delegate modifyAppointment:[_selected appointment]];
     [self display];
@@ -365,7 +383,7 @@
 - (void)moveDown:(id)sender
 {
   if (_selected != nil) {
-    [[[_selected appointment] startDate] changeMinuteBy:[_dataSource minimumStepForDayView]];
+    [[[_selected appointment] startDate] changeMinuteBy:_minStep];
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
     [delegate modifyAppointment:[_selected appointment]];
     [self display];
@@ -375,6 +393,29 @@
 - (BOOL)acceptsFirstResponder
 {
   return YES;
+}
+
+- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+{
+  _firstH = [config integerForKey:FIRST_HOUR];
+  _lastH = [config integerForKey:LAST_HOUR];
+  _minStep = [config integerForKey:MIN_STEP];
+  [self reloadData];
+}
+
+- (int)firstHour
+{
+  return _firstH;
+}
+
+- (int)lastHour
+{
+  return _lastH;
+}
+
+- (int)minimumStep
+{
+  return _minStep;
 }
 
 @end

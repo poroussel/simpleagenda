@@ -1,7 +1,6 @@
 #import <AppKit/AppKit.h>
 #import "LocalStore.h"
 #import "Event.h"
-#import "UserDefaults.h"
 #import "defines.h"
 
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
@@ -16,20 +15,18 @@
   self = [super init];
   if (self) {
     _name = [name copy];
-    _params = [NSMutableDictionary new];
-    [_params addEntriesFromDictionary:[[UserDefaults sharedInstance] objectForKey:name]];
-
+    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
     if (![self eventColor])
       [self setEventColor:[NSColor yellowColor]];
-
-    filename = [_params objectForKey:ST_FILE];
+    
+    filename = [_config objectForKey:ST_FILE];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
     _manager = manager;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
-    if ([_params objectForKey:ST_DISPLAY])
-      _displayed = [[_params objectForKey:ST_DISPLAY] boolValue];
+    if ([_config objectForKey:ST_DISPLAY])
+      _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
       _displayed = YES;
     NSFileManager *fm = [NSFileManager defaultManager];
@@ -63,7 +60,7 @@
   [_set release];
   [_globalFile release];
   [_name release];
-  [_params release];
+  [_config release];
   [super dealloc];
 }
 
@@ -127,7 +124,7 @@
 - (NSColor *)eventColor
 {
   NSColor *aColor = nil;
-  NSData *theData =[_params objectForKey:ST_COLOR];
+  NSData *theData =[_config objectForKey:ST_COLOR];
 
   if (theData)
     aColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
@@ -137,8 +134,7 @@
 - (void)setEventColor:(NSColor *)color
 {
   NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_params setObject:data forKey:ST_COLOR];
-  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
+  [_config setObject:data forKey:ST_COLOR];
 }
 
 - (BOOL)displayed
@@ -149,13 +145,7 @@
 - (void)setDisplayed:(BOOL)state
 {
   _displayed = state;
-  [_params setValue:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
-  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
-}
-
-- (void)defaultDidChanged:(NSString *)name
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADefaultsChangedforStore object:self];
+  [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
 
 @end

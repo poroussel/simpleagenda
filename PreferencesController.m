@@ -2,6 +2,7 @@
 
 #import "PreferencesController.h"
 #import "HourFormatter.h"
+#import "ConfigManager.h"
 #import "defines.h"
 
 @implementation PreferencesController
@@ -14,7 +15,6 @@
       return nil;
 
     ASSIGN(_sm, sm);
-    _defaults = [UserDefaults sharedInstance];
     HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];
@@ -33,10 +33,11 @@
 {
   NSEnumerator *list = [_sm objectEnumerator];
   id <AgendaStore> aStore;
-  int start = [_defaults integerForKey:FIRST_HOUR];
-  int end = [_defaults integerForKey:LAST_HOUR];
-  int step = [_defaults integerForKey:MIN_STEP];
-  NSString *defaultStore = [_defaults objectForKey:ST_DEFAULT];
+  ConfigManager *config = [ConfigManager globalConfig];
+  int start = [config integerForKey:FIRST_HOUR];
+  int end = [config integerForKey:LAST_HOUR];
+  int step = [config integerForKey:MIN_STEP];
+  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -59,7 +60,6 @@
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
-
   [panel makeKeyAndOrderFront:self];
 }
 
@@ -81,34 +81,34 @@
 -(void)changeStart:(id)sender
 {
   int value = [dayStart intValue];
-  if (value != [_defaults integerForKey:FIRST_HOUR]) {
+  if (value != [[ConfigManager globalConfig] integerForKey:FIRST_HOUR]) {
     [dayStartText setIntValue:value];
-    [_defaults setInteger:value forKey:FIRST_HOUR];
+    [[ConfigManager globalConfig] setInteger:value forKey:FIRST_HOUR];
   }
 }
 
 -(void)changeEnd:(id)sender
 {
   int value = [dayEnd intValue];
-  if (value != [_defaults integerForKey:LAST_HOUR]) {
+  if (value != [[ConfigManager globalConfig] integerForKey:LAST_HOUR]) {
     [dayEndText setIntValue:value];
-    [_defaults setInteger:value forKey:LAST_HOUR];
+    [[ConfigManager globalConfig] setInteger:value forKey:LAST_HOUR];
   }
 }
 
 -(void)changeStep:(id)sender
 {
   double value = [minStep doubleValue];
-  if (value * 60 != [_defaults integerForKey:MIN_STEP]) {
+  if (value * 60 != [[ConfigManager globalConfig] integerForKey:MIN_STEP]) {
     [minStepText setDoubleValue:value];
-    [_defaults setInteger:value * 60 forKey:MIN_STEP];
+    [[ConfigManager globalConfig] setInteger:value * 60 forKey:MIN_STEP];
   }
 }
 
 -(void)selectDefaultStore:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[defaultStorePopUp titleOfSelectedItem]];
-  [_defaults setObject:[store description] forKey:ST_DEFAULT];
+  [[ConfigManager globalConfig] setObject:[store description] forKey:ST_DEFAULT];
 }
 
 -(void)toggleDisplay:(id)sender

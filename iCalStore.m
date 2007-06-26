@@ -2,7 +2,6 @@
 #import <GNUstepBase/GSXML.h>
 #import <ical.h>
 #import "iCalStore.h"
-#import "UserDefaults.h"
 #import "defines.h"
 
 @implementation Event(iCalendar)
@@ -195,18 +194,17 @@
   self = [super init];
   if (self) {
     _delegate = manager;
-    _params = [NSMutableDictionary new];
-    [_params addEntriesFromDictionary:[[UserDefaults sharedInstance] objectForKey:name]];
-    _url = [[NSURL alloc] initWithString:[_params objectForKey:ST_URL]];
+    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
+    _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
     if (_url == nil) {
-      NSLog(@"%@ isn't a valid url", [_params objectForKey:ST_URL]);
+      NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
       [self release];
       return nil;
     }
     if ([_url resourceDataUsingCache:NO] == nil) {
       location = [_url propertyForKey:@"Location"];
       if (!location) {
-	NSLog(@"Couldn't read data from %@", [_params objectForKey:ST_URL]);
+	NSLog(@"Couldn't read data from %@", [_config objectForKey:ST_URL]);
 	[self release];
 	return nil;
       }
@@ -222,20 +220,20 @@
     _name = [name copy];
     _modified = NO;
     _lastModified = nil;
-    if ([_params objectForKey:ST_RW])
-      _writable = [[_params objectForKey:ST_RW] boolValue];
+    if ([_config objectForKey:ST_RW])
+      _writable = [[_config objectForKey:ST_RW] boolValue];
     else
       _writable = NO;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
-    if ([_params objectForKey:ST_DISPLAY])
-      _displayed = [[_params objectForKey:ST_DISPLAY] boolValue];
+    if ([_config objectForKey:ST_DISPLAY])
+      _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
       _displayed = YES;
     [self read]; 
 
     if (![_url isFileURL]) {
-      if ([_params objectForKey:ST_REFRESH])
-	_minutesBeforeRefresh = [[_params objectForKey:ST_REFRESH] intValue];
+      if ([_config objectForKey:ST_REFRESH])
+	_minutesBeforeRefresh = [[_config objectForKey:ST_REFRESH] intValue];
       else
 	_minutesBeforeRefresh = 60;
       _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
@@ -262,7 +260,7 @@
     icalcomponent_free(_icomp);
   [_set release];
   [_url release];
-  [_params release];
+  [_config release];
   [_name release];
   [_lastModified release];
   [super dealloc];
@@ -330,7 +328,7 @@
 - (NSColor *)eventColor
 {
   NSColor *aColor = nil;
-  NSData *theData =[_params objectForKey:ST_COLOR];
+  NSData *theData =[_config objectForKey:ST_COLOR];
 
   if (theData)
     aColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
@@ -344,8 +342,7 @@
 - (void)setEventColor:(NSColor *)color
 {
   NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_params setObject:data forKey:ST_COLOR];
-  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
+  [_config setObject:data forKey:ST_COLOR];
 }
 
 - (BOOL)displayed
@@ -356,13 +353,7 @@
 - (void)setDisplayed:(BOOL)state
 {
   _displayed = state;
-  [_params setValue:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
-  [[UserDefaults sharedInstance] setObject:_params forKey:_name];
-}
-
-- (void)defaultDidChanged:(NSString *)name
-{
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADefaultsChangedforStore object:self];
+  [_config setValue:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
 
 @end

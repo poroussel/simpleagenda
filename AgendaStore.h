@@ -2,12 +2,11 @@
 
 #import <AppKit/AppKit.h>
 #import "Event.h"
-#import "UserDefaults.h"
 
 #define SADataChangedInStore @"DataDidChangedInStore"
 #define SADefaultsChangedforStore @"DefaultsChangedforStore"
 
-@protocol AgendaStore <NSObject, DefaultsConsumer>
+@protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
 - (NSEnumerator *)enumerator;
 - (void)addAppointment:(Event *)evt;
