@@ -5,8 +5,35 @@
 #import "iCalStore.h"
 #import "defines.h"
 
-@implementation Event(iCalendar)
+@interface Date(iCalendar)
+- (id)initWithICalTime:(struct icaltimetype)time;
+- (void)setDateToICalTime:(struct icaltimetype)time;
+- (struct icaltimetype)iCalTime;
+@end
 
+@implementation Date(iCalendar)
+- (id)initWithICalTime:(struct icaltimetype)time
+{
+  self = [super init];
+  if (self)
+    [self setDateToICalTime:time];
+  return self;
+}
+
+- (void)setDateToICalTime:(struct icaltimetype)time
+{
+  [self setDateToTime_t:icaltime_as_timet(time)];
+}
+
+- (struct icaltimetype)iCalTime
+{
+  struct icaltimetype it = {};
+  NSLog(@"won't work");
+  return it;
+}
+@end
+
+@implementation Event(iCalendar)
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
@@ -42,8 +69,7 @@
     goto init_error;
   }
   start = icalproperty_get_dtstart(pstart);
-  date = [Date new];
-  [date setDateToTime_t:icaltime_as_timet(start)];
+  date = [[Date alloc] initWithICalTime:start];
   [self setStartDate:date andConstrain:NO];
   [self setEndDate:date];
 
@@ -99,7 +125,6 @@
   [self release];
   return nil;
 }
-
 @end
 
 
@@ -329,11 +354,22 @@
 
 - (void)updateAppointment:(Event *)evt
 {
+  icalproperty *prop;
   icalcomponent *ic = [self getComponentForEvent:evt];
   if (!ic) {
     NSLog(@"iCalendar component not found");
     return;
   }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop) {
+    NSLog(@"No summary");
+    return;
+  }
+  icalproperty_set_summary(prop, [[evt title] UTF8String]);
+  _modified = YES;
+
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (BOOL)contains:(Event *)evt
