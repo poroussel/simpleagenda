@@ -19,6 +19,11 @@
   [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];
 }
 
+- (NSString *)description
+{
+  return [NSString stringWithCString:icaltime_as_ical_string(_time)];
+}
+
 - (id)initWithCoder:(NSCoder *)coder
 {
   /* Conversion from ChronographerSource Date format */
@@ -125,7 +130,9 @@
 {
   struct icaldurationtype dt;
 
-  dt = icaltime_subtract(_time, date->_time);
+  dt = icaltime_subtract(date->_time, _time);
+  if (dt.is_neg)
+    return -dt.days;
   return dt.days;
 }
 
@@ -133,7 +140,9 @@
 {
   struct icaldurationtype dt;
 
-  dt = icaltime_subtract(date->_time, _time);
+  dt = icaltime_subtract(_time, date->_time);
+  if (dt.is_neg)
+    return -dt.days;
   return dt.days;
 }
 
@@ -141,7 +150,9 @@
 {
   struct icaldurationtype dt;
 
-  dt = icaltime_subtract(_time, date->_time);
+  dt = icaltime_subtract(date->_time, _time);
+  if (dt.is_neg)
+    return -dt.weeks;
   return dt.weeks;
 }
 
@@ -149,7 +160,9 @@
 {
   struct icaldurationtype dt;
 
-  dt = icaltime_subtract(date->_time, _time);
+  dt = icaltime_subtract(_time, date->_time);
+  if (dt.is_neg)
+    return -dt.weeks;
   return dt.weeks;
 }
 
@@ -169,16 +182,12 @@
 
 - (int)yearsUntil:(Date *)date
 {
-  int years = 0;
-  NSLog(@"yearsUntil");
-  return years;
+  return date->_time.year - _time.year;
 }
 
 - (int)yearSince:(Date *)date
 {
-  int years = 0;
-  NSLog(@"yearSince");
-  return years;
+  return _time.year - date->_time.year;
 }
 
 - (void)setMinute:(int)minute
