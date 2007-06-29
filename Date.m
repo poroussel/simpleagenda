@@ -9,11 +9,9 @@
   return new;
 }
 
-/* FIXME */
-- (NSComparisonResult)compare:(id)anObject
+- (NSComparisonResult)compare:(id)aDate
 {
-  NSLog(@"compare");
-  return 0;
+  return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -107,6 +105,7 @@
   return _time.day;
 }
 
+/* 0 = sunday */
 - (int)weekday
 {
   return icaltime_day_of_week(_time) - 1;
