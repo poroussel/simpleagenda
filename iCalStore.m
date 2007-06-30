@@ -22,14 +22,12 @@
 
 - (void)setDateToICalTime:(struct icaltimetype)time
 {
-  [self setDateToTime_t:icaltime_as_timet(time)];
+  _time = time;
 }
 
 - (struct icaltimetype)iCalTime
 {
-  struct icaltimetype it = {};
-  NSLog(@"won't work");
-  return it;
+  return _time;
 }
 @end
 

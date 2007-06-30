@@ -63,6 +63,7 @@
   return self;
 }
 
+/* FIXME : rename this 'now' and create a 'today' */
 + (id)date
 {
   return AUTORELEASE([[Date alloc] init]);
@@ -126,6 +127,7 @@
   return icaltime_days_in_month(_time.month, _time.year);
 }
 
+/* if diff is 23, returns 0 day */
 - (int)daysUntil:(Date *)date
 {
   struct icaldurationtype dt;

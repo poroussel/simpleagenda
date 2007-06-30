@@ -1,14 +1,14 @@
 /* All Rights reserved */
 
 #include <AppKit/AppKit.h>
-#include <ChronographerSource/Date.h>
+#include "Date.h"
 #include "CalendarView.h"
-
 
 @implementation CalendarView
 
 - (void)dealloc
 {
+  RELEASE(date);
   [_dayTimer invalidate];
   delegate = nil;
   [boldFont release];
@@ -103,20 +103,18 @@
     [self addSubview: matrix];
 
     delegate = nil;
-    date = [Date new];
+    [self setDate:[Date date]];
 
-    [self setDate: date];
     [self setTitlePosition:NSBelowTop];
 
-    Date *now = [Date new];
+    Date *now = [Date date];
     [now incrementDay];
     [now setMinute:0];
-    _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate] 
+    _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
 				 interval:86400 target:self 
 				 selector:@selector(dayChanged:) 
 				 userInfo:nil 
 				 repeats:YES];
-    [now release];
     [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
@@ -159,8 +157,7 @@
 
   today = [Date new];
   [today setMinute:0];
-  firstWeek = [Date new];
-  [firstWeek setDate: date];
+  firstWeek = [date copy];
   [firstWeek setDay: 1];
   [firstWeek setMinute:0];
   week = [firstWeek weekOfYear];
@@ -171,7 +168,7 @@
 
   for (day = 1; day <= [date numberOfDaysInMonth]; day++) {
     [firstWeek setDay: day];
-    if ([firstWeek isEqual: today]) {
+    if ([firstWeek compare:today] == 0) {
       [[matrix cellAtRow: row column: column] setBackgroundColor: [NSColor yellowColor]];
       [[matrix cellAtRow: row column: column] setDrawsBackground: YES];
     }
@@ -240,18 +237,9 @@
 
 - (void)setDate:(Date *)nDate
 {
-  [date setDate: nDate];
-  [text setIntValue: [date yearOfCommonEra]];
-  [stepper setIntValue: [date yearOfCommonEra]];
-  [button selectItemAtIndex: [date monthOfYear] - 1];
-  [self updateView];
-}
-
-- (void)setNSDate:(NSDate *)nDate
-{
-  [date setDateToNSDate: nDate];
-  [text setIntValue: [date yearOfCommonEra]];
-  [stepper setIntValue: [date yearOfCommonEra]];
+  ASSIGN(date, nDate);
+  [text setIntValue: [date year]];
+  [stepper setIntValue: [date year]];
   [button selectItemAtIndex: [date monthOfYear] - 1];
   [self updateView];
 }
@@ -259,11 +247,6 @@
 - (Date *)date
 {
   return date;
-}
-
-- (NSDate *)nsDate
-{
-  return [date calendarDate];
 }
 
 @end

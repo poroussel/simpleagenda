@@ -1,26 +1,11 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+/*
+ * Based on ChronographerSource Appointment class
+ */
+
 #import <Foundation/Foundation.h>
 #import "Event.h"
-
-@implementation Date(NSCoding)
--(void)encodeWithCoder:(NSCoder *)coder
-{
-  [coder encodeInt:year forKey:@"year"];
-  [coder encodeInt:month forKey:@"month"];
-  [coder encodeInt:day forKey:@"day"];
-  [coder encodeInt:minute forKey:@"minute"];
-}
--(id)initWithCoder:(NSCoder *)coder
-{
-  [super init];
-  year = [coder decodeIntForKey:@"year"];
-  month = [coder decodeIntForKey:@"month"];
-  day = [coder decodeIntForKey:@"day"];
-  minute = [coder decodeIntForKey:@"minute"];
-  return self;
-}
-@end
 
 @implementation Event(NSCoding)
 
@@ -80,15 +65,15 @@
 
 /*
  * Code adapted from ChronographerSource Appointment:isScheduledFor
- * I don't understand the first three lines of their version
  */
 - (BOOL)isScheduledForDay:(Date *)day
 {
-  if (!day || [day daysUntil:startDate] > 0 || [day daysSince:endDate] > 0)
+  NSAssert(day != nil, @"Empty day argument");
+  if ([day daysUntil:startDate] > 0 || [day daysSince:endDate] > 0)
     return NO;
   switch (interval) {
   case RI_NONE:
-    return YES;
+    return [day compare:startDate] == 0;
   case RI_DAILY:
     return ((frequency == 1) ||
 	    ([startDate daysUntil: day] % frequency) == 0);
@@ -115,10 +100,13 @@
   Date *work = [start copy];
 
   for (nd = 0; nd < [start daysUntil:end] + 1; nd++) {
-    if ([self isScheduledForDay:work])
+    if ([self isScheduledForDay:work]) {
+      [work release];
       return YES;
+    }
     [work incrementDay];
   }
+  [work release];
   return NO;
 }
 
@@ -164,21 +152,91 @@
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self title], [self startDate], [self duration]];
-}
-
-- (void)setDuration:(int)newDuration
-{
-  [super setDuration:newDuration];
-  [self setAllDay:(newDuration == 1440)];
+  return [NSString stringWithFormat:@"<%@> from <%@> for <%d> to <%@> (%d)", [self title], [startDate description], [self duration], [endDate description], interval];
 }
 
 - (NSString *)details
 {
   if ([self allDay])
     return @"all day";
-  int h = [[self startDate] minuteOfDay] / 60; 
-  return [NSString stringWithFormat:@"%dh%02d", h, [[self startDate] minuteOfDay] - h * 60];
+  int minute = [[self startDate] minuteOfDay];
+  return [NSString stringWithFormat:@"%dh%02d", minute / 60, minute % 60];
+}
+
+- (NSAttributedString *)descriptionText
+{
+  return descriptionText;
+}
+
+- (NSString *)title
+{
+  return title;
+}
+
+- (int)duration
+{
+  return duration;
+}
+
+- (int)frequency
+{
+  return frequency;
+}
+
+- (Date *)startDate
+{
+  return startDate;
+}
+
+- (Date *)endDate
+{
+  return endDate;
+}
+
+- (int)interval
+{
+  return interval;
+}
+
+- (void)setDescriptionText:(NSAttributedString *)description
+{
+  ASSIGN(descriptionText, description);
+}
+
+- (void)setTitle:(NSString *)newTitle
+{
+  ASSIGN(title, newTitle);
+}
+
+- (void)setDuration:(int)newDuration
+{
+  duration = newDuration;
+  [self setAllDay:(newDuration == 1440)];
+}
+
+- (void)setFrequency:(int)newFrequency
+{
+  frequency = newFrequency;
+}
+
+- (void)setStartDate:(Date *)newStartDate
+{
+  ASSIGN(startDate, newStartDate);
+}
+
+- (void)setStartDate:(Date *)date andConstrain:(BOOL)constrain
+{
+  [self setStartDate:date];
+}
+
+- (void)setEndDate:(Date *)date
+{
+  ASSIGN(endDate, date);
+}
+
+- (void)setInterval:(int)newInterval
+{
+  interval = newInterval;
 }
 
 @end

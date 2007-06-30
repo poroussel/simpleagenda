@@ -1,15 +1,31 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import <ChronographerSource/Date.h>
-#import <ChronographerSource/Appointment.h>
+#import "Date.h"
 #import "AgendaStore.h"
 
-@interface Event : Appointment
+enum intervalType
+{
+  RI_NONE = 0, 
+  RI_DAILY, 
+  RI_WEEKLY, 
+  RI_MONTHLY, 
+  RI_YEARLY
+};
+
+@interface Event : NSObject
 {
   id <AgendaStore> _store;
   NSString *_location;
   BOOL _allDay;
   id _externalRef;
+  NSString *title;
+  NSAttributedString *descriptionText;
+  Date *startDate;
+  Date *endDate;
+  int duration;
+  enum intervalType interval;
+  int frequency;
+  int scheduleLevel;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
@@ -23,5 +39,22 @@
 - (id)externalRef;
 - (void)setExternalRef:(id)externalRef;
 - (NSString *)details;
+
+- (NSAttributedString *)descriptionText;
+- (NSString *)title;
+- (int)duration;
+- (int)frequency;
+- (Date *)startDate;
+- (Date *)endDate;
+- (int)interval;
+
+- (void)setDescriptionText:(NSAttributedString *)descriptionText;
+- (void)setTitle:(NSString *)title;
+- (void)setDuration:(int)duration;
+- (void)setFrequency:(int)frequency;
+- (void)setStartDate:(Date *)startDate;
+- (void)setStartDate:(Date *)startDate andConstrain:(BOOL)constrain;
+- (void)setEndDate:(Date *)endDate;
+- (void)setInterval:(int)interval;
 
 @end

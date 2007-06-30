@@ -12,7 +12,7 @@ ADDITIONAL_OBJCFLAGS +=
 ADDITIONAL_CFLAGS += 
 
 # Additional flags to pass to the linker
-ADDITIONAL_LDFLAGS +=  -lChronographerSource -lical 
+ADDITIONAL_LDFLAGS +=  -lical 
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += 

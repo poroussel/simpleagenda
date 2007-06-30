@@ -16,12 +16,8 @@
 }
 
 - (id)initWithFrame:(NSRect)frame;
-
 - (void)setDate:(Date *)date;
-- (void)setNSDate:(NSDate *)date;
 - (Date *)date;
-- (NSDate *)nsDate;
-
 - (void)setDelegate:(id)aDelegate;
 - (id)delegate;
 

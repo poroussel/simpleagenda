@@ -255,10 +255,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 			      duration:end - start 
 			      title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt withStoreManager:_sm]) {
-    [dayView reloadData];
-    [summary reloadData];
-  }
+  if (apt)
+    [_editor editAppointment:apt withStoreManager:_sm];
   [date release];
   [apt release];
 }
