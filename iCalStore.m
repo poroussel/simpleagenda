@@ -137,13 +137,14 @@
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
+  char uid[255];
   struct icaltimetype itime;
   icalproperty *prop;
 
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
   if (!prop) {
-    /* FIXME : generate unique uid ? */
-    prop = icalproperty_new_uid("SimpleAgenda.app");
+    snprintf(uid, 255, "SimpleAgenda-uuid%f", [[NSDate date] timeIntervalSince1970]);
+    prop = icalproperty_new_uid(uid);
     icalcomponent_add_property(ic, prop);
     [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
   }
