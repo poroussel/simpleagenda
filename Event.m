@@ -1,5 +1,3 @@
-/* emacs buffer mode hint -*- objc -*- */
-
 /*
  * Based on ChronographerSource Appointment class
  */

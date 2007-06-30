@@ -1,5 +1,9 @@
 #import "Date.h"
 
+/*
+ * Based on ChronographerSource Appointment class
+ */
+
 @implementation Date
 
 - (id)copyWithZone:(NSZone *)zone
