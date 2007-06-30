@@ -31,6 +31,11 @@
 }
 @end
 
+@interface Event(iCalendar)
+- (id)initWithICalComponent:(icalcomponent *)ic;
+- (BOOL)updateICalComponent:(icalcomponent *)ic;
+@end
+
 @implementation Event(iCalendar)
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
@@ -60,6 +65,12 @@
     goto init_error;
   }
   [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop) encoding:NSUTF8StringEncoding]];
+  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+  if (prop) {
+    NSAttributedString *as = [[NSAttributedString alloc] initWithString:[NSString stringWithCString:icalproperty_get_description(prop) encoding:NSUTF8StringEncoding]];
+    [self setDescriptionText:as];
+    [as release];
+  }
 
   pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
   if (!pstart) {
@@ -122,6 +133,11 @@
   NSLog(@"Error creating Event from iCal component");
   [self release];
   return nil;
+}
+
+- (BOOL)updateICalComponent:(icalcomponent *)ic
+{
+  return YES;
 }
 @end
 
@@ -352,6 +368,7 @@
 
 - (void)updateAppointment:(Event *)evt
 {
+  struct icaltimetype itime;
   icalproperty *prop;
   icalcomponent *ic = [self getComponentForEvent:evt];
   if (!ic) {
@@ -365,8 +382,30 @@
     return;
   }
   icalproperty_set_summary(prop, [[evt title] UTF8String]);
-  _modified = YES;
+  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+  /* FIXME : create description property if it doesn't exist */
+  if (prop)
+    icalproperty_set_description(prop, [[[evt descriptionText] string] UTF8String]);
+  prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
+  if (!prop) {
+    NSLog(@"No start date");
+    return;
+  }
+  icalproperty_set_dtstart(prop, [[evt startDate] iCalTime]);
+  prop = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
+  if (!prop) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+    if (!prop) {
+      NSLog(@"No end date and no duration");
+      return;
+    }
+    icalproperty_set_duration(prop, icaldurationtype_from_int([evt duration] * 60));
+  } else {
+    itime = icaltime_add([[evt startDate] iCalTime], icaldurationtype_from_int([evt duration] * 60));
+    icalproperty_set_dtend(prop, itime);
+  }
 
+  _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
