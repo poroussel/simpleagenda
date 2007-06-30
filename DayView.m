@@ -29,7 +29,7 @@
 {
   self = [super initWithFrame:frameRect];
   if (self) {
-    _apt = apt;
+    ASSIGN(_apt, apt);
     _selected = NO;
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
 				     forKey:NSForegroundColorAttributeName] retain];
@@ -39,6 +39,7 @@
 
 - (void)dealloc
 {
+  RELEASE(_apt);
   [_textAttributes release];
   [super dealloc];
 }
@@ -60,7 +61,7 @@
 {
   NSString *title;
   NSString *label;
-  NSCalendarDate *start = [[_apt startDate] calendarDate];
+  Date *start = [_apt startDate];
   NSColor *color = [[_apt store] eventColor];
   NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
 				green:[color greenComponent] - 0.3
