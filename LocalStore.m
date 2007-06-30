@@ -92,9 +92,7 @@
 
 - (BOOL)contains:(Event *)evt
 {
-  if ([_set member:evt])
-    return YES;
-  return NO;
+  return [_set containsObject:evt];
 }
 
 -(BOOL)isWritable
