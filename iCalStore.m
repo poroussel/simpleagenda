@@ -137,6 +137,44 @@
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
+  struct icaltimetype itime;
+  icalproperty *prop;
+
+  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop) {
+    prop = icalproperty_new_summary([title UTF8String]);
+    icalcomponent_add_property(ic, prop);
+  } else
+    icalproperty_set_summary(prop, [title UTF8String]);
+
+  if (descriptionText != nil) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+    if (!prop) {
+      prop = icalproperty_new_description([[descriptionText string] UTF8String]);
+      icalcomponent_add_property(ic, prop);
+    } else
+      icalproperty_set_description(prop, [[descriptionText string] UTF8String]);
+  }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
+  if (!prop) {
+    prop = icalproperty_new_dtstart([startDate iCalTime]);
+    icalcomponent_add_property(ic, prop);
+  } else
+    icalproperty_set_dtstart(prop, [startDate iCalTime]);
+
+  prop = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
+  if (!prop) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+    if (!prop) {
+      prop = icalproperty_new_duration(icaldurationtype_from_int(duration * 60));
+      icalcomponent_add_property(ic, prop);
+    } else
+      icalproperty_set_duration(prop, icaldurationtype_from_int(duration * 60));
+  } else {
+    itime = icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60));
+    icalproperty_set_dtend(prop, itime);
+  }
   return YES;
 }
 @end
@@ -368,45 +406,15 @@
 
 - (void)updateAppointment:(Event *)evt
 {
-  struct icaltimetype itime;
-  icalproperty *prop;
   icalcomponent *ic = [self getComponentForEvent:evt];
   if (!ic) {
     NSLog(@"iCalendar component not found");
     return;
   }
-
-  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
-    NSLog(@"No summary");
-    return;
+  if ([evt updateICalComponent:ic]) {
+    _modified = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
-  icalproperty_set_summary(prop, [[evt title] UTF8String]);
-  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-  /* FIXME : create description property if it doesn't exist */
-  if (prop)
-    icalproperty_set_description(prop, [[[evt descriptionText] string] UTF8String]);
-  prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
-  if (!prop) {
-    NSLog(@"No start date");
-    return;
-  }
-  icalproperty_set_dtstart(prop, [[evt startDate] iCalTime]);
-  prop = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
-  if (!prop) {
-    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-    if (!prop) {
-      NSLog(@"No end date and no duration");
-      return;
-    }
-    icalproperty_set_duration(prop, icaldurationtype_from_int([evt duration] * 60));
-  } else {
-    itime = icaltime_add([[evt startDate] iCalTime], icaldurationtype_from_int([evt duration] * 60));
-    icalproperty_set_dtend(prop, itime);
-  }
-
-  _modified = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (BOOL)contains:(Event *)evt
