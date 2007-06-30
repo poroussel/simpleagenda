@@ -25,10 +25,14 @@
     _modified = NO;
     _manager = manager;
     _set = [[NSMutableSet alloc] initWithCapacity:128];
+    if ([_config objectForKey:ST_RW])
+      _writable = [[_config objectForKey:ST_RW] boolValue];
+    else
+      [self setIsWritable:YES];
     if ([_config objectForKey:ST_DISPLAY])
       _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
-      _displayed = YES;
+      [self setDisplayed:YES];
     NSFileManager *fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:_globalPath]) {
       if (![fm createDirectoryAtPath:_globalPath attributes:nil])
@@ -97,7 +101,13 @@
 
 -(BOOL)isWritable
 {
-  return YES;
+  return _writable;
+}
+
+- (void)setIsWritable:(BOOL)writable
+{
+  _writable = writable;
+  [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
 
 - (BOOL)modified

@@ -13,6 +13,7 @@
   NSString *_globalFile;
   NSString *_name;
   BOOL _displayed;
+  BOOL _writable;
 }
 
 @end

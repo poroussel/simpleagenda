@@ -14,6 +14,7 @@
 - (void)updateAppointment:(Event *)evt;
 - (BOOL)contains:(Event *)evt;
 - (BOOL)isWritable;
+- (void)setIsWritable:(BOOL)writable;
 - (BOOL)modified;
 - (void)write;
 - (NSString *)description;

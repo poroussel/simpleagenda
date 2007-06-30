@@ -337,12 +337,12 @@
     if ([_config objectForKey:ST_RW])
       _writable = [[_config objectForKey:ST_RW] boolValue];
     else
-      _writable = NO;
+      [self setIsWritable:NO];
     _set = [[NSMutableSet alloc] initWithCapacity:32];
     if ([_config objectForKey:ST_DISPLAY])
       _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
-      _displayed = YES;
+      [self setDisplayed:YES];
     [self read]; 
 
     if (![_url isFileURL]) {
@@ -445,6 +445,12 @@
 - (BOOL)isWritable
 {
   return _writable;
+}
+
+- (void)setIsWritable:(BOOL)writable
+{
+  _writable = writable;
+  [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
 
 - (BOOL)modified
