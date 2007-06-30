@@ -69,6 +69,7 @@
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [storeColor setColor:[store eventColor]];
   [storeDisplay setState:[store displayed]];
+  [storeWritable setState:[store isWritable]];
 }
 
 -(void)changeColor:(id)sender
@@ -115,6 +116,12 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setDisplayed:[storeDisplay state]];
+}
+
+-(void)toggleWritable:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setIsWritable:[storeWritable state]];
 }
 
 @end

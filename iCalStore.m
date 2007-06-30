@@ -449,6 +449,8 @@
 
 - (void)setIsWritable:(BOOL)writable
 {
+  if (!writable)
+    [self write];
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
@@ -463,7 +465,7 @@
   NSData *data;
   char *text;
   
-  if ([self isWritable] && _icomp && _modified) {
+  if (_writable && _icomp && _modified) {
     text = icalcomponent_as_ical_string(_icomp);
     data = [NSData dataWithBytes:text length:strlen(text)];
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];

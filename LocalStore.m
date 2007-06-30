@@ -106,6 +106,8 @@
 
 - (void)setIsWritable:(BOOL)writable
 {
+  if (!writable)
+    [self write];
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
@@ -117,7 +119,7 @@
 
 - (void)write
 {
-  if (_modified) {
+  if (_writable && _modified) {
     [NSKeyedArchiver archiveRootObject:_set toFile:_globalFile];
     NSLog(@"LocalStore written to %@", _globalFile);
     _modified = NO;

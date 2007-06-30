@@ -17,6 +17,7 @@
   IBOutlet id storeColor;
   IBOutlet id defaultStorePopUp;
   IBOutlet id storeDisplay;
+  IBOutlet id storeWritable;
   StoreManager *_sm;
 }
 
@@ -30,5 +31,6 @@
 -(void)changeStep:(id)sender;
 -(void)selectDefaultStore:(id)sender;
 -(void)toggleDisplay:(id)sender;
+-(void)toggleWritable:(id)sender;
 
 @end
