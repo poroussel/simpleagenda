@@ -140,6 +140,14 @@
   struct icaltimetype itime;
   icalproperty *prop;
 
+  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
+  if (!prop) {
+    /* FIXME : generate unique uid ? */
+    prop = icalproperty_new_uid("SimpleAgenda.app");
+    icalcomponent_add_property(ic, prop);
+    [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+  }
+
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
   if (!prop) {
     prop = icalproperty_new_summary([title UTF8String]);
@@ -384,6 +392,17 @@
 
 - (void)addAppointment:(Event *)evt
 {
+  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
+  if ([evt updateICalComponent:ic]) {
+    [evt setStore:self];
+    [_set addObject:evt];
+    icalcomponent_add_component(_icomp, ic);
+    _modified = YES;
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  } else {
+    icalcomponent_free(ic);
+    [evt release];
+  }
 }
 
 /*
