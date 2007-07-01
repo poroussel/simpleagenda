@@ -79,7 +79,7 @@
   }
   start = icalproperty_get_dtstart(pstart);
   date = [[Date alloc] initWithICalTime:start];
-  [self setStartDate:date andConstrain:NO];
+  [self setStartDate:date];
   [self setEndDate:date];
 
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);

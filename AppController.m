@@ -140,12 +140,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     Date *date = [[calendar date] copy];
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
-      [_selection setStartDate:date andConstrain:NO];
+      [_selection setStartDate:date];
       [[_selection store] updateAppointment:_selection];
     } else {
       Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
-      [new setStartDate:date andConstrain:NO];
+      [new setStartDate:date];
       [[_selection store] addAppointment:new];
       [new release];
     }

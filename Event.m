@@ -47,7 +47,7 @@
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle
 {
   [self init];
-  [self setStartDate:start andConstrain:NO];
+  [self setStartDate:start];
   [self setTitle:aTitle];
   [self setDuration:minutes];
   return self;
@@ -219,17 +219,12 @@
 
 - (void)setStartDate:(Date *)newStartDate
 {
-  ASSIGN(startDate, newStartDate);
-}
-
-- (void)setStartDate:(Date *)date andConstrain:(BOOL)constrain
-{
-  [self setStartDate:date];
+  ASSIGNCOPY(startDate, newStartDate);
 }
 
 - (void)setEndDate:(Date *)date
 {
-  ASSIGN(endDate, date);
+  ASSIGNCOPY(endDate, date);
 }
 
 - (void)setInterval:(int)newInterval

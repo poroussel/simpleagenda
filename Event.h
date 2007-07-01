@@ -53,7 +53,6 @@ enum intervalType
 - (void)setDuration:(int)duration;
 - (void)setFrequency:(int)frequency;
 - (void)setStartDate:(Date *)startDate;
-- (void)setStartDate:(Date *)startDate andConstrain:(BOOL)constrain;
 - (void)setEndDate:(Date *)endDate;
 - (void)setInterval:(int)interval;
 
