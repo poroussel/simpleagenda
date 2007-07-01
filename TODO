@@ -1,7 +1,6 @@
 In no particular order :
 
-* iCalendar write support (almost there, the networking part is
-   working)
+* use libical component as a base for Event class
 
 * support iCalendar VTODO components ?
 
