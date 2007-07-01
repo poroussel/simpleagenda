@@ -460,20 +460,23 @@
   return _modified;
 }
 
-- (void)write
+- (BOOL)write
 {
   NSData *data;
   char *text;
   
-  if (_writable && _icomp && _modified) {
+  if (_icomp) {
     text = icalcomponent_as_ical_string(_icomp);
     data = [NSData dataWithBytes:text length:strlen(text)];
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
     if ([_url setResourceData:data]) {
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
       _modified = NO;
+      return YES;
     }
+    return NO;
   }
+  return YES;
 }
 
 - (NSString *)description

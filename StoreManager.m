@@ -98,7 +98,8 @@
 
   enumerator = [_stores objectEnumerator];
   while ((store = [enumerator nextObject]))
-    [store write];
+    if ([store modified] && [store isWritable])
+      [store write];
 }
 
 @end

@@ -16,7 +16,7 @@
 - (BOOL)isWritable;
 - (void)setIsWritable:(BOOL)writable;
 - (BOOL)modified;
-- (void)write;
+- (BOOL)write;
 - (NSString *)description;
 - (NSColor *)eventColor;
 - (void)setEventColor:(NSColor *)color;

@@ -117,13 +117,14 @@
   return _modified;
 }
 
-- (void)write
+- (BOOL)write
 {
-  if (_writable && _modified) {
-    [NSKeyedArchiver archiveRootObject:_set toFile:_globalFile];
+  if ([NSKeyedArchiver archiveRootObject:_set toFile:_globalFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
     _modified = NO;
+    return YES;
   }
+  return NO;
 }
 
 - (NSString *)description
