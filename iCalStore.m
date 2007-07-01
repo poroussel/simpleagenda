@@ -122,7 +122,7 @@
       [self setEndDate:date];
       break;
     default:
-      NSLog(@"todo");
+      NSLog(@"ToDo");
       break;
     }
   }
@@ -139,6 +139,7 @@
 {
   char uid[255];
   struct icaltimetype itime;
+  struct icalrecurrencetype irec;
   icalproperty *prop;
 
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
@@ -184,10 +185,37 @@
     itime = icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60));
     icalproperty_set_dtend(prop, itime);
   }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
+  if (interval != RI_NONE) {
+    icalrecurrencetype_clear(&irec);
+    if (!prop) {
+      prop = icalproperty_new_rrule(irec);
+      icalcomponent_add_property(ic, prop);
+    }
+    switch (interval) {
+    case RI_DAILY:
+      irec.freq = ICAL_DAILY_RECURRENCE;
+      break;
+    case RI_WEEKLY:
+      irec.freq = ICAL_WEEKLY_RECURRENCE;
+      break;
+    case RI_MONTHLY:
+      irec.freq = ICAL_MONTHLY_RECURRENCE;
+      break;
+    case RI_YEARLY:
+      irec.freq = ICAL_YEARLY_RECURRENCE;
+      break;
+    default:
+      NSLog(@"ToDo");
+    }
+    irec.until = [endDate iCalTime];
+    icalproperty_set_rrule(prop, irec);
+  } else if (prop)
+    icalcomponent_remove_property(ic, prop);
   return YES;
 }
 @end
-
 
 @implementation iCalStore
 
@@ -265,6 +293,7 @@
   return NO;
 }
 
+/* FIXME : reading shouldn't delete local unsaved modifications */
 - (BOOL)read
 {
   NSData *data;
