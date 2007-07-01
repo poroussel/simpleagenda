@@ -428,6 +428,8 @@
     [_set addObject:evt];
     icalcomponent_add_component(_icomp, ic);
     _modified = YES;
+    if (![_url isFileURL])
+      [self write];
     [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   } else {
     icalcomponent_free(ic);
@@ -448,8 +450,10 @@
     return;
   }
   [_set removeObject:evt];
-  _modified = YES;
   icalcomponent_remove_component(_icomp, ic);
+  _modified = YES;
+  if (![_url isFileURL])
+    [self write];
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
@@ -462,6 +466,8 @@
   }
   if ([evt updateICalComponent:ic]) {
     _modified = YES;
+    if (![_url isFileURL])
+      [self write];
     [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
 }
