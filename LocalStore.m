@@ -124,6 +124,8 @@
     _modified = NO;
     return YES;
   }
+  NSLog(@"Unable to write to %@, make this store read only", _globalFile);
+  [self setIsWritable:NO];
   return NO;
 }
 

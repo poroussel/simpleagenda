@@ -474,6 +474,8 @@
       _modified = NO;
       return YES;
     }
+    NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
+    [self setIsWritable:NO];
     return NO;
   }
   return YES;
