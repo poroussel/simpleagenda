@@ -211,7 +211,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @end
 
-@implementation AppController(CalendarView)
+@implementation AppController(CalendarViewDelegate)
 
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {

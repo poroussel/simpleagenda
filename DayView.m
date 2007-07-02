@@ -121,8 +121,13 @@
     _minStep = [config integerForKey:MIN_STEP];
     _height = frameRect.size.height;
     _width = frameRect.size.width;
-    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
-				     forKey:NSForegroundColorAttributeName] retain];
+    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor]
+ 				     forKey:NSForegroundColorAttributeName] retain];
+    _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
+    _alternateBackgroundColor = [[NSColor colorWithCalibratedRed:[_backgroundColor redComponent] + 0.05
+					 green:[_backgroundColor greenComponent] + 0.05
+					 blue:[_backgroundColor blueComponent] + 0.05
+					 alpha:[_backgroundColor alphaComponent]] retain];
     [self reloadData];
   }
   return self;
@@ -130,6 +135,8 @@
 
 - (void)dealloc
 {
+  [_backgroundColor release];
+  [_alternateBackgroundColor release];
   [_textAttributes release];
   [super dealloc];
 }
@@ -170,15 +177,23 @@
 {
   int h, start;
 
-  [[NSColor controlBackgroundColor] set];
-  NSFrameRect(rect);
-
+  /*
+   * FIXME : if we draw the string in the same
+   * loop it doesn't appear on the screen.
+   */
+  for (h = _firstH; h <= _lastH + 1; h++) {
+    start = [self _minuteToPosition:h * 60];
+    if (h % 2)
+      [_backgroundColor set];
+    else
+      [_alternateBackgroundColor set];
+    NSRectFill(NSMakeRect(0, start, rect.size.width, [self _minuteToSize:60] + 1));
+  }
   for (h = _firstH; h <= _lastH; h++) {
     NSString *hour = [NSString stringWithFormat:@"%d h", h];
     start = [self _minuteToPosition:h * 60];
-    [[NSColor grayColor] set];
-    NSFrameRect(NSMakeRect(0, start, rect.size.width, 1));
-    [hour drawInRect:NSMakeRect(4, start - 20, 80, 16) withAttributes:_textAttributes];
+    /* FIXME : draw text in the middle */
+    [hour drawAtPoint:NSMakePoint(4, start - 20) withAttributes:_textAttributes];
   }
   if (_startPt.x != _endPt.x && _startPt.y != _endPt.y) {
     float miny, maxy;

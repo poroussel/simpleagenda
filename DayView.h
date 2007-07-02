@@ -23,6 +23,8 @@
   NSPoint _endPt;
   NSDictionary *_textAttributes;
   AppointmentView *_selected;
+  NSColor *_backgroundColor;
+  NSColor *_alternateBackgroundColor;
 }
 
 - (id)initWithFrame:(NSRect)frameRect;
