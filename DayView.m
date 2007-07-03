@@ -160,10 +160,10 @@
   int size, start;
 
   if ([apt allDay])
-    return NSMakeRect(40, 0, _width - 56, _height);
+    return NSMakeRect(40, 0, _width - 40, _height);
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
-  return NSMakeRect(40, start - size, _width - 56, size);
+  return NSMakeRect(40, start - size, _width - 40, size);
 }
 
 - (int)_roundMinutes:(int)minutes
@@ -173,14 +173,23 @@
 
 - (void)drawRect:(NSRect)rect
 {
+  AppointmentView *aptv; 
+  NSEnumerator *enumerator;
   int h, start;
 
+  _height = rect.size.height;
+  _width = rect.size.width;
+  /* 
+   * FIXME : this is ugly and slow, we're doing
+   * work when it's not needed and probably twice.
+   */
+  enumerator = [[self subviews] objectEnumerator];
+  while ((aptv = [enumerator nextObject]))
+    [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
   /*
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
    */
-  _height = rect.size.height;
-  _width = rect.size.width;
   for (h = _firstH; h <= _lastH + 1; h++) {
     start = [self _minuteToPosition:h * 60];
     if (h % 2)
