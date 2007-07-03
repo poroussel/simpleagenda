@@ -126,6 +126,8 @@
 					 green:[_backgroundColor greenComponent] + 0.05
 					 blue:[_backgroundColor blueComponent] + 0.05
 					 alpha:[_backgroundColor alphaComponent]] retain];
+    _height = frameRect.size.height;
+    _width = frameRect.size.width;
     [self reloadData];
   }
   return self;
@@ -160,10 +162,10 @@
   int size, start;
 
   if ([apt allDay])
-    return NSMakeRect(40, 0, _width - 40, _height);
+    return NSMakeRect(40, 0, _width - 48, _height);
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
-  return NSMakeRect(40, start - size, _width - 40, size);
+  return NSMakeRect(40, start - size, _width - 48, size);
 }
 
 - (int)_roundMinutes:(int)minutes
@@ -173,12 +175,18 @@
 
 - (void)drawRect:(NSRect)rect
 {
+  NSSize size;
+  NSString *hour;
   AppointmentView *aptv; 
   NSEnumerator *enumerator;
   int h, start;
+  int hrow;
+  float miny, maxy;
 
-  _height = rect.size.height;
-  _width = rect.size.width;
+  if (rect.origin.y == 0) {
+    _height = rect.size.height;
+    _width = rect.size.width;
+  }
   /* 
    * FIXME : this is ugly and slow, we're doing
    * work when it's not needed and probably twice.
@@ -190,27 +198,26 @@
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
    */
+  hrow = [self _minuteToSize:60];
   for (h = _firstH; h <= _lastH + 1; h++) {
     start = [self _minuteToPosition:h * 60];
     if (h % 2)
       [_backgroundColor set];
     else
       [_alternateBackgroundColor set];
-    NSRectFill(NSMakeRect(0, start, rect.size.width, [self _minuteToSize:60] + 1));
+    NSRectFill(NSMakeRect(0, start, rect.size.width, hrow + 1));
   }
   for (h = _firstH; h <= _lastH; h++) {
-    NSString *hour = [NSString stringWithFormat:@"%d h", h];
+    hour = [NSString stringWithFormat:@"%d h", h];
     start = [self _minuteToPosition:h * 60];
-    /* FIXME : draw text in the middle */
-    [hour drawAtPoint:NSMakePoint(4, start - 20) withAttributes:_textAttributes];
+    size = [hour sizeWithAttributes:_textAttributes];
+    [hour drawAtPoint:NSMakePoint(4, start - hrow / 2 - size.height / 2) withAttributes:_textAttributes];
   }
   if (_startPt.x != _endPt.x && _startPt.y != _endPt.y) {
-    float miny, maxy;
-
     miny = min(_startPt.y, _endPt.y);
     maxy = max(_startPt.y, _endPt.y);
     [[NSColor grayColor] set];
-    NSFrameRect(NSMakeRect(40, miny, rect.size.width - 56, maxy - miny));
+    NSFrameRect(NSMakeRect(40, miny, rect.size.width - 48, maxy - miny));
   }
 }
 
@@ -365,7 +372,6 @@
     [self display];
   }
   [NSCursor pop];
-  /* If pointer is inside DayView, create a new appointment */
   if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
     int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
     int end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
