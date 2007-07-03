@@ -126,8 +126,6 @@
 					 green:[_backgroundColor greenComponent] + 0.05
 					 blue:[_backgroundColor blueComponent] + 0.05
 					 alpha:[_backgroundColor alphaComponent]] retain];
-    _height = frameRect.size.height;
-    _width = frameRect.size.width;
     [self reloadData];
   }
   return self;
