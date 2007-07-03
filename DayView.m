@@ -119,8 +119,6 @@
     _firstH = [config integerForKey:FIRST_HOUR];
     _lastH = [config integerForKey:LAST_HOUR];
     _minStep = [config integerForKey:MIN_STEP];
-    _height = frameRect.size.height;
-    _width = frameRect.size.width;
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor]
  				     forKey:NSForegroundColorAttributeName] retain];
     _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
@@ -162,10 +160,10 @@
   int size, start;
 
   if ([apt allDay])
-    return NSMakeRect(40, 0, [self frame].size.width - 56, [self frame].size.height);
+    return NSMakeRect(40, 0, _width - 56, _height);
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
-  return NSMakeRect(40, start - size, [self frame].size.width - 56, size);
+  return NSMakeRect(40, start - size, _width - 56, size);
 }
 
 - (int)_roundMinutes:(int)minutes
@@ -181,6 +179,8 @@
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
    */
+  _height = rect.size.height;
+  _width = rect.size.width;
   for (h = _firstH; h <= _lastH + 1; h++) {
     start = [self _minuteToPosition:h * 60];
     if (h % 2)
