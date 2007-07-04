@@ -121,7 +121,7 @@
 
 - (void)updateTitle
 {
-  [self setTitle: [[date calendarDate] descriptionWithCalendarFormat: @"%Y/%m/%d"]];
+  [self setTitle:[self dateAsString]];
 }
 
 - (void)clearSelectedDay
@@ -245,6 +245,11 @@
 - (Date *)date
 {
   return date;
+}
+
+- (NSString *)dateAsString
+{
+  return [[date calendarDate] descriptionWithCalendarFormat: @"%Y/%m/%d"];
 }
 
 @end

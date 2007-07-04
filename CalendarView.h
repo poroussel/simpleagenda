@@ -16,10 +16,11 @@
 }
 
 - (id)initWithFrame:(NSRect)frame;
-- (void)setDate:(Date *)date;
 - (Date *)date;
-- (void)setDelegate:(id)aDelegate;
+- (NSString *)dateAsString;
 - (id)delegate;
+- (void)setDate:(Date *)date;
+- (void)setDelegate:(id)aDelegate;
 
 @end
 
