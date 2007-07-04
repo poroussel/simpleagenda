@@ -19,6 +19,7 @@
 - (id)initWithFrame:(NSRect)frame
 {
   int i;
+  Date *now;
 
   self = [super initWithFrame:frame];
 
@@ -48,6 +49,7 @@
 				     nil];
     boldFont = [NSFont boldSystemFontOfSize: 0];
     normalFont = [NSFont systemFontOfSize: 0];
+    delegate = nil;
 
     button = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 170, 100, 25)];
     [button addItemsWithTitles: months];
@@ -71,16 +73,15 @@
     [cell setEditable: NO];
     [cell setSelectable: NO];
     [cell setAlignment: NSRightTextAlignment];
-    [cell setTarget: self];
-    [cell setAction: @selector(selectDay:)];
-
 
     matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 8, 280, 150)
-			       mode: NSRadioModeMatrix
+			       mode: NSListModeMatrix
 			       prototype: cell
 			       numberOfRows: 7
 			       numberOfColumns: 8];
     [matrix setIntercellSpacing: NSZeroSize];
+    [matrix setDelegate:self];
+    [matrix setAction: @selector(selectDay:)];
     
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
@@ -102,12 +103,9 @@
     [white release];
     [self addSubview: matrix];
 
-    delegate = nil;
-    [self setDate:[Date date]];
-
     [self setTitlePosition:NSBelowTop];
-
-    Date *now = [Date date];
+    now = [Date date];
+    [self setDate:now];
     [now incrementDay];
     [now setMinute:0];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
@@ -237,7 +235,7 @@
 
 - (void)setDate:(Date *)nDate
 {
-  ASSIGN(date, nDate);
+  ASSIGNCOPY(date, nDate);
   [text setIntValue: [date year]];
   [stepper setIntValue: [date year]];
   [button selectItemAtIndex: [date monthOfYear] - 1];
