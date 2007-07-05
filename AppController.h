@@ -24,6 +24,12 @@
   AppointmentCache *_soon;
 }
 
+- (void)copy:(id)sender;
+- (void)cut:(id)sender;
+- (void)paste:(id)sender;
+- (void)editAppointment:(id)sender;
+- (void)delAppointment:(id)sender;
+- (void)exportAppointment:(id)sender;
 - (void)showPrefPanel:(id)sender;
 - (void)addAppointment:(id)sender;
 - (void)editAppointment:(id)sender;

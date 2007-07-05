@@ -15,6 +15,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController
 
+- (void)registerForServices
+{
+  NSArray *sendTypes = [NSArray arrayWithObjects:NSStringPboardType, NSFilenamesPboardType, nil];
+  NSArray *returnTypes = [NSArray arrayWithObjects:nil];
+  [NSApp registerServicesMenuSendTypes: sendTypes returnTypes: returnTypes];
+}
+
 - (id)init
 {
   Date *date;
@@ -38,6 +45,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _soon = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:3];
     [_soon setTitle:@"Soon"];
     [date release];
+    [self registerForServices];
   }
   return self;
 }
@@ -172,13 +180,22 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   }
 }
 
+/* FIXME : this doesn't work completly */
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
+  BOOL itemSelected = [dayView selectedAppointment] != nil;
   SEL action = [menuItem action];
-  if (action == @selector(copy:) || action == @selector(cut:) ||
-      action == @selector(editAppointment:) || action == @selector(delAppointment:) ||
-      action == @selector(exportAppointment:))
-    return [dayView selectedAppointment] != nil;
+
+  if (action == @selector(copy:))
+    return itemSelected;
+  if (action == @selector(cut:))
+    return itemSelected;
+  if (action == @selector(editAppointment:))
+    return itemSelected;
+  if (action == @selector(delAppointment:))
+    return itemSelected;
+  if (action == @selector(exportAppointment:))
+    return itemSelected;
   if (action == @selector(paste:))
     return _selection != nil;
   return YES;

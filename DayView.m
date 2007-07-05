@@ -447,17 +447,47 @@
 
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
-  if (_selected && (!sendType || [sendType isEqual:NSFilenamesPboardType]))
+  if (_selected && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
     return self;
   return nil;
 }
 
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
-  if (!_selected || [types containsObject:NSFilenamesPboardType] == NO)
+  char template[] = "/tmp/SimpleAgendaXXXXXX";
+  NSString *ical;
+  NSFileHandle *fh;
+  int fd;
+
+  if (!_selected)
     return NO;
-  [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
-  return [pboard setPropertyList:[NSArray arrayWithObject:@"/var/www/cal/perso.ics"] forType:NSFilenamesPboardType];
+  NSAssert([types count] == 1, @"It seems our assumption was wrong");
+  ical = [[_selected appointment] eventAsICalendarString];
+
+  /* Export it as a temporary file */
+  if ([types containsObject:NSFilenamesPboardType]) {
+    fd = mkstemp(template);
+    if (fd < 0) {
+      NSLog(@"Unable to create temp file");
+      return NO;
+    }
+    fh = [[NSFileHandle alloc] initWithFileDescriptor:fd closeOnDealloc:YES];
+    if (!fh) {
+      NSLog(@"Unable to create file handle");
+      return NO;
+    }
+    [fh writeData:[ical dataUsingEncoding:NSUTF8StringEncoding]];
+    [fh release];
+    [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
+    return [pboard setPropertyList:[NSArray arrayWithObject:[NSString stringWithCString:template]] forType:NSFilenamesPboardType];
+  }
+
+  /* Export it as a string */
+  if ([types containsObject:NSStringPboardType]) {
+    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+    return [pboard setString:[[_selected appointment] eventAsICalendarString] forType:NSStringPboardType];
+  }
+  return NO;
 }
 @end
 
