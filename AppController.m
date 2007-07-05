@@ -21,6 +21,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
   self = [super init];
   if (self) {
+    _selection = nil;
     _editor = [AppointmentEditor new];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
@@ -122,6 +123,23 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [[apt store] delAppointment: apt];
 }
 
+- (void)exportAppointment:(id)sender;
+{
+  Event *apt = [dayView selectedAppointment];
+  NSSavePanel *panel = [NSSavePanel savePanel];
+  NSString *str;
+
+  if (apt) {
+    [panel setRequiredFileType:@"ics"];
+    [panel setTitle:@"Export As"];
+    if ([panel runModal] == NSOKButton) {
+      str = [apt eventAsICalendarString];
+      if (![str writeToFile:[panel filename] atomically:NO])
+	NSLog(@"Unable to write to file %@", [panel filename]);
+    }
+  }
+}
+
 - (void)copy:(id)sender
 {
   _selection = [dayView selectedAppointment];
@@ -142,6 +160,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
       [_selection setStartDate:date];
       [[_selection store] updateAppointment:_selection];
+      _selection = nil;
     } else {
       Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
@@ -157,7 +176,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   SEL action = [menuItem action];
   if (action == @selector(copy:) || action == @selector(cut:) ||
-      action == @selector(editAppointment:) || action == @selector(delAppointment:))
+      action == @selector(editAppointment:) || action == @selector(delAppointment:) ||
+      action == @selector(exportAppointment:))
     return [dayView selectedAppointment] != nil;
   if (action == @selector(paste:))
     return _selection != nil;
