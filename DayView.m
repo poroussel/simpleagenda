@@ -384,15 +384,6 @@
   [self display];
 }
 
-- (NSMenu *)menuForEvent:(NSEvent *)theEvent
-{
-  NSView *hit = [self hitTest:[self convertPoint:[theEvent locationInWindow] fromView:nil]];
-
-  if ([hit isKindOfClass:[AppointmentView class]])
-    [self _selectAppointmentView:(AppointmentView *)hit];
-  return nil;
-}
-
 - (Event *)selectedAppointment
 {
   return [_selected appointment];
