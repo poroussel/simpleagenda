@@ -233,22 +233,22 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @implementation AppController(DayViewDelegate)
 
-- (void)doubleClickOnAppointment:(Event *)apt
+- (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
   /*
    * FIXME : we should allow to view appointment's 
    * details even if it's read only
    */
-  if ([[apt store] isWritable])
-    [self _editAppointment:apt];
+  if ([[event store] isWritable])
+    [self _editAppointment:event];
 }
 
-- (void)modifyAppointment:(Event *)apt
+- (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
-  [[apt store] updateAppointment:apt];
+  [[event store] updateAppointment:event];
 }
 
-- (void)createAppointmentFrom:(int)start to:(int)end
+- (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end
 {
   Date *date = [[calendar date] copy];
   [date setMinute:start];

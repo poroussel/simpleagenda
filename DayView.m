@@ -278,6 +278,7 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
   int start;
+  int end;
   int diff;
   int minutes;
   BOOL keepOn = YES;
@@ -293,8 +294,8 @@
     [self _selectAppointmentView:aptv];
 
     if ([theEvent clickCount] > 1) {
-      if ([delegate respondsToSelector:@selector(doubleClickOnAppointment:)])
-	[delegate doubleClickOnAppointment:[aptv appointment]];
+      if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
+	[delegate dayView:self editEvent:[aptv appointment]];
       return;
     }
 
@@ -328,8 +329,8 @@
 	}
       }
       [NSCursor pop];
-      if (modified && [delegate respondsToSelector:@selector(modifyAppointment:)])
-	[delegate modifyAppointment:[aptv appointment]];
+      if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
+	[delegate dayView:self modifyEvent:[aptv appointment]];
       return;
     }
 
@@ -354,8 +355,8 @@
       }
     }
     [NSCursor pop];
-    if (modified && [delegate respondsToSelector:@selector(modifyAppointment:)])
-      [delegate modifyAppointment:[aptv appointment]];
+    if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
+      [delegate dayView:self modifyEvent:[aptv appointment]];
     return;
   }
 
@@ -375,10 +376,10 @@
   }
   [NSCursor pop];
   if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
-    int start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
-    int end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
-    if ([delegate respondsToSelector:@selector(createAppointmentFrom:to:)])
-      [delegate createAppointmentFrom:[self _roundMinutes:start] to:[self _roundMinutes:end]];
+    start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
+    end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
+    if ([delegate respondsToSelector:@selector(dayView:createEventFrom:to:)])
+      [delegate dayView:self createEventFrom:[self _roundMinutes:start] to:[self _roundMinutes:end]];
   }
   _startPt = _endPt = NSMakePoint(0, 0);
   [self display];
@@ -391,7 +392,7 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-    [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+  [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
 }
 
 - (void)moveUp:(id)sender
@@ -399,7 +400,8 @@
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:-_minStep];
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
-    [delegate modifyAppointment:[_selected appointment]];
+    if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
+      [delegate dayView:self modifyEvent:[_selected appointment]];
     [self display];
   }
 }
@@ -409,7 +411,8 @@
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:_minStep];
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
-    [delegate modifyAppointment:[_selected appointment]];
+    if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
+      [delegate dayView:self modifyEvent:[_selected appointment]];
     [self display];
   }
 }

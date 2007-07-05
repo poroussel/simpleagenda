@@ -39,9 +39,9 @@
 
 @interface NSObject(DayViewDelegate)
 
-- (void)doubleClickOnAppointment:(Event *)event;
-- (void)modifyAppointment:(Event *)event;
-- (void)createAppointmentFrom:(int)start to:(int)end;
+- (void)dayView:(DayView *)dayview editEvent:(Event *)event;
+- (void)dayView:(DayView *)dayview modifyEvent:(Event *)event;
+- (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end;
 - (void)dayView:(DayView *)dayview selectEvent:(Event *)event;
 
 @end
