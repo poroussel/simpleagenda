@@ -266,9 +266,13 @@
 
 - (void)_selectAppointmentView:(AppointmentView *)aptv
 {
-  [_selected setSelected:NO];
-  [aptv setSelected:YES];
-  _selected = aptv;
+  if (_selected != aptv) {
+    [_selected setSelected:NO];
+    [aptv setSelected:YES];
+    _selected = aptv;
+    if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
+      [delegate dayView:self selectEvent:[aptv appointment]];
+  }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
