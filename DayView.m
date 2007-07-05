@@ -142,17 +142,17 @@
 /* FIXME : the following could probably be simplified... */
 - (int)_minuteToSize:(int)minutes
 {
-  return minutes * _height / ((_lastH - _firstH + 1) * 60);
+  return minutes * [self frame].size.height / ((_lastH - _firstH + 1) * 60);
 }
 
 - (int)_minuteToPosition:(int)minutes
 {
-  return _height - [self _minuteToSize:minutes - (_firstH * 60)] - 1;
+  return [self frame].size.height - [self _minuteToSize:minutes - (_firstH * 60)] - 1;
 }
 
 - (int)_positionToMinute:(float)position
 {
-  return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / _height;
+  return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / [self frame].size.height;
 }
 
 - (NSRect)_frameForAppointment:(Event *)apt
@@ -160,10 +160,10 @@
   int size, start;
 
   if ([apt allDay])
-    return NSMakeRect(40, 0, _width - 48, _height);
+    return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
   start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
-  return NSMakeRect(40, start - size, _width - 48, size);
+  return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
 
 - (int)_roundMinutes:(int)minutes
@@ -181,10 +181,6 @@
   int hrow;
   float miny, maxy;
 
-  if (rect.origin.y == 0) {
-    _height = rect.size.height;
-    _width = rect.size.width;
-  }
   /* 
    * FIXME : this is ugly and slow, we're doing
    * work when it's not needed and probably twice.

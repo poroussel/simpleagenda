@@ -14,8 +14,6 @@
 {
   id <DayViewDataSource> _dataSource;
   IBOutlet id delegate;
-  int _height;
-  int _width;
   int _firstH;
   int _lastH;
   int _minStep;
