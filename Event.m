@@ -411,5 +411,20 @@
     icalcomponent_remove_property(ic, prop);
   return YES;
 }
+
+- (NSString *)eventAsICalendarString
+{
+  NSString *res = nil;
+  icalcomponent *root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT,
+					    icalproperty_new_version("1.0"),
+					    icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"),
+					    0);
+  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
+  icalcomponent_add_component(root, ic);
+  if ([self updateICalComponent:ic])
+    res = [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
+  icalcomponent_free(root);
+  return res;
+}
 @end
 

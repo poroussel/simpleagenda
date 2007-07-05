@@ -445,5 +445,19 @@
   return _minStep;
 }
 
+- (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
+{
+  if (_selected && (!sendType || [sendType isEqual:NSFilenamesPboardType]))
+    return self;
+  return nil;
+}
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
+{
+  if (!_selected || [types containsObject:NSFilenamesPboardType] == NO)
+    return NO;
+  [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
+  return [pboard setPropertyList:[NSArray arrayWithObject:@"/var/www/cal/perso.ics"] forType:NSFilenamesPboardType];
+}
 @end
 

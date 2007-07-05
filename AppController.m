@@ -262,10 +262,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [apt release];
 }
 
-- (void)dayView:(DayView *)dayview selectEvent:(Event *)event
-{
-}
-
 @end
 
 @implementation AppController(AppointmentCacheDelegate)
