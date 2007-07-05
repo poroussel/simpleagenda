@@ -1,5 +1,7 @@
 In no particular order :
 
+* fix global data flow and use of notifications/delegate
+
 * use libical component as a base for Event class
 
 * support iCalendar VTODO components ?

@@ -243,6 +243,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [self _editAppointment:event];
 }
 
+/* FIXME : dayView:modifyEvent -> AgendaStore:updateAppointment -> SADataChangedInStore -> AppointmentCache populateFrom: -> DayView reloadData: -> refresh et perte de la selection */
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
   [[event store] updateAppointment:event];
