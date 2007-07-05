@@ -55,5 +55,10 @@ enum intervalType
 - (void)setStartDate:(Date *)startDate;
 - (void)setEndDate:(Date *)endDate;
 - (void)setInterval:(int)interval;
-
 @end
+
+@interface Event(iCalendar)
+- (id)initWithICalComponent:(icalcomponent *)ic;
+- (BOOL)updateICalComponent:(icalcomponent *)ic;
+@end
+

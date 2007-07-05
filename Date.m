@@ -5,7 +5,6 @@
  */
 
 @implementation Date
-
 - (id)copyWithZone:(NSZone *)zone
 {
   Date *new = [Date allocWithZone:zone];
@@ -242,5 +241,25 @@
   struct icaldurationtype dt = {diff < 0, 0, 0, 0, diff, 0};
   _time = icaltime_add(_time, dt);
 }
-
 @end
+
+@implementation Date(iCalendar)
+- (id)initWithICalTime:(struct icaltimetype)time
+{
+  self = [super init];
+  if (self)
+    [self setDateToICalTime:time];
+  return self;
+}
+
+- (void)setDateToICalTime:(struct icaltimetype)time
+{
+  _time = time;
+}
+
+- (struct icaltimetype)iCalTime
+{
+  return _time;
+}
+@end
+

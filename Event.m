@@ -6,7 +6,6 @@
 #import "Event.h"
 
 @implementation Event(NSCoding)
-
 -(void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:title forKey:@"title"];
@@ -231,6 +230,186 @@
 {
   interval = newInterval;
 }
+@end
 
+@implementation Event(iCalendar)
+- (id)initWithICalComponent:(icalcomponent *)ic
+{
+  icalproperty *prop;
+  icalproperty *pstart;
+  icalproperty *pend;
+  struct icaltimetype start;
+  struct icaltimetype end;
+  struct icaldurationtype diff;
+  struct icalrecurrencetype rec;
+  Date *date;
+
+  self = [self init];
+  if (self == nil)
+    return nil;
+
+  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
+  if (!prop) {
+    NSLog(@"No UID");
+    goto init_error;
+  }
+  [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+    
+  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop) {
+    NSLog(@"No summary");
+    goto init_error;
+  }
+  [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop) encoding:NSUTF8StringEncoding]];
+  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+  if (prop) {
+    NSAttributedString *as = [[NSAttributedString alloc] initWithString:[NSString stringWithCString:icalproperty_get_description(prop) encoding:NSUTF8StringEncoding]];
+    [self setDescriptionText:as];
+    [as release];
+  }
+
+  pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
+  if (!pstart) {
+    NSLog(@"No start date");
+    goto init_error;
+  }
+  start = icalproperty_get_dtstart(pstart);
+  date = [[Date alloc] initWithICalTime:start];
+  [self setStartDate:date];
+  [self setEndDate:date];
+
+  pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
+  if (!pend) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+    if (!prop) {
+      NSLog(@"No end date and no duration");
+      goto init_error;
+    }
+    diff = icalproperty_get_duration(prop);
+  } else {
+    end = icalproperty_get_dtend(pend);
+    diff = icaltime_subtract(end, start);
+  }
+  [self setDuration:icaldurationtype_as_int(diff) / 60];
+
+  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
+  if (prop) {
+    rec = icalproperty_get_rrule(prop);
+    [date changeYearBy:10];
+    switch (rec.freq) {
+    case ICAL_DAILY_RECURRENCE:
+      [self setInterval:RI_DAILY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_WEEKLY_RECURRENCE:
+      [self setInterval:RI_WEEKLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_MONTHLY_RECURRENCE:
+      [self setInterval:RI_MONTHLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    case ICAL_YEARLY_RECURRENCE:
+      [self setInterval:RI_YEARLY];
+      [self setFrequency:rec.interval];
+      [self setEndDate:date];
+      break;
+    default:
+      NSLog(@"ToDo");
+      break;
+    }
+  }
+  [date release];
+  return self;
+
+ init_error:
+  NSLog(@"Error creating Event from iCal component");
+  [self release];
+  return nil;
+}
+
+- (BOOL)updateICalComponent:(icalcomponent *)ic
+{
+  char uid[255];
+  struct icaltimetype itime;
+  struct icalrecurrencetype irec;
+  icalproperty *prop;
+
+  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
+  if (!prop) {
+    snprintf(uid, 255, "SimpleAgenda-uuid%f", [[NSDate date] timeIntervalSince1970]);
+    prop = icalproperty_new_uid(uid);
+    icalcomponent_add_property(ic, prop);
+    [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+  }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop) {
+    prop = icalproperty_new_summary([title UTF8String]);
+    icalcomponent_add_property(ic, prop);
+  } else
+    icalproperty_set_summary(prop, [title UTF8String]);
+
+  if (descriptionText != nil) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+    if (!prop) {
+      prop = icalproperty_new_description([[descriptionText string] UTF8String]);
+      icalcomponent_add_property(ic, prop);
+    } else
+      icalproperty_set_description(prop, [[descriptionText string] UTF8String]);
+  }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
+  if (!prop) {
+    prop = icalproperty_new_dtstart([startDate iCalTime]);
+    icalcomponent_add_property(ic, prop);
+  } else
+    icalproperty_set_dtstart(prop, [startDate iCalTime]);
+
+  prop = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
+  if (!prop) {
+    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+    if (!prop) {
+      prop = icalproperty_new_duration(icaldurationtype_from_int(duration * 60));
+      icalcomponent_add_property(ic, prop);
+    } else
+      icalproperty_set_duration(prop, icaldurationtype_from_int(duration * 60));
+  } else {
+    itime = icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60));
+    icalproperty_set_dtend(prop, itime);
+  }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
+  if (interval != RI_NONE) {
+    icalrecurrencetype_clear(&irec);
+    if (!prop) {
+      prop = icalproperty_new_rrule(irec);
+      icalcomponent_add_property(ic, prop);
+    }
+    switch (interval) {
+    case RI_DAILY:
+      irec.freq = ICAL_DAILY_RECURRENCE;
+      break;
+    case RI_WEEKLY:
+      irec.freq = ICAL_WEEKLY_RECURRENCE;
+      break;
+    case RI_MONTHLY:
+      irec.freq = ICAL_MONTHLY_RECURRENCE;
+      break;
+    case RI_YEARLY:
+      irec.freq = ICAL_YEARLY_RECURRENCE;
+      break;
+    default:
+      NSLog(@"ToDo");
+    }
+    irec.until = [endDate iCalTime];
+    icalproperty_set_rrule(prop, irec);
+  } else if (prop)
+    icalcomponent_remove_property(ic, prop);
+  return YES;
+}
 @end
 

@@ -37,5 +37,11 @@
 - (void)changeYearBy:(int)diff;
 - (void)changeDayBy:(int)diff;
 - (void)changeMinuteBy:(int)diff;
-
 @end
+
+@interface Date(iCalendar)
+- (id)initWithICalTime:(struct icaltimetype)time;
+- (void)setDateToICalTime:(struct icaltimetype)time;
+- (struct icaltimetype)iCalTime;
+@end
+
