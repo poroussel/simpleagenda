@@ -454,10 +454,8 @@
 
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
-  char template[] = "/tmp/SimpleAgendaXXXXXX";
   NSString *ical;
-  NSFileHandle *fh;
-  int fd;
+  NSFileManager *fm;
 
   if (!_selected)
     return NO;
@@ -466,20 +464,13 @@
 
   /* Export it as a temporary file */
   if ([types containsObject:NSFilenamesPboardType]) {
-    fd = mkstemp(template);
-    if (fd < 0) {
-      NSLog(@"Unable to create temp file");
+    fm = [NSFileManager defaultManager];
+    if (![fm createFileAtPath:@"/tmp/calendar.ics" contents:[ical dataUsingEncoding:NSUTF8StringEncoding] attributes:nil]) {
+      NSLog(@"Unable to create file");
       return NO;
     }
-    fh = [[NSFileHandle alloc] initWithFileDescriptor:fd closeOnDealloc:YES];
-    if (!fh) {
-      NSLog(@"Unable to create file handle");
-      return NO;
-    }
-    [fh writeData:[ical dataUsingEncoding:NSUTF8StringEncoding]];
-    [fh release];
     [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
-    return [pboard setPropertyList:[NSArray arrayWithObject:[NSString stringWithCString:template]] forType:NSFilenamesPboardType];
+    return [pboard setPropertyList:[NSArray arrayWithObject:@"/tmp/calendar.ics"] forType:NSFilenamesPboardType];
   }
 
   /* Export it as a string */
