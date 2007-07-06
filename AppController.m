@@ -180,30 +180,27 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   }
 }
 
-/* FIXME : this doesn't work completly */
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
   BOOL itemSelected = [dayView selectedAppointment] != nil;
   SEL action = [menuItem action];
 
-  if (action == @selector(copy:))
+  if (sel_eq(action, @selector(copy:)))
     return itemSelected;
-  if (action == @selector(cut:))
+  if (sel_eq(action, @selector(cut:)))
     return itemSelected;
-  if (action == @selector(editAppointment:))
+  if (sel_eq(action, @selector(editAppointment:)))
     return itemSelected;
-  if (action == @selector(delAppointment:))
+  if (sel_eq(action, @selector(delAppointment:)))
     return itemSelected;
-  if (action == @selector(exportAppointment:))
+  if (sel_eq(action, @selector(exportAppointment:)))
     return itemSelected;
-  if (action == @selector(paste:))
+  if (sel_eq(action, @selector(paste:)))
     return _selection != nil;
   return YES;
 }
 
-
 /* DayViewDataSource protocol */
-
 - (NSEnumerator *)scheduledAppointmentsForDayView
 {
   return [_current enumerator];
