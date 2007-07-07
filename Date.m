@@ -57,11 +57,13 @@
     icaltimezone *tz = icaltimezone_get_builtin_timezone([[[cd timeZone] description] cString]);
     _time = icaltime_null_time();
     _time = icaltime_set_timezone(&_time, tz);    
+    /* FIXME : use icaltime_current_time_with_zone and sort timezone mess */
     _time.year = [cd yearOfCommonEra];
     _time.month = [cd monthOfYear];
     _time.day = [cd dayOfMonth];
     _time.hour = [cd hourOfDay];
     _time.minute = [cd minuteOfHour];
+    _time.second = [cd secondOfMinute];
   }
   return self;
 }
@@ -79,7 +81,7 @@
 				       day:_time.day
 				       hour:_time.hour
 				       minute:_time.minute
-				       second:0 
+				       second:_time.second
 				       timeZone:nil];
   return cd;
 }
