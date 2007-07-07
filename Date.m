@@ -17,6 +17,11 @@
   return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
 }
 
+- (NSComparisonResult)compareTime:(id)aDate
+{
+  return icaltime_compare(_time, ((Date *)aDate)->_time);
+}
+
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];

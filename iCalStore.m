@@ -262,7 +262,15 @@
 
 - (BOOL)contains:(Event *)evt
 {
-  return [_set containsObject:evt];
+  NSEnumerator *enumerator = [_set objectEnumerator];
+  Event *apt;
+
+  while ((apt = [enumerator nextObject])) {
+    /* FIXME : use isEqual: ? */
+    if (![apt compare:evt])
+      return YES;
+  }
+  return NO;
 }
 
 - (BOOL)isWritable

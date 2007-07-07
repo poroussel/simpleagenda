@@ -100,6 +100,10 @@
   return NO;
 }
 
+/*
+ * FIXME : this should possibly be isEqual:
+ * but we would need to override hash:
+ */
 - (NSComparisonResult)compare:(id)evt
 {
   NSAssert([evt isKindOfClass:[Event class]], @"Wrong class");
@@ -167,7 +171,25 @@
 
 - (void)generateUID
 {
-  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@-%@", [[Date date] description], [[NSHost currentHost] name]]];
+  Date *now = [Date date];
+  static Date *lastDate;
+  static int counter;
+
+  if (!lastDate)
+    ASSIGNCOPY(lastDate, [Date date]);
+  else {
+    if (![lastDate compareTime:now])
+      counter++;
+    else {
+      ASSIGNCOPY(lastDate, now);
+      counter = 0;
+    }
+  }
+  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@%d-%@", 
+			 [[Date date] description], 
+			 counter,
+			 [[NSHost currentHost] name]]];
+  NSLog([self UID]);
 }
 
 - (NSAttributedString *)descriptionText

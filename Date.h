@@ -11,7 +11,8 @@
 + (id)date;
 
 - (NSCalendarDate *)calendarDate;
-
+- (NSComparisonResult)compare:(id)aDate;
+- (NSComparisonResult)compareTime:(id)aTime;
 - (int)year;
 - (int)monthOfYear;
 - (int)hourOfDay;
