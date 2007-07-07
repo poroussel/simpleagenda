@@ -18,5 +18,5 @@ ADDITIONAL_LDFLAGS +=  -lical
 ADDITIONAL_INCLUDE_DIRS += 
 
 # Additional library directories the linker should search
-ADDITIONAL_LIB_DIRS += -L/opt/gnustep/Local/Library/Libraries -L/usr/local/lib 
+ADDITIONAL_LIB_DIRS += -L/usr/local/lib 
 
