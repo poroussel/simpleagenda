@@ -52,6 +52,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+  [window setFrameAutosaveName:@"mainWindow"];
   [dayView reloadData];
   [summary sizeToFit];
 }

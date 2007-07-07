@@ -13,6 +13,7 @@
   IBOutlet DayView *dayView;
   IBOutlet NSOutlineView *summary;
 
+  NSWindow *window;
   PreferencesController *_pc;
   AppointmentEditor *_editor;
   StoreManager *_sm;

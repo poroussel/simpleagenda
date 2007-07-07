@@ -11,7 +11,8 @@
 	Outlets = (
 	    calendar,
 	    dayView,
-	    summary
+	    summary,
+	    window
 	);
 	Super = NSObject;
     };
