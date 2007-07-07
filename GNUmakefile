@@ -25,7 +25,8 @@ SimpleAgenda_RESOURCE_FILES = \
 Resources/Agenda.gorm \
 Resources/Appointment.gorm \
 Resources/Preferences.gorm \
-Resources/Calendar.tiff 
+Resources/Calendar.tiff \
+Resources/ical-file.tiff 
 
 
 #

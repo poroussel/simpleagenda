@@ -74,6 +74,23 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_editor release];
 }
 
+
+/* Called when user opens an .ics file in GWorkspace */
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  Event *event;
+
+  if ([fm isReadableFileAtPath:filename]) {
+    event = [[Event alloc] initWithICalString:[NSString stringWithContentsOfFile:filename]];
+    if (event) {
+      /* FIXME : determine if it's a new appointment or an update */
+      return YES;
+    }
+  }
+  return NO;
+}
+
 - (void)showPrefPanel:(id)sender
 {
   [_pc showPreferences];

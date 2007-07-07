@@ -14,5 +14,17 @@
     NSMainNibFile = Agenda.gorm;
     NSPrincipalClass = NSApplication;
     NSRole = Application;
+    NSTypes = (
+	{
+	    NSDocumentClass = "";
+	    NSHumanReadableName = "";
+	    NSIcon = "ical-file.tiff";
+	    NSName = "";
+	    NSRole = "";
+	    NSUnixExtensions = (
+		ics
+	    );
+	}
+    );
     URL = "http://coyote.octets.fr/pub/gnustep/";
 }
