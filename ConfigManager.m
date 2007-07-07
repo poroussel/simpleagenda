@@ -105,7 +105,7 @@ static ConfigManager *singleton;
   id object;
 
   object = [self objectForKey:key];
-  if (object != nil && [object isKindOfClass:[NSNumber class]])
+  if (object != nil)
     return [object intValue];
   return 0;
 }
