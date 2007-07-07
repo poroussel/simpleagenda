@@ -9,7 +9,6 @@
 -(void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:title forKey:@"title"];
-  // FIXME : we encode a simple string, losing the attributes
   [coder encodeObject:[descriptionText string] forKey:@"descriptionText"];
   [coder encodeObject:startDate forKey:@"sdate"];
   [coder encodeObject:endDate forKey:@"edate"];
@@ -19,12 +18,13 @@
   [coder encodeInt:scheduleLevel forKey:@"scheduleLevel"];
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
+  [coder encodeObject:_uid forKey:@"uid"];
 }
 
 -(id)initWithCoder:(NSCoder *)coder
 {
   title = [[coder decodeObjectForKey:@"title"] retain];
-  descriptionText = [[[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]] retain];
+  descriptionText = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
   startDate = [[coder decodeObjectForKey:@"sdate"] retain];
   endDate = [[coder decodeObjectForKey:@"edate"] retain];
   interval = [coder decodeIntForKey:@"interval"];
@@ -36,6 +36,10 @@
     _allDay = [coder decodeBoolForKey:@"allDay"];
   else
     _allDay = NO;
+  if ([coder containsValueForKey:@"uid"])
+    _uid = [[coder decodeObjectForKey:@"uid"] retain];
+  else
+    [self generateUID];
   return self;
 }
 
@@ -49,15 +53,20 @@
   [self setStartDate:start];
   [self setTitle:aTitle];
   [self setDuration:minutes];
+  [self generateUID];
   return self;
 }
 
 - (void)dealloc
 {
   [super dealloc];
+  RELEASE(title);
+  RELEASE(descriptionText);
   RELEASE(_store);
   RELEASE(_location);
-  RELEASE(_externalRef);
+  RELEASE(_uid);
+  RELEASE(startDate);
+  RELEASE(endDate);
 }
 
 /*
@@ -89,6 +98,12 @@
 	     (([startDate yearsUntil: day] % frequency) == 0)));
   }
   return NO;
+}
+
+- (NSComparisonResult)compare:(id)evt
+{
+  NSAssert([evt isKindOfClass:[Event class]], @"Wrong class");
+  return [[self UID] compare:[evt UID]];
 }
 
 - (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end
@@ -137,16 +152,6 @@
   _allDay = allDay;
 }
 
-- (id)externalRef
-{
-  return _externalRef;
-}
-
-- (void)setExternalRef:(id)externalRef
-{
-  ASSIGN(_externalRef, externalRef);
-}
-
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"<%@> from <%@> for <%d> to <%@> (%d)", [self title], [startDate description], [self duration], [endDate description], interval];
@@ -158,6 +163,11 @@
     return @"all day";
   int minute = [[self startDate] minuteOfDay];
   return [NSString stringWithFormat:@"%dh%02d", minute / 60, minute % 60];
+}
+
+- (void)generateUID
+{
+  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@-%@", [[Date date] description], [[NSHost currentHost] name]]];
 }
 
 - (NSAttributedString *)descriptionText
@@ -195,6 +205,11 @@
   return interval;
 }
 
+- (NSString *)UID
+{
+  return _uid;
+}
+
 - (void)setDescriptionText:(NSAttributedString *)description
 {
   ASSIGN(descriptionText, description);
@@ -230,6 +245,12 @@
 {
   interval = newInterval;
 }
+
+- (void)setUID:(NSString *)aUid;
+{
+  ASSIGNCOPY(_uid, aUid);
+}
+
 @end
 
 @implementation Event(iCalendar)
@@ -253,7 +274,7 @@
     NSLog(@"No UID");
     goto init_error;
   }
-  [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
     
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
   if (!prop) {
@@ -353,17 +374,15 @@
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
-  char uid[255];
   struct icaltimetype itime;
   struct icalrecurrencetype irec;
   icalproperty *prop;
 
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
   if (!prop) {
-    snprintf(uid, 255, "SimpleAgenda-uuid%f", [[NSDate date] timeIntervalSince1970]);
-    prop = icalproperty_new_uid(uid);
+    prop = icalproperty_new_uid([[self UID] cString]);
     icalcomponent_add_property(ic, prop);
-    [self setExternalRef:[NSString stringWithCString:icalproperty_get_uid(prop)]];
+    [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
   }
 
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);

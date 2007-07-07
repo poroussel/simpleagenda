@@ -17,7 +17,7 @@ enum intervalType
   id <AgendaStore> _store;
   NSString *_location;
   BOOL _allDay;
-  id _externalRef;
+  NSString *_uid;
   NSString *title;
   NSAttributedString *descriptionText;
   Date *startDate;
@@ -30,15 +30,15 @@ enum intervalType
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
 - (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end;
+- (NSComparisonResult)compare:(id)evt;
 - (id <AgendaStore>)store;
 - (void)setStore:(id <AgendaStore>)store;
 - (NSString *)location;
 - (void)setLocation:(NSString *)aLocation;
 - (BOOL)allDay;
 - (void)setAllDay:(BOOL)allDay;
-- (id)externalRef;
-- (void)setExternalRef:(id)externalRef;
 - (NSString *)details;
+- (void)generateUID;
 
 - (NSAttributedString *)descriptionText;
 - (NSString *)title;
@@ -47,6 +47,7 @@ enum intervalType
 - (Date *)startDate;
 - (Date *)endDate;
 - (int)interval;
+- (NSString *)UID;
 
 - (void)setDescriptionText:(NSAttributedString *)descriptionText;
 - (void)setTitle:(NSString *)title;
@@ -55,6 +56,7 @@ enum intervalType
 - (void)setStartDate:(Date *)startDate;
 - (void)setEndDate:(Date *)endDate;
 - (void)setInterval:(int)interval;
+- (void)setUID:(NSString *)uid;
 @end
 
 @interface Event(iCalendar)

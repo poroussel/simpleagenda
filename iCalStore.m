@@ -9,7 +9,7 @@
 
 - (icalcomponent *)getComponentForEvent:(Event *)evt
 {
-  NSString *uid = [evt externalRef];
+  NSString *uid = [evt UID];
   icalcomponent *ic;
   icalproperty *prop;
 
