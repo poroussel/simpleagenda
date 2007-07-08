@@ -84,8 +84,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *event;
 
   if ([fm isReadableFileAtPath:filename]) {
+    /* FIXME : a file could contain more than 1 appointment */
     event = [[Event alloc] initWithICalString:[NSString stringWithContentsOfFile:filename]];
     if (event) {
+      NSLog([event description]);
       while ((store = [enumerator nextObject])) {
 	if ([store contains:event])
 	  NSLog(@"Event already is in %@", [store description]);

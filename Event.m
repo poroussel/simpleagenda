@@ -403,7 +403,6 @@
   if (!prop) {
     prop = icalproperty_new_uid([[self UID] cString]);
     icalcomponent_add_property(ic, prop);
-    [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
   }
 
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
