@@ -3,6 +3,7 @@
 #import "Event.h"
 #import "defines.h"
 
+#define CurrentVersion 2
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
 @implementation LocalStore
@@ -11,6 +12,7 @@
 {
   NSString *filename;
   BOOL isDir;
+  int version;
 
   self = [super init];
   if (self) {
@@ -46,6 +48,11 @@
 	[savedData makeObjectsPerform:@selector(setStore:) withObject:self];
 	[_set unionSet: savedData];
 	NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_set count]);
+	version = [_config integerForKey:ST_VERSION];
+	if (version < CurrentVersion) {
+	  [_config setInteger:CurrentVersion forKey:ST_VERSION];
+	  [self write];
+	}
       }
     }
   }

@@ -189,7 +189,6 @@
 			 [[Date date] description], 
 			 counter,
 			 [[NSHost currentHost] name]]];
-  NSLog([self UID]);
 }
 
 - (NSAttributedString *)descriptionText

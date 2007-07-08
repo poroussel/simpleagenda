@@ -15,3 +15,4 @@
 #define ST_RW @"storeWritable"
 #define ST_REFRESH @"storeRefresh"
 #define ST_DISPLAY @"storeDisplay"
+#define ST_VERSION @"storeVersion"
