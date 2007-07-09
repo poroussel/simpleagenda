@@ -6,7 +6,8 @@
 	    "addAppointment:",
 	    "editAppointment:",
 	    "delAppointment:",
-	    "exportAppointment:"
+	    "exportAppointment:",
+	    "saveAll:"
 	);
 	Outlets = (
 	    calendar,
@@ -51,6 +52,7 @@
 	    "delAppointment:",
 	    "editAppointment:",
 	    "exportAppointment:",
+	    "saveAll:",
 	    "orderFrontFontPanel:",
 	    "setDataSource:",
 	    "setDelegate:",

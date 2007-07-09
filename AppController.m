@@ -174,6 +174,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   }
 }
 
+- (void)saveAll:(id)sender
+{
+  [_sm synchronise];
+}
+
 - (void)copy:(id)sender
 {
   _selection = [dayView selectedAppointment];
