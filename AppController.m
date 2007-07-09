@@ -7,6 +7,7 @@
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
+#import "iCalTree.h"
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
@@ -162,14 +163,18 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [dayView selectedAppointment];
   NSSavePanel *panel = [NSSavePanel savePanel];
   NSString *str;
+  iCalTree *tree;
 
   if (apt) {
     [panel setRequiredFileType:@"ics"];
     [panel setTitle:@"Export As"];
     if ([panel runModal] == NSOKButton) {
-      str = [apt eventAsICalendarString];
+      tree = [iCalTree new];
+      [tree add:apt];
+      str = [tree iCalTreeAsString];
       if (![str writeToFile:[panel filename] atomically:NO])
 	NSLog(@"Unable to write to file %@", [panel filename]);
+      [tree release];
     }
   }
 }

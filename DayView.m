@@ -3,6 +3,7 @@
 #import "AgendaStore.h"
 #import "DayView.h"
 #import "ConfigManager.h"
+#import "iCalTree.h"
 #import "defines.h"
 
 #define max(x,y) ((x) > (y)) ? (x) : (y)
@@ -451,12 +452,15 @@
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
   NSString *ical;
+  iCalTree *tree;
   NSFileManager *fm;
 
   if (!_selected)
     return NO;
   NSAssert([types count] == 1, @"It seems our assumption was wrong");
-  ical = [[_selected appointment] eventAsICalendarString];
+  tree = AUTORELEASE([iCalTree new]);
+  [tree add:[_selected appointment]];
+  ical = [tree iCalTreeAsString];
 
   /* Export it as a temporary file */
   if ([types containsObject:NSFilenamesPboardType]) {
@@ -472,7 +476,7 @@
   /* Export it as a string */
   if ([types containsObject:NSStringPboardType]) {
     [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-    return [pboard setString:[[_selected appointment] eventAsICalendarString] forType:NSStringPboardType];
+    return [pboard setString:ical forType:NSStringPboardType];
   }
   return NO;
 }

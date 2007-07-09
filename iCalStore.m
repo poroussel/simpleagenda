@@ -1,28 +1,10 @@
 #import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
-#import <ical.h>
 #import "Event.h"
 #import "iCalStore.h"
 #import "defines.h"
 
 @implementation iCalStore
-
-- (icalcomponent *)getComponentForEvent:(Event *)evt
-{
-  NSString *uid = [evt UID];
-  icalcomponent *ic;
-  icalproperty *prop;
-
-  for (ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
-       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT)) {
-    prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-    if (prop) {
-      if ([uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
-	return ic;
-    }
-  }
-  return NULL;
-}
 
 - (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
@@ -86,29 +68,17 @@
 {
   NSData *data;
   NSString *text;
-  Event *ev;
-  icalcomponent *ic;
 
   if ([self needsRefresh]) {
     [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
     data = [_url resourceDataUsingCache:NO];
     if (data) {
       text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-      if (text) {
-	if (_icomp)
-	  icalcomponent_free(_icomp);
-	_icomp = icalparser_parse_string([text cStringUsingEncoding:NSUTF8StringEncoding]);
-	if (_icomp) {
-	  [_set removeAllObjects];
-	  for (ic = icalcomponent_get_first_component(_icomp, ICAL_VEVENT_COMPONENT); 
-	       ic != NULL; ic = icalcomponent_get_next_component(_icomp, ICAL_VEVENT_COMPONENT)) {
-	    ev = [[Event alloc] initWithICalComponent:ic];
-	    if (ev)
-	      [_set addObject:ev];
-	  }
-	}
+      if (text && [_tree parseString:text]) {
+	[_set setSet:[_tree events]];
 	[_set makeObjectsPerform:@selector(setStore:) withObject:self];
 	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_set count]);
+	[text release];
       } else
 	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
     } else
@@ -124,6 +94,7 @@
 
   self = [super init];
   if (self) {
+    _tree = [iCalTree new];
     _delegate = manager;
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
     _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
@@ -187,13 +158,12 @@
 {
   [_refreshTimer invalidate];
   [self write];
-  if (_icomp)
-    icalcomponent_free(_icomp);
   [_set release];
   [_url release];
   [_config release];
   [_name release];
   [_lastModified release];
+  [_tree release];
   [super dealloc];
 }
 
@@ -210,18 +180,13 @@
 
 - (void)addAppointment:(Event *)evt
 {
-  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
-  if ([evt updateICalComponent:ic]) {
+  if ([_tree add:evt]) {
     [evt setStore:self];
     [_set addObject:evt];
-    icalcomponent_add_component(_icomp, ic);
     _modified = YES;
     if (![_url isFileURL])
       [self write];
     [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-  } else {
-    icalcomponent_free(ic);
-    [evt release];
   }
 }
 
@@ -232,27 +197,18 @@
  */
 - (void)delAppointment:(Event *)evt
 {
-  icalcomponent *ic = [self getComponentForEvent:evt];
-  if (!ic) {
-    NSLog(@"iCalendar component not found");
-    return;
+  if ([_tree remove:evt]) {
+    [_set removeObject:evt];
+    _modified = YES;
+    if (![_url isFileURL])
+      [self write];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
-  [_set removeObject:evt];
-  icalcomponent_remove_component(_icomp, ic);
-  _modified = YES;
-  if (![_url isFileURL])
-    [self write];
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
 - (void)updateAppointment:(Event *)evt
 {
-  icalcomponent *ic = [self getComponentForEvent:evt];
-  if (!ic) {
-    NSLog(@"iCalendar component not found");
-    return;
-  }
-  if ([evt updateICalComponent:ic]) {
+  if ([_tree update:evt]) {
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -293,12 +249,9 @@
 
 - (BOOL)write
 {
-  NSData *data;
-  char *text;
+  NSData *data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
   
-  if (_icomp) {
-    text = icalcomponent_as_ical_string(_icomp);
-    data = [NSData dataWithBytes:text length:strlen(text)];
+  if (data) {
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
     if ([_url setResourceData:data]) {
       NSLog(@"iCalStore written to %@", [_url absoluteString]);

@@ -63,6 +63,5 @@ enum intervalType
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (id)initWithICalString:(NSString *)string;
 - (BOOL)updateICalComponent:(icalcomponent *)ic;
-- (NSString *)eventAsICalendarString;
 @end
 

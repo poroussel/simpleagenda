@@ -2,9 +2,11 @@
 
 #import "AgendaStore.h"
 #import "ConfigManager.h"
+#import "iCalTree.h"
 
 @interface iCalStore : NSObject <AgendaStore>
 {
+  iCalTree *_tree;
   ConfigManager *_config;
   NSMutableSet *_set;
   NSString *_name;
@@ -14,7 +16,6 @@
   BOOL _writable;
   BOOL _displayed;
   int _minutesBeforeRefresh;
-  icalcomponent *_icomp;
   NSTimer *_refreshTimer;
   id _delegate;
 }

@@ -15,7 +15,8 @@
 	iCalStore.m,
 	AppointmentCache.m,
 	ConfigManager.m,
-	Date.m
+	Date.m,
+	iCalTree.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -39,7 +40,8 @@
 	iCalStore.h,
 	AppointmentCache.h,
 	ConfigManager.h,
-	Date.h
+	Date.h,
+	iCalTree.h
     );
     IMAGES = (
 	Calendar.tiff,
@@ -52,7 +54,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-07-07 14:06:20 +0200";
+    LAST_EDITING = "2007-07-09 12:54:37 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
