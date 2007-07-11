@@ -373,26 +373,6 @@
   return nil;
 }
 
-- (id)initWithICalString:(NSString *)string;
-{
-  icalcomponent *root = icalparser_parse_string([string cStringUsingEncoding:NSUTF8StringEncoding]);
-  icalcomponent *ic;
-
-  if (root) {
-    ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT);
-    if (!ic)
-      goto init_error;
-    self = [self initWithICalComponent:ic];
-    icalcomponent_free(root);
-    return self;
-  }
- init_error:
-  NSLog(@"Unable to parse string as an iCalendar");
-  icalcomponent_free(root);
-  [self release];
-  return nil;
-}
-
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   struct icaltimetype itime;

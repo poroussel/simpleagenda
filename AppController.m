@@ -79,23 +79,28 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 /* Called when user opens an .ics file in GWorkspace */
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
 {
-  NSEnumerator *enumerator = [_sm objectEnumerator];
   NSFileManager *fm = [NSFileManager defaultManager];
+  NSEnumerator *storeEnum;
+  NSEnumerator *eventEnum;
   id <AgendaStore> store;
   Event *event;
+  iCalTree *tree;
 
   if ([fm isReadableFileAtPath:filename]) {
-    /* FIXME : a file could contain more than 1 appointment */
-    event = [[Event alloc] initWithICalString:[NSString stringWithContentsOfFile:filename]];
-    if (event) {
+    tree = [iCalTree new];
+    [tree parseString:[NSString stringWithContentsOfFile:filename]];
+    eventEnum = [[tree events] objectEnumerator];
+    while ((event = [eventEnum nextObject])) {
       NSLog([event description]);
-      while ((store = [enumerator nextObject])) {
+      storeEnum = [_sm objectEnumerator];
+      while ((store = [storeEnum nextObject])) {
 	if ([store contains:event])
 	  NSLog(@"Event already is in %@", [store description]);
       }
       /* FIXME : determine if it's a new appointment or an update */
-      return YES;
     }
+    [tree release];
+    return YES;
   }
   return NO;
 }
