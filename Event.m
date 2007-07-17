@@ -47,6 +47,14 @@
 
 @implementation Event
 
+- (id)copyWithZone:(NSZone *)zone
+{
+  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
+  Event *new = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  [new generateUID];
+  return new;
+}
+
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle
 {
   [self init];
