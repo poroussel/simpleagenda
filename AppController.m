@@ -94,7 +94,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       NSLog([event description]);
       storeEnum = [_sm objectEnumerator];
       while ((store = [storeEnum nextObject])) {
-	if ([store contains:event])
+	if ([store contains:[event UID]])
 	  NSLog(@"Event already is in %@", [store description]);
       }
       /* FIXME : determine if it's a new appointment or an update */
@@ -160,7 +160,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [dayView selectedAppointment];
 
   if (apt)
-    [[apt store] delAppointment: apt];
+    [[apt store] remove:[apt UID]];
 }
 
 - (void)exportAppointment:(id)sender;
@@ -208,13 +208,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
       [_selection setStartDate:date];
-      [[_selection store] updateAppointment:_selection];
+      [[_selection store] update:[_selection UID] with:_selection];
       _selection = nil;
     } else {
       Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date];
-      [[_selection store] addAppointment:new];
+      [[_selection store] add:new];
       [new release];
     }
     [date release];
@@ -321,7 +321,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 /* FIXME : dayView:modifyEvent -> AgendaStore:updateAppointment -> SADataChangedInStore -> AppointmentCache populateFrom: -> DayView reloadData: -> refresh et perte de la selection */
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
-  [[event store] updateAppointment:event];
+  [[event store] update:[event UID] with:event];
 }
 
 - (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end

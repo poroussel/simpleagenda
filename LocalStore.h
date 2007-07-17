@@ -7,7 +7,7 @@
 {
   id _manager;
   ConfigManager *_config;
-  NSMutableSet *_set;
+  NSMutableDictionary *_data;
   BOOL _modified;
   NSString *_globalPath;
   NSString *_globalFile;

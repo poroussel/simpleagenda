@@ -73,12 +73,12 @@
     aStore = [sm storeForName:[store titleOfSelectedItem]];
 
     if (!originalStore)
-      [aStore addAppointment:data];
+      [aStore add:data];
     else if (originalStore == aStore)
-      [aStore updateAppointment:data];
+      [aStore update:[data UID] with:data];
     else {
-      [originalStore delAppointment:data];
-      [aStore addAppointment:data];
+      [originalStore remove:[data UID]];
+      [aStore add:data];
     }
     return YES;
   }

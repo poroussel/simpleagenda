@@ -8,7 +8,7 @@
 {
   iCalTree *_tree;
   ConfigManager *_config;
-  NSMutableSet *_set;
+  NSMutableDictionary *_data;
   NSString *_name;
   NSURL *_url;
   NSDate *_lastModified;

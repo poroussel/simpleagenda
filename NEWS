@@ -1,0 +1,6 @@
+version 0.26
+	* Save main window geometry
+	* Add a 'Save all' item menu to fsync data
+	* Register SimpleAgenda as an application handling 
+	  .ics files and import events when user open one
+	* Add a NEWS file

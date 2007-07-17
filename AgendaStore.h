@@ -9,10 +9,10 @@
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name forManager:(id)manager;
 - (NSEnumerator *)enumerator;
-- (void)addAppointment:(Event *)evt;
-- (void)delAppointment:(Event *)evt;
-- (void)updateAppointment:(Event *)evt;
-- (BOOL)contains:(Event *)evt;
+- (void)add:(Event *)evt;
+- (void)remove:(NSString *)uid;
+- (void)update:(NSString *)uid with:(Event *)evt;
+- (BOOL)contains:(NSString *)uid;
 - (BOOL)isWritable;
 - (void)setIsWritable:(BOOL)writable;
 - (BOOL)modified;

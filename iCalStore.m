@@ -66,8 +66,11 @@
 /* FIXME : reading shouldn't delete local unsaved modifications */
 - (BOOL)read
 {
+  NSSet *items;
   NSData *data;
   NSString *text;
+  NSEnumerator *enumerator;
+  Event *apt;
 
   if ([self needsRefresh]) {
     [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
@@ -75,9 +78,12 @@
     if (data) {
       text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
       if (text && [_tree parseString:text]) {
-	[_set setSet:[_tree events]];
-	[_set makeObjectsPerform:@selector(setStore:) withObject:self];
-	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_set count]);
+	items = [_tree events];
+	[items makeObjectsPerform:@selector(setStore:) withObject:self];
+	enumerator = [items objectEnumerator];
+	while ((apt = [enumerator nextObject]))
+	  [_data setValue:apt forKey:[apt UID]];
+	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
 	[text release];
       } else
 	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
@@ -126,7 +132,7 @@
       _writable = [[_config objectForKey:ST_RW] boolValue];
     else
       [self setIsWritable:NO];
-    _set = [[NSMutableSet alloc] initWithCapacity:32];
+    _data = [[NSMutableDictionary alloc] initWithCapacity:32];
     if ([_config objectForKey:ST_DISPLAY])
       _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     else
@@ -158,7 +164,7 @@
 {
   [_refreshTimer invalidate];
   [self write];
-  [_set release];
+  [_data release];
   [_url release];
   [_config release];
   [_name release];
@@ -175,14 +181,14 @@
 
 - (NSEnumerator *)enumerator
 {
-  return [_set objectEnumerator];
+  return [_data objectEnumerator];
 }
 
-- (void)addAppointment:(Event *)evt
+- (void)add:(Event *)evt
 {
   if ([_tree add:evt]) {
     [evt setStore:self];
-    [_set addObject:evt];
+    [_data setValue:evt forKey:[evt UID]];
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -195,10 +201,10 @@
  * every change or every x minutes.
  * Do we need to read before writing ?
  */
-- (void)delAppointment:(Event *)evt
+- (void)remove:(NSString *)uid
 {
-  if ([_tree remove:evt]) {
-    [_set removeObject:evt];
+  if ([_tree remove:[_data objectForKey:uid]]) {
+    [_data removeObjectForKey:uid];
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -206,7 +212,7 @@
   }
 }
 
-- (void)updateAppointment:(Event *)evt
+- (void)update:(NSString *)uid with:(Event *)evt
 {
   if ([_tree update:evt]) {
     _modified = YES;
@@ -216,17 +222,9 @@
   }
 }
 
-- (BOOL)contains:(Event *)evt
+- (BOOL)contains:(NSString *)uid
 {
-  NSEnumerator *enumerator = [_set objectEnumerator];
-  Event *apt;
-
-  while ((apt = [enumerator nextObject])) {
-    /* FIXME : use isEqual: ? */
-    if (![apt compare:evt])
-      return YES;
-  }
-  return NO;
+  return [_data objectForKey:uid] != nil;
 }
 
 - (BOOL)isWritable

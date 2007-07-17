@@ -26,7 +26,7 @@
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
     _manager = manager;
-    _set = [[NSMutableSet alloc] initWithCapacity:128];
+    _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     if ([_config objectForKey:ST_RW])
       _writable = [[_config objectForKey:ST_RW] boolValue];
     else
@@ -43,11 +43,15 @@
 	NSLog(@"Created directory %@", _globalPath);
     }
     if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
-      NSSet *savedData =  [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
+      NSSet *savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
+      NSEnumerator *enumerator;
+      Event *apt;
       if (savedData) {
 	[savedData makeObjectsPerform:@selector(setStore:) withObject:self];
-	[_set unionSet: savedData];
-	NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_set count]);
+	enumerator = [savedData objectEnumerator];
+	while ((apt = [enumerator nextObject]))
+	  [_data setValue:apt forKey:[apt UID]];
+	NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_data count]);
 	version = [_config integerForKey:ST_VERSION];
 	if (version < CurrentVersion) {
 	  [_config setInteger:CurrentVersion forKey:ST_VERSION];
@@ -68,7 +72,7 @@
 - (void)dealloc
 {
   [self write];
-  [_set release];
+  [_data release];
   [_globalFile release];
   [_name release];
   [_config release];
@@ -77,42 +81,33 @@
 
 - (NSEnumerator *)enumerator
 {
-  return [_set objectEnumerator];
+  return [_data objectEnumerator];
 }
 
--(void)addAppointment:(Event *)app
+-(void)add:(Event *)app
 {
-  [_set addObject:app];
   [app setStore:self];
+  [_data setValue:app forKey:[app UID]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
--(void)delAppointment:(Event *)app
+-(void)remove:(NSString *)uid
 {
-  [_set removeObject:app];
+  [_data removeObjectForKey:uid];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
--(void)updateAppointment:(Event *)app
+- (void)update:(NSString *)uid with:(Event *)evt;
 {
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
-- (BOOL)contains:(Event *)evt
+- (BOOL)contains:(NSString *)uid
 {
-  NSEnumerator *enumerator = [_set objectEnumerator];
-  Event *apt;
-
-  while ((apt = [enumerator nextObject])) {
-    /* FIXME : use isEqual: ? */
-    if (![apt compare:evt]) {
-      return YES;
-    }
-  }
-  return NO;
+  return [_data objectForKey:uid] != nil;
 }
 
 -(BOOL)isWritable
@@ -135,7 +130,8 @@
 
 - (BOOL)write
 {
-  if ([NSKeyedArchiver archiveRootObject:_set toFile:_globalFile]) {
+  NSSet *set = [NSSet setWithArray:[_data allValues]];
+  if ([NSKeyedArchiver archiveRootObject:set toFile:_globalFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
     _modified = NO;
     return YES;
