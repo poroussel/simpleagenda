@@ -13,11 +13,11 @@
 - (void)remove:(NSString *)uid;
 - (void)update:(NSString *)uid with:(Event *)evt;
 - (BOOL)contains:(NSString *)uid;
-- (BOOL)isWritable;
-- (void)setIsWritable:(BOOL)writable;
 - (BOOL)modified;
 - (BOOL)write;
 - (NSString *)description;
+- (BOOL)isWritable;
+- (void)setIsWritable:(BOOL)writable;
 - (NSColor *)eventColor;
 - (void)setEventColor:(NSColor *)color;
 - (BOOL)displayed;

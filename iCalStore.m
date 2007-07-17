@@ -94,6 +94,15 @@
   return NO;
 }
 
+- (NSDictionary *)defaults
+{
+  return [NSDictionary dictionaryWithObjectsAndKeys:
+			 [NSArchiver archivedDataWithRootObject:[NSColor blueColor]], ST_COLOR,
+		       [NSNumber numberWithBool:NO], ST_RW,
+		       [NSNumber numberWithBool:YES], ST_DISPLAY,
+		       nil, nil];
+}
+
 - (id)initWithName:(NSString *)name
 {
   NSString *location;
@@ -102,6 +111,7 @@
   if (self) {
     _tree = [iCalTree new];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
+    [_config registerDefaults:[self defaults]];
     _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
     if (_url == nil) {
       NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
@@ -127,15 +137,9 @@
     _name = [name copy];
     _modified = NO;
     _lastModified = nil;
-    if ([_config objectForKey:ST_RW])
-      _writable = [[_config objectForKey:ST_RW] boolValue];
-    else
-      [self setIsWritable:NO];
+    _writable = [[_config objectForKey:ST_RW] boolValue];
+    _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     _data = [[NSMutableDictionary alloc] initWithCapacity:32];
-    if ([_config objectForKey:ST_DISPLAY])
-      _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
-    else
-      [self setDisplayed:YES];
     [self read]; 
 
     if (![_url isFileURL]) {
@@ -268,16 +272,8 @@
 
 - (NSColor *)eventColor
 {
-  NSColor *aColor = nil;
   NSData *theData =[_config objectForKey:ST_COLOR];
-
-  if (theData)
-    aColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
-  else {
-    aColor = [NSColor blueColor];
-    [self setEventColor:aColor];
-  }
-  return aColor;
+  return [NSUnarchiver unarchiveObjectWithData:theData];
 }
 
 - (void)setEventColor:(NSColor *)color

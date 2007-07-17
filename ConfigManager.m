@@ -30,6 +30,7 @@ static ConfigManager *singleton;
   if (self) {
     _cpkey = [NSMutableDictionary new];
     _dict = [NSMutableDictionary new];
+    _defaults = [NSMutableDictionary new];
     if (parent == nil)
       parent = [ConfigManager globalConfig];
     [_dict setDictionary:[parent dictionaryForKey:key]];

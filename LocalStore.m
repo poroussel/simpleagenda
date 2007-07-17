@@ -8,8 +8,19 @@
 
 @implementation LocalStore
 
+- (NSDictionary *)defaults
+{
+  return [NSDictionary dictionaryWithObjectsAndKeys:
+			 [NSArchiver archivedDataWithRootObject:[NSColor yellowColor]], ST_COLOR,
+		       [NSNumber numberWithBool:YES], ST_RW,
+		       [NSNumber numberWithBool:YES], ST_DISPLAY,
+		       [NSNumber numberWithInt:CurrentVersion], ST_VERSION,
+		       nil, nil];
+}
+
 - (id)initWithName:(NSString *)name
 {
+  NSFileManager *fm;
   NSString *filename;
   BOOL isDir;
   int version;
@@ -18,23 +29,17 @@
   if (self) {
     _name = [name copy];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
-    if (![self eventColor])
-      [self setEventColor:[NSColor yellowColor]];
+    [_config registerDefaults:[self defaults]];
     
     filename = [_config objectForKey:ST_FILE];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
-    if ([_config objectForKey:ST_RW])
-      _writable = [[_config objectForKey:ST_RW] boolValue];
-    else
-      [self setIsWritable:YES];
-    if ([_config objectForKey:ST_DISPLAY])
-      _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
-    else
-      [self setDisplayed:YES];
-    NSFileManager *fm = [NSFileManager defaultManager];
+    _writable = [[_config objectForKey:ST_RW] boolValue];
+    _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
+    
+    fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:_globalPath]) {
       if (![fm createDirectoryAtPath:_globalPath attributes:nil])
 	NSLog(@"Error creating dir %@", _globalPath);
