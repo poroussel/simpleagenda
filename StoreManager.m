@@ -42,11 +42,10 @@
       dict = [[ConfigManager globalConfig] objectForKey:stname];
       if (dict) {
 	storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
-	store = [storeClass storeNamed:stname forManager:self];
+	store = [storeClass storeNamed:stname];
 	if (store) {
 	  [_stores setObject:store forKey:stname];
 	  NSLog(@"Added %@ to StoreManager", stname);
-	  //	  [[ConfigManager globalConfig] registerClient:store forKey:[store description]];
 	} else
 	  NSLog(@"Unable to initialize store %@", stname);
       }

@@ -8,7 +8,7 @@
 
 @implementation LocalStore
 
-- (id)initWithName:(NSString *)name forManager:(id)manager
+- (id)initWithName:(NSString *)name
 {
   NSString *filename;
   BOOL isDir;
@@ -25,7 +25,6 @@
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _modified = NO;
-    _manager = manager;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     if ([_config objectForKey:ST_RW])
       _writable = [[_config objectForKey:ST_RW] boolValue];
@@ -63,10 +62,9 @@
   return self;
 }
 
-+ (id)storeNamed:(NSString *)name forManager:(id)manager
++ (id)storeNamed:(NSString *)name
 {
-  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name 
-								  forManager:manager]);
+  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
 - (void)dealloc

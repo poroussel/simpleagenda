@@ -94,14 +94,13 @@
   return NO;
 }
 
-- (id)initWithName:(NSString *)name forManager:(id)manager
+- (id)initWithName:(NSString *)name
 {
   NSString *location;
 
   self = [super init];
   if (self) {
     _tree = [iCalTree new];
-    _delegate = manager;
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
     _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
     if (_url == nil) {
@@ -154,10 +153,9 @@
   return self;
 }
 
-+ (id)storeNamed:(NSString *)name forManager:(id)manager
++ (id)storeNamed:(NSString *)name
 {
-  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name 
-								  forManager:manager]);
+  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
 - (void)dealloc

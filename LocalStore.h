@@ -5,7 +5,6 @@
 
 @interface LocalStore : NSObject <AgendaStore>
 {
-  id _manager;
   ConfigManager *_config;
   NSMutableDictionary *_data;
   BOOL _modified;

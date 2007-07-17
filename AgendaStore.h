@@ -7,7 +7,7 @@
 @class Event;
 
 @protocol AgendaStore <NSObject>
-+ (id)storeNamed:(NSString *)name forManager:(id)manager;
++ (id)storeNamed:(NSString *)name;
 - (NSEnumerator *)enumerator;
 - (void)add:(Event *)evt;
 - (void)remove:(NSString *)uid;
