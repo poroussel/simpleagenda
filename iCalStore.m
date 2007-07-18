@@ -217,6 +217,9 @@
 - (void)update:(NSString *)uid with:(Event *)evt
 {
   if ([_tree update:evt]) {
+    [evt setStore:self];
+    [_data removeObjectForKey:uid];
+    [_data setValue:evt forKey:[evt UID]];
     _modified = YES;
     if (![_url isFileURL])
       [self write];

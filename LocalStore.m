@@ -104,6 +104,9 @@
 
 - (void)update:(NSString *)uid with:(Event *)evt;
 {
+  [evt setStore:self];
+  [_data removeObjectForKey:uid];
+  [_data setValue:evt forKey:[evt UID]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }

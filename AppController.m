@@ -91,13 +91,15 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [tree parseString:[NSString stringWithContentsOfFile:filename]];
     eventEnum = [[tree events] objectEnumerator];
     while ((event = [eventEnum nextObject])) {
-      NSLog([event description]);
       storeEnum = [_sm objectEnumerator];
       while ((store = [storeEnum nextObject])) {
 	if ([store contains:[event UID]])
-	  NSLog(@"Event already is in %@", [store description]);
+	  break;
       }
-      /* FIXME : determine if it's a new appointment or an update */
+      if (store)
+	[store update:[event UID] with:event];
+      else
+	[[_sm defaultStore] add:event];
     }
     [tree release];
     return YES;
@@ -212,6 +214,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       _selection = nil;
     } else {
       Event *new = [_selection copy];
+      [new generateUID];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date];
       [[_selection store] add:new];
