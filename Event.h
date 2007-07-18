@@ -30,16 +30,12 @@ enum intervalType
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
 - (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end;
-- (NSComparisonResult)compare:(id)evt;
-- (id <AgendaStore>)store;
-- (void)setStore:(id <AgendaStore>)store;
-- (NSString *)location;
-- (void)setLocation:(NSString *)aLocation;
-- (BOOL)allDay;
-- (void)setAllDay:(BOOL)allDay;
 - (NSString *)details;
 - (void)generateUID;
 
+- (id <AgendaStore>)store;
+- (NSString *)location;
+- (BOOL)allDay;
 - (NSAttributedString *)descriptionText;
 - (NSString *)title;
 - (int)duration;
@@ -49,6 +45,9 @@ enum intervalType
 - (int)interval;
 - (NSString *)UID;
 
+- (void)setStore:(id <AgendaStore>)store;
+- (void)setLocation:(NSString *)aLocation;
+- (void)setAllDay:(BOOL)allDay;
 - (void)setDescriptionText:(NSAttributedString *)descriptionText;
 - (void)setTitle:(NSString *)title;
 - (void)setDuration:(int)duration;

@@ -107,16 +107,6 @@
   return NO;
 }
 
-/*
- * FIXME : this should possibly be isEqual:
- * but we would need to override hash:
- */
-- (NSComparisonResult)compare:(id)evt
-{
-  NSAssert([evt isKindOfClass:[Event class]], @"Wrong class");
-  return [[self UID] compare:[evt UID]];
-}
-
 - (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end
 {
   int nd;
