@@ -10,4 +10,6 @@ In no particular order :
 
 * alerts and user notification (visual, by mail etc)
 
+* AppointmentCache is a bad idea, rip it off
+
 Want to help out ? Contact me at p.o.roussel@free.fr
