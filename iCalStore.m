@@ -63,37 +63,6 @@
   return NO;
 }
 
-/* FIXME : reading shouldn't delete local unsaved modifications */
-- (BOOL)read
-{
-  NSSet *items;
-  NSData *data;
-  NSString *text;
-  NSEnumerator *enumerator;
-  Event *apt;
-
-  if ([self needsRefresh]) {
-    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-    data = [_url resourceDataUsingCache:NO];
-    if (data) {
-      text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-      if (text && [_tree parseString:text]) {
-	items = [_tree events];
-	[items makeObjectsPerform:@selector(setStore:) withObject:self];
-	enumerator = [items objectEnumerator];
-	while ((apt = [enumerator nextObject]))
-	  [_data setValue:apt forKey:[apt UID]];
-	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
-	[text release];
-      } else
-	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-    } else
-      NSLog(@"No data read from %@", [_url absoluteString]);
-    return YES;
-  }
-  return NO;
-}
-
 - (NSDictionary *)defaults
 {
   return [NSDictionary dictionaryWithObjectsAndKeys:
@@ -248,6 +217,36 @@
 - (BOOL)modified
 {
   return _modified;
+}
+
+- (BOOL)read
+{
+  NSSet *items;
+  NSData *data;
+  NSString *text;
+  NSEnumerator *enumerator;
+  Event *apt;
+
+  if ([self needsRefresh]) {
+    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
+    data = [_url resourceDataUsingCache:NO];
+    if (data) {
+      text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+      if (text && [_tree parseString:text]) {
+	items = [_tree events];
+	[items makeObjectsPerform:@selector(setStore:) withObject:self];
+	enumerator = [items objectEnumerator];
+	while ((apt = [enumerator nextObject]))
+	  [_data setValue:apt forKey:[apt UID]];
+	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
+	[text release];
+      } else
+	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+    } else
+      NSLog(@"No data read from %@", [_url absoluteString]);
+    return YES;
+  }
+  return NO;
 }
 
 - (BOOL)write

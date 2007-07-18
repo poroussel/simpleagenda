@@ -14,8 +14,8 @@
 - (void)update:(NSString *)uid with:(Event *)evt;
 - (BOOL)contains:(NSString *)uid;
 - (BOOL)modified;
+- (BOOL)read;
 - (BOOL)write;
-- (NSString *)description;
 - (BOOL)isWritable;
 - (void)setIsWritable:(BOOL)writable;
 - (NSColor *)eventColor;

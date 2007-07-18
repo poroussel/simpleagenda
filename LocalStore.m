@@ -20,17 +20,13 @@
 
 - (id)initWithName:(NSString *)name
 {
-  NSFileManager *fm;
   NSString *filename;
-  BOOL isDir;
-  int version;
 
   self = [super init];
   if (self) {
     _name = [name copy];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
     [_config registerDefaults:[self defaults]];
-    
     filename = [_config objectForKey:ST_FILE];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
@@ -38,31 +34,7 @@
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
-    
-    fm = [NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:_globalPath]) {
-      if (![fm createDirectoryAtPath:_globalPath attributes:nil])
-	NSLog(@"Error creating dir %@", _globalPath);
-      else
-	NSLog(@"Created directory %@", _globalPath);
-    }
-    if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
-      NSSet *savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
-      NSEnumerator *enumerator;
-      Event *apt;
-      if (savedData) {
-	[savedData makeObjectsPerform:@selector(setStore:) withObject:self];
-	enumerator = [savedData objectEnumerator];
-	while ((apt = [enumerator nextObject]))
-	  [_data setValue:apt forKey:[apt UID]];
-	NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_data count]);
-	version = [_config integerForKey:ST_VERSION];
-	if (version < CurrentVersion) {
-	  [_config setInteger:CurrentVersion forKey:ST_VERSION];
-	  [self write];
-	}
-      }
-    }
+    [self read];
   }
   return self;
 }
@@ -132,6 +104,40 @@
 - (BOOL)modified
 {
   return _modified;
+}
+
+- (BOOL)read
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSSet *savedData;
+  NSEnumerator *enumerator;
+  Event *evt;
+  BOOL isDir;
+  int version;
+
+  if (![fm fileExistsAtPath:_globalPath]) {
+    if (![fm createDirectoryAtPath:_globalPath attributes:nil]) {
+      NSLog(@"Error creating dir %@", _globalPath);
+      return NO;
+    }
+    NSLog(@"Created directory %@", _globalPath);
+  }
+  if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
+    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
+    if (savedData) {
+      [savedData makeObjectsPerform:@selector(setStore:) withObject:self];
+      enumerator = [savedData objectEnumerator];
+      while ((evt = [enumerator nextObject]))
+	[_data setValue:evt forKey:[evt UID]];
+      NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_data count]);
+      version = [_config integerForKey:ST_VERSION];
+      if (version < CurrentVersion) {
+	[_config setInteger:CurrentVersion forKey:ST_VERSION];
+	[self write];
+      }
+    }
+  }
+  return YES;
 }
 
 - (BOOL)write
