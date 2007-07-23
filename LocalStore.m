@@ -59,6 +59,11 @@
   return [_data objectEnumerator];
 }
 
+- (NSArray *)events
+{
+  return [_data allValues];
+}
+
 -(void)add:(Event *)app
 {
   [app setStore:self];

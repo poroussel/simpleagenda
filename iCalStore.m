@@ -155,6 +155,11 @@
   return [_data objectEnumerator];
 }
 
+- (NSArray *)events
+{
+  return [_data allValues];
+}
+
 - (void)add:(Event *)evt
 {
   if ([_tree add:evt]) {
