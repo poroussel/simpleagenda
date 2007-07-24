@@ -31,7 +31,7 @@
 
 -(void)showPreferences
 {
-  NSEnumerator *list = [_sm objectEnumerator];
+  NSEnumerator *list = [_sm storeEnumerator];
   id <AgendaStore> aStore;
   ConfigManager *config = [ConfigManager globalConfig];
   int start = [config integerForKey:FIRST_HOUR];
@@ -53,7 +53,7 @@
   [storePopUp selectItemAtIndex:0];
   [self selectStore:self];
 
-  list = [_sm objectEnumerator];
+  list = [_sm storeEnumerator];
   [defaultStorePopUp removeAllItems];
   while ((aStore = [list nextObject])) {
     if ([aStore isWritable])

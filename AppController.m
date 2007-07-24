@@ -80,7 +80,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
 {
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSEnumerator *storeEnum;
   NSEnumerator *eventEnum;
   id <AgendaStore> store;
   Event *event;
@@ -91,11 +90,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [tree parseString:[NSString stringWithContentsOfFile:filename]];
     eventEnum = [[tree events] objectEnumerator];
     while ((event = [eventEnum nextObject])) {
-      storeEnum = [_sm objectEnumerator];
-      while ((store = [storeEnum nextObject])) {
-	if ([store contains:[event UID]])
-	  break;
-      }
+      store = [_sm storeContainingEvent:event];
       if (store)
 	[store update:[event UID] with:event];
       else

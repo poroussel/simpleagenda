@@ -22,7 +22,7 @@
 
 -(BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm
 {
-  NSEnumerator *list = [sm objectEnumerator];
+  NSEnumerator *list = [sm storeEnumerator];
   id <AgendaStore> aStore;
   id <AgendaStore> originalStore;
   int ret;

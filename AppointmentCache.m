@@ -15,7 +15,7 @@
 
   if (source == nil) {
     [_cache removeAllObjects];
-    enumerator = [_sm objectEnumerator];
+    enumerator = [_sm storeEnumerator];
     while ((store = [enumerator nextObject])) {
       eventEnumerator = [store enumerator];
       while ((event = [eventEnumerator nextObject])) {
