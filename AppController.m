@@ -316,7 +316,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 @end
 
 @implementation AppController(NSOutlineViewDataSource)
-
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
   if (item == nil)
@@ -353,6 +352,16 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     return [item details];
   }
   return @"";
+}
+@end
+
+@implementation AppController(NSOutlineViewDelegate)
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+  if ([item isKindOfClass:[Event class]]) {
+    return YES;
+  }
+  return NO;
 }
 @end
 
