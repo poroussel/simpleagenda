@@ -13,7 +13,6 @@
 	PreferencesController.m,
 	HourFormatter.m,
 	iCalStore.m,
-	AppointmentCache.m,
 	ConfigManager.m,
 	Date.m,
 	iCalTree.m
@@ -38,7 +37,6 @@
 	HourFormatter.h,
 	UserDefaults.h,
 	iCalStore.h,
-	AppointmentCache.h,
 	ConfigManager.h,
 	Date.h,
 	iCalTree.h
@@ -54,7 +52,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-07-09 12:54:37 +0200";
+    LAST_EDITING = "2007-07-25 14:52:01 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

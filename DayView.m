@@ -250,7 +250,7 @@
     [aptv removeFromSuperview];
   }
 
-  enumerator = [_dataSource scheduledAppointmentsForDayView];
+  enumerator = [[_dataSource scheduledAppointmentsForDayView] objectEnumerator];
   while ((apt = [enumerator nextObject])) {
     [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed])

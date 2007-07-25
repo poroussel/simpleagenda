@@ -45,7 +45,6 @@ PreferencesController.h \
 HourFormatter.h \
 UserDefaults.h \
 iCalStore.h \
-AppointmentCache.h \
 ConfigManager.h \
 Date.h \
 iCalTree.h
@@ -64,7 +63,6 @@ Event.m \
 PreferencesController.m \
 HourFormatter.m \
 iCalStore.m \
-AppointmentCache.m \
 ConfigManager.m \
 Date.m \
 iCalTree.m

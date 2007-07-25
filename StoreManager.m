@@ -39,6 +39,10 @@
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
     [self setDefaultStore:defaultStore];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					  selector:@selector(dataChanged:) 
+					  name:SADataChangedInStore 
+					  object:nil];
   }
   return self;
 }
@@ -47,6 +51,7 @@
 {
   [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_defaultStore);
+  RELEASE(_delegate);
   [_stores release];
   [super dealloc];
 }
@@ -109,6 +114,22 @@
   while ((store = [enumerator nextObject]))
     if ([store modified] && [store isWritable])
       [store write];
+}
+
+- (void)setDelegate:(id)delegate
+{
+  ASSIGN(_delegate, delegate);
+}
+
+- (id)delegate
+{
+  return _delegate;
+}
+
+- (void)dataChanged:(NSNotification *)not
+{
+  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
+    [_delegate dataChangedInStoreManager:self];
 }
 
 - (id <AgendaStore>)storeContainingEvent:(Event *)event

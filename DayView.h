@@ -5,7 +5,7 @@
 #import "Event.h"
 
 @protocol DayViewDataSource
-- (NSEnumerator *)scheduledAppointmentsForDayView;
+- (NSSet *)scheduledAppointmentsForDayView;
 @end
 
 @class AppointmentView;

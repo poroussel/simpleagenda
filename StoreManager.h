@@ -7,6 +7,7 @@
 {
   NSMutableDictionary *_stores;
   id _defaultStore;
+  id _delegate;
 }
 
 - (void)addStoreNamed:(NSString *)name;
@@ -17,6 +18,13 @@
 - (NSEnumerator *)storeEnumerator;
 - (void)synchronise;
 
+- (void)setDelegate:(id)delegate;
+- (id)delegate;
+
 - (id <AgendaStore>)storeContainingEvent:(Event *)event;
 - (NSArray *)allEvents;
+@end
+
+@interface NSObject(StoreManagerDelegate)
+- (void)dataChangedInStoreManager:(StoreManager *)sm;
 @end

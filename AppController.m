@@ -3,11 +3,63 @@
 #import <AppKit/AppKit.h>
 #import "AppointmentEditor.h"
 #import "StoreManager.h"
-#import "AppointmentCache.h"
 #import "AppController.h"
 #import "Event.h"
 #import "PreferencesController.h"
 #import "iCalTree.h"
+
+@interface SummaryData : NSObject
+{
+  NSString *_title;
+  NSMutableArray *_events;
+}
+- (id)initWithTitle:(NSString *)title;
+- (NSString *)title;
+- (unsigned int)count;
+- (void)flush;
+- (void)addEvent:(Event *)event;
+- (Event *)eventAtIndex:(int)index;
+@end
+
+@implementation SummaryData
+- (id)initWithTitle:(NSString *)title
+{
+  self = [super init];
+  if (self) {
+    ASSIGN(_title, title);
+    _events = [NSMutableArray new];
+  }
+  return self;
+}
+- (void)dealloc
+{
+  [_events release];
+  RELEASE(_title);
+  [super dealloc];
+}
+- (NSString *)title
+{
+  return _title;
+}
+- (unsigned int)count
+{
+  return [_events count];
+}
+- (void)flush
+{
+  [_events removeAllObjects];
+}
+- (void)addEvent:(Event *)event
+{
+  [_events addObject:event];
+}
+- (Event *)eventAtIndex:(int)index
+{
+  return [_events objectAtIndex:index];
+}
+@end
+
+
 
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
@@ -23,29 +75,41 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [NSApp registerServicesMenuSendTypes: sendTypes returnTypes: returnTypes];
 }
 
+- (void)updateSummaryData
+{
+  Date *today = [Date date];
+  Date *tomorrow = [Date date];
+  NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
+  SummaryData *sd0, *sd1;
+  Event *event;
+
+  [tomorrow incrementDay];
+  sd0 = [_summarySections objectAtIndex:0];
+  sd1 = [_summarySections objectAtIndex:1];
+  [sd0 flush];
+  [sd1 flush];
+  while ((event = [enumerator nextObject])) {
+    if ([event isScheduledForDay:today])
+      [sd0 addEvent:event];
+    if ([event isScheduledForDay:tomorrow])
+      [sd1 addEvent:event];
+  }
+  [summary reloadData];
+}
+
 - (id)init
 {
-  Date *date;
-
   self = [super init];
   if (self) {
+    ASSIGNCOPY(_selectedDay, [Date date]);
     _selection = nil;
     _editor = [AppointmentEditor new];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
-
-    date = [Date new];
-    _current = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
-    [_current setDelegate:self];
-    _today = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
-    [_today setTitle:@"Today"];
-    [date incrementDay];
-    _tomorrow = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:1];
-    [_tomorrow setTitle:@"Tomorrow"];
-    [date incrementDay];
-    _soon = [[AppointmentCache alloc] initwithStoreManager:_sm date:date duration:3];
-    [_soon setTitle:@"Soon"];
-    [date release];
+    [_sm setDelegate:self];
+    _summarySections = [[NSArray alloc] initWithObjects:[[SummaryData alloc] initWithTitle:@"Today"], 
+					[[SummaryData alloc] initWithTitle:@"Tomorrow"], nil];
+    [self updateSummaryData];
     [self registerForServices];
   }
   return self;
@@ -60,10 +124,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
-  [_soon release];
-  [_tomorrow release];
-  [_today release];
-  [_current release];
+  [_summarySections release];
+  RELEASE(_selectedDay);
   [_pc release];
   /* 
    * Ugly workaround : [_sm release] should force the
@@ -110,7 +172,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSArray *sorted = [[_current array] sortedArrayUsingFunction:sortAppointments context:nil];
+  NSArray *sorted = [[_sm allEvents] sortedArrayUsingFunction:sortAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
 
@@ -240,9 +302,16 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 }
 
 /* DayViewDataSource protocol */
-- (NSEnumerator *)scheduledAppointmentsForDayView
+- (NSSet *)scheduledAppointmentsForDayView
 {
-  return [_current enumerator];
+  NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
+  NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
+  Event *event;
+
+  while ((event = [enumerator nextObject]))
+    if ([event isScheduledForDay:_selectedDay])
+      [dayEvents addObject:event];
+  return dayEvents;
 }
 
 @end
@@ -252,34 +321,39 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
   if (item == nil)
-    return 3;
-  if ([item isKindOfClass:[AppointmentCache class]])
+    return [_summarySections count];
+  if ([item isKindOfClass:[SummaryData class]])
     return [item count];
   return 0;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
+  if ([item isKindOfClass:[Event class]])
+    return NO;
   return YES;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
-  if (item == nil) {
-    if (index == 0)
-      return _today;
-    if (index == 1)
-      return _tomorrow;
-    return _soon;
-  }
-  return [[item array] objectAtIndex:index];
+  if (item == nil)
+    return [_summarySections objectAtIndex:index];
+  return [item eventAtIndex:index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-  if ([@"title" isEqual:[tableColumn identifier]])
-    return [item title];
-  return [item details];
+  if ([item isKindOfClass:[SummaryData class]]) {
+    if ([@"title" isEqual:[tableColumn identifier]])
+      return [item title];
+    return [NSString stringWithFormat:@"%d item(s)", [item count]];
+  }
+  if ([item isKindOfClass:[Event class]]) {
+    if ([@"title" isEqual:[tableColumn identifier]])
+      return [item title];
+    return [item details];
+  }
+  return @"";
 }
 
 @end
@@ -288,18 +362,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {
-  [_current setDate:date];
+  ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
 }
 
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 {
-  [_today setDate:date];
-  [date incrementDay];
-  [_tomorrow setDate:date];
-  [date incrementDay];
-  [_soon setDate:date];
-  [summary reloadData];
+  [self updateSummaryData];
 }
 
 @end
@@ -337,12 +406,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 @end
 
-@implementation AppController(AppointmentCacheDelegate)
+@implementation AppController(StoreManagerDelegate)
 
-- (void)dataChangedInCache:(AppointmentCache *)ac
+- (void)dataChangedInStoreManager:(StoreManager *)sm
 {
   [dayView reloadData];
-  [summary reloadData];
+  [self updateSummaryData];
 }
 
 @end

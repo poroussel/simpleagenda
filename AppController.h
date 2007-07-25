@@ -19,10 +19,8 @@
   StoreManager *_sm;
   Event *_selection;
   BOOL _deleteSelection;
-  AppointmentCache *_current;
-  AppointmentCache *_today;
-  AppointmentCache *_tomorrow;
-  AppointmentCache *_soon;
+  Date *_selectedDay;
+  NSArray *_summarySections;
 }
 
 - (void)copy:(id)sender;
