@@ -67,7 +67,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 }
 
 @implementation AppController
-
 - (void)registerForServices
 {
   NSArray *sendTypes = [NSArray arrayWithObjects:NSStringPboardType, NSFilenamesPboardType, nil];
@@ -355,26 +354,21 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   }
   return @"";
 }
-
 @end
 
 @implementation AppController(CalendarViewDelegate)
-
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 {
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
 }
-
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 {
   [self updateSummaryData];
 }
-
 @end
 
 @implementation AppController(DayViewDelegate)
-
 - (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
   /*
@@ -384,13 +378,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   if ([[event store] isWritable])
     [self _editAppointment:event];
 }
-
 /* FIXME : dayView:modifyEvent -> AgendaStore:updateAppointment -> SADataChangedInStore -> AppointmentCache populateFrom: -> DayView reloadData: -> refresh et perte de la selection */
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
   [[event store] update:[event UID] with:event];
 }
-
 - (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end
 {
   Date *date = [[calendar date] copy];
@@ -403,15 +395,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [date release];
   [apt release];
 }
-
 @end
 
 @implementation AppController(StoreManagerDelegate)
-
 - (void)dataChangedInStoreManager:(StoreManager *)sm
 {
   [dayView reloadData];
   [self updateSummaryData];
 }
-
 @end
