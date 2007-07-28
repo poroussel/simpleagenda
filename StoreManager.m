@@ -63,7 +63,7 @@
 
 - (void)addStoreNamed:(NSString *)name
 {
-  Class <AgendaStore> storeClass;
+  Class storeClass;
   id <AgendaStore> store;
   NSDictionary *dict;
 
