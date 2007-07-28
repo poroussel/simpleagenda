@@ -47,7 +47,8 @@ UserDefaults.h \
 iCalStore.h \
 ConfigManager.h \
 Date.h \
-iCalTree.h
+iCalTree.h \
+DataTree.h
 
 #
 # Class files
@@ -65,7 +66,8 @@ HourFormatter.m \
 iCalStore.m \
 ConfigManager.m \
 Date.m \
-iCalTree.m
+iCalTree.m \
+DataTree.m
 
 #
 # Other sources

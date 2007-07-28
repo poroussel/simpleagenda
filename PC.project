@@ -15,7 +15,8 @@
 	iCalStore.m,
 	ConfigManager.m,
 	Date.m,
-	iCalTree.m
+	iCalTree.m,
+	DataTree.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -39,7 +40,8 @@
 	iCalStore.h,
 	ConfigManager.h,
 	Date.h,
-	iCalTree.h
+	iCalTree.h,
+	DataTree.h
     );
     IMAGES = (
 	Calendar.tiff,
@@ -52,7 +54,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-07-25 14:52:01 +0200";
+    LAST_EDITING = "2007-07-25 22:20:10 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

@@ -6,6 +6,7 @@
 #import "DayView.h"
 #import "Event.h"
 #import "PreferencesController.h"
+#import "DataTree.h"
 
 @interface AppController : NSObject <DayViewDataSource>
 {
@@ -20,7 +21,7 @@
   Event *_selection;
   BOOL _deleteSelection;
   Date *_selectedDay;
-  NSArray *_summarySections;
+  DataTree *_summaryRoot;
 }
 
 - (void)copy:(id)sender;

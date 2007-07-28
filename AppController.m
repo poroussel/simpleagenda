@@ -8,59 +8,6 @@
 #import "PreferencesController.h"
 #import "iCalTree.h"
 
-@interface SummaryData : NSObject
-{
-  NSString *_title;
-  NSMutableArray *_events;
-}
-- (id)initWithTitle:(NSString *)title;
-- (NSString *)title;
-- (unsigned int)count;
-- (void)flush;
-- (void)addEvent:(Event *)event;
-- (Event *)eventAtIndex:(int)index;
-@end
-
-@implementation SummaryData
-- (id)initWithTitle:(NSString *)title
-{
-  self = [super init];
-  if (self) {
-    ASSIGN(_title, title);
-    _events = [NSMutableArray new];
-  }
-  return self;
-}
-- (void)dealloc
-{
-  [_events release];
-  RELEASE(_title);
-  [super dealloc];
-}
-- (NSString *)title
-{
-  return _title;
-}
-- (unsigned int)count
-{
-  return [_events count];
-}
-- (void)flush
-{
-  [_events removeAllObjects];
-}
-- (void)addEvent:(Event *)event
-{
-  [_events addObject:event];
-}
-- (Event *)eventAtIndex:(int)index
-{
-  return [_events objectAtIndex:index];
-}
-@end
-
-
-
 NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   return [[a startDate] compare:[b startDate]];
@@ -74,24 +21,49 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [NSApp registerServicesMenuSendTypes: sendTypes returnTypes: returnTypes];
 }
 
+- (void)initSummary
+{
+  DataTree *today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
+  DataTree *tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
+  _summaryRoot = [DataTree new];
+  [_summaryRoot addChild:today];
+  [_summaryRoot addChild:tomorrow];
+}
+
+- (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
+{
+  Date *today = [Date date];
+  NSMutableDictionary *attributes = [NSMutableDictionary new];
+  NSString *details;
+
+  [date setMinute:[[event startDate] minuteOfDay]];
+  [attributes setValue:event forKey:@"object"];
+  [attributes setValue:[event title] forKey:@"title"];
+  if ([today daysUntil:date] > 1 || [today daysSince:date] > 1)
+    details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
+  else
+    details = [NSString stringWithFormat:@"%.2d:%.2d", [date hourOfDay], [date minuteOfHour]];
+  [attributes setValue:details forKey:@"details"];
+  return AUTORELEASE(attributes);
+}
+
 - (void)updateSummaryData
 {
   Date *today = [Date date];
   Date *tomorrow = [Date date];
+  DataTree *ttoday = [[_summaryRoot children] objectAtIndex:0];
+  DataTree *ttomorrow = [[_summaryRoot children] objectAtIndex:1];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
-  SummaryData *sd0, *sd1;
   Event *event;
 
+  [ttoday removeChildren];
+  [ttomorrow removeChildren];
   [tomorrow incrementDay];
-  sd0 = [_summarySections objectAtIndex:0];
-  sd1 = [_summarySections objectAtIndex:1];
-  [sd0 flush];
-  [sd1 flush];
   while ((event = [enumerator nextObject])) {
     if ([event isScheduledForDay:today])
-      [sd0 addEvent:event];
+      [ttoday addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
-      [sd1 addEvent:event];
+      [ttomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
   }
   [summary reloadData];
 }
@@ -106,8 +78,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     [_sm setDelegate:self];
-    _summarySections = [[NSArray alloc] initWithObjects:[[SummaryData alloc] initWithTitle:@"Today"], 
-					[[SummaryData alloc] initWithTitle:@"Tomorrow"], nil];
+    [self initSummary];
     [self updateSummaryData];
     [self registerForServices];
   }
@@ -123,7 +94,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
-  [_summarySections release];
+  [_summaryRoot release];
   RELEASE(_selectedDay);
   [_pc release];
   /* 
@@ -319,48 +290,34 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
   if (item == nil)
-    return [_summarySections count];
-  if ([item isKindOfClass:[SummaryData class]])
-    return [item count];
-  return 0;
+    return [[_summaryRoot children] count];
+  return [[item children] count];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-  if ([item isKindOfClass:[Event class]])
-    return NO;
-  return YES;
+  return [[item children] count] > 0;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
   if (item == nil)
-    return [_summarySections objectAtIndex:index];
-  return [item eventAtIndex:index];
+    return [[_summaryRoot children] objectAtIndex:index];
+  return [[item children] objectAtIndex:index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-  if ([item isKindOfClass:[SummaryData class]]) {
-    if ([@"title" isEqual:[tableColumn identifier]])
-      return [item title];
-    return [NSString stringWithFormat:@"%d item(s)", [item count]];
-  }
-  if ([item isKindOfClass:[Event class]]) {
-    if ([@"title" isEqual:[tableColumn identifier]])
-      return [item title];
-    return [item details];
-  }
-  return @"";
+  return [item valueForKey:[tableColumn identifier]];
 }
 @end
 
 @implementation AppController(NSOutlineViewDelegate)
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
-  if ([item isKindOfClass:[Event class]]) {
+  id object = [item valueForKey:@"object"];
+  if (object && [object isKindOfClass:[Event class]])
     return YES;
-  }
   return NO;
 }
 @end
