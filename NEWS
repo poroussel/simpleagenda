@@ -4,3 +4,6 @@ version 0.26
 	* Register SimpleAgenda as an application handling 
 	  .ics files and import events when user open one
 	* Add a NEWS file
+	* Fix compilation with gcc 3.3
+	* Fix events dates in the summary
+

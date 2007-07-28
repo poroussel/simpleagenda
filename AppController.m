@@ -42,7 +42,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   if ([today daysUntil:date] > 1 || [today daysSince:date] > 1)
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
   else
-    details = [NSString stringWithFormat:@"%.2d:%.2d", [date hourOfDay], [date minuteOfHour]];
+    details = [[date calendarDate] descriptionWithCalendarFormat:@"%H:%M"];
   [attributes setValue:details forKey:@"details"];
   return AUTORELEASE(attributes);
 }
