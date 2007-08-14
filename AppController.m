@@ -25,9 +25,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   DataTree *today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
   DataTree *tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
+  DataTree *soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
   _summaryRoot = [DataTree new];
   [_summaryRoot addChild:today];
   [_summaryRoot addChild:tomorrow];
+  [_summaryRoot addChild:soon];
 }
 
 - (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
@@ -39,7 +41,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [date setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
   [attributes setValue:[event title] forKey:@"title"];
-  if ([today daysUntil:date] > 1 || [today daysSince:date] > 1)
+  if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
   else
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%H:%M"];
@@ -51,19 +53,27 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 {
   Date *today = [Date date];
   Date *tomorrow = [Date date];
+  Date *soonStart = [Date date];
+  Date *soonEnd = [Date date];
   DataTree *ttoday = [[_summaryRoot children] objectAtIndex:0];
   DataTree *ttomorrow = [[_summaryRoot children] objectAtIndex:1];
+  DataTree *tsoon = [[_summaryRoot children] objectAtIndex:2];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   Event *event;
 
   [ttoday removeChildren];
   [ttomorrow removeChildren];
+  [tsoon removeChildren];
   [tomorrow incrementDay];
+  [soonStart changeDayBy:2];
+  [soonEnd changeDayBy:5];
   while ((event = [enumerator nextObject])) {
     if ([event isScheduledForDay:today])
       [ttoday addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
       [ttomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
+    if ([event isScheduledBetweenDay:soonStart andDay:soonEnd])
+      [tsoon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:soonStart]]];
   }
   [summary reloadData];
 }
