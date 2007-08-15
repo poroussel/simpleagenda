@@ -6,4 +6,6 @@ version 0.26
 	* Add a NEWS file
 	* Fix compilation with gcc 3.3
 	* Fix events dates in the summary
+	* Selecting an event in the summary shows it in the day view
+
 

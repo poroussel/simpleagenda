@@ -40,6 +40,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
   [date setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
+  [attributes setValue:[date copy] forKey:@"date"];
   [attributes setValue:[event title] forKey:@"title"];
   if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
@@ -332,8 +333,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
   id object = [item valueForKey:@"object"];
-  if (object && [object isKindOfClass:[Event class]])
+
+  if (object && [object isKindOfClass:[Event class]]) {
+    [calendar setDate:[item valueForKey:@"date"]];
     return YES;
+  }
   return NO;
 }
 @end
