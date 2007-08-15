@@ -59,7 +59,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   DataTree *ttomorrow = [[_summaryRoot children] objectAtIndex:1];
   DataTree *tsoon = [[_summaryRoot children] objectAtIndex:2];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
+  NSEnumerator *dayEnumerator;
   Event *event;
+  Date *day;
 
   [ttoday removeChildren];
   [ttomorrow removeChildren];
@@ -72,8 +74,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
       [ttoday addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
       [ttomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
-    if ([event isScheduledBetweenDay:soonStart andDay:soonEnd])
-      [tsoon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:soonStart]]];
+    dayEnumerator = [soonStart enumeratorTo:soonEnd];
+    /* FIXME : sort events by dates */
+    while ((day = [dayEnumerator nextObject])) {
+      if ([event isScheduledForDay:day])
+	[tsoon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:day]]];
+    }
   }
   [summary reloadData];
 }

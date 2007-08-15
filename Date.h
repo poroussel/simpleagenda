@@ -38,6 +38,7 @@
 - (void)changeYearBy:(int)diff;
 - (void)changeDayBy:(int)diff;
 - (void)changeMinuteBy:(int)diff;
+- (NSEnumerator *)enumeratorTo:(Date *)end;
 @end
 
 @interface Date(iCalendar)

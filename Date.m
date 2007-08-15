@@ -1,5 +1,38 @@
 #import "Date.h"
 
+@interface NSDateEnumerator : NSEnumerator
+{
+  Date *_start;
+  Date *_end;
+}
+- (id)initWithStart:(Date *)start end:(Date *)end;
+@end
+@implementation NSDateEnumerator
+- (id)initWithStart:(Date *)start end:(Date *)end
+{
+  self = [super init];
+  if (self != nil) {
+    _start = [start copy];
+    _end = [end copy];
+    [_start changeDayBy:-1];
+  }
+  return self;
+}
+- (id)nextObject
+{
+  [_start incrementDay];
+  if ([_start daysUntil:_end] < 0)
+    return nil;
+  return _start;
+}
+- (void)dealloc
+{
+  [_start release];
+  [_end release];
+  [super dealloc];
+}
+@end
+
 /*
  * Based on ChronographerSource Appointment class
  */
@@ -239,15 +272,24 @@
 
 - (void)changeDayBy:(int)diff
 {
-  struct icaldurationtype dt = {diff < 0, diff, 0, 0, 0, 0};
+  struct icaldurationtype dt = {diff < 0, abs(diff), 0, 0, 0, 0};
   _time = icaltime_add(_time, dt);
 }
 
 - (void)changeMinuteBy:(int)diff
 {
-  struct icaldurationtype dt = {diff < 0, 0, 0, 0, diff, 0};
+  struct icaldurationtype dt = {diff < 0, 0, 0, 0, abs(diff), 0};
   _time = icaltime_add(_time, dt);
 }
+
+- (NSEnumerator *)enumeratorTo:(Date *)end
+{
+  id e;
+  e = [NSDateEnumerator allocWithZone:NSDefaultMallocZone()];
+  e = [e initWithStart:self end:end];
+  return AUTORELEASE(e);
+}
+
 @end
 
 @implementation Date(iCalendar)
