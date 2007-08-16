@@ -54,7 +54,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-07-25 22:20:10 +0200";
+    LAST_EDITING = "2007-08-16 19:45:23 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -99,7 +99,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.25;
+    PROJECT_RELEASE = 0.26;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/pub/gnustep/";
