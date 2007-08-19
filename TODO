@@ -1,7 +1,5 @@
 In no particular order :
 
-* fix global data flow and use of notifications/delegate
-
 * support iCalendar VTODO components ?
 
 * better user preferences (agenda creation/deletion)

@@ -185,10 +185,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt withStoreManager:_sm]) {
-    [dayView reloadData];
-    [summary reloadData];
-  }
+  if (apt)
+    [_editor editAppointment:apt withStoreManager:_sm];
   [date release];
   [apt release];
 }
@@ -364,7 +362,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   if ([[event store] isWritable])
     [self _editAppointment:event];
 }
-/* FIXME : dayView:modifyEvent -> AgendaStore:updateAppointment -> SADataChangedInStore -> AppointmentCache populateFrom: -> DayView reloadData: -> refresh et perte de la selection */
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
   [[event store] update:[event UID] with:event];

@@ -237,30 +237,6 @@
   delegate = theDelegate;
 }
 
-- (void)reloadData
-{
-  ConfigManager *config = [ConfigManager globalConfig];
-  NSEnumerator *enumerator;
-  AppointmentView *aptv;
-  Event *apt;
-
-  enumerator = [[self subviews] objectEnumerator];
-  while ((aptv = [enumerator nextObject])) {
-    [config unregisterClient:self forKey:[[[aptv appointment] store] description]];
-    [aptv removeFromSuperview];
-  }
-
-  enumerator = [[_dataSource scheduledAppointmentsForDayView] objectEnumerator];
-  while ((apt = [enumerator nextObject])) {
-    [config registerClient:self forKey:[[apt store] description]];
-    if ([[apt store] displayed])
-      [self addSubview:[[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt]
-						appointment:apt]];
-  }
-  _selected = nil;
-  [self setNeedsDisplay:YES];
-}
-
 - (void)_selectAppointmentView:(AppointmentView *)aptv
 {
   if (_selected != aptv) {
@@ -270,6 +246,34 @@
     if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
       [delegate dayView:self selectEvent:[aptv appointment]];
   }
+}
+
+/* FIXME : cache visible events to avoid work when data don't change */
+- (void)reloadData
+{
+  ConfigManager *config = [ConfigManager globalConfig];
+  NSEnumerator *enumerator;
+  AppointmentView *aptv;
+  Event *apt;
+  Event *oldSelection = [_selected appointment];
+
+  enumerator = [[self subviews] objectEnumerator];
+  while ((aptv = [enumerator nextObject])) {
+    [config unregisterClient:self forKey:[[[aptv appointment] store] description]];
+    [aptv removeFromSuperview];
+  }
+  _selected = nil;
+  enumerator = [[_dataSource scheduledAppointmentsForDayView] objectEnumerator];
+  while ((apt = [enumerator nextObject])) {
+    [config registerClient:self forKey:[[apt store] description]];
+    if ([[apt store] displayed]) {
+      aptv = [[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt] appointment:apt];
+      [self addSubview:aptv];
+      if (oldSelection && [[oldSelection UID] isEqual:[apt UID]])
+	[self _selectAppointmentView:aptv];
+    }
+  }
+  [self setNeedsDisplay:YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -399,7 +403,6 @@
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
     if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
       [delegate dayView:self modifyEvent:[_selected appointment]];
-    [self display];
   }
 }
 
@@ -410,7 +413,6 @@
     [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
     if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
       [delegate dayView:self modifyEvent:[_selected appointment]];
-    [self display];
   }
 }
 
