@@ -31,6 +31,10 @@
   self = [super init];
   if (self) {
     [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+    /* 
+     * FIXME : this takes a reference on self with prevents
+     * [_sm release] in AppController to properly release it
+     */
     [[ConfigManager globalConfig] registerClient:self forKey:ST_DEFAULT];
     storeArray = [[ConfigManager globalConfig] objectForKey:STORES];
     defaultStore = [[ConfigManager globalConfig] objectForKey:ST_DEFAULT];
@@ -49,6 +53,7 @@
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_defaultStore);
   RELEASE(_delegate);

@@ -118,6 +118,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
    * Ugly workaround : [_sm release] should force the
    * modified stores to synchronise their data but it 
    * doesn't work. We're leaking a object reference.
+   * See StoreManager -init
    */
   [_sm synchronise];
   [_sm release];
