@@ -91,6 +91,16 @@ static ConfigManager *singleton;
   return [_defaults objectForKey:key];
 }
 
+- (void)removeObjectForKey:(NSString *)key
+{
+  [_dict removeObjectForKey:key];
+  [self notifyListenerForKey:key];
+  if (_parent)
+    [_parent setObject:_dict forKey:_key];
+  else
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+}
+
 - (void)setObject:(id)value forKey:(NSString *)key
 {
   [_dict setObject:value forKey:key];

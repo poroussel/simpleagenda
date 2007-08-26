@@ -70,6 +70,10 @@
   [storeColor setColor:[store eventColor]];
   [storeDisplay setState:[store displayed]];
   [storeWritable setState:[store isWritable]];
+  if ([[defaultStorePopUp titleOfSelectedItem] isEqual:[store description]])
+    [removeButton setEnabled:NO];
+  else
+    [removeButton setEnabled:YES];
 }
 
 -(void)changeColor:(id)sender
@@ -122,6 +126,19 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setIsWritable:[storeWritable state]];
+}
+
+/* We only allow the removal of non-default stores */
+-(void)removeStore:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  ConfigManager *config = [ConfigManager globalConfig];
+  NSMutableArray *storeArray = [config objectForKey:STORES];
+
+  [storeArray removeObject:[store description]];
+  [config setObject:storeArray forKey:STORES];
+  [_sm removeStoreNamed:[store description]];
+  [config removeObjectForKey:[store description]];
 }
 
 @end

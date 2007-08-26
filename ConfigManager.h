@@ -22,6 +22,7 @@
 - (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString*)key;
 - (void)unregisterClient:(id <ConfigListener>)client;
 - (id)objectForKey:(NSString *)key;
+- (void)removeObjectForKey:(NSString *)key;
 - (void)setObject:(id)value forKey:(NSString *)key;
 - (int)integerForKey:(NSString *)key;
 - (void)setInteger:(int)value forKey:(NSString *)key;

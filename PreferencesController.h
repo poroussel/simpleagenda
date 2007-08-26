@@ -18,6 +18,7 @@
   IBOutlet id defaultStorePopUp;
   IBOutlet id storeDisplay;
   IBOutlet id storeWritable;
+  IBOutlet id removeButton;
   StoreManager *_sm;
 }
 
@@ -32,5 +33,6 @@
 -(void)selectDefaultStore:(id)sender;
 -(void)toggleDisplay:(id)sender;
 -(void)toggleWritable:(id)sender;
+-(void)removeStore:(id)sender;
 
 @end

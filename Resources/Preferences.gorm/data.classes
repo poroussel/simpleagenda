@@ -5,11 +5,12 @@
 	    "changeEnd:",
 	    "changeStart:",
 	    "changeStep:",
-	    "toggleWritable:",
+	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectStore:",
 	    "setColor:",
-	    "toggleDisplay:"
+	    "toggleDisplay:",
+	    "toggleWritable:"
 	);
 	Super = NSObject;
     };
@@ -22,7 +23,8 @@
 	    "changeStep:",
 	    "selectDefaultStore:",
 	    "toggleDisplay:",
-	    "toggleWritable:"
+	    "toggleWritable:",
+	    "removeStore:"
 	);
 	Outlets = (
 	    panel,
@@ -36,7 +38,8 @@
 	    storePopUp,
 	    defaultStorePopUp,
 	    storeDisplay,
-	    storeWritable
+	    storeWritable,
+	    removeButton
 	);
 	Super = NSObject;
     };

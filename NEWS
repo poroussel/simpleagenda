@@ -1,3 +1,6 @@
+version 0.27
+	* Fix keyboard handling in the day view
+
 version 0.26
 	* Save main window geometry
 	* Add a 'Save all' item menu to fsync data
