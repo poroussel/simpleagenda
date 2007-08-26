@@ -29,6 +29,19 @@
   [super dealloc];
 }
 
+-(void)_setupStoresPopup
+{
+  NSEnumerator *list = [_sm storeEnumerator];
+  id <AgendaStore> aStore;
+
+  [storePopUp removeAllItems];
+  while ((aStore = [list nextObject]))
+    [storePopUp addItemWithTitle:[aStore description]];
+  [storePopUp selectItemAtIndex:0];
+  [self selectStore:self];
+
+}
+
 -(void)showPreferences
 {
   NSEnumerator *list = [_sm storeEnumerator];
@@ -46,20 +59,13 @@
   [minStep setDoubleValue:step/60.0];
   [minStepText setDoubleValue:step/60.0];
 
-  /* This could be done during init ? */
-  [storePopUp removeAllItems];
-  while ((aStore = [list nextObject]))
-    [storePopUp addItemWithTitle:[aStore description]];
-  [storePopUp selectItemAtIndex:0];
-  [self selectStore:self];
-
-  list = [_sm storeEnumerator];
   [defaultStorePopUp removeAllItems];
   while ((aStore = [list nextObject])) {
     if ([aStore isWritable])
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
+  [self _setupStoresPopup];
   [panel makeKeyAndOrderFront:self];
 }
 
@@ -139,6 +145,7 @@
   [config setObject:storeArray forKey:STORES];
   [_sm removeStoreNamed:[store description]];
   [config removeObjectForKey:[store description]];
+  [self _setupStoresPopup];
 }
 
 @end
