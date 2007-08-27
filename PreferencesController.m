@@ -39,18 +39,17 @@
     [storePopUp addItemWithTitle:[aStore description]];
   [storePopUp selectItemAtIndex:0];
   [self selectStore:self];
-
 }
 
 -(void)showPreferences
 {
   NSEnumerator *list = [_sm storeEnumerator];
-  id <AgendaStore> aStore;
   ConfigManager *config = [ConfigManager globalConfig];
+  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
-  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
+  id <AgendaStore> aStore;
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -141,10 +140,11 @@
   ConfigManager *config = [ConfigManager globalConfig];
   NSMutableArray *storeArray = [config objectForKey:STORES];
 
+  [_sm removeStoreNamed:[store description]];
   [storeArray removeObject:[store description]];
   [config setObject:storeArray forKey:STORES];
-  [_sm removeStoreNamed:[store description]];
   [config removeObjectForKey:[store description]];
+  /* FIXME : This could be done by registering STORES key */
   [self _setupStoresPopup];
 }
 
