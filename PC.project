@@ -54,7 +54,7 @@
 	Preferences.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-08-16 19:45:23 +0200";
+    LAST_EDITING = "2007-09-12 23:33:24 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -72,7 +72,7 @@
 	SimpleAgenda.m
     );
     PC_WINDOWS = {
-	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 213}";
+	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 297}";
 	ProjectWindow = "285 25 864 975 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };

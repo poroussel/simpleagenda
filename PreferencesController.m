@@ -65,6 +65,7 @@
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
   [self _setupStoresPopup];
+  [storeClass removeAllItems];
   [panel makeKeyAndOrderFront:self];
 }
 
@@ -146,6 +147,10 @@
   [config removeObjectForKey:[store description]];
   /* FIXME : This could be done by registering STORES key */
   [self _setupStoresPopup];
+}
+
+-(void)createStore:(id)sender
+{
 }
 
 @end

@@ -19,6 +19,7 @@
   IBOutlet id storeDisplay;
   IBOutlet id storeWritable;
   IBOutlet id removeButton;
+  IBOutlet id storeClass;
   StoreManager *_sm;
 }
 
@@ -34,5 +35,6 @@
 -(void)toggleDisplay:(id)sender;
 -(void)toggleWritable:(id)sender;
 -(void)removeStore:(id)sender;
+-(void)createStore:(id)sender;
 
 @end
