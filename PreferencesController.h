@@ -20,6 +20,7 @@
   IBOutlet id storeWritable;
   IBOutlet id removeButton;
   IBOutlet id storeClass;
+  IBOutlet id storeName;
   StoreManager *_sm;
 }
 
