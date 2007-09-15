@@ -44,12 +44,14 @@
 -(void)showPreferences
 {
   NSEnumerator *list = [_sm storeEnumerator];
+  NSEnumerator *backends = [[_sm registeredBackends] objectEnumerator];
   ConfigManager *config = [ConfigManager globalConfig];
   NSString *defaultStore = [config objectForKey:ST_DEFAULT];
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
   id <AgendaStore> aStore;
+  Class backend;
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -66,6 +68,9 @@
   [defaultStorePopUp selectItemWithTitle:defaultStore];
   [self _setupStoresPopup];
   [storeClass removeAllItems];
+  while ((backend = [backends nextObject]))
+    [storeClass addItemWithTitle:[backend description]];
+  [storeClass selectItemAtIndex:0];
   [createButton setEnabled:NO];
   [panel makeKeyAndOrderFront:self];
 }

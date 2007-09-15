@@ -5,11 +5,15 @@
 
 @interface StoreManager : NSObject <ConfigListener>
 {
+  NSMutableDictionary *_backends;
   NSMutableDictionary *_stores;
   id _defaultStore;
   id _delegate;
 }
 
+- (void)registerBackend:(Class)type;
+- (NSArray *)registeredBackends;
+- (Class)backendNamed:(NSString *)name;
 - (void)addStoreNamed:(NSString *)name;
 - (void)removeStoreNamed:(NSString *)name;
 - (id <AgendaStore>)storeForName:(NSString *)name;

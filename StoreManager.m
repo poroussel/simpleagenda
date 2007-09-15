@@ -5,6 +5,8 @@
 #import "StoreManager.h"
 #import "ConfigManager.h"
 #import "defines.h"
+#import "LocalStore.h"
+#import "iCalStore.h"
 
 @implementation StoreManager
 
@@ -38,7 +40,11 @@
     [[ConfigManager globalConfig] registerClient:self forKey:ST_DEFAULT];
     storeArray = [[ConfigManager globalConfig] objectForKey:STORES];
     defaultStore = [[ConfigManager globalConfig] objectForKey:ST_DEFAULT];
+
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
+    _backends = [[NSMutableDictionary alloc] initWithCapacity:2];
+    [self registerBackend:[LocalStore class]];
+    [self registerBackend:[iCalStore class]];
     enumerator = [storeArray objectEnumerator];
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
@@ -58,12 +64,31 @@
   RELEASE(_defaultStore);
   RELEASE(_delegate);
   [_stores release];
+  [_backends release];
   [super dealloc];
 }
 
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
   [self setDefaultStore:[[ConfigManager globalConfig] objectForKey:ST_DEFAULT]];
+}
+
+- (void)registerBackend:(Class)type
+{
+  if ([type conformsToProtocol:@protocol(AgendaStore)])
+    [_backends setObject:type forKey:[type storeTypeName]];
+  else
+    NSLog(@"Can't register %@ as a store backend", [type description]);
+}
+
+- (NSArray *)registeredBackends
+{
+  return [_backends allValues];
+}
+
+- (Class)backendNamed:(NSString *)name
+{
+  return [_backends valueForKey:name];
 }
 
 - (void)addStoreNamed:(NSString *)name
