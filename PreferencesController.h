@@ -21,6 +21,7 @@
   IBOutlet id removeButton;
   IBOutlet id storeClass;
   IBOutlet id storeName;
+  IBOutlet id createButton;
   StoreManager *_sm;
 }
 

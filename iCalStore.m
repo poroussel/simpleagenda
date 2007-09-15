@@ -131,6 +131,11 @@
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
++ (NSString *)storeTypeName
+{
+  return @"iCalendar store";
+}
+
 - (void)dealloc
 {
   [_refreshTimer invalidate];

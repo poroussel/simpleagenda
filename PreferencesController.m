@@ -66,6 +66,7 @@
   [defaultStorePopUp selectItemWithTitle:defaultStore];
   [self _setupStoresPopup];
   [storeClass removeAllItems];
+  [createButton setEnabled:NO];
   [panel makeKeyAndOrderFront:self];
 }
 
@@ -151,6 +152,16 @@
 
 -(void)createStore:(id)sender
 {
+}
+
+-(void)controlTextDidChange:(NSNotification *)notification
+{
+  if ([notification object] == storeName) {
+    if ([_sm storeForName:[storeName stringValue]] || ![[storeName stringValue] length])
+      [createButton setEnabled:NO];
+    else
+      [createButton setEnabled:YES];
+  }
 }
 
 @end

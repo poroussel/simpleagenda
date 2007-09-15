@@ -44,6 +44,11 @@
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
++ (NSString *)storeTypeName
+{
+  return @"Simple file store";
+}
+
 - (void)dealloc
 {
   [self write];

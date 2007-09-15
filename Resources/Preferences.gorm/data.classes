@@ -43,7 +43,8 @@
 	    storeWritable,
 	    removeButton,
 	    storeClass,
-	    storeName
+	    storeName,
+	    createButton
 	);
 	Super = NSObject;
     };
