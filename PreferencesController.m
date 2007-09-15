@@ -69,7 +69,7 @@
   [self _setupStoresPopup];
   [storeClass removeAllItems];
   while ((backend = [backends nextObject]))
-    [storeClass addItemWithTitle:[backend description]];
+    [storeClass addItemWithTitle:[backend storeTypeName]];
   [storeClass selectItemAtIndex:0];
   [createButton setEnabled:NO];
   [panel makeKeyAndOrderFront:self];
