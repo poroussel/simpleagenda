@@ -1,7 +1,8 @@
 version 0.27
 	* Fix keyboard handling in the day view
+	* Add store creation in preferences dialog
 
-version 0.26
+version 0.26 (2007/08/16)
 	* Save main window geometry
 	* Add a 'Save all' item menu to fsync data
 	* Register SimpleAgenda as an application handling 

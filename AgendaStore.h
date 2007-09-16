@@ -8,6 +8,7 @@
 
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name;
++ (id)createWithName:(NSString *)name;
 + (NSString *)storeTypeName;
 - (NSEnumerator *)enumerator;
 - (NSArray *)events;

@@ -44,6 +44,21 @@
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
++ (id)createWithName:(NSString *)name
+{
+  id store;
+  ConfigManager *cm;
+
+  store = [self allocWithZone: NSDefaultMallocZone()];
+  if (store) {
+    cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
+    [cm setObject:[name copy] forKey:ST_FILE];
+    [cm setObject:[[self class] description] forKey:ST_CLASS];
+    [store initWithName:name];
+  }
+  return store;
+}
+
 + (NSString *)storeTypeName
 {
   return @"Simple file store";

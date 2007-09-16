@@ -29,11 +29,21 @@
   [super dealloc];
 }
 
--(void)_setupStoresPopup
+-(void)_setupStores
 {
+  ConfigManager *config = [ConfigManager globalConfig];
+  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
   NSEnumerator *list = [_sm storeEnumerator];
   id <AgendaStore> aStore;
 
+  [defaultStorePopUp removeAllItems];
+  while ((aStore = [list nextObject])) {
+    if ([aStore isWritable])
+      [defaultStorePopUp addItemWithTitle:[aStore description]];
+  }
+  [defaultStorePopUp selectItemWithTitle:defaultStore];
+
+  list = [_sm storeEnumerator];
   [storePopUp removeAllItems];
   while ((aStore = [list nextObject]))
     [storePopUp addItemWithTitle:[aStore description]];
@@ -43,14 +53,11 @@
 
 -(void)showPreferences
 {
-  NSEnumerator *list = [_sm storeEnumerator];
   NSEnumerator *backends = [[_sm registeredBackends] objectEnumerator];
   ConfigManager *config = [ConfigManager globalConfig];
-  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
-  id <AgendaStore> aStore;
   Class backend;
 
   [dayStart setIntValue:start];
@@ -60,13 +67,7 @@
   [minStep setDoubleValue:step/60.0];
   [minStepText setDoubleValue:step/60.0];
 
-  [defaultStorePopUp removeAllItems];
-  while ((aStore = [list nextObject])) {
-    if ([aStore isWritable])
-      [defaultStorePopUp addItemWithTitle:[aStore description]];
-  }
-  [defaultStorePopUp selectItemWithTitle:defaultStore];
-  [self _setupStoresPopup];
+  [self _setupStores];
   [storeClass removeAllItems];
   while ((backend = [backends nextObject]))
     [storeClass addItemWithTitle:[backend storeTypeName]];
@@ -147,16 +148,31 @@
   ConfigManager *config = [ConfigManager globalConfig];
   NSMutableArray *storeArray = [config objectForKey:STORES];
 
-  [_sm removeStoreNamed:[store description]];
   [storeArray removeObject:[store description]];
   [config setObject:storeArray forKey:STORES];
   [config removeObjectForKey:[store description]];
+  [_sm removeStoreNamed:[store description]];
   /* FIXME : This could be done by registering STORES key */
-  [self _setupStoresPopup];
+  [self _setupStores];
 }
 
 -(void)createStore:(id)sender
 {
+  ConfigManager *config = [ConfigManager globalConfig];
+  NSMutableArray *storeArray = [config objectForKey:STORES];
+  id <AgendaStore> store;
+  Class backend;
+
+  backend = [_sm backendNamed:[storeClass titleOfSelectedItem]];
+  if (backend) {
+    store = [backend createWithName:[storeName stringValue]];
+    if (store) {
+      [_sm addStoreNamed:[storeName stringValue]];
+      [storeArray addObject:[storeName stringValue]];
+      [config setObject:storeArray forKey:STORES];
+      [self _setupStores];
+    }
+  }
 }
 
 -(void)controlTextDidChange:(NSNotification *)notification

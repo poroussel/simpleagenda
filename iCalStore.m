@@ -131,6 +131,12 @@
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
++ (id)createWithName:(NSString *)name
+{
+  /* FIXME : fill this */
+  return nil;
+}
+
 + (NSString *)storeTypeName
 {
   return @"iCalendar store";
