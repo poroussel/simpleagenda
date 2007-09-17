@@ -159,7 +159,7 @@
 -(void)createStore:(id)sender
 {
   ConfigManager *config = [ConfigManager globalConfig];
-  NSMutableArray *storeArray = [config objectForKey:STORES];
+  NSMutableArray *storeArray = [NSMutableArray arrayWithArray:[config objectForKey:STORES]];
   id <AgendaStore> store;
   Class backend;
 
@@ -167,12 +167,13 @@
   if (backend) {
     store = [backend createWithName:[storeName stringValue]];
     if (store) {
-      [_sm addStoreNamed:[storeName stringValue]];
+      [_sm addStore:store ForName:[storeName stringValue]];
       [storeArray addObject:[storeName stringValue]];
       [config setObject:storeArray forKey:STORES];
       [self _setupStores];
     }
   }
+  [storeName setStringValue:@""];
 }
 
 -(void)controlTextDidChange:(NSNotification *)notification

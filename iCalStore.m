@@ -4,6 +4,52 @@
 #import "iCalStore.h"
 #import "defines.h"
 
+@implementation iCalStoreDialog
+- (id)init
+{
+  self = [super init];
+  if (self) {
+    if (![NSBundle loadNibNamed:@"iCalendar" owner:self])
+      return nil;
+  }
+  return self;
+}
+
+- (BOOL)showWithName:(NSString *)storeName
+{
+  int ret;
+
+  [name setStringValue:storeName];
+  [url setStringValue:@"http://"];
+  [ok setEnabled:NO];
+  ret = [NSApp runModalForWindow:panel];
+  [panel close];
+  return ret == 1;
+}
+
+-(void)okClicked:(id)sender
+{
+  [NSApp stopModalWithCode:1];
+}
+
+-(void)cancelClicked:(id)sender
+{
+  [NSApp stopModalWithCode:0];
+}
+
+-(void)controlTextDidChange:(NSNotification *)notification
+{
+  NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
+  [ok setEnabled:(storeUrl != nil)];
+}
+
+- (NSString *)url
+{
+  return [url stringValue];
+}
+@end
+
+
 @implementation iCalStore
 
 - (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
@@ -72,6 +118,39 @@
 		       nil, nil];
 }
 
++ (BOOL)canReadFromURL:(NSURL *)url
+{
+  NSURL *newURL;
+  NSString *location;
+
+  if ([url resourceDataUsingCache:NO] == nil) {
+      location = [url propertyForKey:@"Location"];
+      if (!location) {
+	NSLog(@"Couldn't read data from %@", [url description]);
+	return NO;
+      }
+      newURL = [url initWithString:location];
+      if (newURL) {
+	NSAssert(url == newURL, @"URL instance changed => won't work");
+	NSLog(@"Redirected to %@", location);
+	return YES;
+      }
+      NSLog(@"%@ isn't a valid url", location);
+      return NO;
+  }
+  return YES;
+}
+
+/* This is destructive : it writes an empty file */
++ (BOOL)canWriteToURL:(NSURL *)url
+{
+  [url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
+  if ([url setResourceData:[NSData data]])
+     return YES;
+  NSLog(@"Couldn't write to %@", [url description]);
+  return NO;
+}
+
 - (id)initWithName:(NSString *)name
 {
   NSString *location;
@@ -87,6 +166,7 @@
       [self release];
       return nil;
     }
+    /* FIXME : use canReadFromURL and canWriteToURL ? */
     if ([_url resourceDataUsingCache:NO] == nil) {
       location = [_url propertyForKey:@"Location"];
       if (!location) {
@@ -133,8 +213,36 @@
 
 + (id)createWithName:(NSString *)name
 {
-  /* FIXME : fill this */
-  return nil;
+  id store = nil;
+  ConfigManager *cm;
+  iCalStoreDialog *dialog;
+  NSURL *storeURL;
+  BOOL writable = NO;
+
+  dialog = [iCalStoreDialog new];
+  if ([dialog showWithName:name] == YES) {
+    storeURL = [[NSURL alloc] initWithString:[dialog url]];
+    /* If there's no file there */
+    if ([iCalStore canReadFromURL:storeURL] == NO) {
+      /* Try to write one */
+      if ([iCalStore canWriteToURL:storeURL] == NO) {
+	NSLog(@"Unable to read or write at url %@", [dialog url]);
+	[dialog release];
+	return nil;
+      }
+      writable = YES;
+    }
+    store = [self allocWithZone: NSDefaultMallocZone()];
+    if (store) {
+      cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
+      [cm setObject:[dialog url] forKey:ST_URL];
+      [cm setObject:[[self class] description] forKey:ST_CLASS];
+      [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
+      store = [store initWithName:name];
+    }
+  }
+  [dialog release];
+  return store;
 }
 
 + (NSString *)storeTypeName
@@ -267,10 +375,11 @@
 
 - (BOOL)write
 {
-  NSData *data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
-  
-  if (data) {
+  NSData *data;
+
+  if ([self isWritable] && data) {
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
+    data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];  
     if ([_url setResourceData:data]) {
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
       _modified = NO;

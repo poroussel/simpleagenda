@@ -1,0 +1,31 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "cancelClicked:",
+	    "okClicked:"
+	);
+	Super = NSObject;
+    };
+    iCalStore = {
+	Actions = (
+	);
+	Outlets = (
+	    _delegate
+	);
+	Super = NSObject;
+    };
+    iCalStoreDialog = {
+	Actions = (
+	    "cancelClicked:",
+	    "okClicked:"
+	);
+	Outlets = (
+	    panel,
+	    name,
+	    ok,
+	    url
+	);
+	Super = NSObject;
+    };
+}

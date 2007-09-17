@@ -51,10 +51,11 @@
     INTERFACES = (
 	Agenda.gorm,
 	Appointment.gorm,
-	Preferences.gorm
+	Preferences.gorm,
+	iCalendar.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-09-12 23:33:24 +0200";
+    LAST_EDITING = "2007-09-17 17:13:23 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

@@ -109,6 +109,11 @@
   }
 }
 
+- (void)addStore:(id <AgendaStore>)store ForName:(NSString *)name
+{
+  [_stores setObject:store forKey:name];
+}
+
 - (void)removeStoreNamed:(NSString *)name
 {
   [_stores removeObjectForKey:name];

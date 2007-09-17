@@ -4,6 +4,16 @@
 #import "ConfigManager.h"
 #import "iCalTree.h"
 
+@interface iCalStoreDialog : NSObject
+{
+  IBOutlet id panel;
+  IBOutlet id name;
+  IBOutlet id url;
+  IBOutlet id ok;
+}
+
+@end
+
 @interface iCalStore : NSObject <AgendaStore>
 {
   iCalTree *_tree;
