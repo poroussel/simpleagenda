@@ -2,6 +2,7 @@ version 0.27
 	* Fix keyboard handling in the day view
 	* Add store creation in preferences dialog
 	* Load iCal stores asynchronously
+	* Fix keyboard navigation in preferences dialog
 
 version 0.26 (2007/08/16)
 	* Save main window geometry
