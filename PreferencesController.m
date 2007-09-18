@@ -160,18 +160,14 @@
 {
   ConfigManager *config = [ConfigManager globalConfig];
   NSMutableArray *storeArray = [NSMutableArray arrayWithArray:[config objectForKey:STORES]];
-  id <AgendaStore> store;
   Class backend;
 
   backend = [_sm backendNamed:[storeClass titleOfSelectedItem]];
-  if (backend) {
-    store = [backend createWithName:[storeName stringValue]];
-    if (store) {
-      [_sm addStore:store ForName:[storeName stringValue]];
-      [storeArray addObject:[storeName stringValue]];
-      [config setObject:storeArray forKey:STORES];
-      [self _setupStores];
-    }
+  if (backend && [backend registerWithName:[storeName stringValue]]) {
+    [_sm addStoreNamed:[storeName stringValue]];
+    [storeArray addObject:[storeName stringValue]];
+    [config setObject:storeArray forKey:STORES];
+    [self _setupStores];
   }
   [storeName setStringValue:@""];
 }

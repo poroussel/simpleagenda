@@ -104,20 +104,17 @@
     if (store) {
       [_stores setObject:store forKey:name];
       NSLog(@"Added %@ to StoreManager", name);
+      [self dataChanged:nil];
     } else
       NSLog(@"Unable to initialize store %@", name);
   }
-}
-
-- (void)addStore:(id <AgendaStore>)store ForName:(NSString *)name
-{
-  [_stores setObject:store forKey:name];
 }
 
 - (void)removeStoreNamed:(NSString *)name
 {
   [_stores removeObjectForKey:name];
   NSLog(@"Removed %@ from StoreManager", name);
+  [self dataChanged:nil];
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name

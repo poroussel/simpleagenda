@@ -195,9 +195,8 @@
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
-+ (id)createWithName:(NSString *)name
++ (BOOL)registerWithName:(NSString *)name
 {
-  id store = nil;
   ConfigManager *cm;
   iCalStoreDialog *dialog;
   NSURL *storeURL;
@@ -212,20 +211,17 @@
       /* Try to write one */
       if ([iCalStore canWriteToURL:storeURL] == NO) {
 	NSLog(@"Unable to read or write at url %@", [dialog url]);
-	return nil;
+	return NO;
       }
       writable = YES;
     }
-    store = [self allocWithZone: NSDefaultMallocZone()];
-    if (store) {
-      cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
-      [cm setObject:[storeURL description] forKey:ST_URL];
-      [cm setObject:[[self class] description] forKey:ST_CLASS];
-      [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
-      store = [store initWithName:name];
-    }
+    cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
+    [cm setObject:[storeURL description] forKey:ST_URL];
+    [cm setObject:[[self class] description] forKey:ST_CLASS];
+    [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
+    return YES;
   }
-  return store;
+  return NO;
 }
 
 + (NSString *)storeTypeName
