@@ -117,6 +117,7 @@
 - (void)removeStoreNamed:(NSString *)name
 {
   [_stores removeObjectForKey:name];
+  NSLog(@"Removed %@ from StoreManager", name);
 }
 
 - (id <AgendaStore>)storeForName:(NSString *)name
