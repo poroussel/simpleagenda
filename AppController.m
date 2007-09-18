@@ -26,10 +26,12 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   DataTree *today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
   DataTree *tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
   DataTree *soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
+  _results = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Search results" forKey:@"title"]];
   _summaryRoot = [DataTree new];
   [_summaryRoot addChild:today];
   [_summaryRoot addChild:tomorrow];
   [_summaryRoot addChild:soon];
+  [_summaryRoot addChild:_results];
 }
 
 - (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
@@ -265,6 +267,31 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     }
     [date release];
   }
+}
+
+- (void)doSearch:(id)sender
+{
+  NSEnumerator *enumerator;
+  Event *event;
+
+  if ([[search stringValue] length] > 0) {
+    [_results removeChildren];
+    enumerator = [[_sm allEvents] objectEnumerator];
+    while ((event = [enumerator nextObject])) {
+      if ([event contains:[search stringValue]])
+	[_results addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:[event startDate]]]];
+    }
+    [_results setValue:[NSString stringWithFormat:@"%d item(s)", [[_results children] count]] forKey:@"details"];;
+    [summary reloadData];
+  }
+}
+
+- (void)clearSearch:(id)sender
+{
+  [search setStringValue:@""];
+  [_results removeChildren];
+  [_results setValue:@"" forKey:@"details"];;
+  [summary reloadData];
 }
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem

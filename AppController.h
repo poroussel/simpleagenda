@@ -13,6 +13,7 @@
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
   IBOutlet NSOutlineView *summary;
+  IBOutlet NSTextField *search;
 
   NSWindow *window;
   PreferencesController *_pc;
@@ -22,6 +23,7 @@
   BOOL _deleteSelection;
   Date *_selectedDay;
   DataTree *_summaryRoot;
+  DataTree *_results;
 }
 
 - (void)copy:(id)sender;
@@ -36,4 +38,6 @@
 - (void)editAppointment:(id)sender;
 - (void)delAppointment:(id)sender;
 - (void)exportAppointment:(id)sender;
+- (void)doSearch:(id)sender;
+- (void)clearSearch:(id)sender;
 @end

@@ -188,6 +188,22 @@
 			 [[NSHost currentHost] name]]];
 }
 
+- (BOOL)contains:(NSString *)text
+{
+  NSRange range;
+
+  range = [title rangeOfString:text options:NSCaseInsensitiveSearch];
+  if (title && range.length > 0)
+    return YES;
+  range = [_location rangeOfString:text options:NSCaseInsensitiveSearch];
+  if (_location && range.length > 0)
+    return YES;
+  range = [[descriptionText string] rangeOfString:text options:NSCaseInsensitiveSearch];
+  if (descriptionText && range.length > 0)
+    return YES;
+  return NO;
+}
+
 - (NSAttributedString *)descriptionText
 {
   return descriptionText;

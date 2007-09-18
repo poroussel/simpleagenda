@@ -33,6 +33,7 @@ enum intervalType
 - (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end;
 - (NSString *)details;
 - (void)generateUID;
+- (BOOL)contains:(NSString *)text;
 
 - (id <AgendaStore>)store;
 - (NSString *)location;

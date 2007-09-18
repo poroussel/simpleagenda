@@ -7,13 +7,16 @@
 	    "editAppointment:",
 	    "delAppointment:",
 	    "exportAppointment:",
-	    "saveAll:"
+	    "saveAll:",
+	    "doSearch:",
+	    "clearSearch:"
 	);
 	Outlets = (
 	    calendar,
 	    dayView,
 	    summary,
-	    window
+	    window,
+	    search
 	);
 	Super = NSObject;
     };
@@ -50,10 +53,12 @@
 	    "addAppointment:",
 	    "createOrEditAnAppointment:",
 	    "delAppointment:",
+	    "doSearch:",
 	    "editAppointment:",
 	    "exportAppointment:",
-	    "saveAll:",
+	    "clearSearch:",
 	    "orderFrontFontPanel:",
+	    "saveAll:",
 	    "setDataSource:",
 	    "setDelegate:",
 	    "showPrefPanel:",
