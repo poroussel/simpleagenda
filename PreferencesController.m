@@ -170,6 +170,7 @@
     [self _setupStores];
   }
   [storeName setStringValue:@""];
+  [createButton setEnabled:NO];
 }
 
 -(void)controlTextDidChange:(NSNotification *)notification
