@@ -5,39 +5,47 @@
 #import "defines.h"
 
 @implementation iCalStoreDialog
-- (id)init
+- (id)initWithName:(NSString *)storeName
 {
   self = [super init];
   if (self) {
     if (![NSBundle loadNibNamed:@"iCalendar" owner:self])
       return nil;
+    [warning setHidden:YES];
+    [name setStringValue:storeName];
+    [url setStringValue:@"http://"];
   }
   return self;
 }
 
-- (BOOL)showWithName:(NSString *)storeName
+- (void)dealloc
 {
-  int ret;
-
-  [name setStringValue:storeName];
-  [url setStringValue:@"http://"];
-  [ok setEnabled:NO];
-  ret = [NSApp runModalForWindow:panel];
   [panel close];
-  return ret == 1;
 }
 
--(void)okClicked:(id)sender
+- (BOOL)show
+{
+  [ok setEnabled:NO];
+  return [NSApp runModalForWindow:panel];
+}
+
+- (void)okClicked:(id)sender
 {
   [NSApp stopModalWithCode:1];
 }
 
--(void)cancelClicked:(id)sender
+- (void)cancelClicked:(id)sender
 {
   [NSApp stopModalWithCode:0];
 }
 
--(void)controlTextDidChange:(NSNotification *)notification
+- (void)setError:(NSString *)errorText
+{
+  [error setStringValue:errorText];
+  [warning setHidden:NO];
+}
+
+- (void)controlTextDidChange:(NSNotification *)notification
 {
   NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
   [ok setEnabled:(storeUrl != nil)];
@@ -203,25 +211,27 @@
   NSURL *storeURL;
   BOOL writable = NO;
 
-  dialog = [iCalStoreDialog new];
-  if ([dialog showWithName:name] == YES) {
+  dialog = [[iCalStoreDialog alloc] initWithName:name];
+ error:
+  if ([dialog show] == YES) {
     storeURL = [iCalStore getRealURL:[NSURL URLWithString:[dialog url]]];
-    [dialog release];
     /* If there's no file there */
     if ([iCalStore canReadFromURL:storeURL] == NO) {
       /* Try to write one */
       if ([iCalStore canWriteToURL:storeURL] == NO) {
-	NSLog(@"Unable to read or write at url %@", [dialog url]);
-	return NO;
+	[dialog setError:@"Unable to read or write at this url"];
+	goto error;
       }
       writable = YES;
     }
+    [dialog release];
     cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
     [cm setObject:[storeURL description] forKey:ST_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
     return YES;
   }
+  [dialog release];
   return NO;
 }
 

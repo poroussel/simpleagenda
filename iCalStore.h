@@ -10,6 +10,8 @@
   IBOutlet id name;
   IBOutlet id url;
   IBOutlet id ok;
+  IBOutlet id error;
+  IBOutlet id warning;
 }
 
 @end

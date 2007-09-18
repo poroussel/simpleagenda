@@ -24,7 +24,9 @@
 	    panel,
 	    name,
 	    ok,
-	    url
+	    url,
+	    error,
+	    warning
 	);
 	Super = NSObject;
     };
