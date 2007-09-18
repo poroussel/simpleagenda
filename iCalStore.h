@@ -28,6 +28,7 @@
   int _minutesBeforeRefresh;
   NSTimer *_refreshTimer;
   id _delegate;
+  NSMutableData *_retrievedData;
 }
 
 @end

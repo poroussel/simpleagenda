@@ -132,10 +132,8 @@
 
 + (BOOL)canReadFromURL:(NSURL *)url
 {
-  if ([url resourceDataUsingCache:NO] == nil) {
-      NSLog(@"%@ isn't a valid url", [url description]);
+  if ([url resourceDataUsingCache:NO] == nil)
       return NO;
-  }
   return YES;
 }
 
@@ -149,8 +147,12 @@
   [url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
   if (ret)
     return YES;
-  NSLog(@"Couldn't write to %@", [url description]);
   return NO;
+}
+
+- (void)fetchData
+{
+  [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:_url] delegate:self];
 }
 
 - (id)initWithName:(NSString *)name
@@ -169,23 +171,22 @@
     [_url retain];
     _name = [name copy];
     _modified = NO;
+    _retrievedData = nil;
     _lastModified = nil;
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     _data = [[NSMutableDictionary alloc] initWithCapacity:32];
-    [self read]; 
+    [self fetchData]; 
 
-    if (![_url isFileURL]) {
-      if ([_config objectForKey:ST_REFRESH])
-	_minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
-      else
-	_minutesBeforeRefresh = 60;
-      _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
-				       interval:_minutesBeforeRefresh * 60
-				       target:self selector:@selector(refreshData:) 
-				       userInfo:nil repeats:YES];
-      [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
-    }
+    if ([_config objectForKey:ST_REFRESH])
+      _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
+    else
+      _minutesBeforeRefresh = 60;
+    _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
+				     interval:_minutesBeforeRefresh * 60
+				     target:self selector:@selector(refreshData:) 
+				     userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
 }
@@ -244,8 +245,7 @@
 
 - (void)refreshData:(NSTimer *)timer
 {
-  if ([self read])
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  [self read];
 }
 
 - (NSEnumerator *)enumerator
@@ -324,29 +324,8 @@
 
 - (BOOL)read
 {
-  NSSet *items;
-  NSData *data;
-  NSString *text;
-  NSEnumerator *enumerator;
-  Event *apt;
-
   if ([self needsRefresh]) {
-    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-    data = [_url resourceDataUsingCache:NO];
-    if (data) {
-      text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-      if (text && [_tree parseString:text]) {
-	items = [_tree events];
-	[items makeObjectsPerform:@selector(setStore:) withObject:self];
-	enumerator = [items objectEnumerator];
-	while ((apt = [enumerator nextObject]))
-	  [_data setValue:apt forKey:[apt UID]];
-	NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
-	[text release];
-      } else
-	NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-    } else
-      NSLog(@"No data read from %@", [_url absoluteString]);
+    [self fetchData];
     return YES;
   }
   return NO;
@@ -360,10 +339,12 @@
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
     data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];  
     if ([_url setResourceData:data]) {
+      [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
       _modified = NO;
       return YES;
     }
+    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
     NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
     [self setIsWritable:NO];
     return NO;
@@ -397,6 +378,43 @@
 {
   _displayed = state;
   [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+  [_retrievedData appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+  NSSet *items;
+  NSString *text;
+  NSEnumerator *enumerator;
+  Event *apt;
+
+  if (_retrievedData) {
+    text = [[NSString alloc] initWithData:_retrievedData encoding:NSUTF8StringEncoding];
+    if (text && [_tree parseString:text]) {
+      items = [_tree events];
+      [items makeObjectsPerform:@selector(setStore:) withObject:self];
+      enumerator = [items objectEnumerator];
+      while ((apt = [enumerator nextObject]))
+	[_data setValue:apt forKey:[apt UID]];
+      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
+      [text release];
+      [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+    } else
+      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+    [_retrievedData release];
+    _retrievedData = nil;
+  } else
+    NSLog(@"No data available from %@", [_url absoluteString]);
+  [connection release];
 }
 
 @end
