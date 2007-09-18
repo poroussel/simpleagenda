@@ -283,6 +283,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     }
     [_results setValue:[NSString stringWithFormat:@"%d item(s)", [[_results children] count]] forKey:@"details"];;
     [summary reloadData];
+    [summary expandItem:_results];
   }
 }
 
