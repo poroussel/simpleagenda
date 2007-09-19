@@ -55,7 +55,7 @@
 	iCalendar.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-09-18 15:02:08 +0200";
+    LAST_EDITING = "2007-09-19 17:28:53 +0200";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -100,7 +100,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.27;
+    PROJECT_RELEASE = 0.28;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/pub/gnustep/";
