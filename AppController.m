@@ -23,14 +23,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)initSummary
 {
-  DataTree *today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
-  DataTree *tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
-  DataTree *soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
+  _today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
+  _tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
+  _soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
   _results = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Search results" forKey:@"title"]];
   _summaryRoot = [DataTree new];
-  [_summaryRoot addChild:today];
-  [_summaryRoot addChild:tomorrow];
-  [_summaryRoot addChild:soon];
+  [_summaryRoot addChild:_today];
+  [_summaryRoot addChild:_tomorrow];
+  [_summaryRoot addChild:_soon];
   [_summaryRoot addChild:_results];
 }
 
@@ -58,30 +58,27 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   Date *tomorrow = [Date date];
   Date *soonStart = [Date date];
   Date *soonEnd = [Date date];
-  DataTree *ttoday = [[_summaryRoot children] objectAtIndex:0];
-  DataTree *ttomorrow = [[_summaryRoot children] objectAtIndex:1];
-  DataTree *tsoon = [[_summaryRoot children] objectAtIndex:2];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   NSEnumerator *dayEnumerator;
   Event *event;
   Date *day;
 
-  [ttoday removeChildren];
-  [ttomorrow removeChildren];
-  [tsoon removeChildren];
+  [_today removeChildren];
+  [_tomorrow removeChildren];
+  [_soon removeChildren];
   [tomorrow incrementDay];
   [soonStart changeDayBy:2];
   [soonEnd changeDayBy:5];
   while ((event = [enumerator nextObject])) {
     if ([event isScheduledForDay:today])
-      [ttoday addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
+      [_today addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
-      [ttomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
+      [_tomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
     dayEnumerator = [soonStart enumeratorTo:soonEnd];
     /* FIXME : sort events by dates */
     while ((day = [dayEnumerator nextObject])) {
       if ([event isScheduledForDay:day])
-	[tsoon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:day]]];
+	[_soon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:day]]];
     }
   }
   [summary reloadData];
@@ -114,6 +111,10 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
   [_summaryRoot release];
+  [_today release];
+  [_tomorrow release];
+  [_soon release];
+  [_results release];
   RELEASE(_selectedDay);
   [_pc release];
   /* 

@@ -23,6 +23,9 @@
   BOOL _deleteSelection;
   Date *_selectedDay;
   DataTree *_summaryRoot;
+  DataTree *_today;
+  DataTree *_tomorrow;
+  DataTree *_soon;
   DataTree *_results;
 }
 
