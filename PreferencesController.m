@@ -19,6 +19,10 @@
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];
     [[minStepText cell] setFormatter:formatter];
+    RETAIN(globalPreferences);
+    RETAIN(storePreferences);
+    RETAIN(storeFactory);
+    [self selectItem:itemPopUp];
   }
   return self;
 }
@@ -26,6 +30,9 @@
 - (void)dealloc
 {
   RELEASE(_sm);
+  RELEASE(globalPreferences);
+  RELEASE(storePreferences);
+  RELEASE(storeFactory);
   [super dealloc];
 }
 
@@ -171,6 +178,21 @@
   }
   [storeName setStringValue:@""];
   [createButton setEnabled:NO];
+}
+
+-(void)selectItem:(id)sender
+{
+  switch ([sender indexOfSelectedItem]) {
+  case 0:
+    [slot setContentView:globalPreferences];
+    break;
+  case 1:
+    [slot setContentView:storePreferences];
+    break;
+  case 2:
+    [slot setContentView:storeFactory];
+    break;
+  }
 }
 
 -(void)controlTextDidChange:(NSNotification *)notification

@@ -22,6 +22,11 @@
   IBOutlet id storeClass;
   IBOutlet id storeName;
   IBOutlet id createButton;
+  IBOutlet NSBox *slot;
+  IBOutlet id globalPreferences;
+  IBOutlet id storePreferences;
+  IBOutlet id storeFactory;
+  IBOutlet id itemPopUp;
   StoreManager *_sm;
 }
 
@@ -38,5 +43,6 @@
 -(void)toggleWritable:(id)sender;
 -(void)removeStore:(id)sender;
 -(void)createStore:(id)sender;
+-(void)selectItem:(id)sender;
 
 @end

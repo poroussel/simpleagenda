@@ -1,4 +1,7 @@
-versio 0.28
+version 0.29
+	* Preferences dialog uses a popup to select categories
+
+version 0.28
 	* Simple text search
 
 version 0.27 (2007/09/18)

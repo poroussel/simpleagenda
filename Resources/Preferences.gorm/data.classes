@@ -6,6 +6,7 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
+	    "selectItem:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectStore:",
@@ -26,7 +27,8 @@
 	    "toggleDisplay:",
 	    "toggleWritable:",
 	    "removeStore:",
-	    "createStore:"
+	    "createStore:",
+	    "selectItem:"
 	);
 	Outlets = (
 	    panel,
@@ -44,7 +46,12 @@
 	    removeButton,
 	    storeClass,
 	    storeName,
-	    createButton
+	    createButton,
+	    slot,
+	    globalPreferences,
+	    itemPopUp,
+	    storeFactory,
+	    storePreferences
 	);
 	Super = NSObject;
     };
