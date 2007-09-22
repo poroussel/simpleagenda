@@ -88,6 +88,7 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [storeColor setColor:[store eventColor]];
+  [storeTextColor setColor:[store textColor]];
   [storeDisplay setState:[store displayed]];
   [storeWritable setState:[store isWritable]];
   if ([[defaultStorePopUp titleOfSelectedItem] isEqual:[store description]])
@@ -101,6 +102,13 @@
   NSColor *rgb = [[storeColor color] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setEventColor:rgb];
+}
+
+-(void)changeTextColor:(id)sender
+{
+  NSColor *rgb = [[storeTextColor color] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setTextColor:rgb];
 }
 
 -(void)changeStart:(id)sender

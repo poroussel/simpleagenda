@@ -20,6 +20,7 @@
 	Actions = (
 	    "selectStore:",
 	    "changeColor:",
+	    "changeTextColor:",
 	    "changeEnd:",
 	    "changeStart:",
 	    "changeStep:",
@@ -39,6 +40,7 @@
 	    minStep,
 	    minStepText,
 	    storeColor,
+	    storeTextColor,
 	    storePopUp,
 	    defaultStorePopUp,
 	    storeDisplay,
