@@ -23,6 +23,8 @@
 - (void)setIsWritable:(BOOL)writable;
 - (NSColor *)eventColor;
 - (void)setEventColor:(NSColor *)color;
+- (NSColor *)textColor;
+- (void)setTextColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
 @end

@@ -12,6 +12,7 @@
 {
   return [NSDictionary dictionaryWithObjectsAndKeys:
 			 [NSArchiver archivedDataWithRootObject:[NSColor yellowColor]], ST_COLOR,
+			 [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:YES], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       [NSNumber numberWithInt:CurrentVersion], ST_VERSION,
@@ -180,18 +181,26 @@
 
 - (NSColor *)eventColor
 {
-  NSColor *aColor = nil;
   NSData *theData =[_config objectForKey:ST_COLOR];
-
-  if (theData)
-    aColor = (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
-  return aColor;
+  return [NSUnarchiver unarchiveObjectWithData:theData];
 }
 
 - (void)setEventColor:(NSColor *)color
 {
   NSData *data = [NSArchiver archivedDataWithRootObject:color];
   [_config setObject:data forKey:ST_COLOR];
+}
+
+- (NSColor *)textColor
+{
+  NSData *theData =[_config objectForKey:ST_TEXT_COLOR];
+  return [NSUnarchiver unarchiveObjectWithData:theData];
+}
+
+- (void)setTextColor:(NSColor *)color
+{
+  NSData *data = [NSArchiver archivedDataWithRootObject:color];
+  [_config setObject:data forKey:ST_TEXT_COLOR];
 }
 
 - (BOOL)displayed

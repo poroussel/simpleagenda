@@ -15,6 +15,7 @@
   IBOutlet id minStepText;
   IBOutlet id storePopUp;
   IBOutlet id storeColor;
+  IBOutlet id storeTextColor;
   IBOutlet id defaultStorePopUp;
   IBOutlet id storeDisplay;
   IBOutlet id storeWritable;

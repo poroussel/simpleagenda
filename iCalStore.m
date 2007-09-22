@@ -121,6 +121,7 @@
 {
   return [NSDictionary dictionaryWithObjectsAndKeys:
 			 [NSArchiver archivedDataWithRootObject:[NSColor blueColor]], ST_COLOR,
+			 [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       nil, nil];
@@ -377,6 +378,18 @@
 {
   NSData *data = [NSArchiver archivedDataWithRootObject:color];
   [_config setObject:data forKey:ST_COLOR];
+}
+
+- (NSColor *)textColor
+{
+  NSData *theData =[_config objectForKey:ST_TEXT_COLOR];
+  return [NSUnarchiver unarchiveObjectWithData:theData];
+}
+
+- (void)setTextColor:(NSColor *)color
+{
+  NSData *data = [NSArchiver archivedDataWithRootObject:color];
+  [_config setObject:data forKey:ST_TEXT_COLOR];
 }
 
 - (BOOL)displayed

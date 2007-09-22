@@ -16,24 +16,18 @@
 @interface AppointmentView : NSView
 {
   Event *_apt;
-  NSDictionary *_textAttributes;
   BOOL _selected;
 }
-
 - (Event *)appointment;
-
 @end
 
 @implementation AppointmentView
-
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
 {
   self = [super initWithFrame:frameRect];
   if (self) {
     ASSIGN(_apt, apt);
     _selected = NO;
-    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor darkGrayColor]
-				     forKey:NSForegroundColorAttributeName] retain];
   }
   return self;
 }
@@ -41,7 +35,6 @@
 - (void)dealloc
 {
   RELEASE(_apt);
-  [_textAttributes release];
   [super dealloc];
 }
 
@@ -68,6 +61,8 @@
 				green:[color greenComponent] - 0.3
 				blue:[color blueComponent] - 0.3
 				alpha:[color alphaComponent]];
+  NSDictionary *textAttributes = [NSDictionary dictionaryWithObject:[[_apt store] textColor]
+					       forKey:NSForegroundColorAttributeName];
 
   if ([_apt allDay])
     title = [NSString stringWithFormat:@"All day : %@", [_apt title]];
@@ -83,7 +78,7 @@
   [darkColor set];
   if (![_apt allDay])
     NSRectFill(RedimRect(rect));
-  [label drawInRect:TextRect(rect) withAttributes:_textAttributes];
+  [label drawInRect:TextRect(rect) withAttributes:textAttributes];
   if (_selected) {
     [[NSColor grayColor] set];
     NSFrameRect(rect);
@@ -94,7 +89,6 @@
 {
   return _apt;
 }
-
 @end
 
 

@@ -11,6 +11,7 @@
 #define ST_CLASS @"storeClass"
 #define ST_FILE @"storeFilename"
 #define ST_COLOR @"storeColor"
+#define ST_TEXT_COLOR @"storeTextColor"
 #define ST_URL @"storeURL"
 #define ST_RW @"storeWritable"
 #define ST_REFRESH @"storeRefresh"
