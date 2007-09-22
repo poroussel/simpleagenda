@@ -33,6 +33,33 @@
 }
 @end
 
+@implementation Date(NSCoding)
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+  [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];
+}
+- (id)initWithCoder:(NSCoder *)coder
+{
+  /* Conversion from ChronographerSource Date format */
+  if ([coder containsValueForKey:@"year"]) {
+    int minute = abs([coder decodeIntForKey:@"minute"]);
+    _time = icaltime_null_time();
+    _time.year = [coder decodeIntForKey:@"year"];
+    _time.month = [coder decodeIntForKey:@"month"];
+    _time.day = [coder decodeIntForKey:@"day"];
+    _time.hour = minute / 60;
+    _time.minute = minute % 60;
+    _time = icaltime_normalize(_time);
+    icaltimezone *tz = icaltimezone_get_builtin_timezone([[[NSTimeZone localTimeZone] description] cString]);
+    _time = icaltime_set_timezone(&_time, tz);    
+  } else {
+    NSString *icalTime = [coder decodeObjectForKey:@"icalTime"];
+    _time = icaltime_from_string([icalTime cString]);
+  }
+  return self;
+}
+@end
+
 /*
  * Based on ChronographerSource Appointment class
  */
@@ -55,56 +82,31 @@
   return icaltime_compare(_time, ((Date *)aDate)->_time);
 }
 
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-  [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];
-}
-
 - (NSString *)description
 {
   return [NSString stringWithCString:icaltime_as_ical_string(_time)];
 }
 
-- (id)initWithCoder:(NSCoder *)coder
-{
-  /* Conversion from ChronographerSource Date format */
-  if ([coder containsValueForKey:@"year"]) {
-    int minute = abs([coder decodeIntForKey:@"minute"]);
-    _time = icaltime_null_time();
-    _time.year = [coder decodeIntForKey:@"year"];
-    _time.month = [coder decodeIntForKey:@"month"];
-    _time.day = [coder decodeIntForKey:@"day"];
-    _time.hour = minute / 60;
-    _time.minute = minute % 60;
-    _time = icaltime_normalize(_time);
-    icaltimezone *tz = icaltimezone_get_builtin_timezone([[[NSTimeZone localTimeZone] description] cString]);
-    _time = icaltime_set_timezone(&_time, tz);    
-  } else {
-    NSString *icalTime = [coder decodeObjectForKey:@"icalTime"];
-    _time = icaltime_from_string([icalTime cString]);
-  }
-  return self;
-}
 
-
-- (id)init
+- (id)initWithTime:(BOOL)time
 {
   self = [super init];
   if (self) {
-    NSCalendarDate *cd = [NSCalendarDate calendarDate];
-    icaltimezone *tz = icaltimezone_get_builtin_timezone([[[cd timeZone] description] cString]);
-    _time = icaltime_null_time();
-    _time = icaltime_set_timezone(&_time, tz);    
-    /* FIXME : use icaltime_current_time_with_zone and sort timezone mess */
-    _time.year = [cd yearOfCommonEra];
-    _time.month = [cd monthOfYear];
-    _time.day = [cd dayOfMonth];
-    _time.hour = [cd hourOfDay];
-    _time.minute = [cd minuteOfHour];
-    _time.second = [cd secondOfMinute];
+    if (time) {
+      NSCalendarDate *cd = [NSCalendarDate calendarDate];
+      icaltimezone *tz = icaltimezone_get_builtin_timezone([[[cd timeZone] description] cString]);
+      _time = icaltime_current_time_with_zone(tz);
+    } else
+      _time = icaltime_today();
   }
   return self;
 }
+
+- (id)init
+{
+  return [self initWithTime:YES];
+}
+
 
 /* FIXME : rename this 'now' and create a 'today' */
 + (id)date
@@ -289,7 +291,6 @@
   e = [e initWithStart:self end:end];
   return AUTORELEASE(e);
 }
-
 @end
 
 @implementation Date(iCalendar)

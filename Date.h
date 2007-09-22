@@ -3,7 +3,7 @@
 #import <Foundation/Foundation.h>
 #import <ical.h>
 
-@interface Date : NSObject <NSCoding, NSCopying>
+@interface Date : NSObject
 {
   struct icaltimetype _time;
 }
@@ -31,9 +31,9 @@
 - (int)yearsUntil:(Date *)date;
 - (int)yearSince:(Date *)date;
 - (void)setMinute:(int)minute;
-- (void)setDay:(int)minute;
-- (void)setMonth:(int)minute;
-- (void)setYear:(int)minute;
+- (void)setDay:(int)day;
+- (void)setMonth:(int)month;
+- (void)setYear:(int)year;
 - (void)incrementDay;
 - (void)changeYearBy:(int)diff;
 - (void)changeDayBy:(int)diff;
