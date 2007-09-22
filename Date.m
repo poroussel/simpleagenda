@@ -90,14 +90,19 @@
 
 - (id)initWithTime:(BOOL)time
 {
+  const char *tzone;
+  icaltimezone *tz, *utc;
+
   self = [super init];
   if (self) {
-    if (time) {
-      NSCalendarDate *cd = [NSCalendarDate calendarDate];
-      icaltimezone *tz = icaltimezone_get_builtin_timezone([[[cd timeZone] description] cString]);
-      _time = icaltime_current_time_with_zone(tz);
-    } else
+    tzone = [[[[NSCalendarDate calendarDate] timeZone] description] cString];
+    tz = icaltimezone_get_builtin_timezone(tzone);
+    utc = icaltimezone_get_utc_timezone();
+    if (time)
+      _time = icaltime_current_time_with_zone(NULL);
+    else
       _time = icaltime_today();
+    icaltimezone_convert_time(&_time, utc, tz);
   }
   return self;
 }
