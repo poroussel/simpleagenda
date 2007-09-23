@@ -1,7 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "Event.h"
-#import "ConfigManager.h"
 
 @interface StoreManager : NSObject
 {
