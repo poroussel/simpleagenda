@@ -285,6 +285,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [summary reloadData];
     [summary expandItem:_results];
   }
+  [window makeFirstResponder:search];
 }
 
 - (void)clearSearch:(id)sender
@@ -293,6 +294,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_results removeChildren];
   [_results setValue:@"" forKey:@"details"];;
   [summary reloadData];
+  [window makeFirstResponder:search];
 }
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
