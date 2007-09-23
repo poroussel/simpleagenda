@@ -140,8 +140,7 @@
 
 -(void)selectDefaultStore:(id)sender
 {
-  id <AgendaStore> store = [_sm storeForName:[defaultStorePopUp titleOfSelectedItem]];
-  [[ConfigManager globalConfig] setObject:[store description] forKey:ST_DEFAULT];
+  [_sm setDefaultStore:[defaultStorePopUp titleOfSelectedItem]];
 }
 
 -(void)toggleDisplay:(id)sender

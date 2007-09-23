@@ -3,7 +3,7 @@
 #import "Event.h"
 #import "ConfigManager.h"
 
-@interface StoreManager : NSObject <ConfigListener>
+@interface StoreManager : NSObject
 {
   NSMutableDictionary *_backends;
   NSMutableDictionary *_stores;

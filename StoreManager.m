@@ -29,18 +29,13 @@
   NSString *defaultStore;
   NSEnumerator *enumerator;
   NSString *stname;
+  ConfigManager *config = [ConfigManager globalConfig];
 
   self = [super init];
   if (self) {
-    [[ConfigManager globalConfig] registerDefaults:[self defaults]];
-    /* 
-     * FIXME : this takes a reference on self with prevents
-     * [_sm release] in AppController to properly release it
-     */
-    [[ConfigManager globalConfig] registerClient:self forKey:ST_DEFAULT];
-    storeArray = [[ConfigManager globalConfig] objectForKey:STORES];
-    defaultStore = [[ConfigManager globalConfig] objectForKey:ST_DEFAULT];
-
+    [config registerDefaults:[self defaults]];
+    storeArray = [config objectForKey:STORES];
+    defaultStore = [config objectForKey:ST_DEFAULT];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     _backends = [[NSMutableDictionary alloc] initWithCapacity:2];
     [self registerBackend:[LocalStore class]];
@@ -60,17 +55,11 @@
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_defaultStore);
   RELEASE(_delegate);
   [_stores release];
   [_backends release];
   [super dealloc];
-}
-
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
-{
-  [self setDefaultStore:[[ConfigManager globalConfig] objectForKey:ST_DEFAULT]];
 }
 
 - (void)registerBackend:(Class)type
@@ -125,8 +114,10 @@
 - (void)setDefaultStore:(NSString *)name
 {
   id st = [self storeForName:name];
-  if (st != nil)
+  if (st != nil) {
     ASSIGN(_defaultStore, st);
+    [[ConfigManager globalConfig] setObject:name forKey:ST_DEFAULT];
+  }
 }
 
 - (id <AgendaStore>)defaultStore
