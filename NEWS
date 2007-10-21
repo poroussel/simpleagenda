@@ -2,6 +2,7 @@ version 0.29
 	* Preferences dialog uses a popup to select categories (r276)
 	* Events text color selectable in store preferences
 	* Fix time zone bugs
+	* Fix iCal authenticated loading 
 
 version 0.28
 	* Simple text search

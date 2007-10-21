@@ -87,6 +87,7 @@
 
   [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
   data = [_url resourceDataUsingCache:NO];
+  [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
   if (data) {
     parser = [GSXMLParser parserWithData:data];
     if ([parser parse]) {
@@ -161,7 +162,8 @@
 
 - (void)fetchData
 {
-  [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:_url] delegate:self];
+  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
+  [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
 }
 
 - (id)initWithName:(NSString *)name
@@ -403,41 +405,46 @@
   [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+@end
+
+
+@implementation iCalStore(NSURLClient)
+
+- (void)URL:(NSURL *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
 {
-  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
+  [_retrievedData appendData:newBytes];
+}
+- (void)URL:(NSURL *)sender resourceDidFailLoadingWithReason:(NSString *)reason
+{
+  NSLog(@"resourceDidFailLoadingWithReason %@", reason);
+  [_retrievedData release];
+}
+- (void)URLResourceDidCancelLoading:(NSURL *)sender
+{
+  NSLog(@"URLResourceDidCancelLoading");
+  [_retrievedData release];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-  [_retrievedData appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+- (void)URLResourceDidFinishLoading:(NSURL *)sender
 {
   NSSet *items;
   NSString *text;
   NSEnumerator *enumerator;
   Event *apt;
 
-  if (_retrievedData) {
-    text = [[NSString alloc] initWithData:_retrievedData encoding:NSUTF8StringEncoding];
-    if (text && [_tree parseString:text]) {
-      items = [_tree events];
-      [items makeObjectsPerform:@selector(setStore:) withObject:self];
-      enumerator = [items objectEnumerator];
-      while ((apt = [enumerator nextObject]))
-	[_data setValue:apt forKey:[apt UID]];
-      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
-      [text release];
-      [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-    } else
-      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-    [_retrievedData release];
-    _retrievedData = nil;
+  text = [[NSString alloc] initWithData:_retrievedData encoding:NSUTF8StringEncoding];
+  if (text && [_tree parseString:text]) {
+    items = [_tree events];
+    [items makeObjectsPerform:@selector(setStore:) withObject:self];
+    enumerator = [items objectEnumerator];
+    while ((apt = [enumerator nextObject]))
+      [_data setValue:apt forKey:[apt UID]];
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
+    [text release];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   } else
-    NSLog(@"No data available from %@", [_url absoluteString]);
-  [connection release];
+    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  [_retrievedData release];
 }
 
 @end
