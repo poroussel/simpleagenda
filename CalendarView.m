@@ -13,6 +13,10 @@
   delegate = nil;
   [boldFont release];
   [normalFont release];
+  [title release];
+  [matrix release];
+  [button release];
+  [stepper release];
   [super dealloc];
 }
 
@@ -50,6 +54,14 @@
     boldFont = [NSFont boldSystemFontOfSize: 0];
     normalFont = [NSFont systemFontOfSize: 0];
     delegate = nil;
+
+    title = [[NSTextField alloc] initWithFrame: NSMakeRect(120, 200, 100, 20)];
+    [title setEditable:NO];
+    [title setDrawsBackground:NO];
+    [title setBezeled:NO];
+    [title setBordered:NO];
+    [title setSelectable:NO];
+    [self addSubview: title];
 
     button = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 170, 100, 25)];
     [button addItemsWithTitles: months];
@@ -103,7 +115,7 @@
     [white release];
     [self addSubview: matrix];
 
-    [self setTitlePosition:NSBelowTop];
+    //[self setTitlePosition:NSBelowTop];
     now = [Date date];
     [self setDate:now];
     [now incrementDay];
@@ -121,7 +133,7 @@
 
 - (void)updateTitle
 {
-  [self setTitle:[self dateAsString]];
+  [title setStringValue:[self dateAsString]];
 }
 
 - (void)clearSelectedDay

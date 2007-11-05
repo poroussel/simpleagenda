@@ -2,17 +2,18 @@
 
 #import <AppKit/AppKit.h>
 
-@interface CalendarView : NSBox
+@interface CalendarView : NSView
 {
-	Date *date;
-	NSPopUpButton *button;
-	NSStepper *stepper;
-	NSTextField *text;
-	NSMatrix *matrix;
-	NSFont *normalFont;
-	NSFont *boldFont;
-	IBOutlet id delegate;
-        NSTimer *_dayTimer;
+  NSTextField *title;
+  Date *date;
+  NSPopUpButton *button;
+  NSStepper *stepper;
+  NSTextField *text;
+  NSMatrix *matrix;
+  NSFont *normalFont;
+  NSFont *boldFont;
+  IBOutlet id delegate;
+  NSTimer *_dayTimer;
 }
 
 - (id)initWithFrame:(NSRect)frame;
