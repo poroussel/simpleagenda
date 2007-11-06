@@ -55,7 +55,7 @@
     normalFont = [NSFont systemFontOfSize: 0];
     delegate = nil;
 
-    title = [[NSTextField alloc] initWithFrame: NSMakeRect(120, 200, 100, 20)];
+    title = [[NSTextField alloc] initWithFrame: NSMakeRect(122, 164, 100, 20)];
     [title setEditable:NO];
     [title setDrawsBackground:NO];
     [title setBezeled:NO];
@@ -63,18 +63,18 @@
     [title setSelectable:NO];
     [self addSubview: title];
 
-    button = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 170, 100, 25)];
+    button = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 162, 100, 25)];
     [button addItemsWithTitles: months];
     [button setTarget: self];
     [button setAction: @selector(selectMonth:)];
     [self addSubview: button];
 
-    text = [[NSTextField alloc] initWithFrame: NSMakeRect(202, 172, 60, 21)];
+    text = [[NSTextField alloc] initWithFrame: NSMakeRect(202, 164, 60, 21)];
     [text setEditable: NO];
     [text setAlignment: NSRightTextAlignment];
     [self addSubview: text];
 
-    stepper = [[NSStepper alloc] initWithFrame: NSMakeRect(266, 170, 16, 25)];
+    stepper = [[NSStepper alloc] initWithFrame: NSMakeRect(266, 162, 16, 25)];
     [stepper setMinValue: 1970];
     [stepper setMaxValue: 2037];
     [stepper setTarget: self];
