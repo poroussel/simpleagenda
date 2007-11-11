@@ -156,13 +156,13 @@
     [_delegate dataChangedInStoreManager:self];
 }
 
-- (id <AgendaStore>)storeContainingEvent:(Event *)event
+- (id <AgendaStore>)storeContainingElement:(Element *)elt
 {
   NSEnumerator *enumerator = [_stores objectEnumerator];
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store contains:[event UID]])
+    if ([store contains:elt])
       return store;
   return nil;
 }
@@ -177,6 +177,15 @@
     [all addObjectsFromArray:[store events]];
   return all;
 }
+- (NSArray *)allTasks;
+{
+  NSMutableArray *all = [NSMutableArray arrayWithCapacity:128];
+  NSEnumerator *enumerator = [_stores objectEnumerator];
+  id <AgendaStore> store;
 
+  while ((store = [enumerator nextObject]))
+    [all addObjectsFromArray:[store tasks]];
+  return all;
+}
 @end
 

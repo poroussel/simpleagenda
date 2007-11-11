@@ -5,6 +5,7 @@
 #import "StoreManager.h"
 #import "AppController.h"
 #import "Event.h"
+#import "Task.h"
 #import "PreferencesController.h"
 #import "iCalTree.h"
 
@@ -43,7 +44,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [date setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
   [attributes setValue:[date copy] forKey:@"date"];
-  [attributes setValue:[event title] forKey:@"title"];
+  [attributes setValue:[event summary] forKey:@"title"];
   if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
   else
@@ -91,6 +92,7 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     ASSIGNCOPY(_selectedDay, [Date date]);
     _selection = nil;
     _editor = [AppointmentEditor new];
+    _taskEditor = [TaskEditor new];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     [_sm setDelegate:self];
@@ -103,9 +105,27 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+  NSPopUpButtonCell *cell = [NSPopUpButtonCell new];
+  [cell addItemsWithTitles:[Task stateNamesArray]];
+  [[taskView tableColumnWithIdentifier:@"state"] setDataCell:cell];
+  [taskView setAutoresizesAllColumnsToFit:YES];
+  /* 
+   * FIXME : this shouldn't be needed but I can't make it
+   * work by editing the interface with Gorm...
+   * [[taskView superview] superview] is the ScrollView
+   */
+  [[[[taskView superview] superview] superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+  [taskView setUsesAlternatingRowBackgroundColors:YES];
+  [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:92];
+  [taskView setTarget:self];
+  [taskView setDoubleAction:@selector(editAppointment:)];
+  [summary setAutoresizesAllColumnsToFit:YES];
+  [summary setAutosaveName:@"summary"];
+  [summary setAutosaveTableColumns:YES];
+  [summary setTarget:self];
+  [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
   [dayView reloadData];
-  [summary sizeToFit];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
@@ -115,7 +135,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_tomorrow release];
   [_soon release];
   [_results release];
-  RELEASE(_selectedDay);
   [_pc release];
   /* 
    * Ugly workaround : [_sm release] should force the
@@ -125,6 +144,8 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [_sm synchronise];
   [_sm release];
   [_editor release];
+  [_taskEditor release];
+  RELEASE(_selectedDay);
 }
 
 
@@ -134,19 +155,23 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   NSFileManager *fm = [NSFileManager defaultManager];
   NSEnumerator *eventEnum;
   id <AgendaStore> store;
-  Event *event;
+  Element *elt;
   iCalTree *tree;
 
   if ([fm isReadableFileAtPath:filename]) {
     tree = [iCalTree new];
     [tree parseString:[NSString stringWithContentsOfFile:filename]];
-    eventEnum = [[tree events] objectEnumerator];
-    while ((event = [eventEnum nextObject])) {
-      store = [_sm storeContainingEvent:event];
+    eventEnum = [[tree components] objectEnumerator];
+    while ((elt = [eventEnum nextObject])) {
+      store = [_sm storeContainingElement:elt];
       if (store)
-	[store update:[event UID] with:event];
-      else
-	[[_sm defaultStore] add:event];
+	[store update:elt];
+      else {
+	if ([elt isKindOfClass:[Event class]])
+	  [[_sm defaultStore] addEvent:(Event *)elt];
+	else
+	  [[_sm defaultStore] addTask:(Task *)elt];
+      }
     }
     [tree release];
     return YES;
@@ -176,11 +201,6 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   return [dayView firstHour] * 60;
 }
 
-- (void)_editAppointment:(Event *)apt
-{
-  [_editor editAppointment:apt withStoreManager:_sm];
-}
-
 - (void)addAppointment:(id)sender
 {
   Date *date = [[calendar date] copy];
@@ -192,37 +212,48 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     [_editor editAppointment:apt withStoreManager:_sm];
   [date release];
   [apt release];
+  [tabs selectTabViewItemWithIdentifier:@"Day"];
+}
+
+- (void)addTask:(id)sender
+{
+  Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
+  if (task)
+    [_taskEditor editTask:task withStoreManager:_sm];
+  [task release];
+  [tabs selectTabViewItemWithIdentifier:@"Tasks"];
 }
 
 - (void)editAppointment:(id)sender
 {
-  Event *apt = [dayView selectedAppointment];
-
-  if (apt)
-    [self _editAppointment:apt];
+  if (_clickedElement) {
+    if ([_clickedElement isKindOfClass:[Event class]])
+      [_editor editAppointment:(Event *)_clickedElement withStoreManager:_sm];
+    else
+      [_taskEditor editTask:(Task *)_clickedElement withStoreManager:_sm];
+  }
 }
 
 - (void)delAppointment:(id)sender
 {
-  Event *apt = [dayView selectedAppointment];
-
-  if (apt)
-    [[apt store] remove:[apt UID]];
+  if (_clickedElement) {
+    [[_clickedElement store] remove:_clickedElement];
+    _clickedElement = nil;
+  }
 }
 
 - (void)exportAppointment:(id)sender;
 {
-  Event *apt = [dayView selectedAppointment];
   NSSavePanel *panel = [NSSavePanel savePanel];
   NSString *str;
   iCalTree *tree;
 
-  if (apt) {
+  if (_clickedElement) {
     [panel setRequiredFileType:@"ics"];
     [panel setTitle:@"Export As"];
     if ([panel runModal] == NSOKButton) {
       tree = [iCalTree new];
-      [tree add:apt];
+      [tree add:_clickedElement];
       str = [tree iCalTreeAsString];
       if (![str writeToFile:[panel filename] atomically:NO])
 	NSLog(@"Unable to write to file %@", [panel filename]);
@@ -238,13 +269,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (void)copy:(id)sender
 {
-  _selection = [dayView selectedAppointment];
+  _selection = (Event *)_clickedElement;
   _deleteSelection = NO;
 }
 
 - (void)cut:(id)sender
 {
-  _selection = [dayView selectedAppointment];
+  _selection = (Event *)_clickedElement;
   _deleteSelection = YES;
 }
 
@@ -255,14 +286,14 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
       [_selection setStartDate:date];
-      [[_selection store] update:[_selection UID] with:_selection];
+      [[_selection store] update:_selection];
       _selection = nil;
     } else {
       Event *new = [_selection copy];
       [new generateUID];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date];
-      [[_selection store] add:new];
+      [[_selection store] addEvent:new];
       [new release];
     }
     [date release];
@@ -299,13 +330,13 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
-  BOOL itemSelected = [dayView selectedAppointment] != nil;
+  BOOL itemSelected = _clickedElement != nil;
   SEL action = [menuItem action];
 
   if (sel_eq(action, @selector(copy:)))
-    return itemSelected;
+    return itemSelected && [_clickedElement isKindOfClass:[Event class]];
   if (sel_eq(action, @selector(cut:)))
-    return itemSelected;
+    return itemSelected && [_clickedElement isKindOfClass:[Event class]];
   if (sel_eq(action, @selector(editAppointment:)))
     return itemSelected;
   if (sel_eq(action, @selector(delAppointment:)))
@@ -339,19 +370,16 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
     return [[_summaryRoot children] count];
   return [[item children] count];
 }
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
   return [[item children] count] > 0;
 }
-
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
 {
   if (item == nil)
     return [[_summaryRoot children] objectAtIndex:index];
   return [[item children] objectAtIndex:index];
 }
-
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
   return [item valueForKey:[tableColumn identifier]];
@@ -364,7 +392,9 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   id object = [item valueForKey:@"object"];
 
   if (object && [object isKindOfClass:[Event class]]) {
+    _clickedElement = object;
     [calendar setDate:[item valueForKey:@"date"]];
+    [tabs selectTabViewItemWithIdentifier:@"Day"];
     return YES;
   }
   return NO;
@@ -386,16 +416,11 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
 @implementation AppController(DayViewDelegate)
 - (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
-  /*
-   * FIXME : we should allow to view appointment's 
-   * details even if it's read only
-   */
-  if ([[event store] isWritable])
-    [self _editAppointment:event];
+  [_editor editAppointment:event withStoreManager:_sm];
 }
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
-  [[event store] update:[event UID] with:event];
+  [[event store] update:event];
 }
 - (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end
 {
@@ -409,12 +434,62 @@ NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
   [date release];
   [apt release];
 }
+- (void)dayView:(DayView *)dayview selectEvent:(Event *)event
+{
+  _clickedElement = event;
+}
 @end
 
 @implementation AppController(StoreManagerDelegate)
 - (void)dataChangedInStoreManager:(StoreManager *)sm
 {
   [dayView reloadData];
+  [taskView reloadData];
   [self updateSummaryData];
 }
 @end
+
+@implementation AppController(NSTableDataSource)
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+  return [[_sm allTasks] count];
+}
+- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)operation
+{
+  return NO;
+}
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+  Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
+
+  if ([[aTableColumn identifier] isEqualToString:@"summary"])
+    return [task summary];
+  return [NSNumber numberWithInt:[task state]];
+}
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+  Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
+
+  if ([[task store] isWritable]) {
+    [task setState:[anObject intValue]];
+    [[task store] update:task];
+  }
+}
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+  Task *task;
+
+  if ([[aTableColumn identifier] isEqualToString:@"state"]) {
+    task = [[_sm allTasks] objectAtIndex:rowIndex];
+    [aCell setEnabled:[[task store] isWritable]];
+  }
+}
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+  int index = [taskView clickedRow];
+
+  if (index > -1)
+    _clickedElement = [[_sm allTasks] objectAtIndex:index];
+}
+@end
+

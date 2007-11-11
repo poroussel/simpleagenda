@@ -1,4 +1,6 @@
 #import "iCalTree.h"
+#import "Event.h"
+#import "Task.h"
 
 @implementation iCalTree
 
@@ -44,10 +46,11 @@
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
 }
 
-- (NSSet *)events
+- (NSSet *)components
 {
   icalcomponent *ic;
   Event *ev;
+  Task *task;
   NSMutableSet *work = [NSMutableSet setWithCapacity:32];
 
   for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT); 
@@ -56,17 +59,24 @@
     if (ev)
       [work addObject:ev];
   }
+  for (ic = icalcomponent_get_first_component(root, ICAL_VTODO_COMPONENT); 
+       ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VTODO_COMPONENT)) {
+    task = [[Task alloc] initWithICalComponent:ic];
+    if (task)
+      [work addObject:task];
+  }
   return [NSSet setWithSet:work];
 }
 
-- (icalcomponent *)componentForEvent:(Event *)evt
+- (icalcomponent *)componentForEvent:(Element *)elt
 {
-  NSString *uid = [evt UID];
+  NSString *uid = [elt UID];
   icalcomponent *ic;
   icalproperty *prop;
+  int type = [elt iCalComponentType];
 
-  for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT); 
-       ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VEVENT_COMPONENT)) {
+  for (ic = icalcomponent_get_first_component(root, type); 
+       ic != NULL; ic = icalcomponent_get_next_component(root, type)) {
     prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
     if (prop) {
       if ([uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
@@ -76,39 +86,33 @@
   return NULL;
 }
 
-- (BOOL)add:(Event *)event
+- (BOOL)add:(Element *)elt
 {
-  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
-  if (!ic) {
-    NSLog(@"Couldn't create iCalendar component");
+  icalcomponent *ic = [elt asICalComponent];
+  if (!ic)
     return NO;
-  }
-  if ([event updateICalComponent:ic]) {
-    icalcomponent_add_component(root, ic);
-    return YES;
-  }
-  icalcomponent_free(ic);
-  return NO;
+  icalcomponent_add_component(root, ic);
+  return YES;
 }
 
-- (BOOL)remove:(Event *)event
+- (BOOL)remove:(Element *)elt
 {
-  icalcomponent *ic = [self componentForEvent:event];
+  icalcomponent *ic = [self componentForEvent:elt];
   if (!ic) {
-    NSLog(@"iCalendar component not found");
+    NSLog(@"iCalTree remove : iCalendar component not found");
     return NO;
   }
   icalcomponent_remove_component(root, ic);
   return YES;
 }
 
-- (BOOL)update:(Event *)event
+- (BOOL)update:(Element *)elt
 {
-  icalcomponent *ic = [self componentForEvent:event];
+  icalcomponent *ic = [self componentForEvent:elt];
   if (!ic) {
-    NSLog(@"iCalendar component not found");
+    NSLog(@"iCalTree update : iCalendar component not found");
     return NO;
   }
-  return [event updateICalComponent:ic];
+  return [elt updateICalComponent:ic];
 }
 @end

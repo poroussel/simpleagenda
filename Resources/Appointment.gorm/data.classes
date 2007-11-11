@@ -15,7 +15,8 @@
 	    endDateStepper,
 	    location,
 	    store,
-	    allDay
+	    allDay,
+	    ok
 	);
 	Super = NSWindowController;
     };

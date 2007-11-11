@@ -9,14 +9,17 @@
 	    "exportAppointment:",
 	    "saveAll:",
 	    "doSearch:",
-	    "clearSearch:"
+	    "clearSearch:",
+	    "addTask:"
 	);
 	Outlets = (
 	    calendar,
 	    dayView,
 	    summary,
 	    window,
-	    search
+	    search,
+	    taskView,
+	    tabs
 	);
 	Super = NSObject;
     };
@@ -51,12 +54,13 @@
     FirstResponder = {
 	Actions = (
 	    "addAppointment:",
+	    "clearSearch:",
 	    "createOrEditAnAppointment:",
 	    "delAppointment:",
 	    "doSearch:",
 	    "editAppointment:",
 	    "exportAppointment:",
-	    "clearSearch:",
+	    "addTask:",
 	    "orderFrontFontPanel:",
 	    "saveAll:",
 	    "setDataSource:",

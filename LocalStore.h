@@ -7,9 +7,11 @@
 {
   ConfigManager *_config;
   NSMutableDictionary *_data;
+  NSMutableDictionary *_tasks;
   BOOL _modified;
   NSString *_globalPath;
   NSString *_globalFile;
+  NSString *_globalTaskFile;
   NSString *_name;
   BOOL _displayed;
   BOOL _writable;

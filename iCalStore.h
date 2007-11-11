@@ -21,6 +21,7 @@
   iCalTree *_tree;
   ConfigManager *_config;
   NSMutableDictionary *_data;
+  NSMutableDictionary *_tasks;
   NSString *_name;
   NSURL *_url;
   NSDate *_lastModified;

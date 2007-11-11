@@ -16,6 +16,7 @@
   id location;
   id store;
   id allDay;
+  id ok;
 }
 
 - (BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm;

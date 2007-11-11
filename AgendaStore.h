@@ -4,7 +4,9 @@
 
 #define SADataChangedInStore @"DataDidChangedInStore"
 
+@class Element;
 @class Event;
+@class Task;
 
 @protocol AgendaStore <NSObject>
 + (id)storeNamed:(NSString *)name;
@@ -12,10 +14,12 @@
 + (NSString *)storeTypeName;
 - (NSEnumerator *)enumerator;
 - (NSArray *)events;
-- (void)add:(Event *)evt;
-- (void)remove:(NSString *)uid;
-- (void)update:(NSString *)uid with:(Event *)evt;
-- (BOOL)contains:(NSString *)uid;
+- (NSArray *)tasks;
+- (void)addEvent:(Event *)evt;
+- (void)addTask:(Task *)task;
+- (void)remove:(Element *)elt;
+- (void)update:(Element *)evt;
+- (BOOL)contains:(Element *)elt;
 - (BOOL)modified;
 - (BOOL)read;
 - (BOOL)write;

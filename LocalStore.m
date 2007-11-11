@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #import "LocalStore.h"
 #import "Event.h"
+#import "Task.h"
 #import "defines.h"
 
 #define CurrentVersion 2
@@ -31,8 +32,11 @@
     filename = [_config objectForKey:ST_FILE];
     _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
+    _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
+    NSLog([_globalTaskFile description]);
     _modified = NO;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
+    _tasks = [[NSMutableDictionary alloc] initWithCapacity:16];
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     [self read];
@@ -64,7 +68,9 @@
 {
   [self write];
   [_data release];
+  [_tasks release];
   [_globalFile release];
+  [_globalTaskFile release];
   [_name release];
   [_config release];
   [super dealloc];
@@ -79,34 +85,55 @@
 {
   return [_data allValues];
 }
-
--(void)add:(Event *)app
+- (NSArray *)tasks
 {
-  [app setStore:self];
-  [_data setValue:app forKey:[app UID]];
-  _modified = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  return [_tasks allValues];
 }
 
--(void)remove:(NSString *)uid
-{
-  [_data removeObjectForKey:uid];
-  _modified = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-}
-
-- (void)update:(NSString *)uid with:(Event *)evt;
+-(void)addEvent:(Event *)evt
 {
   [evt setStore:self];
-  [_data removeObjectForKey:uid];
   [_data setValue:evt forKey:[evt UID]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
-
-- (BOOL)contains:(NSString *)uid
+-(void)addTask:(Task *)task
 {
-  return [_data objectForKey:uid] != nil;
+  [task setStore:self];
+  [_tasks setValue:task forKey:[task UID]];
+  _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+}
+
+-(void)remove:(Element *)elt
+{
+  if ([elt isKindOfClass:[Event class]])
+    [_data removeObjectForKey:[elt UID]];
+  else
+    [_tasks removeObjectForKey:[elt UID]];
+  _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+}
+
+- (void)update:(Element *)elt;
+{
+  [elt setStore:self];
+  if ([elt isKindOfClass:[Event class]]) {
+    [_data removeObjectForKey:[elt UID]];
+    [_data setValue:elt forKey:[elt UID]];
+  } else {
+    [_tasks removeObjectForKey:[elt UID]];
+    [_tasks setValue:elt forKey:[elt UID]];
+  }  
+  _modified = YES;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+}
+
+- (BOOL)contains:(Element *)elt
+{
+  if ([elt isKindOfClass:[Event class]])
+    return [_data objectForKey:[elt UID]] != nil;
+  return [_tasks objectForKey:[elt UID]] != nil;
 }
 
 -(BOOL)isWritable
@@ -116,8 +143,6 @@
 
 - (void)setIsWritable:(BOOL)writable
 {
-  if (!writable)
-    [self write];
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
@@ -133,6 +158,7 @@
   NSSet *savedData;
   NSEnumerator *enumerator;
   Event *evt;
+  Task *task;
   BOOL isDir;
   int version;
 
@@ -148,8 +174,9 @@
     if (savedData) {
       [savedData makeObjectsPerform:@selector(setStore:) withObject:self];
       enumerator = [savedData objectEnumerator];
-      while ((evt = [enumerator nextObject]))
+      while ((evt = [enumerator nextObject])) {
 	[_data setValue:evt forKey:[evt UID]];
+      }
       NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_data count]);
       version = [_config integerForKey:ST_VERSION];
       if (version < CurrentVersion) {
@@ -158,13 +185,25 @@
       }
     }
   }
+  if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {
+    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];       
+    if (savedData) {
+      [savedData makeObjectsPerform:@selector(setStore:) withObject:self];
+      enumerator = [savedData objectEnumerator];
+      while ((task = [enumerator nextObject]))
+	[_tasks setValue:task forKey:[task UID]];
+      NSLog(@"LocalStore from %@ : loaded %d tasks(s)", _globalTaskFile, [_tasks count]);
+    }
+  }
   return YES;
 }
 
 - (BOOL)write
 {
   NSSet *set = [NSSet setWithArray:[_data allValues]];
-  if ([NSKeyedArchiver archiveRootObject:set toFile:_globalFile]) {
+  NSSet *tasks = [NSSet setWithArray:[_tasks allValues]];
+  if ([NSKeyedArchiver archiveRootObject:set toFile:_globalFile] && 
+      [NSKeyedArchiver archiveRootObject:tasks toFile:_globalTaskFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
     _modified = NO;
     return YES;

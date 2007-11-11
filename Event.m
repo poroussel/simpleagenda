@@ -8,8 +8,7 @@
 @implementation Event(NSCoding)
 -(void)encodeWithCoder:(NSCoder *)coder
 {
-  [coder encodeObject:title forKey:@"title"];
-  [coder encodeObject:[descriptionText string] forKey:@"descriptionText"];
+  [super encodeWithCoder:coder];
   [coder encodeObject:startDate forKey:@"sdate"];
   [coder encodeObject:endDate forKey:@"edate"];
   [coder encodeInt:interval forKey:@"interval"];
@@ -18,13 +17,10 @@
   [coder encodeInt:scheduleLevel forKey:@"scheduleLevel"];
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
-  [coder encodeObject:_uid forKey:@"uid"];
 }
-
 -(id)initWithCoder:(NSCoder *)coder
 {
-  title = [[coder decodeObjectForKey:@"title"] retain];
-  descriptionText = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
+  [super initWithCoder:coder];
   startDate = [[coder decodeObjectForKey:@"sdate"] retain];
   endDate = [[coder decodeObjectForKey:@"edate"] retain];
   interval = [coder decodeIntForKey:@"interval"];
@@ -36,13 +32,8 @@
     _allDay = [coder decodeBoolForKey:@"allDay"];
   else
     _allDay = NO;
-  if ([coder containsValueForKey:@"uid"])
-    _uid = [[coder decodeObjectForKey:@"uid"] retain];
-  else
-    [self generateUID];
   return self;
 }
-
 @end
 
 @implementation Event
@@ -56,22 +47,18 @@
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle
 {
-  [self init];
-  [self setStartDate:start];
-  [self setTitle:aTitle];
-  [self setDuration:minutes];
-  [self generateUID];
+  self = [self initWithSummary:aTitle];
+  if (self) {
+    [self setStartDate:start];
+    [self setDuration:minutes];
+  }
   return self;
 }
 
 - (void)dealloc
 {
   [super dealloc];
-  RELEASE(title);
-  RELEASE(descriptionText);
-  RELEASE(_store);
   RELEASE(_location);
-  RELEASE(_uid);
   RELEASE(startDate);
   RELEASE(endDate);
 }
@@ -123,16 +110,6 @@
   return NO;
 }
 
-- (id <AgendaStore>)store
-{
-  return _store;
-}
-
-- (void)setStore:(id <AgendaStore>)store
-{
-  ASSIGN(_store, store);
-}
-
 - (NSString *)location
 {
   return _location;
@@ -155,7 +132,7 @@
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"<%@> from <%@> for <%d> to <%@> (%d)", [self title], [startDate description], [self duration], [endDate description], interval];
+  return [NSString stringWithFormat:@"<%@> from <%@> for <%d> to <%@> (%d)", [self summary], [startDate description], [self duration], [endDate description], interval];
 }
 
 - (NSString *)details
@@ -166,47 +143,15 @@
   return [NSString stringWithFormat:@"%dh%02d", minute / 60, minute % 60];
 }
 
-- (void)generateUID
-{
-  Date *now = [Date date];
-  static Date *lastDate;
-  static int counter;
-
-  if (!lastDate)
-    ASSIGNCOPY(lastDate, [Date date]);
-  else {
-    if (![lastDate compareTime:now])
-      counter++;
-    else {
-      ASSIGNCOPY(lastDate, now);
-      counter = 0;
-    }
-  }
-  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@%d-%@", 
-			 [[Date date] description], 
-			 counter,
-			 [[NSHost currentHost] name]]];
-}
-
 - (BOOL)contains:(NSString *)text
 {
-  if (title && [title rangeOfString:text options:NSCaseInsensitiveSearch].length > 0)
+  if ([self summary] && [[self summary] rangeOfString:text options:NSCaseInsensitiveSearch].length > 0)
     return YES;
   if (_location && [_location rangeOfString:text options:NSCaseInsensitiveSearch].length > 0)
     return YES;
-  if (descriptionText && [[descriptionText string] rangeOfString:text options:NSCaseInsensitiveSearch].length > 0)
+  if ([self text] && [[[self text] string] rangeOfString:text options:NSCaseInsensitiveSearch].length > 0)
     return YES;
   return NO;
-}
-
-- (NSAttributedString *)descriptionText
-{
-  return descriptionText;
-}
-
-- (NSString *)title
-{
-  return title;
 }
 
 - (int)duration
@@ -234,21 +179,6 @@
   return interval;
 }
 
-- (NSString *)UID
-{
-  return _uid;
-}
-
-- (void)setDescriptionText:(NSAttributedString *)description
-{
-  ASSIGN(descriptionText, description);
-}
-
-- (void)setTitle:(NSString *)newTitle
-{
-  ASSIGN(title, newTitle);
-}
-
 - (void)setDuration:(int)newDuration
 {
   duration = newDuration;
@@ -274,12 +204,6 @@
 {
   interval = newInterval;
 }
-
-- (void)setUID:(NSString *)aUid;
-{
-  ASSIGNCOPY(_uid, aUid);
-}
-
 @end
 
 @implementation Event(iCalendar)
@@ -294,29 +218,9 @@
   struct icalrecurrencetype rec;
   Date *date;
 
-  self = [self init];
+  self = [super initWithICalComponent:ic];
   if (self == nil)
     return nil;
-
-  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-  if (!prop) {
-    NSLog(@"No UID");
-    goto init_error;
-  }
-  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
-    
-  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
-    NSLog(@"No summary");
-    goto init_error;
-  }
-  [self setTitle:[NSString stringWithCString:icalproperty_get_summary(prop) encoding:NSUTF8StringEncoding]];
-  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-  if (prop) {
-    NSAttributedString *as = [[NSAttributedString alloc] initWithString:[NSString stringWithCString:icalproperty_get_description(prop) encoding:NSUTF8StringEncoding]];
-    [self setDescriptionText:as];
-    [as release];
-  }
 
   pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
   if (!pstart) {
@@ -381,34 +285,28 @@
   return nil;
 }
 
+- (icalcomponent *)asICalComponent
+{
+  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
+  if (!ic) {
+    NSLog(@"Couldn't create iCalendar component");
+    return NULL;
+  }
+  if (![self updateICalComponent:ic]) {
+    icalcomponent_free(ic);
+    return NULL;
+  }
+  return ic;
+}
+
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   struct icaltimetype itime;
   struct icalrecurrencetype irec;
   icalproperty *prop;
 
-  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_uid([[self UID] cString]);
-    icalcomponent_add_property(ic, prop);
-  }
-
-  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_summary([title UTF8String]);
-    icalcomponent_add_property(ic, prop);
-  } else
-    icalproperty_set_summary(prop, [title UTF8String]);
-
-  if (descriptionText != nil) {
-    prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-    if (!prop) {
-      prop = icalproperty_new_description([[descriptionText string] UTF8String]);
-      icalcomponent_add_property(ic, prop);
-    } else
-      icalproperty_set_description(prop, [[descriptionText string] UTF8String]);
-  }
-
+  if (![super updateICalComponent:ic])
+    return NO;
   prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
   if (!prop) {
     prop = icalproperty_new_dtstart([startDate iCalTime]);
@@ -457,6 +355,11 @@
   } else if (prop)
     icalcomponent_remove_property(ic, prop);
   return YES;
+}
+
+- (int)iCalComponentType
+{
+  return ICAL_VEVENT_COMPONENT;
 }
 @end
 

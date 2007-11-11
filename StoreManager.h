@@ -1,6 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "Event.h"
+#import "Element.h"
 
 @interface StoreManager : NSObject
 {
@@ -25,8 +25,9 @@
 - (void)setDelegate:(id)delegate;
 - (id)delegate;
 - (void)dataChanged:(NSNotification *)not;
-- (id <AgendaStore>)storeContainingEvent:(Event *)event;
+- (id <AgendaStore>)storeContainingElement:(Element *)elt;
 - (NSArray *)allEvents;
+- (NSArray *)allTasks;
 @end
 
 @interface NSObject(StoreManagerDelegate)

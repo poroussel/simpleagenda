@@ -27,7 +27,7 @@
   id <AgendaStore> originalStore;
   int ret;
 
-  [title setStringValue:[data title]];
+  [title setStringValue:[data summary]];
   [duration setFloatValue:[data duration] / 60.0];
   [durationText setFloatValue:[data duration] / 60.0];
   [repeat selectItemAtIndex:[data interval]];
@@ -35,17 +35,19 @@
   [allDay setState:[data allDay]];
 
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
-  [[description textStorage] appendAttributedString:[data descriptionText]];
+  [[description textStorage] appendAttributedString:[data text]];
 
   [window makeFirstResponder:title];
 
   originalStore = [data store];
   if (!originalStore)
     [data setStore:[sm defaultStore]];
+  else if (![originalStore isWritable])
+    [ok setEnabled:NO];
     
   [store removeAllItems];
   while ((aStore = [list nextObject])) {
-    if ([aStore isWritable])
+    if ([aStore isWritable] || aStore == originalStore)
       [store addItemWithTitle:[aStore description]];
   }
   [store selectItemWithTitle:[[data store] description]];
@@ -53,7 +55,7 @@
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
-    [data setTitle:[title stringValue]];
+    [data setSummary:[title stringValue]];
     [data setDuration:[duration floatValue] * 60.0];
     [data setInterval:[repeat indexOfSelectedItem]];
     if ([repeat indexOfSelectedItem] == 0)
@@ -66,19 +68,18 @@
       [data setFrequency:1];
       [end release];
     }
-    [data setDescriptionText:[[description textStorage] copy]];
+    [data setText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
     [data setAllDay:[allDay state]];
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
-
     if (!originalStore)
-      [aStore add:data];
+      [aStore addEvent:data];
     else if (originalStore == aStore)
-      [aStore update:[data UID] with:data];
+      [aStore update:data];
     else {
-      [originalStore remove:[data UID]];
-      [aStore add:data];
+      [originalStore remove:data];
+      [aStore addEvent:data];
     }
     return YES;
   }

@@ -1,3 +1,11 @@
+version 0.30
+	* Refactor code to handle multiple kinds of events
+	* Add simple task (iCalendar VTODO) support
+	* Add a task view
+	* Coherent ui : in summary, day view and task view, 
+	  simple click to select and double click to edit
+	* Make calendar view smaller
+
 version 0.29 (2007/11/02)
 	* Preferences dialog uses a popup to select categories (r276)
 	* Events text color selectable in store preferences

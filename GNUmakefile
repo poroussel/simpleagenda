@@ -26,6 +26,7 @@ Resources/Agenda.gorm \
 Resources/Appointment.gorm \
 Resources/Preferences.gorm \
 Resources/iCalendar.gorm \
+Resources/Task.gorm \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff 
 
@@ -49,7 +50,10 @@ iCalStore.h \
 ConfigManager.h \
 Date.h \
 iCalTree.h \
-DataTree.h
+DataTree.h \
+Element.h \
+Task.h \
+TaskEditor.h
 
 #
 # Class files
@@ -68,7 +72,10 @@ iCalStore.m \
 ConfigManager.m \
 Date.m \
 iCalTree.m \
-DataTree.m
+DataTree.m \
+Element.m \
+Task.m \
+TaskEditor.m
 
 #
 # Other sources

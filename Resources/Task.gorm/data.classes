@@ -1,0 +1,24 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "validate:"
+	);
+	Super = NSObject;
+    };
+    TaskEditor = {
+	Actions = (
+	    "validate:",
+	    "cancel:"
+	);
+	Outlets = (
+	    window,
+	    description,
+	    summary,
+	    store,
+	    state,
+	    ok
+	);
+	Super = NSObject;
+    };
+}

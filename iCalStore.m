@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
 #import "Event.h"
+#import "Task.h"
 #import "iCalStore.h"
 #import "defines.h"
 
@@ -187,6 +188,7 @@
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     _data = [[NSMutableDictionary alloc] initWithCapacity:32];
+    _tasks = [[NSMutableDictionary alloc] initWithCapacity:32];
     [self fetchData]; 
 
     if ([_config objectForKey:ST_REFRESH])
@@ -248,6 +250,7 @@
   [_refreshTimer invalidate];
   [self write];
   [_data release];
+  [_tasks release];
   [_url release];
   [_config release];
   [_name release];
@@ -270,12 +273,27 @@
 {
   return [_data allValues];
 }
+- (NSArray *)tasks
+{
+  return [_tasks allValues];
+}
 
-- (void)add:(Event *)evt
+- (void)addEvent:(Event *)evt
 {
   if ([_tree add:evt]) {
     [evt setStore:self];
     [_data setValue:evt forKey:[evt UID]];
+    _modified = YES;
+    if (![_url isFileURL])
+      [self write];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  }
+}
+- (void)addTask:(Task *)task
+{
+  if ([_tree add:task]) {
+    [task setStore:self];
+    [_tasks setValue:task forKey:[task UID]];
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -288,10 +306,10 @@
  * every change or every x minutes.
  * Do we need to read before writing ?
  */
-- (void)remove:(NSString *)uid
+- (void)remove:(Element *)elt
 {
-  if ([_tree remove:[_data objectForKey:uid]]) {
-    [_data removeObjectForKey:uid];
+  if ([_tree remove:[_data objectForKey:[elt UID]]]) {
+    [_data removeObjectForKey:[elt UID]];
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -299,12 +317,17 @@
   }
 }
 
-- (void)update:(NSString *)uid with:(Event *)evt
+- (void)update:(Element *)elt
 {
-  if ([_tree update:evt]) {
-    [evt setStore:self];
-    [_data removeObjectForKey:uid];
-    [_data setValue:evt forKey:[evt UID]];
+  if ([_tree update:(Event *)elt]) {
+    [elt setStore:self];
+    if ([elt isKindOfClass:[Event class]]) {
+      [_data removeObjectForKey:[elt UID]];
+      [_data setValue:elt forKey:[elt UID]];
+    } else {
+      [_tasks removeObjectForKey:[elt UID]];
+      [_tasks setValue:elt forKey:[elt UID]];
+    }
     _modified = YES;
     if (![_url isFileURL])
       [self write];
@@ -312,9 +335,11 @@
   }
 }
 
-- (BOOL)contains:(NSString *)uid
+- (BOOL)contains:(Element *)elt
 {
-  return [_data objectForKey:uid] != nil;
+  if ([elt isKindOfClass:[Event class]])
+    return [_data objectForKey:[elt UID]] != nil;
+  return [_tasks objectForKey:[elt UID]] != nil;
 }
 
 - (BOOL)isWritable
@@ -324,8 +349,6 @@
 
 - (void)setIsWritable:(BOOL)writable
 {
-  if (!writable)
-    [self write];
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
 }
@@ -404,12 +427,10 @@
   _displayed = state;
   [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
-
 @end
 
 
 @implementation iCalStore(NSURLClient)
-
 - (void)URL:(NSURL *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
 {
   [_retrievedData appendData:newBytes];
@@ -430,21 +451,25 @@
   NSSet *items;
   NSString *text;
   NSEnumerator *enumerator;
-  Event *apt;
+  Element *elt;
 
   text = [[NSString alloc] initWithData:_retrievedData encoding:NSUTF8StringEncoding];
   if (text && [_tree parseString:text]) {
-    items = [_tree events];
+    items = [_tree components];
     [items makeObjectsPerform:@selector(setStore:) withObject:self];
     enumerator = [items objectEnumerator];
-    while ((apt = [enumerator nextObject]))
-      [_data setValue:apt forKey:[apt UID]];
+    while ((elt = [enumerator nextObject])) {
+      if ([elt isKindOfClass:[Event class]])
+	[_data setValue:elt forKey:[elt UID]];
+      else
+	[_tasks setValue:elt forKey:[elt UID]];
+    }
     NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [_tasks count]);
     [text release];
     [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   } else
     NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
   [_retrievedData release];
 }
-
 @end

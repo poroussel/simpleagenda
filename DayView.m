@@ -65,11 +65,11 @@
 					       forKey:NSForegroundColorAttributeName];
 
   if ([_apt allDay])
-    title = [NSString stringWithFormat:@"All day : %@", [_apt title]];
+    title = [NSString stringWithFormat:@"All day : %@", [_apt summary]];
   else
-    title = [NSString stringWithFormat:@"%2dh%0.2d : %@", [start hourOfDay], [start minuteOfHour], [_apt title]];
-  if ([_apt descriptionText])
-    label = [NSString stringWithFormat:@"%@\n\n%@", title, [[_apt descriptionText] string]];
+    title = [NSString stringWithFormat:@"%2dh%0.2d : %@", [start hourOfDay], [start minuteOfHour], [_apt summary]];
+  if ([_apt text])
+    label = [NSString stringWithFormat:@"%@\n\n%@", title, [[_apt text] string]];
   else
     label = [NSString stringWithString:title];
 
@@ -301,6 +301,7 @@
 
     frame = [aptv frame];
     inResize = [self mouse:mouseLoc inRect:RedimRect(frame)];
+    /* FIXME : doesn't work */
     if (inResize) {
       [[NSCursor resizeUpDownCursor] push];
       start = [[[aptv appointment] startDate] minuteOfDay];
@@ -378,11 +379,6 @@
   }
   _startPt = _endPt = NSMakePoint(0, 0);
   [self display];
-}
-
-- (Event *)selectedAppointment
-{
-  return [_selected appointment];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -477,4 +473,3 @@
   return NO;
 }
 @end
-

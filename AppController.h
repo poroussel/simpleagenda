@@ -2,8 +2,10 @@
 
 #import "AgendaStore.h"
 #import "AppointmentEditor.h"
+#import "TaskEditor.h"
 #import "CalendarView.h"
 #import "DayView.h"
+#import "Element.h"
 #import "Event.h"
 #import "PreferencesController.h"
 #import "DataTree.h"
@@ -14,12 +16,16 @@
   IBOutlet DayView *dayView;
   IBOutlet NSOutlineView *summary;
   IBOutlet NSTextField *search;
+  IBOutlet NSTableView *taskView;
+  IBOutlet NSWindow *window;
+  IBOutlet NSTabView *tabs;
 
-  NSWindow *window;
   PreferencesController *_pc;
   AppointmentEditor *_editor;
+  TaskEditor *_taskEditor;
   StoreManager *_sm;
   Event *_selection;
+  Element *_clickedElement;
   BOOL _deleteSelection;
   Date *_selectedDay;
   DataTree *_summaryRoot;
@@ -38,6 +44,7 @@
 - (void)saveAll:(id)sender;
 - (void)showPrefPanel:(id)sender;
 - (void)addAppointment:(id)sender;
+- (void)addTask:(id)sender;
 - (void)editAppointment:(id)sender;
 - (void)delAppointment:(id)sender;
 - (void)exportAppointment:(id)sender;
