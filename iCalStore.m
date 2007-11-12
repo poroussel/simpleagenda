@@ -5,6 +5,16 @@
 #import "iCalStore.h"
 #import "defines.h"
 
+@interface iCalStoreDialog : NSObject
+{
+  IBOutlet id panel;
+  IBOutlet id name;
+  IBOutlet id url;
+  IBOutlet id ok;
+  IBOutlet id error;
+  IBOutlet id warning;
+}
+@end
 @implementation iCalStoreDialog
 - (id)initWithName:(NSString *)storeName
 {
@@ -18,40 +28,33 @@
   }
   return self;
 }
-
 - (void)dealloc
 {
   [panel close];
 }
-
 - (BOOL)show
 {
   [ok setEnabled:NO];
   return [NSApp runModalForWindow:panel];
 }
-
 - (void)okClicked:(id)sender
 {
   [NSApp stopModalWithCode:1];
 }
-
 - (void)cancelClicked:(id)sender
 {
   [NSApp stopModalWithCode:0];
 }
-
 - (void)setError:(NSString *)errorText
 {
   [error setStringValue:errorText];
   [warning setHidden:NO];
 }
-
 - (void)controlTextDidChange:(NSNotification *)notification
 {
   NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
   [ok setEnabled:(storeUrl != nil)];
 }
-
 - (NSString *)url
 {
   return [url stringValue];
@@ -60,7 +63,6 @@
 
 
 @implementation iCalStore
-
 - (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
   GSXMLNode *inter;
@@ -169,11 +171,9 @@
 
 - (id)initWithName:(NSString *)name
 {
-  self = [super init];
+  self = [super initWithName:name];
   if (self) {
     _tree = [iCalTree new];
-    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
-    [_config registerDefaults:[self defaults]];
     _url = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
     if (_url == nil) {
       NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
@@ -181,14 +181,8 @@
       return nil;
     }
     [_url retain];
-    _name = [name copy];
-    _modified = NO;
     _retrievedData = nil;
     _lastModified = nil;
-    _writable = [[_config objectForKey:ST_RW] boolValue];
-    _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
-    _data = [[NSMutableDictionary alloc] initWithCapacity:32];
-    _tasks = [[NSMutableDictionary alloc] initWithCapacity:32];
     [self fetchData]; 
 
     if ([_config objectForKey:ST_REFRESH])
@@ -202,11 +196,6 @@
     [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
-}
-
-+ (id)storeNamed:(NSString *)name
-{
-  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
 }
 
 + (BOOL)registerWithName:(NSString *)name
@@ -249,11 +238,7 @@
 {
   [_refreshTimer invalidate];
   [self write];
-  [_data release];
-  [_tasks release];
   [_url release];
-  [_config release];
-  [_name release];
   [_lastModified release];
   [_tree release];
   [super dealloc];
@@ -264,40 +249,20 @@
   [self read];
 }
 
-- (NSEnumerator *)enumerator
-{
-  return [_data objectEnumerator];
-}
-
-- (NSArray *)events
-{
-  return [_data allValues];
-}
-- (NSArray *)tasks
-{
-  return [_tasks allValues];
-}
-
 - (void)addEvent:(Event *)evt
 {
   if ([_tree add:evt]) {
-    [evt setStore:self];
-    [_data setValue:evt forKey:[evt UID]];
-    _modified = YES;
+    [super addEvent:evt];
     if (![_url isFileURL])
       [self write];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
 }
 - (void)addTask:(Task *)task
 {
   if ([_tree add:task]) {
-    [task setStore:self];
-    [_tasks setValue:task forKey:[task UID]];
-    _modified = YES;
+    [super addTask:task];
     if (![_url isFileURL])
       [self write];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
 }
 
@@ -309,56 +274,19 @@
 - (void)remove:(Element *)elt
 {
   if ([_tree remove:elt]) {
-    if ([elt isKindOfClass:[Event class]])
-      [_data removeObjectForKey:[elt UID]];
-    else
-      [_tasks removeObjectForKey:[elt UID]];
-    _modified = YES;
+    [super remove:elt];
     if (![_url isFileURL])
       [self write];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
 }
 
 - (void)update:(Element *)elt
 {
   if ([_tree update:(Event *)elt]) {
-    [elt setStore:self];
-    if ([elt isKindOfClass:[Event class]]) {
-      [_data removeObjectForKey:[elt UID]];
-      [_data setValue:elt forKey:[elt UID]];
-    } else {
-      [_tasks removeObjectForKey:[elt UID]];
-      [_tasks setValue:elt forKey:[elt UID]];
-    }
-    _modified = YES;
+    [super update:elt];
     if (![_url isFileURL])
       [self write];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
   }
-}
-
-- (BOOL)contains:(Element *)elt
-{
-  if ([elt isKindOfClass:[Event class]])
-    return [_data objectForKey:[elt UID]] != nil;
-  return [_tasks objectForKey:[elt UID]] != nil;
-}
-
-- (BOOL)isWritable
-{
-  return _writable;
-}
-
-- (void)setIsWritable:(BOOL)writable
-{
-  _writable = writable;
-  [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
-}
-
-- (BOOL)modified
-{
-  return _modified;
 }
 
 - (BOOL)read
@@ -389,46 +317,6 @@
     return NO;
   }
   return YES;
-}
-
-- (NSString *)description
-{
-  return _name;
-}
-
-- (NSColor *)eventColor
-{
-  NSData *theData =[_config objectForKey:ST_COLOR];
-  return [NSUnarchiver unarchiveObjectWithData:theData];
-}
-
-- (void)setEventColor:(NSColor *)color
-{
-  NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_config setObject:data forKey:ST_COLOR];
-}
-
-- (NSColor *)textColor
-{
-  NSData *theData =[_config objectForKey:ST_TEXT_COLOR];
-  return [NSUnarchiver unarchiveObjectWithData:theData];
-}
-
-- (void)setTextColor:(NSColor *)color
-{
-  NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_config setObject:data forKey:ST_TEXT_COLOR];
-}
-
-- (BOOL)displayed
-{
-  return _displayed;
-}
-
-- (void)setDisplayed:(BOOL)state
-{
-  _displayed = state;
-  [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
 }
 @end
 

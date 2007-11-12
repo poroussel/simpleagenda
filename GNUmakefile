@@ -53,7 +53,8 @@ iCalTree.h \
 DataTree.h \
 Element.h \
 Task.h \
-TaskEditor.h
+TaskEditor.h \
+MemoryStore.h
 
 #
 # Class files
@@ -75,7 +76,8 @@ iCalTree.m \
 DataTree.m \
 Element.m \
 Task.m \
-TaskEditor.m
+TaskEditor.m \
+MemoryStore.m
 
 #
 # Other sources

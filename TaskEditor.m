@@ -17,8 +17,8 @@
 -(BOOL)editTask:(Task *)task withStoreManager:(StoreManager *)sm
 {
   NSEnumerator *list = [sm storeEnumerator];
-  id <AgendaStore> aStore;
-  id <AgendaStore> originalStore;
+  id <MemoryStore> aStore;
+  id <MemoryStore> originalStore;
   int ret;
 
   [summary setStringValue:[task summary]];

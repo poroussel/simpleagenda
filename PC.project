@@ -19,7 +19,8 @@
 	DataTree.m,
 	Element.m,
 	Task.m,
-	TaskEditor.m
+	TaskEditor.m,
+	MemoryStore.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -47,7 +48,8 @@
 	DataTree.h,
 	Element.h,
 	Task.h,
-	TaskEditor.h
+	TaskEditor.h,
+	MemoryStore.h
     );
     IMAGES = (
 	Calendar.tiff,
@@ -62,7 +64,7 @@
 	Task.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-11-12 13:34:09 +0100";
+    LAST_EDITING = "2007-11-12 18:57:50 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

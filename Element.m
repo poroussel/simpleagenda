@@ -44,7 +44,7 @@
   RELEASE(_uid);
 }
 
-- (id <AgendaStore>)store
+- (id <MemoryStore>)store
 {
   return _store;
 }

@@ -8,10 +8,12 @@
 @class Event;
 @class Task;
 
-@protocol AgendaStore <NSObject>
+@protocol MemoryStore <NSObject>
 + (id)storeNamed:(NSString *)name;
 + (BOOL)registerWithName:(NSString *)name;
 + (NSString *)storeTypeName;
+- (NSDictionary *)defaults;
+- (id)initWithName:(NSString *)name;
 - (NSEnumerator *)enumerator;
 - (NSArray *)events;
 - (NSArray *)tasks;
@@ -21,8 +23,6 @@
 - (void)update:(Element *)evt;
 - (BOOL)contains:(Element *)elt;
 - (BOOL)modified;
-- (BOOL)read;
-- (BOOL)write;
 - (BOOL)isWritable;
 - (void)setIsWritable:(BOOL)writable;
 - (NSColor *)eventColor;
@@ -31,4 +31,12 @@
 - (void)setTextColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
+@end
+
+@protocol StoreBackend
+- (BOOL)read;
+- (BOOL)write;
+@end
+
+@protocol AgendaStore <MemoryStore, StoreBackend>
 @end

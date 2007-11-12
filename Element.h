@@ -13,7 +13,7 @@ enum classificationType
 
 @interface Element : NSObject <NSCoding>
 {
-  id <AgendaStore> _store;
+  id <MemoryStore> _store;
   NSString *_uid;
   NSString *_summary;
   NSAttributedString *_text;
@@ -22,13 +22,13 @@ enum classificationType
 
 - (id)initWithSummary:(NSString *)summary;
 - (void)generateUID;
-- (id <AgendaStore>)store;
+- (id <MemoryStore>)store;
 - (NSAttributedString *)text;
 - (NSString *)summary;
 - (NSString *)UID;
 - (enum classificationType)classification;
 
-- (void)setStore:(id <AgendaStore>)store;
+- (void)setStore:(id <MemoryStore>)store;
 - (void)setText:(NSAttributedString *)text;
 - (void)setSummary:(NSString *)summary;
 - (void)setUID:(NSString *)uid;

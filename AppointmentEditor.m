@@ -7,7 +7,6 @@
 
 @implementation AppointmentEditor
 
-
 -(id)init
 {
   self = [super init];
@@ -23,8 +22,8 @@
 -(BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm
 {
   NSEnumerator *list = [sm storeEnumerator];
-  id <AgendaStore> aStore;
-  id <AgendaStore> originalStore;
+  id <MemoryStore> aStore;
+  id <MemoryStore> originalStore;
   int ret;
 
   [title setStringValue:[data summary]];
