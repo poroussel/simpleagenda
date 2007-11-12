@@ -25,6 +25,7 @@
   NSColor *_alternateBackgroundColor;
 }
 
+- (void)selectAppointmentView:(AppointmentView *)aptv;
 - (NSRect)frameForAppointment:(Event *)apt;
 - (int)minuteToPosition:(int)minutes;
 - (int)positionToMinute:(float)position;

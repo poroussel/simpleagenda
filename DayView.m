@@ -100,7 +100,7 @@
   }
   if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
     [delegate dayView:parent selectEvent:_apt];
-  [self setSelected:YES];
+  [parent selectAppointmentView:self];
 
   if (![[_apt store] isWritable] || [_apt allDay])
     return;
@@ -297,7 +297,7 @@
   delegate = theDelegate;
 }
 
-- (void)_selectAppointmentView:(AppointmentView *)aptv
+- (void)selectAppointmentView:(AppointmentView *)aptv
 {
   if (_selected != aptv) {
     [_selected setSelected:NO];
@@ -330,7 +330,7 @@
       aptv = [[AppointmentView alloc] initWithFrame:[self frameForAppointment:apt] appointment:apt];
       [self addSubview:aptv];
       if (oldSelection && [[oldSelection UID] isEqual:[apt UID]])
-	[self _selectAppointmentView:aptv];
+	[self selectAppointmentView:aptv];
     }
   }
   [self setNeedsDisplay:YES];
