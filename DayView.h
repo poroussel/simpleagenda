@@ -25,6 +25,11 @@
   NSColor *_alternateBackgroundColor;
 }
 
+- (NSRect)frameForAppointment:(Event *)apt;
+- (int)minuteToPosition:(int)minutes;
+- (int)positionToMinute:(float)position;
+- (int)roundMinutes:(int)minutes;
+- (id)delegate;
 - (void)reloadData;
 - (int)firstHour;
 - (int)lastHour;

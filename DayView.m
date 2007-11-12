@@ -31,18 +31,15 @@
   }
   return self;
 }
-
 - (void)dealloc
 {
   RELEASE(_apt);
   [super dealloc];
 }
-
 - (BOOL)selected
 {
   return _selected;
 }
-
 - (void)setSelected:(BOOL)selected
 {
   if (selected != _selected) {
@@ -50,7 +47,6 @@
     [self display];
   }
 }
-
 - (void)drawRect:(NSRect)rect
 {
   NSString *title;
@@ -83,6 +79,79 @@
     [[NSColor grayColor] set];
     NSFrameRect(rect);
   }
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  DayView *parent = [self superview];
+  id delegate = [parent delegate];
+  NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+  int diff;
+  int start;
+  int minutes;
+  BOOL keepOn = YES;
+  BOOL modified = NO;
+  BOOL inResize;
+
+  if ([theEvent clickCount] > 1) {
+    if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
+      [delegate dayView:parent editEvent:_apt];
+    return;
+  }
+  if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
+    [delegate dayView:parent selectEvent:_apt];
+  [self setSelected:YES];
+
+  if (![[_apt store] isWritable] || [_apt allDay])
+    return;
+
+  inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];
+  if (inResize) {
+    [[NSCursor resizeUpDownCursor] push];
+    start = [[_apt startDate] minuteOfDay];
+    while (keepOn) {
+      theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
+
+      switch ([theEvent type]) {
+      case NSLeftMouseDragged:
+	minutes = [parent positionToMinute:mouseLoc.y];
+	[_apt setDuration:[parent roundMinutes:minutes - start]];
+	modified = YES;
+	[parent display];
+	break;
+      case NSLeftMouseUp:
+	keepOn = NO;
+	break;
+      default:
+	break;
+      }
+    }
+  } else {
+    [[NSCursor openHandCursor] push];
+    mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
+    diff = [parent minuteToPosition:[[_apt startDate] minuteOfDay]] - mouseLoc.y;
+    while (keepOn) {
+      theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
+      switch ([theEvent type]) {
+      case NSLeftMouseDragged:
+	minutes = [parent positionToMinute:mouseLoc.y + diff];
+	[[_apt startDate] setMinute:[parent roundMinutes:minutes]];
+	modified = YES;
+	[parent display];
+	break;
+      case NSLeftMouseUp:
+	keepOn = NO;
+	break;
+      default:
+	break;
+      }
+    }
+  }
+  [NSCursor pop];
+  if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
+    [delegate dayView:parent modifyEvent:_apt];
 }
 
 - (Event *)appointment
@@ -139,31 +208,28 @@
 {
   return minutes * [self frame].size.height / ((_lastH - _firstH + 1) * 60);
 }
-
-- (int)_minuteToPosition:(int)minutes
+- (int)minuteToPosition:(int)minutes
 {
   return [self frame].size.height - [self _minuteToSize:minutes - (_firstH * 60)] - 1;
 }
-
-- (int)_positionToMinute:(float)position
+- (int)positionToMinute:(float)position
 {
   return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / [self frame].size.height;
 }
-
-- (NSRect)_frameForAppointment:(Event *)apt
+- (NSRect)frameForAppointment:(Event *)apt
 {
   int size, start;
 
   if ([apt allDay])
     return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
-  start = [self _minuteToPosition:[[apt startDate] minuteOfDay]];
+  start = [self minuteToPosition:[[apt startDate] minuteOfDay]];
   size = [self _minuteToSize:[apt duration]];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
-
-- (int)_roundMinutes:(int)minutes
+- (int)roundMinutes:(int)minutes
 {
-  return minutes / _minStep * _minStep;
+  int rounded = minutes / _minStep * _minStep;
+  return (rounded < _minStep) ? _minStep : rounded;
 }
 
 - (void)drawRect:(NSRect)rect
@@ -182,14 +248,14 @@
    */
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject]))
-    [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
+    [aptv setFrame:[self frameForAppointment:[aptv appointment]]];
   /*
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
    */
   hrow = [self _minuteToSize:60];
   for (h = _firstH; h <= _lastH + 1; h++) {
-    start = [self _minuteToPosition:h * 60];
+    start = [self minuteToPosition:h * 60];
     if (h % 2)
       [_backgroundColor set];
     else
@@ -198,7 +264,7 @@
   }
   for (h = _firstH; h <= _lastH; h++) {
     hour = [NSString stringWithFormat:@"%d h", h];
-    start = [self _minuteToPosition:h * 60];
+    start = [self minuteToPosition:h * 60];
     size = [hour sizeWithAttributes:_textAttributes];
     [hour drawAtPoint:NSMakePoint(4, start - hrow / 2 - size.height / 2) withAttributes:_textAttributes];
   }
@@ -261,7 +327,7 @@
   while ((apt = [enumerator nextObject])) {
     [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed]) {
-      aptv = [[AppointmentView alloc] initWithFrame:[self _frameForAppointment:apt] appointment:apt];
+      aptv = [[AppointmentView alloc] initWithFrame:[self frameForAppointment:apt] appointment:apt];
       [self addSubview:aptv];
       if (oldSelection && [[oldSelection UID] isEqual:[apt UID]])
 	[self _selectAppointmentView:aptv];
@@ -274,87 +340,10 @@
 {
   int start;
   int end;
-  int diff;
-  int minutes;
   BOOL keepOn = YES;
-  BOOL modified = NO;
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-  NSView *hit = [self hitTest:mouseLoc];
-  NSRect frame;
-  BOOL inResize;
 
   [[self window] makeFirstResponder:self];
-  if ([hit isKindOfClass:[AppointmentView class]]) {
-    AppointmentView *aptv = hit;
-    [self _selectAppointmentView:aptv];
-
-    if ([theEvent clickCount] > 1) {
-      if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
-	[delegate dayView:self editEvent:[aptv appointment]];
-      return;
-    }
-
-    if (![[[aptv appointment] store] isWritable])
-      return;
-    if ([[aptv appointment] allDay])
-      return;
-
-    frame = [aptv frame];
-    inResize = [self mouse:mouseLoc inRect:RedimRect(frame)];
-    /* FIXME : doesn't work */
-    if (inResize) {
-      [[NSCursor resizeUpDownCursor] push];
-      start = [[[aptv appointment] startDate] minuteOfDay];
-      while (keepOn) {
-	theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-	mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-
-	switch ([theEvent type]) {
-	case NSLeftMouseDragged:
-	  minutes = [self _positionToMinute:mouseLoc.y];
-	  [[aptv appointment] setDuration:[self _roundMinutes:minutes - start]];
- 	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
-	  modified = YES;
-	  [self display];
-	  break;
-	case NSLeftMouseUp:
-	  keepOn = NO;
-	  break;
-	default:
-	  break;
-	}
-      }
-      [NSCursor pop];
-      if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
-	[delegate dayView:self modifyEvent:[aptv appointment]];
-      return;
-    }
-
-    [[NSCursor openHandCursor] push];
-    diff = [self _minuteToPosition:[[[aptv appointment] startDate] minuteOfDay]] - mouseLoc.y;
-    while (keepOn) {
-      theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-      mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-      switch ([theEvent type]) {
-      case NSLeftMouseDragged:
-	minutes = [self _positionToMinute:mouseLoc.y + diff];
-	[[[aptv appointment] startDate] setMinute:[self _roundMinutes:minutes]];
-	modified = YES;
-	[self display];
-	break;
-      case NSLeftMouseUp:
-	keepOn = NO;
-	break;
-      default:
-	break;
-      }
-    }
-    [NSCursor pop];
-    if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
-      [delegate dayView:self modifyEvent:[aptv appointment]];
-    return;
-  }
-
   _startPt = _endPt = mouseLoc;
   [[NSCursor crosshairCursor] push];
   while (keepOn) {
@@ -371,10 +360,10 @@
   }
   [NSCursor pop];
   if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
-    start = [self _positionToMinute:max(_startPt.y, _endPt.y)];
-    end = [self _positionToMinute:min(_startPt.y, _endPt.y)];
+    start = [self positionToMinute:max(_startPt.y, _endPt.y)];
+    end = [self positionToMinute:min(_startPt.y, _endPt.y)];
     if ([delegate respondsToSelector:@selector(dayView:createEventFrom:to:)])
-      [delegate dayView:self createEventFrom:[self _roundMinutes:start] to:[self _roundMinutes:end]];
+      [delegate dayView:self createEventFrom:[self roundMinutes:start] to:[self roundMinutes:end]];
   }
   _startPt = _endPt = NSMakePoint(0, 0);
   [self display];
@@ -389,7 +378,7 @@
 {
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:-_minStep];
-    [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
+    [_selected setFrame:[self frameForAppointment:[_selected appointment]]];
     if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
       [delegate dayView:self modifyEvent:[_selected appointment]];
   }
@@ -399,7 +388,7 @@
 {
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:_minStep];
-    [_selected setFrame:[self _frameForAppointment:[_selected appointment]]];
+    [_selected setFrame:[self frameForAppointment:[_selected appointment]]];
     if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
       [delegate dayView:self modifyEvent:[_selected appointment]];
   }
