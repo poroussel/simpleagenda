@@ -6,6 +6,8 @@ In no particular order :
 
 * list view of all items ?
 
+* refactor LocalStore and iCalStore
+
 * build a framework to allow other applications to access the data ?
 
 Want to help out ? Contact me at p.o.roussel@free.fr

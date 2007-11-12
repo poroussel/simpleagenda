@@ -1,4 +1,4 @@
-version 0.30
+version 0.30 (2007/11/12)
 	* Refactor code to handle multiple kinds of events
 	* Add simple task (iCalendar VTODO) support
 	* Add a task view
@@ -31,5 +31,3 @@ version 0.26 (2007/08/16)
 	* Fix compilation with gcc 3.3
 	* Fix events dates in the summary
 	* Selecting an event in the summary shows it in the day view
-
-

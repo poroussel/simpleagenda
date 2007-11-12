@@ -62,7 +62,7 @@
 	Task.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-11-06 18:44:33 +0100";
+    LAST_EDITING = "2007-11-12 13:34:09 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -81,7 +81,7 @@
     );
     PC_WINDOWS = {
 	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 297}";
-	ProjectWindow = "285 25 864 975 0 0  1280 1024 ";
+	ProjectWindow = "285 87 842 913 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;
@@ -107,7 +107,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.29;
+    PROJECT_RELEASE = 0.30;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/pub/gnustep/";
