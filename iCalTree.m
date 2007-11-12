@@ -83,6 +83,7 @@
 	return ic;
     }
   }
+  NSLog(@"iCalendar component not found for %@", [elt description]);
   return NULL;
 }
 
@@ -98,10 +99,8 @@
 - (BOOL)remove:(Element *)elt
 {
   icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic) {
-    NSLog(@"iCalTree remove : iCalendar component not found");
+  if (!ic)
     return NO;
-  }
   icalcomponent_remove_component(root, ic);
   return YES;
 }
@@ -109,10 +108,8 @@
 - (BOOL)update:(Element *)elt
 {
   icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic) {
-    NSLog(@"iCalTree update : iCalendar component not found");
+  if (!ic)
     return NO;
-  }
   return [elt updateICalComponent:ic];
 }
 @end

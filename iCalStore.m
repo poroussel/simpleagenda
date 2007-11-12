@@ -308,8 +308,11 @@
  */
 - (void)remove:(Element *)elt
 {
-  if ([_tree remove:[_data objectForKey:[elt UID]]]) {
-    [_data removeObjectForKey:[elt UID]];
+  if ([_tree remove:elt]) {
+    if ([elt isKindOfClass:[Event class]])
+      [_data removeObjectForKey:[elt UID]];
+    else
+      [_tasks removeObjectForKey:[elt UID]];
     _modified = YES;
     if (![_url isFileURL])
       [self write];
