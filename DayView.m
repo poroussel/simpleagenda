@@ -313,7 +313,7 @@
 	case NSLeftMouseDragged:
 	  minutes = [self _positionToMinute:mouseLoc.y];
 	  [[aptv appointment] setDuration:[self _roundMinutes:minutes - start]];
-	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
+ 	  [aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
 	  modified = YES;
 	  [self display];
 	  break;
@@ -339,7 +339,6 @@
       case NSLeftMouseDragged:
 	minutes = [self _positionToMinute:mouseLoc.y + diff];
 	[[[aptv appointment] startDate] setMinute:[self _roundMinutes:minutes]];
-	[aptv setFrame:[self _frameForAppointment:[aptv appointment]]];
 	modified = YES;
 	[self display];
 	break;
