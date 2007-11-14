@@ -208,20 +208,18 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
   Event *apt = [[Event alloc] initWithStartDate:date 
 					  duration:60
 					  title:@"edit title..."];
-  if (apt)
-    [_editor editAppointment:apt withStoreManager:_sm];
+  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
+    [tabs selectTabViewItemWithIdentifier:@"Day"];
   [date release];
   [apt release];
-  [tabs selectTabViewItemWithIdentifier:@"Day"];
 }
 
 - (void)addTask:(id)sender
 {
   Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
-  if (task)
-    [_taskEditor editTask:task withStoreManager:_sm];
+  if (task && [_taskEditor editTask:task withStoreManager:_sm])
+    [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
-  [tabs selectTabViewItemWithIdentifier:@"Tasks"];
 }
 
 - (void)editAppointment:(id)sender
