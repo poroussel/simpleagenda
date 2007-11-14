@@ -73,12 +73,12 @@
 
 - (void)generateUID
 {
-  Date *now = [Date date];
+  Date *now = [Date now];
   static Date *lastDate;
   static int counter;
 
   if (!lastDate)
-    ASSIGNCOPY(lastDate, [Date date]);
+    ASSIGNCOPY(lastDate, now);
   else {
     if (![lastDate compareTime:now])
       counter++;
@@ -88,7 +88,7 @@
     }
   }
   [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@%d-%@", 
-			 [[Date date] description], 
+			 [now description], 
 			 counter,
 			 [[NSHost currentHost] name]]];
 }

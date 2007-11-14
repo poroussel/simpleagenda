@@ -55,7 +55,7 @@ static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
 {
   _state = state;
   if (state == TK_COMPLETED)
-    [self setCompletionDate:[Date date]];
+    [self setCompletionDate:[Date today]];
   else
     [self setCompletionDate:nil];
 }

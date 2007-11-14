@@ -8,8 +8,8 @@
   struct icaltimetype _time;
 }
 
-+ (id)date;
-
++ (id)now;
++ (id)today;
 - (NSCalendarDate *)calendarDate;
 - (NSComparisonResult)compare:(id)aDate;
 - (NSComparisonResult)compareTime:(id)aTime;

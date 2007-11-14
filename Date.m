@@ -87,7 +87,6 @@
   return [NSString stringWithCString:icaltime_as_ical_string(_time)];
 }
 
-
 - (id)initWithTime:(BOOL)time
 {
   const char *tzone;
@@ -106,17 +105,17 @@
   }
   return self;
 }
-
 - (id)init
 {
   return [self initWithTime:YES];
 }
-
-
-/* FIXME : rename this 'now' and create a 'today' */
-+ (id)date
++ (id)now
 {
-  return AUTORELEASE([[Date alloc] init]);
+  return AUTORELEASE([[Date alloc] initWithTime:YES]);
+}
++ (id)today
+{
+  return AUTORELEASE([[Date alloc] initWithTime:NO]);
 }
 
 - (NSCalendarDate *)calendarDate

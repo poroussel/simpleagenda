@@ -37,7 +37,7 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
 
 - (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
 {
-  Date *today = [Date date];
+  Date *today = [Date today];
   NSMutableDictionary *attributes = [NSMutableDictionary new];
   NSString *details;
 
@@ -55,10 +55,10 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
 
 - (void)updateSummaryData
 {
-  Date *today = [Date date];
-  Date *tomorrow = [Date date];
-  Date *soonStart = [Date date];
-  Date *soonEnd = [Date date];
+  Date *today = [Date today];
+  Date *tomorrow = [Date today];
+  Date *soonStart = [Date today];
+  Date *soonEnd = [Date today];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   NSEnumerator *dayEnumerator;
   Event *event;
@@ -89,7 +89,7 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
 {
   self = [super init];
   if (self) {
-    ASSIGNCOPY(_selectedDay, [Date date]);
+    ASSIGNCOPY(_selectedDay, [Date today]);
     _selection = nil;
     _editor = [AppointmentEditor new];
     _taskEditor = [TaskEditor new];

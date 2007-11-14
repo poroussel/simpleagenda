@@ -115,11 +115,9 @@
     [white release];
     [self addSubview: matrix];
 
-    //[self setTitlePosition:NSBelowTop];
-    now = [Date date];
+    now = [Date today];
     [self setDate:now];
     [now incrementDay];
-    [now setMinute:0];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
 				 interval:86400 target:self 
 				 selector:@selector(dayChanged:) 
