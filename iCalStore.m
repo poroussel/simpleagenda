@@ -31,6 +31,7 @@
 - (void)dealloc
 {
   [panel close];
+  [super dealloc];
 }
 - (BOOL)show
 {
