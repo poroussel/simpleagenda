@@ -115,9 +115,15 @@
     [white release];
     [self addSubview: matrix];
 
-    now = [Date today];
+    /*
+     * FIXME : this should be [Date today] but it leads to
+     * every appointment starting at 00:00. Probably a problem 
+     * between ical time and ical date
+     */
+    now = [Date now];
     [self setDate:now];
     [now incrementDay];
+    [now setMinute:0];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
 				 interval:86400 target:self 
 				 selector:@selector(dayChanged:) 
