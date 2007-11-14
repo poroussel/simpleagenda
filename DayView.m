@@ -83,7 +83,7 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  DayView *parent = [self superview];
+  DayView *parent = (DayView *)[self superview];
   id delegate = [parent delegate];
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   int diff;
