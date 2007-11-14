@@ -9,7 +9,7 @@
 #import "PreferencesController.h"
 #import "iCalTree.h"
 
-NSComparisonResult sortAppointments(Event *a, Event *b, void *data)
+NSComparisonResult sortAppointments(id a, id b, void *data)
 {
   return [[a startDate] compare:[b startDate]];
 }
