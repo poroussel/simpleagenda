@@ -9,9 +9,14 @@
 #import "PreferencesController.h"
 #import "iCalTree.h"
 
-NSComparisonResult sortAppointments(id a, id b, void *data)
+NSComparisonResult compareAppointments(id a, id b, void *data)
 {
-  return [[a startDate] compare:[b startDate]];
+  return [[a startDate] compareTime:[b startDate]];
+}
+
+NSComparisonResult compareDataTreeElements(id a, id b, void *context)
+{
+  return [[[a valueForKey:@"object"] startDate] compareTime:[[b valueForKey:@"object"] startDate]];
 }
 
 @implementation AppController
@@ -75,15 +80,15 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
       [_today addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
       [_tomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
-  }
-  dayEnumerator = [soonStart enumeratorTo:soonEnd];
-  while ((day = [dayEnumerator nextObject])) {
-    enumerator = [[_sm allEvents] objectEnumerator];
-    while ((event = [enumerator nextObject])) {
+    dayEnumerator = [soonStart enumeratorTo:soonEnd];
+    while ((day = [dayEnumerator nextObject])) {
       if ([event isScheduledForDay:day])
 	[_soon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:day]]];
     }
   }
+  [_today sortChildrenUsingFunction:compareDataTreeElements context:nil];
+  [_tomorrow sortChildrenUsingFunction:compareDataTreeElements context:nil];
+  [_soon sortChildrenUsingFunction:compareDataTreeElements context:nil];
   [summary reloadData];
 }
 
@@ -189,7 +194,7 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSArray *sorted = [[_sm allEvents] sortedArrayUsingFunction:sortAppointments context:nil];
+  NSArray *sorted = [[_sm allEvents] sortedArrayUsingFunction:compareAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
 
@@ -313,6 +318,7 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
 	[_results addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:[event startDate]]]];
     }
     [_results setValue:[NSString stringWithFormat:@"%d item(s)", [[_results children] count]] forKey:@"details"];;
+    [_results sortChildrenUsingFunction:compareDataTreeElements context:nil];
     [summary reloadData];
     [summary expandItem:_results];
   }

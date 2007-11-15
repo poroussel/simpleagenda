@@ -19,4 +19,5 @@
 - (void)setAttributes:(NSDictionary *)attributes;
 - (void)setValue:(id)value forKey:(NSString *)key;
 - (id)valueForKey:(NSString *)key;
+- (void)sortChildrenUsingFunction:(int (*)(id, id, void *))compare context:(void *)context;
 @end
