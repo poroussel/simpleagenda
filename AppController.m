@@ -75,9 +75,11 @@ NSComparisonResult sortAppointments(id a, id b, void *data)
       [_today addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
       [_tomorrow addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:tomorrow]]];
-    dayEnumerator = [soonStart enumeratorTo:soonEnd];
-    /* FIXME : sort events by dates */
-    while ((day = [dayEnumerator nextObject])) {
+  }
+  dayEnumerator = [soonStart enumeratorTo:soonEnd];
+  while ((day = [dayEnumerator nextObject])) {
+    enumerator = [[_sm allEvents] objectEnumerator];
+    while ((event = [enumerator nextObject])) {
       if ([event isScheduledForDay:day])
 	[_soon addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:day]]];
     }
