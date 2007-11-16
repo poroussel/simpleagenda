@@ -492,8 +492,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-  int index = [taskView clickedRow];
-
+  int index = [taskView selectedRow];
   if (index > -1)
     _clickedElement = [[_sm allTasks] objectAtIndex:index];
 }
