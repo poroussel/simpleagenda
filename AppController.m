@@ -255,8 +255,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   if (_clickedElement) {
     [panel setRequiredFileType:@"ics"];
-    [panel setTitle:@"Export As"];
-    if ([panel runModal] == NSOKButton) {
+    [panel setTitle:@"Export as"];
+    if ([panel runModalForDirectory:nil file:[_clickedElement summary]] == NSOKButton) {
       tree = [iCalTree new];
       [tree add:_clickedElement];
       str = [tree iCalTreeAsString];
