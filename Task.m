@@ -16,7 +16,7 @@ static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
   [super initWithCoder:coder];
   _state = [coder decodeIntForKey:@"state"];
   if ([coder containsValueForKey:@"completion"])
-    _completionDate = [coder decodeObjectForKey:@"completion"];
+    _completionDate = [[coder decodeObjectForKey:@"completion"] retain];
   else
     _completionDate = nil;
   return self;
