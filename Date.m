@@ -40,22 +40,8 @@
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
-  /* Conversion from ChronographerSource Date format */
-  if ([coder containsValueForKey:@"year"]) {
-    int minute = abs([coder decodeIntForKey:@"minute"]);
-    _time = icaltime_null_time();
-    _time.year = [coder decodeIntForKey:@"year"];
-    _time.month = [coder decodeIntForKey:@"month"];
-    _time.day = [coder decodeIntForKey:@"day"];
-    _time.hour = minute / 60;
-    _time.minute = minute % 60;
-    _time = icaltime_normalize(_time);
-    icaltimezone *tz = icaltimezone_get_builtin_timezone([[[NSTimeZone localTimeZone] description] cString]);
-    _time = icaltime_set_timezone(&_time, tz);    
-  } else {
-    NSString *icalTime = [coder decodeObjectForKey:@"icalTime"];
-    _time = icaltime_from_string([icalTime cString]);
-  }
+  NSString *icalTime = [coder decodeObjectForKey:@"icalTime"];
+  _time = icaltime_from_string([icalTime cString]);
   return self;
 }
 @end
