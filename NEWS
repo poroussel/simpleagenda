@@ -1,3 +1,8 @@
+version 0.31
+	* Bug fixes
+	* Appointments sorted by date in the summary
+	* Deleted code to read old Date objects encoding
+
 version 0.30 (2007/11/12)
 	* Refactor code to handle multiple kinds of events
 	* Add simple task (iCalendar VTODO) support
