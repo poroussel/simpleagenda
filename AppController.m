@@ -305,13 +305,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   }
 }
 
-- (void)doSearch:(id)sender
+- (void)performSearch
 {
   NSEnumerator *enumerator;
   Event *event;
 
+  [_results removeChildren];
   if ([[search stringValue] length] > 0) {
-    [_results removeChildren];
     enumerator = [[_sm allEvents] objectEnumerator];
     while ((event = [enumerator nextObject])) {
       if ([event contains:[search stringValue]])
@@ -319,9 +319,14 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     }
     [_results setValue:[NSString stringWithFormat:@"%d item(s)", [[_results children] count]] forKey:@"details"];;
     [_results sortChildrenUsingFunction:compareDataTreeElements context:nil];
-    [summary reloadData];
     [summary expandItem:_results];
   }
+}
+
+- (void)doSearch:(id)sender
+{
+  [self performSearch];
+  [summary reloadData];
   [window makeFirstResponder:search];
 }
 
@@ -451,6 +456,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [dayView reloadData];
   [taskView reloadData];
+  [self performSearch];
   [self updateSummaryData];
 }
 @end
