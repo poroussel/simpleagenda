@@ -141,6 +141,7 @@
 -(void)selectDefaultStore:(id)sender
 {
   [_sm setDefaultStore:[defaultStorePopUp titleOfSelectedItem]];
+  [self selectStore:nil];
 }
 
 -(void)toggleDisplay:(id)sender
