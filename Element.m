@@ -25,13 +25,19 @@
   return self;
 }
 
+- (id)init
+{
+  self = [super init];
+  if (self)
+    [self generateUID];
+  return self;
+}
+
 - (id)initWithSummary:(NSString *)summary
 {
   self = [self init];
-  if (self) {
+  if (self)
     [self setSummary:summary];
-    [self generateUID];
-  }
   return self;
 }
 
