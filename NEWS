@@ -1,4 +1,4 @@
-version 0.31
+version 0.31 (2007/11/21)
 	* Bug fixes
 	* Appointments sorted by date in the summary
 	* Deleted code to read old Date objects encoding
