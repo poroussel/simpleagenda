@@ -14,6 +14,21 @@
     NSMainNibFile = Agenda.gorm;
     NSPrincipalClass = NSApplication;
     NSRole = Application;
+    NSServices = (
+	{
+	    NSKeyEquivalent = {
+		default = t;
+	    };
+	    NSMenuItem = {
+		default = "SimpleAgenda/Create Task";
+	    };
+	    NSMessage = newTask;
+	    NSPortName = SimpleAgenda;
+	    NSSendTypes = (
+		NSStringPboardType
+	    );
+	}
+    );
     NSTypes = (
 	{
 	    NSDocumentClass = "";

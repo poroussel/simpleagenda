@@ -132,7 +132,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)not
+{
   [dayView reloadData];
+  [NSApp setServicesProvider: self];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
@@ -224,6 +229,33 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)addTask:(id)sender
 {
   Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
+  if (task && [_taskEditor editTask:task withStoreManager:_sm])
+    [tabs selectTabViewItemWithIdentifier:@"Tasks"];
+  [task release];
+}
+
+- (void)newTask:(NSPasteboard *)pboard userData:(NSString *)userData error:(NSString **)error
+{
+  NSString *aString;
+  NSArray *allTypes;
+  Task *task;
+
+  allTypes = [pboard types];  
+  if (![allTypes containsObject: NSStringPboardType]) {
+    *error = @"No string type supplied on pasteboard";
+    return;
+  }
+  aString = [pboard stringForType: NSStringPboardType];
+  if (aString == nil) {
+    *error = @"No string value supplied on pasteboard";
+    return;
+  }
+  task = [Task new];
+  if ([aString length] > 40) {
+    [task setSummary:@"New note"];
+    [task setText:AUTORELEASE([[NSAttributedString alloc ] initWithString:aString])];
+  } else
+    [task setSummary:aString];
   if (task && [_taskEditor editTask:task withStoreManager:_sm])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
