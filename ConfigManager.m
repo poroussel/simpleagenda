@@ -35,7 +35,7 @@ static ConfigManager *singleton;
       parent = [ConfigManager globalConfig];
     [_dict setDictionary:[parent dictionaryForKey:key]];
     ASSIGN(_parent, parent);
-    ASSIGN(_key, key);
+    ASSIGNCOPY(_key, key);
   }
   return self;
 }

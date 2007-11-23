@@ -45,7 +45,7 @@
 
   [defaultStorePopUp removeAllItems];
   while ((aStore = [list nextObject])) {
-    if ([aStore isWritable])
+    if ([aStore writable])
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
@@ -90,7 +90,7 @@
   [storeColor setColor:[store eventColor]];
   [storeTextColor setColor:[store textColor]];
   [storeDisplay setState:[store displayed]];
-  [storeWritable setState:[store isWritable]];
+  [storeWritable setState:[store writable]];
   if ([[defaultStorePopUp titleOfSelectedItem] isEqual:[store description]])
     [removeButton setEnabled:NO];
   else
@@ -153,7 +153,7 @@
 -(void)toggleWritable:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
-  [store setIsWritable:[storeWritable state]];
+  [store setWritable:[storeWritable state]];
 }
 
 /* We only allow the removal of non-default stores */

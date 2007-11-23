@@ -220,7 +220,7 @@
       writable = YES;
     }
     [dialog release];
-    cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
+    cm = [[ConfigManager alloc] initForKey:name withParent:nil];
     [cm setObject:[storeURL description] forKey:ST_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
@@ -303,7 +303,7 @@
 {
   NSData *data;
 
-  if ([self isWritable] && data) {
+  if ([self writable] && data) {
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
     data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];  
     if ([_url setResourceData:data]) {
@@ -314,7 +314,7 @@
     }
     [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
     NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
-    [self setIsWritable:NO];
+    [self setWritable:NO];
     return NO;
   }
   return YES;

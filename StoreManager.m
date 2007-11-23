@@ -136,7 +136,7 @@
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store modified] && [store isWritable])
+    if ([store modified] && [store writable])
       [store write];
 }
 

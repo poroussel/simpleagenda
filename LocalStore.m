@@ -39,7 +39,7 @@
 {
   ConfigManager *cm;
 
-  cm = [[ConfigManager alloc] initForKey:[name copy] withParent:nil];
+  cm = [[ConfigManager alloc] initForKey:name withParent:nil];
   [cm setObject:[name copy] forKey:ST_FILE];
   [cm setObject:[[self class] description] forKey:ST_CLASS];
   return YES;
@@ -115,7 +115,7 @@
     return YES;
   }
   NSLog(@"Unable to write to %@, make this store read only", _globalFile);
-  [self setIsWritable:NO];
+  [self setWritable:NO];
   return NO;
 }
 @end

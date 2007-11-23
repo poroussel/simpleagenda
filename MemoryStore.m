@@ -53,11 +53,6 @@
   [super dealloc];
 }
 
-- (NSEnumerator *)enumerator
-{
-  return [_data objectEnumerator];
-}
-
 - (NSArray *)events
 {
   return [_data allValues];
@@ -113,12 +108,12 @@
   return [_tasks objectForKey:[elt UID]] != nil;
 }
 
--(BOOL)isWritable
+-(BOOL)writable
 {
   return _writable;
 }
 
-- (void)setIsWritable:(BOOL)writable
+- (void)setWritable:(BOOL)writable
 {
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];

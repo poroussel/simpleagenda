@@ -102,7 +102,7 @@
     [delegate dayView:parent selectEvent:_apt];
   [parent selectAppointmentView:self];
 
-  if (![[_apt store] isWritable] || [_apt allDay])
+  if (![[_apt store] writable] || [_apt allDay])
     return;
 
   inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];

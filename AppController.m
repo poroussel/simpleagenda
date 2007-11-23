@@ -318,7 +318,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)paste:(id)sender
 {
-  if (_selection && [[_selection store] isWritable]) {
+  if (_selection && [[_selection store] writable]) {
     Date *date = [[calendar date] copy];
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
@@ -514,7 +514,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
 
-  if ([[task store] isWritable]) {
+  if ([[task store] writable]) {
     [task setState:[anObject intValue]];
     [[task store] update:task];
   }
@@ -525,7 +525,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   if ([[aTableColumn identifier] isEqualToString:@"state"]) {
     task = [[_sm allTasks] objectAtIndex:rowIndex];
-    [aCell setEnabled:[[task store] isWritable]];
+    [aCell setEnabled:[[task store] writable]];
   }
 }
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification

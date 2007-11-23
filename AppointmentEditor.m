@@ -41,12 +41,12 @@
   originalStore = [data store];
   if (!originalStore)
     [data setStore:[sm defaultStore]];
-  else if (![originalStore isWritable])
+  else if (![originalStore writable])
     [ok setEnabled:NO];
     
   [store removeAllItems];
   while ((aStore = [list nextObject])) {
-    if ([aStore isWritable] || aStore == originalStore)
+    if ([aStore writable] || aStore == originalStore)
       [store addItemWithTitle:[aStore description]];
   }
   [store selectItemWithTitle:[[data store] description]];

@@ -14,4 +14,3 @@
   BOOL _writable;
 }
 @end
-

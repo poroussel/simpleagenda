@@ -10,11 +10,9 @@
 
 @protocol MemoryStore <NSObject>
 + (id)storeNamed:(NSString *)name;
+- (id)initWithName:(NSString *)name;
 + (BOOL)registerWithName:(NSString *)name;
 + (NSString *)storeTypeName;
-- (NSDictionary *)defaults;
-- (id)initWithName:(NSString *)name;
-- (NSEnumerator *)enumerator;
 - (NSArray *)events;
 - (NSArray *)tasks;
 - (void)addEvent:(Event *)evt;
@@ -23,8 +21,8 @@
 - (void)update:(Element *)evt;
 - (BOOL)contains:(Element *)elt;
 - (BOOL)modified;
-- (BOOL)isWritable;
-- (void)setIsWritable:(BOOL)writable;
+- (BOOL)writable;
+- (void)setWritable:(BOOL)writable;
 - (NSColor *)eventColor;
 - (void)setEventColor:(NSColor *)color;
 - (NSColor *)textColor;
