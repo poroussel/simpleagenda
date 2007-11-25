@@ -6,10 +6,6 @@
 #import "iCalTree.h"
 #import "defines.h"
 
-#define max(x,y) ((x) > (y)) ? (x) : (y)
-#define min(x,y) ((x) < (y)) ? (x) : (y)
-#define abs(x) ((x) < 0) ? (-x) : (x)
-
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height)
 
@@ -269,8 +265,8 @@
     [hour drawAtPoint:NSMakePoint(4, start - hrow / 2 - size.height / 2) withAttributes:_textAttributes];
   }
   if (_startPt.x != _endPt.x && _startPt.y != _endPt.y) {
-    miny = min(_startPt.y, _endPt.y);
-    maxy = max(_startPt.y, _endPt.y);
+    miny = MIN(_startPt.y, _endPt.y);
+    maxy = MAX(_startPt.y, _endPt.y);
     [[NSColor grayColor] set];
     NSFrameRect(NSMakeRect(40, miny, rect.size.width - 48, maxy - miny));
   }
@@ -359,9 +355,9 @@
     [self display];
   }
   [NSCursor pop];
-  if (abs(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
-    start = [self positionToMinute:max(_startPt.y, _endPt.y)];
-    end = [self positionToMinute:min(_startPt.y, _endPt.y)];
+  if (ABS(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
+    start = [self positionToMinute:MAX(_startPt.y, _endPt.y)];
+    end = [self positionToMinute:MIN(_startPt.y, _endPt.y)];
     if ([delegate respondsToSelector:@selector(dayView:createEventFrom:to:)])
       [delegate dayView:self createEventFrom:[self roundMinutes:start] to:[self roundMinutes:end]];
   }
