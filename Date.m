@@ -264,13 +264,13 @@
 
 - (void)changeDayBy:(int)diff
 {
-  struct icaldurationtype dt = {diff < 0, abs(diff), 0, 0, 0, 0};
+  struct icaldurationtype dt = {diff < 0, ABS(diff), 0, 0, 0, 0};
   _time = icaltime_add(_time, dt);
 }
 
 - (void)changeMinuteBy:(int)diff
 {
-  struct icaldurationtype dt = {diff < 0, 0, 0, 0, abs(diff), 0};
+  struct icaldurationtype dt = {diff < 0, 0, 0, 0, ABS(diff), 0};
   _time = icaltime_add(_time, dt);
 }
 
