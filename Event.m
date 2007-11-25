@@ -42,6 +42,7 @@
 {
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
   Event *new = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  [new generateUID];
   return new;
 }
 

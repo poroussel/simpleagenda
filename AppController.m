@@ -318,7 +318,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)paste:(id)sender
 {
-  if (_selection && [[_selection store] writable]) {
+  if (_selection) {
     Date *date = [[calendar date] copy];
     if (_deleteSelection) {
       [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
@@ -327,7 +327,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       _selection = nil;
     } else {
       Event *new = [_selection copy];
-      [new generateUID];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date];
       [[_selection store] addEvent:new];
@@ -377,9 +376,9 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   SEL action = [menuItem action];
 
   if (sel_eq(action, @selector(copy:)))
-    return itemSelected && [_clickedElement isKindOfClass:[Event class]];
+    return itemSelected && [_clickedElement isKindOfClass:[Event class]] && [[_clickedElement store] writable];
   if (sel_eq(action, @selector(cut:)))
-    return itemSelected && [_clickedElement isKindOfClass:[Event class]];
+    return itemSelected && [_clickedElement isKindOfClass:[Event class]] && [[_clickedElement store] writable];
   if (sel_eq(action, @selector(editAppointment:)))
     return itemSelected;
   if (sel_eq(action, @selector(delAppointment:)))
@@ -387,7 +386,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if (sel_eq(action, @selector(exportAppointment:)))
     return itemSelected;
   if (sel_eq(action, @selector(paste:)))
-    return _selection != nil;
+    return _selection != nil && [[_selection store] writable];
   return YES;
 }
 
