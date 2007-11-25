@@ -89,14 +89,6 @@
 
 - (void)update:(Element *)elt;
 {
-  [elt setStore:self];
-  if ([elt isKindOfClass:[Event class]]) {
-    [_data removeObjectForKey:[elt UID]];
-    [_data setValue:elt forKey:[elt UID]];
-  } else {
-    [_tasks removeObjectForKey:[elt UID]];
-    [_tasks setValue:elt forKey:[elt UID]];
-  }  
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
