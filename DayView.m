@@ -274,20 +274,16 @@
 
 - (id)dataSource
 {
-  return _dataSource;
+  return dataSource;
 }
-
 - (void)setDataSource:(id)source
 {
-  _dataSource = source;
-  [self reloadData];
+  dataSource = source;
 }
-
 - (id)delegate
 {
   return delegate;
 }
-
 - (void)setDelegate:(id)theDelegate
 {
   delegate = theDelegate;
@@ -319,7 +315,7 @@
     [aptv removeFromSuperview];
   }
   _selected = nil;
-  enumerator = [[_dataSource scheduledAppointmentsForDayView] objectEnumerator];
+  enumerator = [[dataSource scheduledAppointmentsForDayView] objectEnumerator];
   while ((apt = [enumerator nextObject])) {
     [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed]) {
@@ -407,12 +403,10 @@
 {
   return _firstH;
 }
-
 - (int)lastHour
 {
   return _lastH;
 }
-
 - (int)minimumStep
 {
   return _minStep;

@@ -36,9 +36,8 @@
 	Actions = (
 	);
 	Outlets = (
-	    _dataSource,
-	    delegate,
-	    _width
+	    dataSource,
+	    delegate
 	);
 	Super = NSView;
     };

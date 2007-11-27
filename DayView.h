@@ -12,7 +12,7 @@
 
 @interface DayView : NSView <ConfigListener>
 {
-  id <DayViewDataSource> _dataSource;
+  IBOutlet id <DayViewDataSource> dataSource;
   IBOutlet id delegate;
   int _firstH;
   int _lastH;
