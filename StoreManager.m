@@ -8,9 +8,36 @@
 #import "LocalStore.h"
 #import "iCalStore.h"
 
+static NSMutableDictionary *backends = nil;
+
 @implementation StoreManager
 
 #define PERSONAL_AGENDA @"Personal Agenda"
+
++ (void)initialize
+{
+  NSArray *classes = GSObjCAllSubclassesOfClass([MemoryStore class]);
+  NSEnumerator *enumerator = [classes objectEnumerator];
+  Class backendClass;
+
+  if (backends == nil) {
+    backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
+    while ((backendClass = [enumerator nextObject])) {
+      if ([backendClass conformsToProtocol:@protocol(AgendaStore)])
+	[backends setObject:backendClass forKey:[backendClass storeTypeName]];
+      else
+	NSLog(@"Can't register %@ as a store backend", [backendClass description]);
+    }
+  }
+}
++ (NSArray *)backends
+{
+  return [backends allValues];
+}
++ (Class)backendForName:(NSString *)name
+{
+  return [backends valueForKey:name];
+}
 
 - (NSDictionary *)defaults
 {
@@ -37,9 +64,6 @@
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
-    _backends = [[NSMutableDictionary alloc] initWithCapacity:2];
-    [self registerBackend:[LocalStore class]];
-    [self registerBackend:[iCalStore class]];
     enumerator = [storeArray objectEnumerator];
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
@@ -58,26 +82,7 @@
   RELEASE(_defaultStore);
   RELEASE(_delegate);
   [_stores release];
-  [_backends release];
   [super dealloc];
-}
-
-- (void)registerBackend:(Class)type
-{
-  if ([type conformsToProtocol:@protocol(AgendaStore)])
-    [_backends setObject:type forKey:[type storeTypeName]];
-  else
-    NSLog(@"Can't register %@ as a store backend", [type description]);
-}
-
-- (NSArray *)registeredBackends
-{
-  return [_backends allValues];
-}
-
-- (Class)backendNamed:(NSString *)name
-{
-  return [_backends valueForKey:name];
 }
 
 - (void)addStoreNamed:(NSString *)name

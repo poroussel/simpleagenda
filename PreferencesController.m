@@ -60,7 +60,7 @@
 
 -(void)showPreferences
 {
-  NSEnumerator *backends = [[_sm registeredBackends] objectEnumerator];
+  NSEnumerator *backends = [[StoreManager backends] objectEnumerator];
   ConfigManager *config = [ConfigManager globalConfig];
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
@@ -177,7 +177,7 @@
   NSMutableArray *storeArray = [NSMutableArray arrayWithArray:[config objectForKey:STORES]];
   Class backend;
 
-  backend = [_sm backendNamed:[storeClass titleOfSelectedItem]];
+  backend = [StoreManager backendForName:[storeClass titleOfSelectedItem]];
   if (backend && [backend registerWithName:[storeName stringValue]]) {
     [_sm addStoreNamed:[storeName stringValue]];
     [storeArray addObject:[storeName stringValue]];
