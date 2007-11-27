@@ -1,5 +1,6 @@
 version 0.32
 	* Add 'SimpleAgenda/Create Task' service
+	* Internal modifications and refactoring
 
 version 0.31 (2007/11/21)
 	* Bug fixes

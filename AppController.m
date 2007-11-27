@@ -100,9 +100,9 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     _selection = nil;
     _editor = [AppointmentEditor new];
     _taskEditor = [TaskEditor new];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
-    [_sm setDelegate:self];
     [self initSummary];
     [self updateSummaryData];
     [self registerForServices];
@@ -142,6 +142,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_summaryRoot release];
   [_today release];
   [_tomorrow release];
@@ -403,6 +404,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   return dayEvents;
 }
 
+- (void)dataChanged:(NSNotification *)not
+{
+  [dayView reloadData];
+  [taskView reloadData];
+  [self performSearch];
+  [self updateSummaryData];
+}
 @end
 
 @implementation AppController(NSOutlineViewDataSource)
@@ -479,16 +487,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)dayView:(DayView *)dayview selectEvent:(Event *)event
 {
   _clickedElement = event;
-}
-@end
-
-@implementation AppController(StoreManagerDelegate)
-- (void)dataChangedInStoreManager:(StoreManager *)sm
-{
-  [dayView reloadData];
-  [taskView reloadData];
-  [self performSearch];
-  [self updateSummaryData];
 }
 @end
 

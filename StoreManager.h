@@ -2,11 +2,12 @@
 
 #import "Element.h"
 
+#define SADataChanged @"DataDidChanged"
+
 @interface StoreManager : NSObject
 {
   NSMutableDictionary *_stores;
   id _defaultStore;
-  id _delegate;
 }
 
 + (NSArray *)backends;
@@ -18,16 +19,8 @@
 - (void)setDefaultStore:(NSString *)name;
 - (id <AgendaStore>)defaultStore;
 - (NSEnumerator *)storeEnumerator;
-
 - (void)synchronise;
-- (void)setDelegate:(id)delegate;
-- (id)delegate;
-- (void)dataChanged:(NSNotification *)not;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;
 - (NSArray *)allEvents;
 - (NSArray *)allTasks;
-@end
-
-@interface NSObject(StoreManagerDelegate)
-- (void)dataChangedInStoreManager:(StoreManager *)sm;
 @end

@@ -80,9 +80,13 @@ static NSMutableDictionary *backends = nil;
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_defaultStore);
-  RELEASE(_delegate);
   [_stores release];
   [super dealloc];
+}
+
+- (void)dataChanged:(NSNotification *)not
+{
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChanged object:self];
 }
 
 - (void)addStoreNamed:(NSString *)name
@@ -143,22 +147,6 @@ static NSMutableDictionary *backends = nil;
   while ((store = [enumerator nextObject]))
     if ([store modified] && [store writable])
       [store write];
-}
-
-- (void)setDelegate:(id)delegate
-{
-  ASSIGN(_delegate, delegate);
-}
-
-- (id)delegate
-{
-  return _delegate;
-}
-
-- (void)dataChanged:(NSNotification *)not
-{
-  if ([_delegate respondsToSelector:@selector(dataChangedInStoreManager:)])
-    [_delegate dataChangedInStoreManager:self];
 }
 
 - (id <AgendaStore>)storeContainingElement:(Element *)elt
