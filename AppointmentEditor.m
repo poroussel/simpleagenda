@@ -73,12 +73,12 @@
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
     if (!originalStore)
-      [aStore addEvent:data];
+      [aStore add:data];
     else if (originalStore == aStore)
       [aStore update:data];
     else {
       [originalStore remove:data];
-      [aStore addEvent:data];
+      [aStore add:data];
     }
     return YES;
   }

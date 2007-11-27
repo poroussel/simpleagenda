@@ -53,12 +53,12 @@
     [task setState:[state indexOfSelectedItem]];
     aStore = [sm storeForName:[store titleOfSelectedItem]];
     if (!originalStore)
-      [aStore addTask:task];
+      [aStore add:task];
     else if (originalStore == aStore)
       [aStore update:task];
     else {
       [originalStore remove:task];
-      [aStore addTask:task];
+      [aStore add:task];
     }
     return YES;
   }

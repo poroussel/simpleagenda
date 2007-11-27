@@ -250,18 +250,10 @@
   [self read];
 }
 
-- (void)addEvent:(Event *)evt
+- (void)add:(Element *)elt
 {
-  if ([_tree add:evt]) {
-    [super addEvent:evt];
-    if (![_url isFileURL])
-      [self write];
-  }
-}
-- (void)addTask:(Task *)task
-{
-  if ([_tree add:task]) {
-    [super addTask:task];
+  if ([_tree add:elt]) {
+    [super add:elt];
     if (![_url isFileURL])
       [self write];
   }

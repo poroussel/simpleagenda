@@ -15,8 +15,7 @@
 + (NSString *)storeTypeName;
 - (NSArray *)events;
 - (NSArray *)tasks;
-- (void)addEvent:(Event *)evt;
-- (void)addTask:(Task *)task;
+- (void)add:(Element *)evt;
 - (void)remove:(Element *)elt;
 - (void)update:(Element *)evt;
 - (BOOL)contains:(Element *)elt;

@@ -179,12 +179,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       store = [_sm storeContainingElement:elt];
       if (store)
 	[store update:elt];
-      else {
-	if ([elt isKindOfClass:[Event class]])
-	  [[_sm defaultStore] addEvent:(Event *)elt];
-	else
-	  [[_sm defaultStore] addTask:(Task *)elt];
-      }
+      else
+	[[_sm defaultStore] add:elt];
     }
     [tree release];
     return YES;
@@ -330,7 +326,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       Event *new = [_selection copy];
       [date setMinute:[self _sensibleStartForDuration:[new duration]]];
       [new setStartDate:date];
-      [[_selection store] addEvent:new];
+      [[_selection store] add:new];
       [new release];
     }
     [date release];

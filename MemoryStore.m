@@ -62,17 +62,13 @@
   return [_tasks allValues];
 }
 
--(void)addEvent:(Event *)evt
+-(void)add:(Element *)elt
 {
-  [evt setStore:self];
-  [_data setValue:evt forKey:[evt UID]];
-  _modified = YES;
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-}
--(void)addTask:(Task *)task
-{
-  [task setStore:self];
-  [_tasks setValue:task forKey:[task UID]];
+  [elt setStore:self];
+  if ([elt isKindOfClass:[Event class]])
+    [_data setValue:elt forKey:[elt UID]];
+  else
+    [_tasks setValue:elt forKey:[elt UID]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
