@@ -5,8 +5,6 @@
 #define SADataChangedInStore @"DataDidChangedInStore"
 
 @class Element;
-@class Event;
-@class Task;
 
 @protocol MemoryStore <NSObject>
 + (id)storeNamed:(NSString *)name;
