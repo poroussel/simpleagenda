@@ -33,11 +33,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   _tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
   _soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
   _results = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Search results" forKey:@"title"]];
+  _tasks = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Open tasks" forKey:@"title"]];
   _summaryRoot = [DataTree new];
   [_summaryRoot addChild:_today];
   [_summaryRoot addChild:_tomorrow];
   [_summaryRoot addChild:_soon];
   [_summaryRoot addChild:_results];
+  [_summaryRoot addChild:_tasks];
 }
 
 - (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
@@ -58,6 +60,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   return AUTORELEASE(attributes);
 }
 
+- (NSDictionary *)attributesFromTask:(Task *)task
+{
+  return [NSMutableDictionary dictionaryWithObjectsAndKeys:task, @"object", [task summary], @"title", nil, nil];
+}
+
 - (void)updateSummaryData
 {
   Date *today = [Date today];
@@ -68,6 +75,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSEnumerator *dayEnumerator;
   Event *event;
   Date *day;
+  Task *task;
 
   [_today removeChildren];
   [_tomorrow removeChildren];
@@ -89,6 +97,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_today sortChildrenUsingFunction:compareDataTreeElements context:nil];
   [_tomorrow sortChildrenUsingFunction:compareDataTreeElements context:nil];
   [_soon sortChildrenUsingFunction:compareDataTreeElements context:nil];
+  [_tasks removeChildren];
+  enumerator = [[_sm allTasks] objectEnumerator];
+  while ((task = [enumerator nextObject])) {
+    if ([task state] != TK_COMPLETED)
+      [_tasks addChild:[DataTree dataTreeWithAttributes:[self attributesFromTask:task]]];
+  }
   [summary reloadData];
 }
 
@@ -441,6 +455,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     _clickedElement = object;
     [calendar setDate:[item valueForKey:@"date"]];
     [tabs selectTabViewItemWithIdentifier:@"Day"];
+    return YES;
+  }
+  if (object && [object isKindOfClass:[Task class]]) {
+    _clickedElement = object;
+    [tabs selectTabViewItemWithIdentifier:@"Tasks"];
     return YES;
   }
   return NO;

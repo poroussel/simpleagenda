@@ -33,6 +33,7 @@
   DataTree *_tomorrow;
   DataTree *_soon;
   DataTree *_results;
+  DataTree *_tasks;
 }
 
 - (void)copy:(id)sender;
