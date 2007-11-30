@@ -54,7 +54,7 @@
 {
   return _store;
 }
-- (void)setStore:(id <AgendaStore>)store
+- (void)setStore:(id <MemoryStore>)store
 {
   ASSIGN(_store, store);
 }
