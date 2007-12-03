@@ -15,6 +15,7 @@
   BOOL _selected;
 }
 - (Event *)appointment;
+- (void)setSelected:(BOOL)selected;
 @end
 
 @implementation AppointmentView

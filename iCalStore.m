@@ -14,6 +14,9 @@
   IBOutlet id error;
   IBOutlet id warning;
 }
+- (BOOL)show;
+- (void)setError:(NSString *)errorText;
+- (NSString *)url;
 @end
 @implementation iCalStoreDialog
 - (id)initWithName:(NSString *)storeName
@@ -63,8 +66,7 @@
 @end
 
 
-@implementation iCalStore
-- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
+@implementation iCalStore- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
   GSXMLNode *inter;
 
