@@ -28,29 +28,8 @@
   self = [super initWithFrame:frame];
 
   if (self) {
-    NSArray *months = [[NSArray alloc] initWithObjects: _(@"January"),
-				       _(@"February"),
-				       _(@"March"),
-				       _(@"April"),
-				       _(@"May"), 
-				       _(@"June"),
-				       _(@"July"),
-				       _(@"August"),
-				       _(@"September"),
-				       _(@"October"),
-				       _(@"November"),
-				       _(@"December"),
-				       nil];
-
-    NSArray *days = [[NSArray alloc] initWithObjects: @"",
-				     _(@"mon"),
-				     _(@"tue"),
-				     _(@"wed"),
-				     _(@"thu"),
-				     _(@"fri"),
-				     _(@"sat"),
-				     _(@"sun"), 
-				     nil];
+    NSArray *months = [[NSUserDefaults standardUserDefaults] objectForKey:NSMonthNameArray];
+    NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = [NSFont boldSystemFontOfSize: 0];
     normalFont = [NSFont systemFontOfSize: 0];
     delegate = nil;
@@ -103,7 +82,10 @@
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
-      [cell setStringValue: [days objectAtIndex: i]];
+      if (i < 7 && i > 0)
+	[cell setStringValue: [days objectAtIndex: i]];
+      else if (i == 7)
+	[cell setStringValue: [days objectAtIndex: 0]];
     }
     for (i = 0; i < 7; i++) {
       cell = [matrix cellAtRow: i column: 0];
