@@ -2,23 +2,29 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     AppController = {
 	Actions = (
-	    "showPrefPanel:",
-	    "addAppointment:",
+	    "copy:",
+	    "cut:",
+	    "paste:",
 	    "editAppointment:",
 	    "delAppointment:",
 	    "exportAppointment:",
 	    "saveAll:",
+	    "showPrefPanel:",
+	    "addAppointment:",
+	    "addTask:",
+	    "editAppointment:",
+	    "delAppointment:",
+	    "exportAppointment:",
 	    "doSearch:",
-	    "clearSearch:",
-	    "addTask:"
+	    "clearSearch:"
 	);
 	Outlets = (
 	    calendar,
 	    dayView,
 	    summary,
-	    window,
 	    search,
 	    taskView,
+	    window,
 	    tabs
 	);
 	Super = NSObject;
