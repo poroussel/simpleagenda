@@ -151,16 +151,18 @@
   return YES;
 }
 
-/* This is destructive : it writes an empty file */
 + (BOOL)canWriteToURL:(NSURL *)url
 {
   BOOL ret;
+  NSURL *tmp = AUTORELEASE([[NSURL alloc] initWithString:@"sa.write" relativeToURL:url]);
 
-  [url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-  ret = [url setResourceData:[NSData data]];
-  [url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-  if (ret)
+  [tmp setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
+  ret = [tmp setResourceData:[NSData data]];
+  if (ret) {
+    [tmp setProperty:@"DELETE" forKey:GSHTTPPropertyMethodKey];
+    [tmp setResourceData:[NSData data]];
     return YES;
+  }
   return NO;
 }
 
