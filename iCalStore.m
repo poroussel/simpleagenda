@@ -160,7 +160,7 @@
   ret = [tmp setResourceData:[NSData data]];
   if (ret) {
     [tmp setProperty:@"DELETE" forKey:GSHTTPPropertyMethodKey];
-    [tmp setResourceData:[NSData data]];
+    [tmp setResourceData:nil];
     return YES;
   }
   return NO;
@@ -212,14 +212,13 @@
  error:
   if ([dialog show] == YES) {
     storeURL = [iCalStore getRealURL:[NSURL URLWithString:[dialog url]]];
-    /* If there's no file there */
-    if ([iCalStore canReadFromURL:storeURL] == NO) {
-      /* Try to write one */
-      if ([iCalStore canWriteToURL:storeURL] == NO) {
-	[dialog setError:@"Unable to read or write at this url"];
+    writable = YES;
+    if ([iCalStore canWriteToURL:storeURL] == NO) {
+      writable = NO;
+      if ([iCalStore canReadFromURL:storeURL] == NO) {
+	[dialog setError:@"Unable to read at this url"];
 	goto error;
       }
-      writable = YES;
     }
     [dialog release];
     cm = [[ConfigManager alloc] initForKey:name withParent:nil];

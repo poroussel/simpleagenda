@@ -3,6 +3,8 @@ version 0.32
 	* Internal modifications and refactoring
 	* Add Open tasks category to summary view
 	* Enable 24 hours DayView
+	* Change iCalStore creation to set store writable flag is 
+	  possible without erasing existing data 
 
 version 0.31 (2007/11/21)
 	* Bug fixes
