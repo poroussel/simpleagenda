@@ -66,7 +66,8 @@
 @end
 
 
-@implementation iCalStore- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
+@implementation iCalStore
+- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
   GSXMLNode *inter;
 

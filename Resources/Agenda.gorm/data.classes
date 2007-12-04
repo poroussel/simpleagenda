@@ -34,7 +34,8 @@
 	    "setDelegate:"
 	);
 	Outlets = (
-	    delegate
+	    delegate,
+	    dataSource
 	);
 	Super = NSBox;
     };

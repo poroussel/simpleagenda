@@ -10,7 +10,7 @@
 #import "PreferencesController.h"
 #import "DataTree.h"
 
-@interface AppController : NSObject <DayViewDataSource>
+@interface AppController : NSObject <AgendaDataSource>
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
@@ -34,6 +34,7 @@
   DataTree *_soon;
   DataTree *_results;
   DataTree *_tasks;
+  NSArray *_eventsCache;
 }
 
 - (void)copy:(id)sender;

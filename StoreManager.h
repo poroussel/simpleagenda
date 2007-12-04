@@ -1,6 +1,11 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import "Date.h"
 #import "Element.h"
+
+@protocol AgendaDataSource
+- (NSSet *)scheduledAppointmentsForDay:(Date *)day;
+@end
 
 #define SADataChanged @"DataDidChanged"
 

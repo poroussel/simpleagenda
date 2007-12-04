@@ -3,14 +3,16 @@
 #include <AppKit/AppKit.h>
 #include "Date.h"
 #include "CalendarView.h"
+#include "StoreManager.h"
 
 @implementation CalendarView
-
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(date);
   [_dayTimer invalidate];
-  delegate = nil;
+  RELEASE(delegate);
+  RELEASE(dataSource);
   [boldFont release];
   [normalFont release];
   [title release];
@@ -33,6 +35,7 @@
     boldFont = [NSFont boldSystemFontOfSize: 0];
     normalFont = [NSFont systemFontOfSize: 0];
     delegate = nil;
+    dataSource = nil;
 
     title = [[NSTextField alloc] initWithFrame: NSMakeRect(122, 164, 100, 20)];
     [title setEditable:NO];
@@ -112,9 +115,9 @@
 				 userInfo:nil 
 				 repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
   }
   return self;
-
 }
 
 - (void)updateTitle
@@ -141,6 +144,7 @@
   int day, row, column, week;
   Date *firstWeek;
   Date *today;
+  NSSet *events;
 
   [self clearSelectedDay];
   for (row = 1; row < 7; row++) {
@@ -167,6 +171,10 @@
     if ([firstWeek compare:today] == 0) {
       [[matrix cellAtRow: row column: column] setBackgroundColor: [NSColor yellowColor]];
       [[matrix cellAtRow: row column: column] setDrawsBackground: YES];
+    }
+    if (dataSource) {
+      events = [dataSource scheduledAppointmentsForDay:firstWeek];
+      [[matrix cellAtRow: row column: column] setBezeled:([events count] > 0)];
     }
     [[matrix cellAtRow: row column: column] setIntValue: day];
     [[matrix cellAtRow: row column: column] setTag: day];
@@ -222,9 +230,8 @@
 
 - (void)setDelegate: (id)aDelegate
 {
-  delegate = aDelegate;
+  ASSIGN(delegate, aDelegate);
 }
-
 - (id)delegate
 {
   return delegate;
@@ -239,7 +246,6 @@
   [button selectItemAtIndex: [date monthOfYear] - 1];
   [self updateView];
 }
-
 - (Date *)date
 {
   return date;
@@ -247,7 +253,22 @@
 
 - (NSString *)dateAsString
 {
-  return [[date calendarDate] descriptionWithCalendarFormat: @"%Y/%m/%d"];
+  return [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
 }
 
+- (void)setDataSource:(NSObject <AgendaDataSource> *)source
+{
+  ASSIGN(dataSource, source);
+  [self updateView];
+}
+- (id)dataSource
+{
+  return dataSource;
+}
+
+- (void)dataChanged:(NSNotification *)not
+{
+  if (dataSource)
+    [self updateView];
+}
 @end

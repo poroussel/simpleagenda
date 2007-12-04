@@ -1,6 +1,7 @@
 /* emacs objective-c mode -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import "StoreManager.h"
 
 @interface CalendarView : NSView
 {
@@ -13,6 +14,7 @@
   NSFont *normalFont;
   NSFont *boldFont;
   IBOutlet id delegate;
+  IBOutlet NSObject <AgendaDataSource> *dataSource;
   NSTimer *_dayTimer;
 }
 
@@ -20,14 +22,13 @@
 - (Date *)date;
 - (NSString *)dateAsString;
 - (id)delegate;
+- (id)dataSource;
 - (void)setDate:(Date *)date;
-- (void)setDelegate:(id)aDelegate;
-
+- (void)setDelegate:(id)delegate;
+- (void)setDataSource:(NSObject <AgendaDataSource> *)source;
 @end
 
 @interface NSObject(CalendarViewDelegate)
-
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
-
 @end

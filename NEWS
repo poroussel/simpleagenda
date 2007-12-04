@@ -5,6 +5,8 @@ version 0.32
 	* Enable 24 hours DayView
 	* Change iCalStore creation to set store writable flag is 
 	  possible without erasing existing data 
+	* Show days with appointments in MonthView. Initial kind 
+	  of ugly version
 
 version 0.31 (2007/11/21)
 	* Bug fixes

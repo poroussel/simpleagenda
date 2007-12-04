@@ -3,16 +3,13 @@
 #import <AppKit/AppKit.h>
 #import "ConfigManager.h"
 #import "Event.h"
-
-@protocol DayViewDataSource
-- (NSSet *)scheduledAppointmentsForDayView;
-@end
+#import "StoreManager.h"
 
 @class AppointmentView;
 
 @interface DayView : NSView <ConfigListener>
 {
-  IBOutlet id <DayViewDataSource> dataSource;
+  IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
   int _firstH;
   int _lastH;
