@@ -23,6 +23,10 @@
     RETAIN(storePreferences);
     RETAIN(storeFactory);
     [self selectItem:itemPopUp];
+    /* FIXME : I can't set these within Gorm */
+    [dayStart setContinuous:YES];
+    [dayEnd setContinuous:YES];
+    [minStep setContinuous:YES];
   }
   return self;
 }
