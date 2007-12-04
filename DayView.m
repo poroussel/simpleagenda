@@ -159,7 +159,6 @@
 
 
 @implementation DayView
-
 - (NSDictionary *)defaults
 {
   NSDictionary *dict = [NSDictionary 
@@ -177,6 +176,7 @@
     [config registerClient:self forKey:FIRST_HOUR];
     [config registerClient:self forKey:LAST_HOUR];
     [config registerClient:self forKey:MIN_STEP];
+
     _firstH = [config integerForKey:FIRST_HOUR];
     _lastH = [config integerForKey:LAST_HOUR];
     _minStep = [config integerForKey:MIN_STEP];
@@ -301,7 +301,6 @@
   }
 }
 
-/* FIXME : cache visible events to avoid work when data don't change */
 - (void)reloadData
 {
   ConfigManager *config = [ConfigManager globalConfig];
@@ -312,12 +311,13 @@
 
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
-    [config unregisterClient:self forKey:[[[aptv appointment] store] description]];
-    [aptv removeFromSuperview];
+    [aptv removeFromSuperviewWithoutNeedingDisplay];
+    [aptv release];
   }
   _selected = nil;
   enumerator = [[dataSource scheduledAppointmentsForDay:nil] objectEnumerator];
   while ((apt = [enumerator nextObject])) {
+    /* FIXME : probably shouldn't be there */
     [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed]) {
       aptv = [[AppointmentView alloc] initWithFrame:[self frameForAppointment:apt] appointment:apt];
