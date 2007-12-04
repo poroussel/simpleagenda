@@ -7,6 +7,8 @@ version 0.32
 	  possible without erasing existing data 
 	* Show days with appointments in MonthView. Initial kind 
 	  of ugly version
+	* Real asynchronous startup for remote stores. Thanks to 
+	  Dennis Leeuw for this bug report (and many others)
 
 version 0.31 (2007/11/21)
 	* Bug fixes

@@ -175,31 +175,68 @@
   [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
 }
 
+- (void)parseData:(NSData *)data
+{
+  NSSet *items;
+  NSString *text;
+  NSEnumerator *enumerator;
+  Element *elt;
+
+  text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+  if (text && [_tree parseString:text]) {
+    items = [_tree components];
+    [items makeObjectsPerform:@selector(setStore:) withObject:self];
+    enumerator = [items objectEnumerator];
+    while ((elt = [enumerator nextObject])) {
+      if ([elt isKindOfClass:[Event class]])
+	[_data setValue:elt forKey:[elt UID]];
+      else if ([elt isKindOfClass:[Task class]])
+	[_tasks setValue:elt forKey:[elt UID]];
+    }
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [_tasks count]);
+    [text release];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  } else
+    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+}
+
+- (void)initStoreAsync:(id)object
+{
+  NSAutoreleasePool *pool = [NSAutoreleasePool new];
+  NSData *data;
+
+  _url = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
+  if (_url == nil) {
+    NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
+    [self release];
+    [pool release];
+    return;
+  }
+  [_url retain];
+  data = [_url resourceDataUsingCache:NO];
+  [self parseData:data];
+  [data release];
+  if ([_config objectForKey:ST_REFRESH])
+    _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
+  else
+    _minutesBeforeRefresh = 60;
+  _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
+				   interval:_minutesBeforeRefresh * 60
+				   target:self selector:@selector(refreshData:) 
+				   userInfo:nil repeats:YES];
+  [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+  [pool release];
+}
+
 - (id)initWithName:(NSString *)name
 {
   self = [super initWithName:name];
   if (self) {
     _tree = [iCalTree new];
-    _url = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
-    if (_url == nil) {
-      NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
-      [self release];
-      return nil;
-    }
-    [_url retain];
     _retrievedData = nil;
     _lastModified = nil;
-    [self fetchData]; 
-
-    if ([_config objectForKey:ST_REFRESH])
-      _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
-    else
-      _minutesBeforeRefresh = 60;
-    _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
-				     interval:_minutesBeforeRefresh * 60
-				     target:self selector:@selector(refreshData:) 
-				     userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+    [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;
 }
@@ -333,31 +370,9 @@
   NSLog(@"URLResourceDidCancelLoading");
   [_retrievedData release];
 }
-
 - (void)URLResourceDidFinishLoading:(NSURL *)sender
 {
-  NSSet *items;
-  NSString *text;
-  NSEnumerator *enumerator;
-  Element *elt;
-
-  text = [[NSString alloc] initWithData:_retrievedData encoding:NSUTF8StringEncoding];
-  if (text && [_tree parseString:text]) {
-    items = [_tree components];
-    [items makeObjectsPerform:@selector(setStore:) withObject:self];
-    enumerator = [items objectEnumerator];
-    while ((elt = [enumerator nextObject])) {
-      if ([elt isKindOfClass:[Event class]])
-	[_data setValue:elt forKey:[elt UID]];
-      else
-	[_tasks setValue:elt forKey:[elt UID]];
-    }
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [_tasks count]);
-    [text release];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-  } else
-    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  [self parseData:_retrievedData];
   [_retrievedData release];
 }
 @end
