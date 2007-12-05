@@ -3,7 +3,8 @@
     AppointmentEditor = {
 	Actions = (
 	    "cancel:",
-	    "validate:"
+	    "validate:",
+	    "selectFrequency:"
 	);
 	Outlets = (
 	    description,
@@ -12,7 +13,6 @@
 	    repeat,
 	    endDate,
 	    durationText,
-	    endDateStepper,
 	    location,
 	    store,
 	    allDay,
@@ -22,7 +22,7 @@
     };
     FirstResponder = {
 	Actions = (
-	    "newAction:",
+	    "selectFrequency:",
 	    "validate:"
 	);
 	Super = NSObject;
