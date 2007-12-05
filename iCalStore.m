@@ -65,7 +65,10 @@
 }
 @end
 
-
+@interface iCalStore(Private)
+- (void)fetchData;
+- (void)parseData:(NSData *)data;
+@end
 @implementation iCalStore
 - (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
 {
