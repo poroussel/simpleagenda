@@ -71,7 +71,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Date *tomorrow = [Date today];
   Date *soonStart = [Date today];
   Date *soonEnd = [Date today];
-  NSEnumerator *enumerator = [_eventsCache objectEnumerator];
+  NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   NSEnumerator *dayEnumerator;
   Event *event;
   Date *day;
@@ -117,7 +117,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
-    ASSIGNCOPY(_eventsCache, [_sm allEvents]);
     [self initSummary];
     [self updateSummaryData];
     [self registerForServices];
@@ -174,7 +173,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_editor release];
   [_taskEditor release];
   RELEASE(_selectedDay);
-  RELEASE(_eventsCache);
 }
 
 
@@ -212,7 +210,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSArray *sorted = [_eventsCache sortedArrayUsingFunction:compareAppointments context:nil];
+  NSArray *sorted = [[_sm allEvents] sortedArrayUsingFunction:compareAppointments context:nil];
   NSEnumerator *enumerator = [sorted objectEnumerator];
   Event *apt;
 
@@ -356,7 +354,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   [_results removeChildren];
   if ([[search stringValue] length] > 0) {
-    enumerator = [_eventsCache objectEnumerator];
+    enumerator = [[_sm allEvents] objectEnumerator];
     while ((event = [enumerator nextObject])) {
       if ([event contains:[search stringValue]])
 	[_results addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:[event startDate]]]];
@@ -407,7 +405,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (NSSet *)scheduledAppointmentsForDay:(Date *)day
 {
   NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
-  NSEnumerator *enumerator = [_eventsCache objectEnumerator];
+  NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   Event *event;
 
   if (day == nil)
@@ -420,7 +418,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)dataChanged:(NSNotification *)not
 {
-  ASSIGNCOPY(_eventsCache, [_sm allEvents]);
   [dayView reloadData];
   [taskView reloadData];
   [self performSearch];

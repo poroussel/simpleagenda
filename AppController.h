@@ -34,7 +34,6 @@
   DataTree *_soon;
   DataTree *_results;
   DataTree *_tasks;
-  NSArray *_eventsCache;
 }
 
 - (void)copy:(id)sender;
