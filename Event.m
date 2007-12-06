@@ -231,8 +231,6 @@
   start = icalproperty_get_dtstart(pstart);
   date = [[Date alloc] initWithICalTime:start];
   [self setStartDate:date];
-  [self setEndDate:date];
-
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
   if (!pend) {
     prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
@@ -250,31 +248,30 @@
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
   if (prop) {
     rec = icalproperty_get_rrule(prop);
-    [date changeYearBy:10];
     switch (rec.freq) {
     case ICAL_DAILY_RECURRENCE:
       [self setInterval:RI_DAILY];
       [self setFrequency:rec.interval];
-      [self setEndDate:date];
       break;
     case ICAL_WEEKLY_RECURRENCE:
       [self setInterval:RI_WEEKLY];
       [self setFrequency:rec.interval];
-      [self setEndDate:date];
       break;
     case ICAL_MONTHLY_RECURRENCE:
       [self setInterval:RI_MONTHLY];
       [self setFrequency:rec.interval];
-      [self setEndDate:date];
       break;
     case ICAL_YEARLY_RECURRENCE:
       [self setInterval:RI_YEARLY];
       [self setFrequency:rec.interval];
-      [self setEndDate:date];
       break;
     default:
       NSLog(@"ToDo");
       break;
+    }
+    if (!icaltime_is_null_time(rec.until)) {
+      [date setDateToICalTime:rec.until];
+      [self setEndDate:date];
     }
   }
   [date release];
@@ -353,6 +350,8 @@
     }
     if (endDate != nil)
       irec.until = [endDate iCalTime];
+    else
+      irec.until = icaltime_null_time();
     icalproperty_set_rrule(prop, irec);
   } else if (prop)
     icalcomponent_remove_property(ic, prop);

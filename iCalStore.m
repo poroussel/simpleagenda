@@ -216,16 +216,17 @@
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
   NSData *data;
+  NSURL *realURL;
 
-  _url = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
-  if (_url == nil) {
+  realURL = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
+  if (realURL == nil) {
     NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
     [self release];
     [pool release];
     return;
   }
-  [_url retain];
-  data = [_url resourceDataUsingCache:NO];
+  _url = [realURL copy];
+  data = [realURL resourceDataUsingCache:NO];
   [self parseData:data];
   [data release];
   if ([_config objectForKey:ST_REFRESH])
@@ -345,23 +346,21 @@
 
 - (BOOL)write
 {
-  NSData *data;
+  NSData *data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
+  NSURLHandle *handle;
 
-  if ([self writable]) {
-    [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-    data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
-    if (data != nil) {
-      if ([_url setResourceData:data]) {
-	[_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-	NSLog(@"iCalStore written to %@", [_url absoluteString]);
-	_modified = NO;
-	return YES;
-      }
-      [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-      NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
-      [self setWritable:NO];
-    } else
-      NSLog(@"Unable to encode iCalendar data");
+  if (data && [self writable]) {
+    handle = [_url URLHandleUsingCache:NO];
+    [handle writeProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
+    [handle writeData:data];
+    [handle loadInForeground];
+    if ([handle status] == NSURLHandleLoadSucceeded) {
+      _modified = NO;
+      NSLog(@"iCalStore written to %@", [_url absoluteString]);
+      return YES;
+    }
+    [self setWritable:NO];
+    NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
     return NO;
   }
   return YES;
