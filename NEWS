@@ -5,8 +5,7 @@ version 0.32
 	* Enable 24 hours DayView
 	* Change iCalStore creation to set store writable flag if 
 	  possible without erasing existing data 
-	* Show days with appointments in MonthView. Initial kind 
-	  of ugly version
+	* Show days with appointments in MonthView.
 	* Real asynchronous startup for remote stores. Thanks to 
 	  Dennis Leeuw for this bug report (and many others)
 	* Fix end date processing for recurrent events : events can 

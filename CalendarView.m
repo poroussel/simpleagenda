@@ -5,6 +5,28 @@
 #import "CalendarView.h"
 #import "StoreManager.h"
 
+static NSImage *circle = nil;
+
+@interface NSCalendarDayCell : NSTextFieldCell
+{
+  BOOL events;
+}
+- (void)setEvents:(BOOL)ev;
+- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView;
+@end
+@implementation NSCalendarDayCell
+- (void)setEvents:(BOOL)ev
+{
+  events = ev;
+}
+- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+  [super drawInteriorWithFrame:cellFrame inView:controlView];
+  if (events)
+    [circle compositeToPoint:NSMakePoint(cellFrame.origin.x + 8, cellFrame.origin.y + [circle size].height + 5) operation:NSCompositeSourceOver];
+}
+@end
+
 @implementation CalendarView
 - (void)dealloc
 {
@@ -63,7 +85,13 @@
     [stepper setAction: @selector(selectYear:)];
     [self addSubview: stepper];
 
-    NSTextFieldCell *cell = [NSTextFieldCell new];
+    if (!circle) {
+      NSString *path = [[NSBundle mainBundle] pathForImageResource:@"check"];
+      circle = [[NSImage alloc] initWithContentsOfFile:path];
+      [circle setFlipped:YES];
+    }
+
+    NSCalendarDayCell *cell = [NSCalendarDayCell new];
     [cell setEditable: NO];
     [cell setSelectable: NO];
     [cell setAlignment: NSRightTextAlignment];
@@ -174,7 +202,7 @@
     }
     if (dataSource) {
       events = [dataSource scheduledAppointmentsForDay:firstWeek];
-      [[matrix cellAtRow: row column: column] setBezeled:([events count] > 0)];
+      [[matrix cellAtRow: row column: column] setEvents:([events count] > 0)];
     }
     [[matrix cellAtRow: row column: column] setIntValue: day];
     [[matrix cellAtRow: row column: column] setTag: day];
