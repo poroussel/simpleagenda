@@ -3,7 +3,7 @@ version 0.32
 	* Internal modifications and refactoring
 	* Add Open tasks category to summary view
 	* Enable 24 hours DayView
-	* Change iCalStore creation to set store writable flag is 
+	* Change iCalStore creation to set store writable flag if 
 	  possible without erasing existing data 
 	* Show days with appointments in MonthView. Initial kind 
 	  of ugly version
