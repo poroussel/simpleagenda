@@ -16,6 +16,7 @@
   id store;
   id allDay;
   id ok;
+  id until;
   Date *startDate;
 }
 
@@ -23,4 +24,5 @@
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 - (void)selectFrequency:(id)sender;
+- (void)toggleUntil:(id)sender;
 @end

@@ -4,7 +4,8 @@
 	Actions = (
 	    "cancel:",
 	    "validate:",
-	    "selectFrequency:"
+	    "selectFrequency:",
+	    "toggleUntil:"
 	);
 	Outlets = (
 	    description,
@@ -16,12 +17,14 @@
 	    location,
 	    store,
 	    allDay,
-	    ok
+	    ok,
+	    until
 	);
 	Super = NSWindowController;
     };
     FirstResponder = {
 	Actions = (
+	    "toggleUntil:",
 	    "selectFrequency:",
 	    "validate:"
 	);

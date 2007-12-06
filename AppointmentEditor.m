@@ -37,7 +37,6 @@
   [duration setFloatValue:[data duration] / 60.0];
   [durationText setFloatValue:[data duration] / 60.0];
   [repeat selectItemAtIndex:[data interval]];
-  [endDate setEnabled:([data interval] != 0)];
   [location setStringValue:[data location]];
   [allDay setState:[data allDay]];
 
@@ -59,6 +58,14 @@
   }
   [store selectItemWithTitle:[[data store] description]];
   startDate = [data startDate];
+  [until setEnabled:([data interval] != 0)];
+  if ([data interval] != 0 && [data endDate]) {
+    [until setState:YES];
+    [endDate setObjectValue:[[data endDate] calendarDate]];
+  } else {
+    [until setState:NO];
+    [endDate setObjectValue:nil];
+  }
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
@@ -66,12 +73,11 @@
     [data setDuration:[duration floatValue] * 60.0];
     [data setInterval:[repeat indexOfSelectedItem]];
     if ([repeat indexOfSelectedItem] != 0) {
-      /* FIXME : don't force 10 years validity for recurrent events */
-      Date *end = [[data startDate] copy];
-      [end changeYearBy:10];
-      [data setEndDate:end];
       [data setFrequency:1];
-      [end release];
+      if ([until state] && [endDate objectValue])
+	[data setEndDate:AUTORELEASE([[Date alloc] initWithCalendarDate:[endDate objectValue] withTime:NO])];
+      else
+	[data setEndDate:nil];
     }
     [data setText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
@@ -114,26 +120,37 @@
 
 - (void)selectFrequency:(id)sender
 {
-  Date *futur = [startDate copy];
-  int selected = [repeat indexOfSelectedItem];
+  int index = [repeat indexOfSelectedItem];
+  [until setEnabled:!!index];
+  if (!index)
+    [until setState:NO];
+  [self toggleUntil:nil];
+}
 
-  [endDate setEnabled:(selected != 0)];
-  switch (selected) {
-  case 1:
-  case 2:
-    /* Daily and weekly : 1 month by default */
-    [futur changeDayBy:[futur numberOfDaysInMonth]];
-    break;
-  case 3:
-    /* Monthly : 1 year */
-    [futur changeYearBy:1];
-    break;
-  case 4:
-    /* Yearly : 10 years */
-    [futur changeYearBy:10];
-    break;
-  }
-  [endDate setObjectValue:[futur calendarDate]];
-  [futur release];
+- (void)toggleUntil:(id)sender
+{
+  [endDate setEnabled:[until state]];
+  if ([until state]) {
+    Date *futur = [startDate copy];
+    int selected = [repeat indexOfSelectedItem];
+    switch (selected) {
+    case 1:
+    case 2:
+      /* Daily and weekly : 1 month by default */
+      [futur changeDayBy:[futur numberOfDaysInMonth]];
+      break;
+    case 3:
+      /* Monthly : 1 year */
+      [futur changeYearBy:1];
+      break;
+    case 4:
+      /* Yearly : 10 years */
+      [futur changeYearBy:10];
+      break;
+    }
+    [endDate setObjectValue:[futur calendarDate]];
+    [futur release];
+  } else
+    [endDate setObjectValue:nil];
 }
 @end

@@ -91,6 +91,21 @@
   }
   return self;
 }
+- (id)initWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
+{
+  self = [self initWithTime:time];
+  if (self) {
+    _time.year = [cd yearOfCommonEra];
+    _time.month = [cd monthOfYear];
+    _time.day = [cd dayOfMonth];
+    if (time) {
+      _time.hour = [cd hourOfDay];
+      _time.minute = [cd minuteOfHour];
+      _time.second = [cd secondOfMinute];
+    }
+  }
+  return self;
+}
 - (id)init
 {
   return [self initWithTime:YES];
@@ -120,43 +135,39 @@
 {
   return _time.year;
 }
-
 - (int)monthOfYear
 {
   return _time.month;
 }
-
 - (int)hourOfDay
 {
   return _time.hour;
 }
-
+- (int)secondOfMinute
+{
+  return _time.second;
+}
 - (int)minuteOfHour
 {
   return _time.minute;
 }
-
 - (int)minuteOfDay
 {
   return _time.hour * 60 + _time.minute;
 }
-
 - (int)dayOfMonth
 {
   return _time.day;
 }
-
 /* 0 = sunday */
 - (int)weekday
 {
   return icaltime_day_of_week(_time) - 1;
 }
-
 - (int)weekOfYear
 {
   return icaltime_week_number(_time);
 }
-
 - (int)numberOfDaysInMonth
 {
   return icaltime_days_in_month(_time.month, _time.year);

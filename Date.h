@@ -10,12 +10,14 @@
 
 + (id)now;
 + (id)today;
+- (id)initWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time;
 - (NSCalendarDate *)calendarDate;
 - (NSComparisonResult)compare:(id)aDate;
 - (NSComparisonResult)compareTime:(id)aTime;
 - (int)year;
 - (int)monthOfYear;
 - (int)hourOfDay;
+- (int)secondOfMinute;
 - (int)minuteOfHour;
 - (int)minuteOfDay;
 - (int)dayOfMonth;
