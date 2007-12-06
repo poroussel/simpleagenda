@@ -65,9 +65,7 @@
     [data setSummary:[title stringValue]];
     [data setDuration:[duration floatValue] * 60.0];
     [data setInterval:[repeat indexOfSelectedItem]];
-    if ([repeat indexOfSelectedItem] == 0)
-      [data setEndDate:[data startDate]];
-    else {
+    if ([repeat indexOfSelectedItem] != 0) {
       /* FIXME : don't force 10 years validity for recurrent events */
       Date *end = [[data startDate] copy];
       [end changeYearBy:10];

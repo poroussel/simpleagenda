@@ -70,7 +70,7 @@
 - (BOOL)isScheduledForDay:(Date *)day
 {
   NSAssert(day != nil, @"Empty day argument");
-  if ([day daysUntil:startDate] > 0 || [day daysSince:endDate] > 0)
+  if ([day daysUntil:startDate] > 0 || (endDate && [day daysSince:endDate] > 0))
     return NO;
   switch (interval) {
   case RI_NONE:
@@ -351,7 +351,8 @@
     default:
       NSLog(@"ToDo");
     }
-    irec.until = [endDate iCalTime];
+    if (endDate != nil)
+      irec.until = [endDate iCalTime];
     icalproperty_set_rrule(prop, irec);
   } else if (prop)
     icalcomponent_remove_property(ic, prop);
