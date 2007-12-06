@@ -56,8 +56,16 @@
 }
 - (void)controlTextDidChange:(NSNotification *)notification
 {
-  NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
-  [ok setEnabled:(storeUrl != nil)];
+  NS_DURING
+    {
+      NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
+      [ok setEnabled:(storeUrl != nil)];
+    }
+  NS_HANDLER
+    {
+      [ok setEnabled:NO];
+    }
+  NS_ENDHANDLER
 }
 - (NSString *)url
 {
@@ -339,18 +347,21 @@
 {
   NSData *data;
 
-  if ([self writable] && data) {
+  if ([self writable]) {
     [_url setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-    data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];  
-    if ([_url setResourceData:data]) {
+    data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
+    if (data != nil) {
+      if ([_url setResourceData:data]) {
+	[_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
+	NSLog(@"iCalStore written to %@", [_url absoluteString]);
+	_modified = NO;
+	return YES;
+      }
       [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-      NSLog(@"iCalStore written to %@", [_url absoluteString]);
-      _modified = NO;
-      return YES;
-    }
-    [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-    NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
-    [self setWritable:NO];
+      NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
+      [self setWritable:NO];
+    } else
+      NSLog(@"Unable to encode iCalendar data");
     return NO;
   }
   return YES;
