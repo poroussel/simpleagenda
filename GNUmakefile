@@ -29,7 +29,8 @@ Resources/iCalendar.gorm \
 Resources/Task.gorm \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff \
-Resources/check.tiff 
+Resources/check.tiff \
+Resources/repeat.tiff 
 
 
 #

@@ -54,7 +54,8 @@
     IMAGES = (
 	Calendar.tiff,
 	"ical-file.tiff",
-	check.tiff
+	check.tiff,
+	repeat.tiff
     );
     INSTALLDIR = "$(HOME)/GNUstep";
     INTERFACES = (
@@ -65,7 +66,7 @@
 	Task.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-12-07 01:37:05 +0100";
+    LAST_EDITING = "2007-12-07 12:04:43 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

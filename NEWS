@@ -1,3 +1,7 @@
+version 0.33
+	* Fix dates of summary events
+	* Add a visual hint for recurrent events
+
 version 0.32 (2007/12/07)
 	* Add 'SimpleAgenda/Create Task' service
 	* Internal modifications and refactoring
