@@ -226,7 +226,7 @@
     return;
   }
   _url = [realURL copy];
-  data = [realURL resourceDataUsingCache:NO];
+  data = [realURL resourceDataUsingCache:YES];
   [self parseData:data];
   [data release];
   if ([_config objectForKey:ST_REFRESH])
