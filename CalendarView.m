@@ -172,19 +172,20 @@ static NSImage *circle = nil;
   int day, row, column, week;
   Date *firstWeek;
   Date *today;
-  NSSet *events;
+  NSCalendarDayCell *cell;
 
   [self clearSelectedDay];
   for (row = 1; row < 7; row++) {
     for (column = 1; column < 8; column++) {
-      [[matrix cellAtRow: row column: column] setStringValue: @""];
-      [[matrix cellAtRow: row column: column] setTag: 0];
-      [[matrix cellAtRow: row column: column] setBackgroundColor: [NSColor clearColor]];
+      cell = [matrix cellAtRow: row column: column];
+      [cell setStringValue: @""];
+      [cell setTag: 0];
+      [cell setBackgroundColor: [NSColor clearColor]];
+      [cell setEvents:NO];
     }
   }
 
-  today = [Date new];
-  [today setMinute:0];
+  today = [[Date today] retain];
   firstWeek = [date copy];
   [firstWeek setDay: 1];
   [firstWeek setMinute:0];
@@ -195,18 +196,17 @@ static NSImage *circle = nil;
     column = 7;
 
   for (day = 1; day <= [date numberOfDaysInMonth]; day++) {
+    cell = [matrix cellAtRow: row column: column];
     [firstWeek setDay: day];
     if ([firstWeek compare:today] == 0) {
-      [[matrix cellAtRow: row column: column] setBackgroundColor: [NSColor yellowColor]];
-      [[matrix cellAtRow: row column: column] setDrawsBackground: YES];
+      [cell setBackgroundColor: [NSColor yellowColor]];
+      [cell setDrawsBackground: YES];
     }
-    if (dataSource) {
-      events = [dataSource scheduledAppointmentsForDay:firstWeek];
-      [[matrix cellAtRow: row column: column] setEvents:([events count] > 0)];
-    }
-    [[matrix cellAtRow: row column: column] setIntValue: day];
-    [[matrix cellAtRow: row column: column] setTag: day];
-    [[matrix cellAtRow: row column: column] setFont: normalFont];
+    if (dataSource && [[dataSource scheduledAppointmentsForDay:firstWeek] count])
+      [cell setEvents:YES];
+    [cell setIntValue: day];
+    [cell setTag: day];
+    [cell setFont: normalFont];
     [[matrix cellAtRow: row column: 0] setStringValue: [NSString stringWithFormat: @"%d ", week]];
     column++;
     if (column > 7) {
