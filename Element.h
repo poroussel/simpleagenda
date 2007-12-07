@@ -33,7 +33,6 @@ enum classificationType
 - (void)setSummary:(NSString *)summary;
 - (void)setUID:(NSString *)uid;
 - (void)setClassification:(enum classificationType)classification;
-
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
 - (BOOL)updateICalComponent:(icalcomponent *)ic;

@@ -14,7 +14,6 @@
   [coder encodeInt:interval forKey:@"interval"];
   [coder encodeInt:frequency forKey:@"frequency"];
   [coder encodeInt:duration forKey:@"duration"];
-  [coder encodeInt:scheduleLevel forKey:@"scheduleLevel"];
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
 }
@@ -26,7 +25,6 @@
   interval = [coder decodeIntForKey:@"interval"];
   frequency = [coder decodeIntForKey:@"frequency"];
   duration = [coder decodeIntForKey:@"duration"];
-  scheduleLevel = [coder decodeIntForKey:@"scheduleLevel"];
   _location = [[coder decodeObjectForKey:@"location"] retain];
   if ([coder containsValueForKey:@"allDay"])
     _allDay = [coder decodeBoolForKey:@"allDay"];
@@ -37,7 +35,6 @@
 @end
 
 @implementation Event
-
 - (id)copy
 {
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
