@@ -23,7 +23,7 @@ static NSImage *circle = nil;
 {
   [super drawInteriorWithFrame:cellFrame inView:controlView];
   if (events)
-    [circle compositeToPoint:NSMakePoint(cellFrame.origin.x + 8, cellFrame.origin.y + [circle size].height + 5) operation:NSCompositeSourceOver];
+    [circle compositeToPoint:NSMakePoint(cellFrame.origin.x + 10, cellFrame.origin.y + [circle size].height + 7) operation:NSCompositeSourceOver];
 }
 @end
 
