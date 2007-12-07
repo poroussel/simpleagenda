@@ -50,7 +50,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   [date setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
-  [attributes setValue:date forKey:@"date"];
+  [attributes setValue:AUTORELEASE([date copy]) forKey:@"date"];
   [attributes setValue:[event summary] forKey:@"title"];
   if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
