@@ -5,7 +5,8 @@
 	    "cancel:",
 	    "validate:",
 	    "selectFrequency:",
-	    "toggleUntil:"
+	    "toggleUntil:",
+	    "toggleAllDay:"
 	);
 	Outlets = (
 	    description,
@@ -24,8 +25,9 @@
     };
     FirstResponder = {
 	Actions = (
-	    "toggleUntil:",
+	    "toggleAllDay:",
 	    "selectFrequency:",
+	    "toggleUntil:",
 	    "validate:"
 	);
 	Super = NSObject;

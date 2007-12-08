@@ -25,4 +25,5 @@
 - (void)cancel:(id)sender;
 - (void)selectFrequency:(id)sender;
 - (void)toggleUntil:(id)sender;
+- (void)toggleAllDay:(id)sender;
 @end

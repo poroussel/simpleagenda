@@ -4,6 +4,8 @@
 #import "AppointmentEditor.h"
 #import "HourFormatter.h"
 #import "AgendaStore.h"
+#import "ConfigManager.h"
+#import "defines.h"
 
 @implementation AppointmentEditor
 -(id)init
@@ -79,6 +81,7 @@
       else
 	[data setEndDate:nil];
     }
+    /* FIXME : why do we copy one and not the other ? */
     [data setText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
     [data setAllDay:[allDay state]];
@@ -152,5 +155,19 @@
     [futur release];
   } else
     [endDate setObjectValue:nil];
+}
+
+- (void)toggleAllDay:(id)sender
+{
+  if ([allDay state]) {
+    [duration setEnabled:NO];
+    [duration setIntValue:0];
+    [durationText setIntValue:0];
+  } else {
+    [duration setEnabled:YES];
+    [duration setFloatValue:1];
+    [durationText setFloatValue:1];
+    [startDate setMinute:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR] * 60];
+  }
 }
 @end
