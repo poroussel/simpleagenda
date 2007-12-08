@@ -43,6 +43,7 @@
 
 - (NSString *)iCalTreeAsString
 {
+  icalcomponent_strip_errors(root);
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
 }
 
