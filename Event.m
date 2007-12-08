@@ -122,9 +122,9 @@
 {
   return _allDay;
 }
-
 - (void)setAllDay:(BOOL)allDay
 {
+  [startDate setDate:allDay];
   _allDay = allDay;
 }
 
@@ -180,7 +180,6 @@
 - (void)setDuration:(int)newDuration
 {
   duration = newDuration;
-  [self setAllDay:(newDuration == 1440)];
 }
 
 - (void)setFrequency:(int)newFrequency
@@ -210,6 +209,7 @@
   icalproperty *prop;
   icalproperty *pstart;
   icalproperty *pend;
+  icalproperty *pdur;
   struct icaltimetype start;
   struct icaltimetype end;
   struct icaldurationtype diff;
@@ -229,19 +229,18 @@
   date = [[Date alloc] initWithICalTime:start];
   [self setStartDate:date];
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
-  if (!pend) {
-    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-    if (!prop) {
-      NSLog(@"No end date and no duration");
-      goto init_error;
+  pdur = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
+  if (!pend && !pdur)
+    [self setAllDay:YES];
+  else {
+    if (!pend)
+      diff = icalproperty_get_duration(pdur);
+    else {
+      end = icalproperty_get_dtend(pend);
+      diff = icaltime_subtract(end, start);
     }
-    diff = icalproperty_get_duration(prop);
-  } else {
-    end = icalproperty_get_dtend(pend);
-    diff = icaltime_subtract(end, start);
-  }
-  [self setDuration:icaldurationtype_as_int(diff) / 60];
-
+    [self setDuration:icaldurationtype_as_int(diff) / 60];
+  }  
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
   if (prop) {
     rec = icalproperty_get_rrule(prop);
@@ -296,39 +295,26 @@
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
-  struct icaltimetype itime;
   struct icalrecurrencetype irec;
-  icalproperty *prop;
 
   if (![super updateICalComponent:ic])
     return NO;
-  prop = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_dtstart([startDate iCalTime]);
-    icalcomponent_add_property(ic, prop);
-  } else
-    icalproperty_set_dtstart(prop, [startDate iCalTime]);
 
-  prop = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
-  if (!prop) {
-    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-    if (!prop) {
-      prop = icalproperty_new_duration(icaldurationtype_from_int(duration * 60));
-      icalcomponent_add_property(ic, prop);
-    } else
-      icalproperty_set_duration(prop, icaldurationtype_from_int(duration * 60));
-  } else {
-    itime = icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60));
-    icalproperty_set_dtend(prop, itime);
-  }
+  [self deleteProperty:ICAL_LOCATION_PROPERTY fromComponent:ic];
+  if ([self location])
+    icalcomponent_add_property(ic, icalproperty_new_location([[self location] UTF8String]));
 
-  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
+  [self deleteProperty:ICAL_DTSTART_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_dtstart([startDate iCalTime]));
+
+  [self deleteProperty:ICAL_DTEND_PROPERTY fromComponent:ic];
+  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
+  if (![self allDay])
+    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60))));
+
+  [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
   if (interval != RI_NONE) {
     icalrecurrencetype_clear(&irec);
-    if (!prop) {
-      prop = icalproperty_new_rrule(irec);
-      icalcomponent_add_property(ic, prop);
-    }
     switch (interval) {
     case RI_DAILY:
       irec.freq = ICAL_DAILY_RECURRENCE;
@@ -349,9 +335,8 @@
       irec.until = [endDate iCalTime];
     else
       irec.until = icaltime_null_time();
-    icalproperty_set_rrule(prop, irec);
-  } else if (prop)
-    icalcomponent_remove_property(ic, prop);
+    icalcomponent_add_property(ic, icalproperty_new_rrule(irec));
+  }
   return YES;
 }
 

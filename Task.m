@@ -120,16 +120,10 @@ static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
-  icalproperty *prop;
-
   if (![super updateICalComponent:ic])
     return NO;
-  prop = icalcomponent_get_first_property(ic, ICAL_STATUS_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_status(statusCorr[[self state]]);
-    icalcomponent_add_property(ic, prop);
-  } else
-    icalproperty_set_status(prop, statusCorr[[self state]]);
+  [self deleteProperty:ICAL_STATUS_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_status(statusCorr[[self state]]));
   return YES;
 }
 

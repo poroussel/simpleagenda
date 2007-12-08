@@ -164,29 +164,28 @@
   }
   return ic;
 }
-- (BOOL)updateICalComponent:(icalcomponent *)ic
+- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
-
-  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_uid([[self UID] cString]);
-    icalcomponent_add_property(ic, prop);
-  }
-  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
-    prop = icalproperty_new_summary([[self summary] UTF8String]);
-    icalcomponent_add_property(ic, prop);
-  } else
-    icalproperty_set_summary(prop, [[self summary] UTF8String]);
-  if ([self text] != nil) {
-    prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-    if (!prop) {
-      prop = icalproperty_new_description([[[self text] string] UTF8String]);
-      icalcomponent_add_property(ic, prop);
-    } else
-      icalproperty_set_description(prop, [[[self text] string] UTF8String]);
-  }
+  prop = icalcomponent_get_first_property(ic, kind);
+  if (prop)
+      icalcomponent_remove_property(ic, prop);
+  /*
+   * FIXME : not sure if the following is wise
+   * while ((prop = icalcomponent_get_next_property(ic, kind)))
+   *  icalcomponent_remove_property(ic, prop);
+   */
+}
+- (BOOL)updateICalComponent:(icalcomponent *)ic
+{
+  [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_uid([[self UID] cString]));
+  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
+  if ([self summary])
+    icalcomponent_add_property(ic, icalproperty_new_summary([[self summary] UTF8String]));
+  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
+  if ([self text])
+    icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
   return YES;
 }
 - (int)iCalComponentType

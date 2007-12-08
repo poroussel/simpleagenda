@@ -35,6 +35,7 @@ enum classificationType
 - (void)setClassification:(enum classificationType)classification;
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
+- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic;
 - (BOOL)updateICalComponent:(icalcomponent *)ic;
 - (int)iCalComponentType;
 @end
