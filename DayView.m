@@ -451,43 +451,4 @@ static NSImage *repeatImage;
 {
   return _minStep;
 }
-
-- (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
-{
-  if (_selected && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
-    return self;
-  return nil;
-}
-/* FIXME : put this in AppController ? */
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
-{
-  NSString *ical;
-  iCalTree *tree;
-  NSFileManager *fm;
-
-  if (!_selected)
-    return NO;
-  NSAssert([types count] == 1, @"It seems our assumption was wrong");
-  tree = AUTORELEASE([iCalTree new]);
-  [tree add:[_selected appointment]];
-  ical = [tree iCalTreeAsString];
-
-  /* Export it as a temporary file */
-  if ([types containsObject:NSFilenamesPboardType]) {
-    fm = [NSFileManager defaultManager];
-    if (![fm createFileAtPath:@"/tmp/calendar.ics" contents:[ical dataUsingEncoding:NSUTF8StringEncoding] attributes:nil]) {
-      NSLog(@"Unable to create file");
-      return NO;
-    }
-    [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
-    return [pboard setPropertyList:[NSArray arrayWithObject:@"/tmp/calendar.ics"] forType:NSFilenamesPboardType];
-  }
-
-  /* Export it as a string */
-  if ([types containsObject:NSStringPboardType]) {
-    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-    return [pboard setString:ical forType:NSStringPboardType];
-  }
-  return NO;
-}
 @end

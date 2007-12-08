@@ -423,6 +423,50 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self performSearch];
   [self updateSummaryData];
 }
+
+- (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
+{
+  if (_clickedElement && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
+    return self;
+  return nil;
+}
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
+{
+  NSString *ical;
+  NSString *filename;
+  iCalTree *tree;
+  NSFileWrapper *fw;
+  BOOL written;
+
+  if (!_clickedElement)
+    return NO;
+  NSAssert([types count] == 1, @"It seems our assumption was wrong");
+  tree = AUTORELEASE([iCalTree new]);
+  [tree add:_clickedElement];
+  ical = [tree iCalTreeAsString];
+
+  if ([types containsObject:NSFilenamesPboardType]) {
+    fw = [[NSFileWrapper alloc] initRegularFileWithContents:[ical dataUsingEncoding:NSUTF8StringEncoding]];
+    if (!fw) {
+      NSLog(@"Unable to encode into NSFileWrapper");
+      return NO;
+    }
+    filename = [NSString stringWithFormat:@"%@/%@.ics", NSTemporaryDirectory(), [_clickedElement summary]];
+    written = [fw writeToFile:filename atomically:YES updateFilenames:YES];
+    [fw release];
+    if (!written) {
+      NSLog(@"Unable to write to file %@", filename);
+      return NO;
+    }
+    [pboard declareTypes:[NSArray arrayWithObject:NSFilenamesPboardType] owner:nil];
+    return [pboard setPropertyList:[NSArray arrayWithObject:filename] forType:NSFilenamesPboardType];
+  }
+  if ([types containsObject:NSStringPboardType]) {
+    [pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+    return [pboard setString:ical forType:NSStringPboardType];
+  }
+  return NO;
+}
 @end
 
 @implementation AppController(NSOutlineViewDataSource)
