@@ -454,7 +454,6 @@ static NSImage *repeatImage;
 
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
-  NSLog(@"validRequestorForSendType");
   if (_selected && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
     return self;
   return nil;
@@ -465,7 +464,7 @@ static NSImage *repeatImage;
   NSString *ical;
   iCalTree *tree;
   NSFileManager *fm;
-  NSLog(@"writeSelectionToPasteboard");
+
   if (!_selected)
     return NO;
   NSAssert([types count] == 1, @"It seems our assumption was wrong");
