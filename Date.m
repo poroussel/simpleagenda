@@ -292,6 +292,15 @@
   e = [e initWithStart:self end:end];
   return AUTORELEASE(e);
 }
+
+- (BOOL)isDate
+{
+  return _time.is_date;
+}
+- (void)setDate:(BOOL)date
+{
+  _time.is_date = date;
+}
 @end
 
 @implementation Date(iCalendar)
