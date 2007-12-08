@@ -300,6 +300,8 @@
 - (void)setDate:(BOOL)date
 {
   _time.is_date = date;
+  if (!date)
+    icaltime_set_timezone(&_time, NULL);
 }
 @end
 
