@@ -429,7 +429,7 @@ static NSImage *repeatImage;
     return self;
   return nil;
 }
-
+/* FIXME : put this in AppController ? */
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
   NSString *ical;
