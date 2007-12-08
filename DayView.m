@@ -8,8 +8,8 @@
 
 static NSImage *repeatImage;
 
-#define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 6)
-#define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height)
+#define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 10)
+#define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height - 2)
 
 @interface AppointmentView : NSView
 {
@@ -41,11 +41,10 @@ static NSImage *repeatImage;
 }
 - (void)setSelected:(BOOL)selected
 {
-  if (selected != _selected) {
-    _selected = selected;
-    [self display];
-  }
+  _selected = selected;
 }
+#define CEC_BORDERSIZE 1
+#define RADIUS 5
 - (void)drawRect:(NSRect)rect
 {
   NSString *title;
@@ -68,18 +67,47 @@ static NSImage *repeatImage;
   else
     label = [NSString stringWithString:title];
 
+  PSnewpath();
+  PSmoveto(RADIUS + CEC_BORDERSIZE, CEC_BORDERSIZE);
+  PSrcurveto( -RADIUS, 0, -RADIUS, RADIUS, -RADIUS, RADIUS);
+  PSrlineto(0,NSHeight(rect) - 2 * (RADIUS + CEC_BORDERSIZE));
+  PSrcurveto( 0, RADIUS, RADIUS, RADIUS, RADIUS, RADIUS);
+  PSrlineto(NSWidth(rect) - 2 * (RADIUS + CEC_BORDERSIZE),0);
+  PSrcurveto( RADIUS, 0, RADIUS, -RADIUS, RADIUS, -RADIUS);
+  PSrlineto(0, -NSHeight(rect) + 2 * (RADIUS + CEC_BORDERSIZE));
+  PSrcurveto( 0, -RADIUS, -RADIUS, -RADIUS, -RADIUS, -RADIUS);
+  PSclosepath();
+  PSgsave();
   [color set];
-  NSRectFill(rect);
-  [darkColor set];
-  if (![_apt allDay])
-    NSRectFill(RedimRect(rect));
+  PSsetalpha(0.7);
+  PSfill();
+  PSgrestore();
+  if (_selected)
+    [[NSColor whiteColor] set];
+  else
+    [darkColor set];
+  PSsetalpha(0.7);
+  PSsetlinewidth(CEC_BORDERSIZE);
+  PSstroke();
+  if (![_apt allDay]) {
+    NSRect rd = RedimRect(rect);
+    PSnewpath();
+    PSmoveto(RADIUS + CEC_BORDERSIZE, rd.origin.y);
+    PSrcurveto( -RADIUS, 0, -RADIUS, RADIUS, -RADIUS, RADIUS);
+    PSrlineto(0,NSHeight(rd) - 2 * (RADIUS + CEC_BORDERSIZE));
+    PSrcurveto( 0, RADIUS, RADIUS, RADIUS, RADIUS, RADIUS);
+    PSrlineto(NSWidth(rd) - 2 * (RADIUS + CEC_BORDERSIZE),0);
+    PSrcurveto( RADIUS, 0, RADIUS, -RADIUS, RADIUS, -RADIUS);
+    PSrlineto(0, -NSHeight(rd) + 2 * (RADIUS + CEC_BORDERSIZE));
+    PSrcurveto( 0, -RADIUS, -RADIUS, -RADIUS, -RADIUS, -RADIUS);
+    PSclosepath();
+    [darkColor set];
+    PSsetalpha(0.7);
+    PSfill();
+  }
   [label drawInRect:TextRect(rect) withAttributes:textAttributes];
   if ([_apt interval] != RI_NONE)
-    [repeatImage compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 16) operation:NSCompositeSourceOver];
-  if (_selected) {
-    [[NSColor grayColor] set];
-    NSFrameRect(rect);
-  }
+    [repeatImage compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -305,6 +333,7 @@ static NSImage *repeatImage;
   if (_selected != aptv) {
     [_selected setSelected:NO];
     [aptv setSelected:YES];
+    [self setNeedsDisplay:YES];
     _selected = aptv;
     if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
       [delegate dayView:self selectEvent:[aptv appointment]];

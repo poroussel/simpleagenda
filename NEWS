@@ -2,6 +2,8 @@ version 0.33
 	* Fix dates of summary events
 	* Add a visual hint for recurrent events
 	* Fix iCalendar date and duration encoding
+	* Draw appointments with transparency (code from old 
+	  http://www.linuks.mine.nu/agenda/agenda-0.1.tar.gz)
 
 version 0.32 (2007/12/07)
 	* Add 'SimpleAgenda/Create Task' service
