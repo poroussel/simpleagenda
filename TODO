@@ -1,5 +1,7 @@
 In no particular order :
 
+* fix text position in AppointmentView spreading outside DayView
+
 * alerts and user notification (visual, by mail etc)
 
 * week and month views

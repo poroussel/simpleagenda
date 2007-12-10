@@ -198,12 +198,8 @@
     items = [_tree components];
     [items makeObjectsPerform:@selector(setStore:) withObject:self];
     enumerator = [items objectEnumerator];
-    while ((elt = [enumerator nextObject])) {
-      if ([elt isKindOfClass:[Event class]])
-	[_data setValue:elt forKey:[elt UID]];
-      else if ([elt isKindOfClass:[Task class]])
-	[_tasks setValue:elt forKey:[elt UID]];
-    }
+    while ((elt = [enumerator nextObject]))
+      [super add:elt];
     NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
     NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [_tasks count]);
     [text release];
@@ -226,6 +222,10 @@
     return;
   }
   _url = [realURL copy];
+  /* 
+   * FIXME : utiliser [NSObject performSelectorOnMainThread: withObject: waitUntilDone:]
+   * pour eviter de dupliquer le code de chargement
+   */
   data = [realURL resourceDataUsingCache:YES];
   [self parseData:data];
   [data release];
