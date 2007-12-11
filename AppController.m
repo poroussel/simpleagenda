@@ -210,8 +210,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSArray *sorted = [[_sm allEvents] sortedArrayUsingFunction:compareAppointments context:nil];
-  NSEnumerator *enumerator = [sorted objectEnumerator];
+  NSEnumerator *enumerator = [[self scheduledAppointmentsForDay:nil] objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
