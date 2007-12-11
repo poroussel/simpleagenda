@@ -3,6 +3,7 @@ version 0.34
 	  we used to refresh the view for each appointment and task.
 	  Should be quite faster when loading a big calendar. Also, 
 	  stop saving unmodified local calendars on exit.
+	* Fix text position for appointments going outside the day view
 
 version 0.33 (2007/12/08)
 	* Fix dates of summary events

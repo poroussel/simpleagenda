@@ -69,13 +69,13 @@ static NSImage *repeatImage;
 
   PSnewpath();
   PSmoveto(RADIUS + CEC_BORDERSIZE, CEC_BORDERSIZE);
-  PSrcurveto( -RADIUS, 0, -RADIUS, RADIUS, -RADIUS, RADIUS);
-  PSrlineto(0,NSHeight(rect) - 2 * (RADIUS + CEC_BORDERSIZE));
+  PSrcurveto(-RADIUS, 0, -RADIUS, RADIUS, -RADIUS, RADIUS);
+  PSrlineto(0, NSHeight(rect) + rect.origin.y - 2 * (RADIUS + CEC_BORDERSIZE));
   PSrcurveto( 0, RADIUS, RADIUS, RADIUS, RADIUS, RADIUS);
   PSrlineto(NSWidth(rect) - 2 * (RADIUS + CEC_BORDERSIZE),0);
   PSrcurveto( RADIUS, 0, RADIUS, -RADIUS, RADIUS, -RADIUS);
-  PSrlineto(0, -NSHeight(rect) + 2 * (RADIUS + CEC_BORDERSIZE));
-  PSrcurveto( 0, -RADIUS, -RADIUS, -RADIUS, -RADIUS, -RADIUS);
+  PSrlineto(0, -NSHeight(rect) - rect.origin.y + 2 * (RADIUS + CEC_BORDERSIZE));
+  PSrcurveto(0, -RADIUS, -RADIUS, -RADIUS, -RADIUS, -RADIUS);
   PSclosepath();
   PSgsave();
   [color set];
