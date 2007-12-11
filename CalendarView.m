@@ -259,7 +259,7 @@ static NSImage *circle = nil;
 
 - (void)doubleClick:(id)sender
 {
-  if ([delegate respondsToSelector:@selector(calendarView:userActionForDate:)])
+  if ([[matrix selectedCell] tag] > 0 && [delegate respondsToSelector:@selector(calendarView:userActionForDate:)])
     [delegate calendarView:self userActionForDate:date];
 }
 
