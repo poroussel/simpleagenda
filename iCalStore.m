@@ -74,7 +74,7 @@
 @end
 
 @interface iCalStore(Private)
-- (void)fetchData;
+- (void)fetchData:(id)object;
 - (void)parseData:(NSData *)data;
 @end
 @implementation iCalStore
@@ -180,7 +180,7 @@
   return NO;
 }
 
-- (void)fetchData
+- (void)fetchData:(id)object
 {
   _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
   [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
@@ -211,7 +211,6 @@
 - (void)initStoreAsync:(id)object
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  NSData *data;
   NSURL *realURL;
 
   realURL = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
@@ -222,13 +221,7 @@
     return;
   }
   _url = [realURL copy];
-  /* 
-   * FIXME : utiliser [NSObject performSelectorOnMainThread: withObject: waitUntilDone:]
-   * pour eviter de dupliquer le code de chargement
-   */
-  data = [realURL resourceDataUsingCache:YES];
-  [self parseData:data];
-  [data release];
+  [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
   if ([_config objectForKey:ST_REFRESH])
     _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
   else
@@ -338,7 +331,7 @@
 - (BOOL)read
 {
   if ([self needsRefresh]) {
-    [self fetchData];
+    [self fetchData:nil];
     return YES;
   }
   return NO;
