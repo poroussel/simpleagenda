@@ -145,8 +145,7 @@ static NSMutableDictionary *backends = nil;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store modified] && [store writable])
-      [store write];
+    [store write];
 }
 
 - (id <AgendaStore>)storeContainingElement:(Element *)elt

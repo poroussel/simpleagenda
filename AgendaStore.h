@@ -13,11 +13,13 @@
 + (NSString *)storeTypeName;
 - (NSArray *)events;
 - (NSArray *)tasks;
+- (void)fillWithElements:(NSSet *)set;
 - (void)add:(Element *)evt;
 - (void)remove:(Element *)elt;
 - (void)update:(Element *)evt;
 - (BOOL)contains:(Element *)elt;
 - (BOOL)modified;
+- (void)setModified:(BOOL)modified;
 - (BOOL)writable;
 - (void)setWritable:(BOOL)writable;
 - (NSColor *)eventColor;

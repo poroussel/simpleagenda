@@ -62,9 +62,6 @@
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   NSSet *savedData;
-  NSEnumerator *enumerator;
-  Event *evt;
-  Task *task;
   BOOL isDir;
   int version;
 
@@ -78,12 +75,8 @@
   if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
     if (savedData) {
-      [savedData makeObjectsPerform:@selector(setStore:) withObject:self];
-      enumerator = [savedData objectEnumerator];
-      while ((evt = [enumerator nextObject])) {
-	[_data setValue:evt forKey:[evt UID]];
-      }
-      NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [_data count]);
+      [self fillWithElements:savedData];
+      NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [[self events] count]);
       version = [_config integerForKey:ST_VERSION];
       if (version < CurrentVersion) {
 	[_config setInteger:CurrentVersion forKey:ST_VERSION];
@@ -94,11 +87,8 @@
   if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];       
     if (savedData) {
-      [savedData makeObjectsPerform:@selector(setStore:) withObject:self];
-      enumerator = [savedData objectEnumerator];
-      while ((task = [enumerator nextObject]))
-	[_tasks setValue:task forKey:[task UID]];
-      NSLog(@"LocalStore from %@ : loaded %d tasks(s)", _globalTaskFile, [_tasks count]);
+      [self fillWithElements:savedData];
+      NSLog(@"LocalStore from %@ : loaded %d tasks(s)", _globalTaskFile, [[self tasks] count]);
     }
   }
   return YES;
@@ -106,12 +96,17 @@
 
 - (BOOL)write
 {
-  NSSet *set = [NSSet setWithArray:[_data allValues]];
-  NSSet *tasks = [NSSet setWithArray:[_tasks allValues]];
+  NSSet *set;
+  NSSet *tasks;
+
+  if (![self modified])
+    return YES;
+  set = [NSSet setWithArray:[self events]];
+  tasks = [NSSet setWithArray:[self tasks]];
   if ([NSKeyedArchiver archiveRootObject:set toFile:_globalFile] && 
       [NSKeyedArchiver archiveRootObject:tasks toFile:_globalTaskFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
-    _modified = NO;
+    [self setModified:NO];
     return YES;
   }
   NSLog(@"Unable to write to %@, make this store read only", _globalFile);

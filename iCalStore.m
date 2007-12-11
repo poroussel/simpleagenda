@@ -188,24 +188,17 @@
 
 - (void)parseData:(NSData *)data
 {
-  NSSet *items;
   NSString *text;
-  NSEnumerator *enumerator;
-  Element *elt;
 
   text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
   if (text && [_tree parseString:text]) {
-    items = [_tree components];
-    [items makeObjectsPerform:@selector(setStore:) withObject:self];
-    enumerator = [items objectEnumerator];
-    while ((elt = [enumerator nextObject]))
-      [super add:elt];
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [_data count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [_tasks count]);
-    [text release];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+    [self fillWithElements:[_tree components]];
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
   } else
     NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  if (text)
+    [text release];
 }
 
 - (void)initStoreAsync:(id)object
@@ -339,16 +332,19 @@
 
 - (BOOL)write
 {
-  NSData *data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
+  NSData *data;
   NSURLHandle *handle;
 
-  if (data && [self writable]) {
+  if (![self modified] || ![self writable])
+    return YES;
+  data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
+  if (data) {
     handle = [_url URLHandleUsingCache:NO];
     [handle writeProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
     [handle writeData:data];
     [handle loadInForeground];
     if ([handle status] == NSURLHandleLoadSucceeded) {
-      _modified = NO;
+      [self setModified:NO];
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
       return YES;
     }

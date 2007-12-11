@@ -62,7 +62,23 @@
   return [_tasks allValues];
 }
 
--(void)add:(Element *)elt
+/* Should be used only when loading data */
+- (void)fillWithElements:(NSSet *)set
+{
+  NSEnumerator *enumerator = [set objectEnumerator];
+  Element *elt;
+
+  while ((elt = [enumerator nextObject])) {
+    [elt setStore:self];
+    if ([elt isKindOfClass:[Event class]])
+      [_data setValue:elt forKey:[elt UID]];
+    else
+      [_tasks setValue:elt forKey:[elt UID]];
+  }
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+}
+
+- (void)add:(Element *)elt
 {
   [elt setStore:self];
   if ([elt isKindOfClass:[Event class]])
@@ -73,7 +89,7 @@
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
 
--(void)remove:(Element *)elt
+- (void)remove:(Element *)elt
 {
   if ([elt isKindOfClass:[Event class]])
     [_data removeObjectForKey:[elt UID]];
@@ -110,6 +126,11 @@
 - (BOOL)modified
 {
   return _modified;
+}
+
+- (void)setModified:(BOOL)modified
+{
+  _modified = modified;
 }
 
 - (NSString *)description
