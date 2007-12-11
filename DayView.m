@@ -147,7 +147,7 @@ static NSImage *repeatImage;
 	minutes = [parent positionToMinute:mouseLoc.y];
 	[_apt setDuration:[parent roundMinutes:minutes - start]];
 	modified = YES;
-	[parent display];
+	[parent setNeedsDisplay:YES];
 	break;
       case NSLeftMouseUp:
 	keepOn = NO;
@@ -168,7 +168,7 @@ static NSImage *repeatImage;
 	minutes = [parent positionToMinute:mouseLoc.y + diff];
 	[[_apt startDate] setMinute:[parent roundMinutes:minutes]];
 	modified = YES;
-	[parent display];
+	[parent setNeedsDisplay:YES];
 	break;
       case NSLeftMouseUp:
 	keepOn = NO;
@@ -388,7 +388,7 @@ static NSImage *repeatImage;
     default:
       break;
     }
-    [self display];
+    [self setNeedsDisplay:YES];
   }
   [NSCursor pop];
   if (ABS(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
@@ -398,7 +398,7 @@ static NSImage *repeatImage;
       [delegate dayView:self createEventFrom:[self roundMinutes:start] to:[self roundMinutes:end]];
   }
   _startPt = _endPt = NSMakePoint(0, 0);
-  [self display];
+  [self setNeedsDisplay:YES];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
