@@ -513,16 +513,20 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @end
 
 @implementation AppController(CalendarViewDelegate)
-- (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
+- (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date
 {
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [tabs selectTabViewItemWithIdentifier:@"Day"];
   [[tabs selectedTabViewItem] setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
 }
-- (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
+- (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
   [self updateSummaryData];
+}
+- (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date
+{
+  [self addAppointment:self];
 }
 @end
 

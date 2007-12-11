@@ -31,4 +31,5 @@
 @interface NSObject(CalendarViewDelegate)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
+- (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date;
 @end

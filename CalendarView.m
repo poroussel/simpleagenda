@@ -104,6 +104,7 @@ static NSImage *circle = nil;
     [matrix setIntercellSpacing: NSZeroSize];
     [matrix setDelegate:self];
     [matrix setAction: @selector(selectDay:)];
+    [matrix setDoubleAction: @selector(doubleClick:)];
     
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
@@ -256,6 +257,12 @@ static NSImage *circle = nil;
   }
 }
 
+- (void)doubleClick:(id)sender
+{
+  if ([delegate respondsToSelector:@selector(calendarView:userActionForDate:)])
+    [delegate calendarView:self userActionForDate:date];
+}
+
 - (void)setDelegate: (id)aDelegate
 {
   ASSIGN(delegate, aDelegate);
@@ -263,7 +270,6 @@ static NSImage *circle = nil;
 - (id)delegate
 {
   return delegate;
-
 }
 
 - (void)setDate:(Date *)nDate
