@@ -74,68 +74,19 @@
 @end
 
 @interface iCalStore(Private)
++ (NSURL *)getRealURL:(NSURL *)url;
++ (BOOL)canReadFromURL:(NSURL *)url;
++ (BOOL)canWriteToURL:(NSURL *)url;
+- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node;
+- (NSDate *)getLastModified;
+- (BOOL)needsRefresh;
 - (void)fetchData:(id)object;
 - (void)parseData:(NSData *)data;
+- (void)initTimer:(id)object;
+- (void)initStoreAsync:(id)object;
 @end
+
 @implementation iCalStore
-- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
-{
-  GSXMLNode *inter;
-
-  while (node) {
-    if ([node type] == [GSXMLNode typeFromDescription:@"XML_ELEMENT_NODE"] && 
-	[@"getlastmodified" isEqualToString:[node name]])
-      return node;
-    if ([node firstChild]) {
-      inter = [self getLastModifiedElement:[node firstChild]];
-      if (inter)
-	return inter;
-    }
-    node = [node next];
-  }
-  return nil;
-}
-
-- (NSDate *)getLastModified
-{
-  GSXMLParser *parser;
-  GSXMLNode *node;
-  NSDate *date;
-  NSData *data;
-
-  [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
-  data = [_url resourceDataUsingCache:NO];
-  [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-  if (data) {
-    parser = [GSXMLParser parserWithData:data];
-    if ([parser parse]) {
-      node = [self getLastModifiedElement:[[parser document] root]];
-      date = [NSDate dateWithNaturalLanguageString:[node content]];
-      return date;
-    }
-  }
-  return nil;
-}
-
-- (BOOL)needsRefresh
-{
-  NSDate *lm = [self getLastModified];
-
-  if (!_lastModified) {
-    if (lm)
-      _lastModified = [lm copy];
-    return YES;
-  }
-  if (!lm)
-    return YES;
-  if ([_lastModified compare:lm] == NSOrderedAscending) {
-    [_lastModified release];
-    _lastModified = [lm copy];
-    return YES;
-  }
-  return NO;
-}
-
 - (NSDictionary *)defaults
 {
   return [NSDictionary dictionaryWithObjectsAndKeys:
@@ -144,87 +95,6 @@
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       nil, nil];
-}
-
-+ (NSURL *)getRealURL:(NSURL *)url
-{
-  NSString *location;
-
-  location = [url propertyForKey:@"Location"];
-  if (location) {
-    NSLog(@"Redirected to %@", location);
-    return [iCalStore getRealURL:[NSURL URLWithString:location]];
-  }
-  return url;
-}
-
-+ (BOOL)canReadFromURL:(NSURL *)url
-{
-  if ([url resourceDataUsingCache:NO] == nil)
-      return NO;
-  return YES;
-}
-
-+ (BOOL)canWriteToURL:(NSURL *)url
-{
-  BOOL ret;
-  NSURL *tmp = AUTORELEASE([[NSURL alloc] initWithString:@"sa.write" relativeToURL:url]);
-
-  [tmp setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-  ret = [tmp setResourceData:[NSData data]];
-  if (ret) {
-    [tmp setProperty:@"DELETE" forKey:GSHTTPPropertyMethodKey];
-    [tmp setResourceData:nil];
-    return YES;
-  }
-  return NO;
-}
-
-- (void)fetchData:(id)object
-{
-  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
-  [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
-}
-
-- (void)parseData:(NSData *)data
-{
-  NSString *text;
-
-  text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-  if (text && [_tree parseString:text]) {
-    [self fillWithElements:[_tree components]];
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
-  } else
-    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-  if (text)
-    [text release];
-}
-
-- (void)initStoreAsync:(id)object
-{
-  NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  NSURL *realURL;
-
-  realURL = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
-  if (realURL == nil) {
-    NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
-    [self release];
-    [pool release];
-    return;
-  }
-  _url = [realURL copy];
-  [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
-  if ([_config objectForKey:ST_REFRESH])
-    _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
-  else
-    _minutesBeforeRefresh = 60;
-  _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
-				   interval:_minutesBeforeRefresh * 60
-				   target:self selector:@selector(refreshData:) 
-				   userInfo:nil repeats:YES];
-  [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
-  [pool release];
 }
 
 - (id)initWithName:(NSString *)name
@@ -376,5 +246,143 @@
 {
   [self parseData:_retrievedData];
   [_retrievedData release];
+}
+@end
+
+@implementation iCalStore(Private)
++ (NSURL *)getRealURL:(NSURL *)url
+{
+  NSString *location;
+
+  location = [url propertyForKey:@"Location"];
+  if (location) {
+    NSLog(@"Redirected to %@", location);
+    return [iCalStore getRealURL:[NSURL URLWithString:location]];
+  }
+  return url;
+}
++ (BOOL)canReadFromURL:(NSURL *)url
+{
+  if ([url resourceDataUsingCache:NO] == nil)
+      return NO;
+  return YES;
+}
+
++ (BOOL)canWriteToURL:(NSURL *)url
+{
+  BOOL ret;
+  NSURL *tmp = AUTORELEASE([[NSURL alloc] initWithString:@"sa.write" relativeToURL:url]);
+
+  [tmp setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
+  ret = [tmp setResourceData:[NSData data]];
+  if (ret) {
+    [tmp setProperty:@"DELETE" forKey:GSHTTPPropertyMethodKey];
+    [tmp setResourceData:nil];
+    return YES;
+  }
+  return NO;
+}
+- (BOOL)needsRefresh
+{
+  NSDate *lm = [self getLastModified];
+
+  if (!_lastModified) {
+    if (lm)
+      _lastModified = [lm copy];
+    return YES;
+  }
+  if (!lm)
+    return YES;
+  if ([_lastModified compare:lm] == NSOrderedAscending) {
+    [_lastModified release];
+    _lastModified = [lm copy];
+    return YES;
+  }
+  return NO;
+}
+- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
+{
+  GSXMLNode *inter;
+
+  while (node) {
+    if ([node type] == [GSXMLNode typeFromDescription:@"XML_ELEMENT_NODE"] && 
+	[@"getlastmodified" isEqualToString:[node name]])
+      return node;
+    if ([node firstChild]) {
+      inter = [self getLastModifiedElement:[node firstChild]];
+      if (inter)
+	return inter;
+    }
+    node = [node next];
+  }
+  return nil;
+}
+- (NSDate *)getLastModified
+{
+  GSXMLParser *parser;
+  GSXMLNode *node;
+  NSDate *date;
+  NSData *data;
+
+  [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
+  data = [_url resourceDataUsingCache:NO];
+  [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
+  if (data) {
+    parser = [GSXMLParser parserWithData:data];
+    if ([parser parse]) {
+      node = [self getLastModifiedElement:[[parser document] root]];
+      date = [NSDate dateWithNaturalLanguageString:[node content]];
+      return date;
+    }
+  }
+  return nil;
+}
+- (void)fetchData:(id)object
+{
+  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
+  [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
+}
+- (void)parseData:(NSData *)data
+{
+  NSString *text;
+
+  text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+  if (text && [_tree parseString:text]) {
+    [self fillWithElements:[_tree components]];
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
+  } else
+    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  if (text)
+    [text release];
+}
+- (void)initTimer:(id)object
+{
+  if ([_config objectForKey:ST_REFRESH])
+    _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
+  else
+    _minutesBeforeRefresh = 60;
+  _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
+				   interval:_minutesBeforeRefresh * 60
+				   target:self selector:@selector(refreshData:) 
+				   userInfo:nil repeats:YES];
+  [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+}
+- (void)initStoreAsync:(id)object
+{
+  NSAutoreleasePool *pool = [NSAutoreleasePool new];
+  NSURL *realURL;
+
+  realURL = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
+  if (realURL == nil) {
+    NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
+    [self release];
+    [pool release];
+    return;
+  }
+  _url = [realURL copy];
+  [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
+  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
+  [pool release];
 }
 @end
