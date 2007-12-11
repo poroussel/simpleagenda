@@ -517,6 +517,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
+  [tabs selectTabViewItemWithIdentifier:@"Day"];
+  [[tabs selectedTabViewItem] setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 {
