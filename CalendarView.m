@@ -174,12 +174,14 @@ static NSImage *circle = nil;
 
   [self clearSelectedDay];
   for (row = 1; row < 7; row++) {
-    for (column = 1; column < 8; column++) {
+    for (column = 0; column < 8; column++) {
       cell = [matrix cellAtRow: row column: column];
       [cell setStringValue: @""];
-      [cell setTag: 0];
       [cell setBackgroundColor: [NSColor clearColor]];
-      [cell setEvents:NO];
+      if (column > 0) {
+	[cell setTag: 0];
+	[cell setEvents:NO];
+      }
     }
   }
 
@@ -206,6 +208,7 @@ static NSImage *circle = nil;
     [cell setTag: day];
     [cell setFont: normalFont];
     [[matrix cellAtRow: row column: 0] setStringValue: [NSString stringWithFormat: @"%d ", week]];
+    [[matrix cellAtRow: row column: 0] setBackgroundColor:[NSColor orangeColor]];
     column++;
     if (column > 7) {
       column = 1;
