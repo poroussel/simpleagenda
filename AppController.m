@@ -276,7 +276,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if (_clickedElement) {
     if ([_clickedElement isKindOfClass:[Event class]])
       [_editor editAppointment:(Event *)_clickedElement withStoreManager:_sm];
-    else
+    else if ([_clickedElement isKindOfClass:[Task class]])
       [_taskEditor editTask:(Task *)_clickedElement withStoreManager:_sm];
   }
 }
@@ -534,6 +534,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(DayViewDelegate)
 - (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
+  _clickedElement = event;
   [_editor editAppointment:event withStoreManager:_sm];
 }
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
