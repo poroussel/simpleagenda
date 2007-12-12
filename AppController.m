@@ -114,11 +114,9 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     _selection = nil;
     _editor = [AppointmentEditor new];
     _taskEditor = [TaskEditor new];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
     _sm = [StoreManager new];
     _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
     [self initSummary];
-    [self updateSummaryData];
     [self registerForServices];
   }
   return self;
@@ -150,8 +148,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
 {
+  [self updateSummaryData];
   [dayView reloadData];
   [NSApp setServicesProvider: self];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
@@ -499,7 +499,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if (object && [object isKindOfClass:[Event class]]) {
     _clickedElement = object;
     [calendar setDate:[item valueForKey:@"date"]];
-    [tabs selectTabViewItemWithIdentifier:@"Day"];
     return YES;
   }
   if (object && [object isKindOfClass:[Task class]]) {
@@ -514,10 +513,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(CalendarViewDelegate)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date
 {
+  NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
-  [tabs selectTabViewItemWithIdentifier:@"Day"];
-  [[tabs selectedTabViewItem] setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
+  [dayTab setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
+  /* FIXME : this, somehow, prevents the selected month to show up in the popup */
+  /* [tabs selectTabViewItem:dayTab]; */
+  [tabs setNeedsDisplay:YES];
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {

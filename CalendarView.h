@@ -7,7 +7,7 @@
 {
   NSTextField *title;
   Date *date;
-  NSPopUpButton *button;
+  NSPopUpButton *month;
   NSStepper *stepper;
   NSTextField *text;
   NSMatrix *matrix;

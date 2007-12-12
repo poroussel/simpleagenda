@@ -39,7 +39,7 @@ static NSImage *circle = nil;
   [normalFont release];
   [title release];
   [matrix release];
-  [button release];
+  [month release];
   [stepper release];
   [super dealloc];
 }
@@ -67,11 +67,11 @@ static NSImage *circle = nil;
     [title setSelectable:NO];
     [self addSubview: title];
 
-    button = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 162, 100, 25)];
-    [button addItemsWithTitles: months];
-    [button setTarget: self];
-    [button setAction: @selector(selectMonth:)];
-    [self addSubview: button];
+    month = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 162, 100, 25)];
+    [month addItemsWithTitles: months];
+    [month setTarget: self];
+    [month setAction: @selector(selectMonth:)];
+    [self addSubview: month];
 
     text = [[NSTextField alloc] initWithFrame: NSMakeRect(202, 164, 60, 21)];
     [text setEditable: NO];
@@ -163,9 +163,6 @@ static NSImage *circle = nil;
 {
   [[matrix cellWithTag: [date dayOfMonth]] setFont: boldFont];
   [self updateTitle];
-
-  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
-    [delegate calendarView:self selectedDateChanged:date];
 }
 
 - (void)updateView
@@ -230,30 +227,34 @@ static NSImage *circle = nil;
   [today release];
 }
 
-- (void)selectMonth: (id)sender
+- (void)selectMonth:(id)sender
 {
-  int month = [button indexOfSelectedItem] + 1;
-  
-  [date setMonth: month];
+  int idx = [month indexOfSelectedItem] + 1;
+  [date setMonth: idx];
   [self updateView];
+  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
+    [delegate calendarView:self selectedDateChanged:date];
 }
 
-- (void)selectYear: (id)sender
+- (void)selectYear:(id)sender
 {
   int year = [stepper intValue];
-  
   [text setIntValue: year];
   [date setYear: year];
   [self updateView];
+  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
+    [delegate calendarView:self selectedDateChanged:date];
 }
 
-- (void)selectDay: (id)sender
+- (void)selectDay:(id)sender
 {
   int day = [[matrix selectedCell] tag];
   if (day > 0) {
     [self clearSelectedDay];
     [date setDay: day];
     [self setSelectedDay];
+    if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
+      [delegate calendarView:self selectedDateChanged:date];
   }
 }
 
@@ -277,8 +278,10 @@ static NSImage *circle = nil;
   ASSIGNCOPY(date, nDate);
   [text setIntValue: [date year]];
   [stepper setIntValue: [date year]];
-  [button selectItemAtIndex: [date monthOfYear] - 1];
+  [month selectItemAtIndex: [date monthOfYear] - 1];
   [self updateView];
+  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
+    [delegate calendarView:self selectedDateChanged:date];
 }
 - (Date *)date
 {
