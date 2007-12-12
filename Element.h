@@ -2,6 +2,7 @@
 
 #import <ical.h>
 #import "AgendaStore.h"
+#import "Date.h"
 
 enum classificationType
 {
@@ -18,6 +19,7 @@ enum classificationType
   NSString *_summary;
   NSAttributedString *_text;
   enum classificationType _classification;
+  Date *_stamp;
 }
 
 - (id)initWithSummary:(NSString *)summary;
@@ -27,12 +29,15 @@ enum classificationType
 - (NSString *)summary;
 - (NSString *)UID;
 - (enum classificationType)classification;
+- (Date *)dateStamp;
 
 - (void)setStore:(id <MemoryStore>)store;
 - (void)setText:(NSAttributedString *)text;
 - (void)setSummary:(NSString *)summary;
 - (void)setUID:(NSString *)uid;
 - (void)setClassification:(enum classificationType)classification;
+- (void)setDateStamp:(Date *)stamp;
+
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic;

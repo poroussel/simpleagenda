@@ -9,6 +9,8 @@
   [coder encodeObject:[_text string] forKey:@"descriptionText"];
   [coder encodeObject:_uid forKey:@"uid"];
   [coder encodeInt:_classification forKey:@"classification"];
+  if (_stamp)
+    [coder encodeObject:_stamp forKey:@"dtstamp"];
 }
 -(id)initWithCoder:(NSCoder *)coder
 {
@@ -22,14 +24,20 @@
     _classification = [coder decodeIntForKey:@"classification"];
   else
     _classification = CT_PUBLIC;
+  if ([coder containsValueForKey:@"dtstamp"])
+    _stamp = [[coder decodeObjectForKey:@"dtstamp"] retain];
+  else
+    _stamp = nil;
   return self;
 }
 
 - (id)init
 {
   self = [super init];
-  if (self)
+  if (self) {
     [self generateUID];
+    [self setDateStamp:[Date now]];
+  }
   return self;
 }
 
@@ -48,6 +56,7 @@
   RELEASE(_text);
   RELEASE(_store);
   RELEASE(_uid);
+  RELEASE(_stamp);
 }
 
 - (id <MemoryStore>)store
@@ -116,10 +125,19 @@
   _classification = classification;
 }
 
+- (Date *)dateStamp
+{
+  return _stamp;
+}
+- (void)setDateStamp:(Date *)stamp;
+{
+  ASSIGNCOPY(_stamp, stamp);
+}
 
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
+  Date *date;
 
   self = [self init];
   if (self == nil)
@@ -143,6 +161,12 @@
     NSAttributedString *as = [[NSAttributedString alloc] initWithString:[NSString stringWithCString:icalproperty_get_description(prop) encoding:NSUTF8StringEncoding]];
     [self setText:as];
     [as release];
+  }
+  prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
+  if (prop) {
+    date = [[Date alloc] initWithICalTime:icalproperty_get_dtstamp(prop)];
+    [self setDateStamp:date];
+    [date release];
   }
   return self;
  init_error:
@@ -186,6 +210,8 @@
   [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
   if ([self text])
     icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
+  [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp iCalTime]));
   return YES;
 }
 - (int)iCalComponentType

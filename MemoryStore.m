@@ -101,6 +101,7 @@
 
 - (void)update:(Element *)elt;
 {
+  [elt setDateStamp:[Date now]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
