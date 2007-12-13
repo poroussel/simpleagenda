@@ -497,15 +497,19 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
   id object = [item valueForKey:@"object"];
+  NSString *tabIdentifier = [[tabs selectedTabViewItem] identifier];;
 
   if (object && [object isKindOfClass:[Event class]]) {
-    _clickedElement = object;
     [calendar setDate:[item valueForKey:@"date"]];
+    if (![tabIdentifier isEqualToString:@"Day"])
+      [tabs selectTabViewItemWithIdentifier:@"Day"];
+    _clickedElement = object;
     return YES;
   }
   if (object && [object isKindOfClass:[Task class]]) {
+    if (![tabIdentifier isEqualToString:@"Tasks"])
+      [tabs selectTabViewItemWithIdentifier:@"Tasks"];
     _clickedElement = object;
-    [tabs selectTabViewItemWithIdentifier:@"Tasks"];
     return YES;
   }
   return NO;
@@ -608,12 +612,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(NSTabViewDelegate)
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-  if ([[tabViewItem identifier] isEqualToString:@"Day"]) {
+  if ([[tabViewItem identifier] isEqualToString:@"Day"])
     [taskView deselectAll:self];
-  }
-  if ([[tabViewItem identifier] isEqualToString:@"Tasks"]) {
+  if ([[tabViewItem identifier] isEqualToString:@"Tasks"])
     [dayView deselectAll:self];
-  }
   _clickedElement = nil;
 }
 @end
