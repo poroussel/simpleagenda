@@ -146,6 +146,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [window setFrameAutosaveName:@"mainWindow"];
   /* FIXME : do this in Gorm */
   [tabs setDelegate:self];
+  [[tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]] setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not

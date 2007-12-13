@@ -4,7 +4,7 @@ version 0.34
 	  Should be quite faster when loading a big calendar. Also, 
 	  stop saving unmodified local calendars on exit.
 	* Fix position for appointments going outside the day view
-	* Show abbreviated date in day view tab (except on startup)
+	* Show abbreviated date in day view tab
 	* Double click on the calendar to add an appointment
 	* Fix iCalendar stores data refresh timer
 	* Workaround for the element selection problem. Needs a far
