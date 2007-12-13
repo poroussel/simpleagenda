@@ -127,8 +127,6 @@ static NSImage *repeatImage;
       [delegate dayView:parent editEvent:_apt];
     return;
   }
-  if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
-    [delegate dayView:parent selectEvent:_apt];
   [parent selectAppointmentView:self];
 
   if (![[_apt store] writable] || [_apt allDay])
