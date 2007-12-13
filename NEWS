@@ -1,4 +1,4 @@
-version 0.34
+version 0.34 (2007/12/13)
 	* Fix loading and saving logic : when loading an iCalendar,
 	  we used to refresh the view for each appointment and task.
 	  Should be quite faster when loading a big calendar. Also, 
