@@ -6,7 +6,9 @@ version 0.34
 	* Fix position for appointments going outside the day view
 	* Show abbreviated date in day view tab (except on startup)
 	* Double click on the calendar to add an appointment
-	* Fix iCalendar stores data refresh
+	* Fix iCalendar stores data refresh timer
+	* Workaround for the element selection problem. Needs a far
+	  better solution.
 
 version 0.33 (2007/12/08)
 	* Fix dates of summary events

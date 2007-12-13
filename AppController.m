@@ -144,6 +144,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
+  /* FIXME : do this in Gorm */
+  [tabs setDelegate:self];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
@@ -602,3 +604,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 @end
 
+/* FIXME : gross hack around selection problem */
+@implementation AppController(NSTabViewDelegate)
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+  if ([[tabViewItem identifier] isEqualToString:@"Day"]) {
+    [taskView deselectAll:self];
+  }
+  if ([[tabViewItem identifier] isEqualToString:@"Tasks"]) {
+    [dayView deselectAll:self];
+  }
+  _clickedElement = nil;
+}
+@end

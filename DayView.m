@@ -449,4 +449,13 @@ static NSImage *repeatImage;
 {
   return _minStep;
 }
+
+- (void)deselectAll:(id)sender
+{
+  if (_selected) {
+    [_selected setSelected:NO];
+    [self setNeedsDisplay:YES];
+    _selected = nil;
+  }
+}
 @end
