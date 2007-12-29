@@ -137,7 +137,7 @@ static NSImage *circle = nil;
     now = [Date now];
     [self setDate:now];
     [now incrementDay];
-    [now setMinute:0];
+    [now clearTime];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
 				 interval:86400 target:self 
 				 selector:@selector(dayChanged:) 
@@ -223,11 +223,9 @@ static NSImage *circle = nil;
 
 - (void)dayChanged:(NSTimer *)timer
 {
-  Date *today = [Date new];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:currentDateChanged:)])
-    [delegate calendarView:self currentDateChanged:today];
-  [today release];
+    [delegate calendarView:self currentDateChanged:[Date today]];
 }
 
 - (void)selectMonth:(id)sender

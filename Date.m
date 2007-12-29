@@ -40,8 +40,7 @@
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
-  NSString *icalTime = [coder decodeObjectForKey:@"icalTime"];
-  _time = icaltime_from_string([icalTime cString]);
+  _time = icaltime_from_string([[coder decodeObjectForKey:@"icalTime"] cString]);
   return self;
 }
 @end
@@ -73,7 +72,7 @@
   return [NSString stringWithCString:icaltime_as_ical_string(_time)];
 }
 
-- (id)initWithTime:(BOOL)time
+- (id)init
 {
   const char *tzone;
   icaltimezone *tz, *utc;
@@ -81,20 +80,20 @@
   self = [super init];
   if (self) {
     tzone = [[[[NSCalendarDate calendarDate] timeZone] description] cString];
-    tz = icaltimezone_get_builtin_timezone(tzone);
     utc = icaltimezone_get_utc_timezone();
-    if (time)
-      _time = icaltime_current_time_with_zone(NULL);
-    else
-      _time = icaltime_today();
+    tz = icaltimezone_get_builtin_timezone(tzone);
+    if (!tz)
+      NSLog(@"Couldn't get a timezone corresponding to %s", tzone);
+    _time = icaltime_current_time_with_zone(NULL);
     icaltimezone_convert_time(&_time, utc, tz);
   }
   return self;
 }
 - (id)initWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
 {
-  self = [self initWithTime:time];
+  self = [self init];
   if (self) {
+    [self setDate:!time];
     _time.year = [cd yearOfCommonEra];
     _time.month = [cd monthOfYear];
     _time.day = [cd dayOfMonth];
@@ -106,29 +105,26 @@
   }
   return self;
 }
-- (id)init
-{
-  return [self initWithTime:YES];
-}
 + (id)now
 {
-  return AUTORELEASE([[Date alloc] initWithTime:YES]);
+  return AUTORELEASE([[Date alloc] init]);
 }
 + (id)today
 {
-  return AUTORELEASE([[Date alloc] initWithTime:NO]);
+  Date *d = [[Date alloc] init];
+  [d setDate:YES];
+  return AUTORELEASE(d);
 }
 
 - (NSCalendarDate *)calendarDate
 {
-  NSCalendarDate *cd = [NSCalendarDate dateWithYear:_time.year 
-				       month:_time.month
-				       day:_time.day
-				       hour:_time.hour
-				       minute:_time.minute
-				       second:_time.second
-				       timeZone:nil];
-  return cd;
+  return [NSCalendarDate dateWithYear:_time.year 
+			 month:_time.month
+			 day:_time.day
+			 hour:_time.hour
+			 minute:_time.minute
+			 second:_time.second
+			 timeZone:nil];
 }
 
 - (int)year
@@ -236,6 +232,19 @@
 - (int)yearSince:(Date *)date
 {
   return _time.year - date->_time.year;
+}
+
+- (void)clearTime
+{
+  _time.hour = 0;
+  _time.minute = 0;
+  _time.second = 0;
+}
+
+- (void)setSecondOfMinute:(int)second
+{
+  _time.second = second;
+  _time = icaltime_normalize(_time);
 }
 
 - (void)setMinute:(int)minute

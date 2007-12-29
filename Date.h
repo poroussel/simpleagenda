@@ -32,6 +32,8 @@
 - (int)monthsSince:(Date *)date;
 - (int)yearsUntil:(Date *)date;
 - (int)yearSince:(Date *)date;
+- (void)clearTime;
+- (void)setSecondOfMinute:(int)second;
 - (void)setMinute:(int)minute;
 - (void)setDay:(int)day;
 - (void)setMonth:(int)month;
