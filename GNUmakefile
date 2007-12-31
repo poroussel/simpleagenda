@@ -7,7 +7,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #
 # Application
 #
-VERSION = 0.34
+VERSION = 0.35
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff

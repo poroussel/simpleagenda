@@ -1,3 +1,7 @@
+version 0.35 (2007/12/31)
+	* Fix (fingers crossed) timezone bugs and current day timer
+	* New website at http://coyote.octets.fr/simpleagenda
+
 version 0.34 (2007/12/13)
 	* Fix loading and saving logic : when loading an iCalendar,
 	  we used to refresh the view for each appointment and task.
