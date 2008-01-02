@@ -151,6 +151,7 @@
   for (row = 1; row < 7; row++) {
     for (column = 0; column < 8; column++) {
       cell = [matrix cellAtRow: row column: column];
+      [cell setBezeled:NO];
       [cell setStringValue: @""];
       [cell setBackgroundColor: [NSColor clearColor]];
       if (column > 0) {
@@ -163,7 +164,6 @@
   today = [[Date today] retain];
   firstWeek = [date copy];
   [firstWeek setDay: 1];
-  [firstWeek setMinute:0];
   week = [firstWeek weekOfYear];
   row = 1;
   column = [firstWeek weekday];
@@ -177,11 +177,12 @@
       [cell setBackgroundColor: [NSColor yellowColor]];
       [cell setDrawsBackground: YES];
     }
-    [cell setIntValue: day];
-    [cell setTag: day];
-    [cell setFont: normalFont];
+    [cell setIntValue:day];
+    [cell setTag:day];
     if (dataSource && [[dataSource scheduledAppointmentsForDay:firstWeek] count])
       [cell setFont:boldFont];
+    else
+      [cell setFont: normalFont];
     [[matrix cellAtRow: row column: 0] setStringValue: [NSString stringWithFormat: @"%d ", week]];
     [[matrix cellAtRow: row column: 0] setBackgroundColor:[NSColor orangeColor]];
     column++;
