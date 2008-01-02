@@ -1,31 +1,7 @@
-/* All Rights reserved */
-
 #import <AppKit/AppKit.h>
 #import "Date.h"
 #import "CalendarView.h"
 #import "StoreManager.h"
-
-static NSImage *circle = nil;
-
-@interface NSCalendarDayCell : NSTextFieldCell
-{
-  BOOL events;
-}
-- (void)setEvents:(BOOL)ev;
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView;
-@end
-@implementation NSCalendarDayCell
-- (void)setEvents:(BOOL)ev
-{
-  events = ev;
-}
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-  [super drawInteriorWithFrame:cellFrame inView:controlView];
-  if (events)
-    [circle compositeToPoint:NSMakePoint(cellFrame.origin.x + 10, cellFrame.origin.y + [circle size].height + 7) operation:NSCompositeSourceOver];
-}
-@end
 
 @implementation CalendarView
 - (void)dealloc
@@ -85,13 +61,7 @@ static NSImage *circle = nil;
     [stepper setAction: @selector(selectYear:)];
     [self addSubview: stepper];
 
-    if (!circle) {
-      NSString *path = [[NSBundle mainBundle] pathForImageResource:@"check"];
-      circle = [[NSImage alloc] initWithContentsOfFile:path];
-      [circle setFlipped:YES];
-    }
-
-    NSCalendarDayCell *cell = [NSCalendarDayCell new];
+    NSTextFieldCell *cell = [NSTextFieldCell new];
     [cell setEditable: NO];
     [cell setSelectable: NO];
     [cell setAlignment: NSRightTextAlignment];
@@ -156,12 +126,12 @@ static NSImage *circle = nil;
 
 - (void)clearSelectedDay
 {
-  [[matrix cellWithTag: [date dayOfMonth]] setFont: normalFont];
+  [[matrix cellWithTag: [date dayOfMonth]] setBezeled:NO];
 }
 
 - (void)setSelectedDay
 {
-  [[matrix cellWithTag: [date dayOfMonth]] setFont: boldFont];
+  [[matrix cellWithTag: [date dayOfMonth]] setBezeled:YES];
   [self updateTitle];
 }
 
@@ -170,7 +140,7 @@ static NSImage *circle = nil;
   int day, row, column, week;
   Date *firstWeek;
   Date *today;
-  NSCalendarDayCell *cell;
+  NSTextFieldCell *cell;
 
   [self clearSelectedDay];
   for (row = 1; row < 7; row++) {
@@ -180,7 +150,7 @@ static NSImage *circle = nil;
       [cell setBackgroundColor: [NSColor clearColor]];
       if (column > 0) {
 	[cell setTag: 0];
-	[cell setEvents:NO];
+	[cell setFont:normalFont];
       }
     }
   }
@@ -202,11 +172,11 @@ static NSImage *circle = nil;
       [cell setBackgroundColor: [NSColor yellowColor]];
       [cell setDrawsBackground: YES];
     }
-    if (dataSource && [[dataSource scheduledAppointmentsForDay:firstWeek] count])
-      [cell setEvents:YES];
     [cell setIntValue: day];
     [cell setTag: day];
     [cell setFont: normalFont];
+    if (dataSource && [[dataSource scheduledAppointmentsForDay:firstWeek] count])
+      [cell setFont:boldFont];
     [[matrix cellAtRow: row column: 0] setStringValue: [NSString stringWithFormat: @"%d ", week]];
     [[matrix cellAtRow: row column: 0] setBackgroundColor:[NSColor orangeColor]];
     column++;
