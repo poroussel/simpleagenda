@@ -30,43 +30,49 @@
   if (self) {
     NSArray *months = [[NSUserDefaults standardUserDefaults] objectForKey:NSMonthNameArray];
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
-    boldFont = [NSFont boldSystemFontOfSize: 0];
-    normalFont = [NSFont systemFontOfSize: 0];
+    boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
+    normalFont = RETAIN([NSFont systemFontOfSize:11]);
     delegate = nil;
     dataSource = nil;
 
-    title = [[NSTextField alloc] initWithFrame: NSMakeRect(122, 164, 100, 20)];
+    title = [[NSTextField alloc] initWithFrame: NSMakeRect(85, 142, 80, 20)];
     [title setEditable:NO];
     [title setDrawsBackground:NO];
     [title setBezeled:NO];
     [title setBordered:NO];
     [title setSelectable:NO];
+    [title setFont:normalFont];
+    [title setAlignment: NSCenterTextAlignment];
     [self addSubview: title];
 
-    month = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 162, 100, 25)];
+    month = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 140, 80, 25)];
+    [month setFont:normalFont];
     [month addItemsWithTitles: months];
     [month setTarget: self];
     [month setAction: @selector(selectMonth:)];
     [self addSubview: month];
 
-    text = [[NSTextField alloc] initWithFrame: NSMakeRect(202, 164, 60, 21)];
+    text = [[NSTextField alloc] initWithFrame: NSMakeRect(164, 142, 40, 21)];
     [text setEditable: NO];
     [text setAlignment: NSRightTextAlignment];
+    [text setFont:normalFont];
     [self addSubview: text];
 
-    stepper = [[NSStepper alloc] initWithFrame: NSMakeRect(266, 162, 16, 25)];
+    stepper = [[NSStepper alloc] initWithFrame: NSMakeRect(206, 140, 16, 25)];
     [stepper setMinValue: 1970];
     [stepper setMaxValue: 2037];
     [stepper setTarget: self];
     [stepper setAction: @selector(selectYear:)];
+    [stepper setFont:normalFont];
     [self addSubview: stepper];
 
     NSTextFieldCell *cell = [NSTextFieldCell new];
     [cell setEditable: NO];
     [cell setSelectable: NO];
     [cell setAlignment: NSRightTextAlignment];
+    [cell setFont:normalFont];
 
-    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 8, 280, 150)
+    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 8, 220, 128)
 			       mode: NSListModeMatrix
 			       prototype: cell
 			       numberOfRows: 7
@@ -80,14 +86,13 @@
     NSColor *white = [NSColor whiteColor];
     for (i = 0; i < 8; i++) {
       cell = [matrix cellAtRow: 0 column: i];
-      [cell setAlignment: NSCenterTextAlignment];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
       if (i < 7 && i > 0)
-	[cell setStringValue: [days objectAtIndex: i]];
+	[cell setStringValue: [[days objectAtIndex: i] substringToIndex:1]];
       else if (i == 7)
-	[cell setStringValue: [days objectAtIndex: 0]];
+	[cell setStringValue: [[days objectAtIndex: 0] substringToIndex:1]];
     }
     for (i = 0; i < 7; i++) {
       cell = [matrix cellAtRow: i column: 0];
