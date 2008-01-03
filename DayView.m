@@ -188,6 +188,11 @@ static NSImage *repeatImage;
 @end
 
 
+NSComparisonResult compareAppointmentViews(id a, id b, void *data)
+{
+  return [[[a appointment] startDate] compareTime:[[b appointment] startDate]];
+}
+
 @implementation DayView
 - (NSDictionary *)defaults
 {
@@ -249,6 +254,44 @@ static NSImage *repeatImage;
 {
   return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / [self frame].size.height;
 }
+
+- (void)fixFrames
+{
+  int i, j, k, n;
+  NSArray *subviews;
+  AppointmentView *view, *next;
+  NSRect fview, fnext;
+  float width, x;
+
+  subviews = [[self subviews] sortedArrayUsingFunction:compareAppointmentViews context:NULL];
+  if ([subviews count] < 2)
+    return;
+  for (i = 0; i < [subviews count] - 1; i++) {
+    view = [subviews objectAtIndex:i];
+    fview = [view frame];
+    for (j = i + 1, n = 1; j < [subviews count]; j++) {
+      next = [subviews objectAtIndex:j];
+      fnext = [next frame];
+      if (!NSIntersectsRect(fview, fnext))
+	break;
+      n++;
+      fview = fnext;
+    }
+    if (n != 1) {
+      width = [view frame].size.width / n;
+      x = [view frame].origin.x;
+      for (k = i; k < i + n; k++) {
+	view = [subviews objectAtIndex:k];
+	fview = [view frame];
+	fview.size.width = width;
+	fview.origin.x = x;
+	x += width;
+	[view setFrame:fview];
+      }
+      i = 0;
+    }
+  }
+}
 - (NSRect)frameForAppointment:(Event *)apt
 {
   int size, start;
@@ -282,6 +325,7 @@ static NSImage *repeatImage;
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject]))
     [aptv setFrame:[self frameForAppointment:[aptv appointment]]];
+  [self fixFrames];
   /*
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
@@ -357,7 +401,7 @@ static NSImage *repeatImage;
     /* FIXME : probably shouldn't be there */
     [config registerClient:self forKey:[[apt store] description]];
     if ([[apt store] displayed]) {
-      aptv = [[AppointmentView alloc] initWithFrame:[self frameForAppointment:apt] appointment:apt];
+      aptv = [[AppointmentView alloc] initWithFrame:NSZeroRect appointment:apt];
       [self addSubview:aptv];
       if (oldSelection && [[oldSelection UID] isEqual:[apt UID]])
 	[self selectAppointmentView:aptv];
