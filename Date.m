@@ -162,6 +162,7 @@
 }
 - (int)weekOfYear
 {
+  /* FIXME : ical function doesn't work. See ticket #3 */
   return icaltime_week_number(_time);
 }
 - (int)numberOfDaysInMonth
