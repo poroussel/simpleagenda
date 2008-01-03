@@ -68,6 +68,7 @@
     [until setState:NO];
     [endDate setObjectValue:nil];
   }
+  [endDate setEnabled:[until state]];
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
