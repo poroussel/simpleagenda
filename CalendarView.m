@@ -3,12 +3,32 @@
 #import "CalendarView.h"
 #import "StoreManager.h"
 
+@interface DayFormatter : NSFormatter
+@end
+@implementation DayFormatter
+- (NSString *)stringForObjectValue:(id)anObject
+{
+  NSAssert([anObject isKindOfClass:[Date class]], @"Needs a Date as input");
+  return [NSString stringWithFormat:@"%2d", [anObject dayOfMonth]];
+}
+- (BOOL)getObjectValue:(id *)anObject forString:(NSString *)string errorDescription:(NSString **)error
+{
+  return NO;
+}
+- (NSAttributedString *)attributedStringForObjectValue:(id)anObject withDefaultAttributes:(NSDictionary *)attributes
+{
+  return nil;
+}
+@end
+
 @implementation CalendarView
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(date);
+  RELEASE(monthDisplayed);
   [_dayTimer invalidate];
+  RELEASE(_dayTimer);
   RELEASE(delegate);
   RELEASE(dataSource);
   [boldFont release];
@@ -23,10 +43,12 @@
 - (id)initWithFrame:(NSRect)frame
 {
   int i;
+  int j;
+  int tag;
   Date *now;
+  DayFormatter *formatter;
 
   self = [super initWithFrame:frame];
-
   if (self) {
     NSArray *months = [[NSUserDefaults standardUserDefaults] objectForKey:NSMonthNameArray];
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
@@ -100,8 +122,14 @@
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
     }
-    [orange release];
-    [white release];
+    formatter = [DayFormatter new];
+    for (i = 1, tag = 1; i < 8; i++) {
+      for (j = 1; j < 7; j++) {
+	[[matrix cellAtRow: j column: i] setFormatter:formatter];
+	[[matrix cellAtRow: j column: i] setTag:tag++];
+      }
+    }
+    [formatter release];
     [self addSubview: matrix];
 
     /*
@@ -131,69 +159,73 @@
 
 - (void)clearSelectedDay
 {
-  [[matrix cellWithTag: [date dayOfMonth]] setBezeled:NO];
+  [[matrix cellWithTag:bezeledCell] setBezeled:NO];
 }
 
 - (void)setSelectedDay
 {
-  [[matrix cellWithTag: [date dayOfMonth]] setBezeled:YES];
-  [self updateTitle];
+  NSCell *cell;
+  int i, j;
+  id object;
+
+  for (i = 1; i < 8; i++) {
+    for (j = 1; j < 7; j++) {
+      cell = [matrix cellAtRow:j column:i];
+      object = [cell objectValue];
+      if (object != nil && ![date compare:object]) {
+	bezeledCell = [cell tag];
+	[cell setBezeled:YES];
+	[self updateTitle];
+	return;
+      }
+    }
+  }
 }
 
 - (void)updateView
 {
-  int day, row, column, week;
-  Date *firstWeek;
-  Date *today;
+  int row, column, week;
+  Date *day, *today;
   NSTextFieldCell *cell;
+  NSColor *clear = [NSColor clearColor];
+  NSColor *white = [NSColor whiteColor];
+  NSColor *black = [NSColor blackColor];
 
   [self clearSelectedDay];
-  for (row = 1; row < 7; row++) {
-    for (column = 0; column < 8; column++) {
-      cell = [matrix cellAtRow: row column: column];
-      [cell setBezeled:NO];
-      [cell setStringValue: @""];
-      [cell setBackgroundColor: [NSColor clearColor]];
-      if (column > 0) {
-	[cell setTag: 0];
-	[cell setFont:normalFont];
-      }
-    }
-  }
-
   today = [[Date today] retain];
-  firstWeek = [date copy];
-  [firstWeek setDay: 1];
-  week = [firstWeek weekOfYear];
+  day = [monthDisplayed copy];
+  [day setDay: 1];
+  week = [day weekOfYear];
   row = 1;
-  column = [firstWeek weekday];
+  column = [day weekday];
   if (!column)
     column = 7;
-
-  for (day = 1; day <= [date numberOfDaysInMonth]; day++) {
-    cell = [matrix cellAtRow: row column: column];
-    [firstWeek setDay: day];
-    if ([firstWeek compare:today] == 0) {
-      [cell setBackgroundColor: [NSColor yellowColor]];
-      [cell setDrawsBackground: YES];
-    }
-    [cell setIntValue:day];
-    [cell setTag:day];
-    if (dataSource && [[dataSource scheduledAppointmentsForDay:firstWeek] count])
-      [cell setFont:boldFont];
-    else
-      [cell setFont: normalFont];
-    [[matrix cellAtRow: row column: 0] setStringValue: [NSString stringWithFormat: @"%d ", week]];
-    [[matrix cellAtRow: row column: 0] setBackgroundColor:[NSColor orangeColor]];
-    column++;
-    if (column > 7) {
-      column = 1;
-      row++;
-      week++;
+  [day changeDayBy:1-column];
+  column = 1;
+  for (row = 1; row < 7; row++, week++) {
+    [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
+    for (column = 1; column < 8; column++, [day incrementDay]) {
+      cell = [matrix cellAtRow: row column: column];
+      if ([day compare:today] == 0) {
+	[cell setBackgroundColor:[NSColor yellowColor]];
+	[cell setDrawsBackground:YES];
+      } else {
+	[cell setBackgroundColor:clear];
+	[cell setDrawsBackground:NO];
+      }
+      [cell setObjectValue:[day copy]];
+      if (dataSource && [[dataSource scheduledAppointmentsForDay:day] count])
+	[cell setFont:boldFont];
+      else
+	[cell setFont: normalFont];
+      if ([day monthOfYear] == [monthDisplayed monthOfYear])
+	[cell setTextColor:black];
+      else
+	[cell setTextColor:white];
     }
   }
   [self setSelectedDay];
-  [firstWeek release];
+  [day release];
   [today release];
 }
 
@@ -208,6 +240,7 @@
 {
   int idx = [month indexOfSelectedItem] + 1;
   [date setMonth: idx];
+  [monthDisplayed setMonth: idx];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
     [delegate calendarView:self selectedDateChanged:date];
@@ -218,6 +251,7 @@
   int year = [stepper intValue];
   [text setIntValue: year];
   [date setYear: year];
+  [monthDisplayed setYear: year];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
     [delegate calendarView:self selectedDateChanged:date];
@@ -225,10 +259,10 @@
 
 - (void)selectDay:(id)sender
 {
-  int day = [[matrix selectedCell] tag];
-  if (day > 0) {
+  id day = [[matrix selectedCell] objectValue];
+  if ([day isKindOfClass:[Date class]]) {
     [self clearSelectedDay];
-    [date setDay: day];
+    ASSIGNCOPY(date, day);
     [self setSelectedDay];
     if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
       [delegate calendarView:self selectedDateChanged:date];
@@ -253,9 +287,10 @@
 - (void)setDate:(Date *)nDate
 {
   ASSIGNCOPY(date, nDate);
-  [text setIntValue: [date year]];
-  [stepper setIntValue: [date year]];
-  [month selectItemAtIndex: [date monthOfYear] - 1];
+  ASSIGNCOPY(monthDisplayed, nDate);
+  [text setIntValue: [nDate year]];
+  [stepper setIntValue: [nDate year]];
+  [month selectItemAtIndex: [nDate monthOfYear] - 1];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
     [delegate calendarView:self selectedDateChanged:date];
@@ -282,7 +317,6 @@
 
 - (void)dataChanged:(NSNotification *)not
 {
-  if (dataSource)
-    [self updateView];
+  [self updateView];
 }
 @end

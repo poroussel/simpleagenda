@@ -7,6 +7,7 @@
 {
   NSTextField *title;
   Date *date;
+  Date *monthDisplayed;
   NSPopUpButton *month;
   NSStepper *stepper;
   NSTextField *text;
@@ -16,6 +17,7 @@
   IBOutlet id delegate;
   IBOutlet NSObject <AgendaDataSource> *dataSource;
   NSTimer *_dayTimer;
+  int bezeledCell;
 }
 
 - (id)initWithFrame:(NSRect)frame;

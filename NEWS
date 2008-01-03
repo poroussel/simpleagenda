@@ -1,3 +1,12 @@
+version 0.36
+	* Calendar UI changes : to reduce calendar size, use different
+	  visual hints. Today has a yellow background (unchanged), the 
+	  selected day cell is bezeled/pushed (was a bold font) and busy 
+	  days use a bold font (instead of a tick mark). Always show six 
+	  weeks with black text for the chosen month and white text for 
+	  the previous and next ones. Use a defined font size so that it 
+	  all fits whatever the user choose as a default size.
+
 version 0.35 (2007/12/31)
 	* Fix (fingers crossed) timezone bugs and current day timer
 	* New website at http://coyote.octets.fr/simpleagenda
