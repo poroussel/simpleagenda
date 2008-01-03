@@ -192,16 +192,14 @@
   NSColor *black = [NSColor blackColor];
 
   [self clearSelectedDay];
-  today = [[Date today] retain];
+  today = [Date today];
   day = [monthDisplayed copy];
   [day setDay: 1];
   week = [day weekOfYear];
-  row = 1;
   column = [day weekday];
   if (!column)
     column = 7;
   [day changeDayBy:1-column];
-  column = 1;
   for (row = 1; row < 7; row++, week++) {
     [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
     for (column = 1; column < 8; column++, [day incrementDay]) {
@@ -226,7 +224,6 @@
   }
   [self setSelectedDay];
   [day release];
-  [today release];
 }
 
 - (void)dayChanged:(NSTimer *)timer
