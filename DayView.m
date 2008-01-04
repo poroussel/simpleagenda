@@ -142,10 +142,12 @@ static NSImage *repeatImage;
 
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	minutes = [parent positionToMinute:mouseLoc.y];
-	[_apt setDuration:[parent roundMinutes:minutes - start]];
-	modified = YES;
-	[parent setNeedsDisplay:YES];
+	minutes = [parent roundMinutes:[parent positionToMinute:mouseLoc.y] - start];
+	if (minutes != [_apt duration]) {
+	  [_apt setDuration:minutes];
+	  modified = YES;
+	  [parent setNeedsDisplay:YES];
+	}
 	break;
       case NSLeftMouseUp:
 	keepOn = NO;
@@ -163,10 +165,12 @@ static NSImage *repeatImage;
       mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	minutes = [parent positionToMinute:mouseLoc.y + diff];
-	[[_apt startDate] setMinute:[parent roundMinutes:minutes]];
-	modified = YES;
-	[parent setNeedsDisplay:YES];
+	minutes = [parent roundMinutes:[parent positionToMinute:mouseLoc.y + diff]];
+	if (minutes != [[_apt startDate] minuteOfDay]) {
+	  [[_apt startDate] setMinute:minutes];
+	  modified = YES;
+	  [parent setNeedsDisplay:YES];
+	}
 	break;
       case NSLeftMouseUp:
 	keepOn = NO;
