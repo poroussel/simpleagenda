@@ -279,7 +279,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       if (!NSIntersectsRect(fview, fnext))
 	break;
       n++;
-      fview = fnext;
+      fview = NSUnionRect(fview, fnext);
     }
     if (n != 1) {
       width = [view frame].size.width / n;
@@ -292,7 +292,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 	x += width;
 	[view setFrame:fview];
       }
-      i = 0;
     }
   }
 }
