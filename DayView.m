@@ -127,11 +127,11 @@ static NSImage *repeatImage;
       [delegate dayView:parent editEvent:_apt];
     return;
   }
+  [self becomeFirstResponder];
   [parent selectAppointmentView:self];
 
   if (![[_apt store] writable] || [_apt allDay])
     return;
-
   inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];
   if (inResize) {
     [[NSCursor resizeUpDownCursor] push];
@@ -184,13 +184,15 @@ static NSImage *repeatImage;
   if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
     [delegate dayView:parent modifyEvent:_apt];
 }
-
 - (Event *)appointment
 {
   return _apt;
 }
+- (BOOL)acceptsFirstResponder
+{
+  return YES;
+}
 @end
-
 
 NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 {
@@ -388,26 +390,37 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 - (void)reloadData
 {
   ConfigManager *config = [ConfigManager globalConfig];
-  NSEnumerator *enumerator;
+  NSEnumerator *enumerator, *enm;
   AppointmentView *aptv;
   Event *apt;
-  Event *oldSelection = [_selected appointment];
+  NSSet *events;
+  BOOL found;
 
+  events = [dataSource scheduledAppointmentsForDay:nil];
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
-    [aptv removeFromSuperviewWithoutNeedingDisplay];
-    [aptv release];
+    if (![events containsObject:[aptv appointment]]) {
+      if (aptv == _selected)
+	_selected = nil;
+      [aptv removeFromSuperviewWithoutNeedingDisplay];
+      [aptv release];
+    }
   }
-  _selected = nil;
-  enumerator = [[dataSource scheduledAppointmentsForDay:nil] objectEnumerator];
+  enumerator = [events objectEnumerator];
   while ((apt = [enumerator nextObject])) {
-    /* FIXME : probably shouldn't be there */
-    [config registerClient:self forKey:[[apt store] description]];
-    if ([[apt store] displayed]) {
-      aptv = [[AppointmentView alloc] initWithFrame:NSZeroRect appointment:apt];
-      [self addSubview:aptv];
-      if (oldSelection && [[oldSelection UID] isEqual:[apt UID]])
-	[self selectAppointmentView:aptv];
+    found = NO;
+    enm = [[self subviews] objectEnumerator];
+    while ((aptv = [enm nextObject])) {
+      if ([apt isEqual:[aptv appointment]]) {
+	found = YES;
+	break;
+      }
+    }
+    if (found == NO) {
+      /* FIXME : probably shouldn't be there */
+      [config registerClient:self forKey:[[apt store] description]];
+      if ([[apt store] displayed])
+	[self addSubview:[[AppointmentView alloc] initWithFrame:NSZeroRect appointment:apt]];
     }
   }
   [self setNeedsDisplay:YES];
