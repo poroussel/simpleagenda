@@ -6,6 +6,8 @@ version 0.36
 	  weeks with black text for the chosen month and white text for 
 	  the previous and next ones. Use a defined font size so that it 
 	  all fits whatever the user choose as a default size.
+	* Day view : circle through appointments with TAB and edit the 
+	  selected one with enter
 
 version 0.35 (2007/12/31)
 	* Fix (fingers crossed) timezone bugs and current day timer

@@ -461,7 +461,46 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-  [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
+  NSString *characters = [theEvent characters];
+  unichar character = 0;
+
+  if ([characters length] > 0)
+    character = [characters characterAtIndex: 0];
+  
+  switch (character) {
+  case '\r':
+  case NSEnterCharacter: 
+    NSLog(@"enter");
+    if (_selected != nil) {
+      if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
+	[delegate dayView:self editEvent:[_selected appointment]];
+      return;
+    }
+  case NSUpArrowFunctionKey:
+    [self moveUp:self];
+    return;
+  case NSDownArrowFunctionKey:
+    [self moveDown:self];
+    return;
+  case NSTabCharacter:
+    if (_selected != nil) {
+      unsigned int index = [[self subviews] indexOfObject:_selected];
+      if (index != NSNotFound) {
+	if ([theEvent modifierFlags] & NSShiftKeyMask) {
+	  index--;
+	  if (index < 0)
+	    index = [[self subviews] count] - 1;
+	} else {
+	  index++;
+	  if (index >= [[self subviews] count])
+	    index = 0;
+	}
+	[self selectAppointmentView:[[self subviews] objectAtIndex:index]];
+      }
+      return;
+    }
+  }
+  [super keyDown:theEvent];
 }
 
 - (void)moveUp:(id)sender
