@@ -43,6 +43,7 @@
 - (void)delAppointment:(id)sender;
 - (void)exportAppointment:(id)sender;
 - (void)saveAll:(id)sender;
+- (void)reloadAll:(id)sender;
 - (void)showPrefPanel:(id)sender;
 - (void)addAppointment:(id)sender;
 - (void)addTask:(id)sender;

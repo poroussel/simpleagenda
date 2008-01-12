@@ -27,7 +27,7 @@
   self = [super initWithName:name];
   if (self) {
     filename = [_config objectForKey:ST_FILE];
-    _globalPath = [LocalAgendaPath stringByExpandingTildeInPath];
+    _globalPath = [[LocalAgendaPath stringByExpandingTildeInPath] retain];
     _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
     [self read];
@@ -55,6 +55,7 @@
   [self write];
   [_globalFile release];
   [_globalTaskFile release];
+  [_globalPath release];
   [super dealloc];
 }
 

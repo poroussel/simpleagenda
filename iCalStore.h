@@ -2,14 +2,14 @@
 
 #import "MemoryStore.h"
 #import "iCalTree.h"
+#import "WebDAVResource.h"
 
 @interface iCalStore : MemoryStore <AgendaStore>
 {
   iCalTree *_tree;
   NSURL *_url;
-  NSDate *_lastModified;
   int _minutesBeforeRefresh;
   NSTimer *_refreshTimer;
-  NSMutableData *_retrievedData;
+  WebDAVResource *_resource;
 }
 @end

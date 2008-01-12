@@ -13,6 +13,8 @@
 #define ST_COLOR @"storeColor"
 #define ST_TEXT_COLOR @"storeTextColor"
 #define ST_URL @"storeURL"
+#define ST_CALENDAR_URL @"storeCalendarURL"
+#define ST_TASK_URL @"storeTaskURL"
 #define ST_RW @"storeWritable"
 #define ST_REFRESH @"storeRefresh"
 #define ST_DISPLAY @"storeDisplay"

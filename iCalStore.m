@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
-#import <GNUstepBase/GSXML.h>
 #import "Event.h"
 #import "Task.h"
 #import "iCalStore.h"
+#import "WebDAVResource.h"
 #import "defines.h"
 
 @interface iCalStoreDialog : NSObject
@@ -15,7 +15,6 @@
   IBOutlet id warning;
 }
 - (BOOL)show;
-- (void)setError:(NSString *)errorText;
 - (NSString *)url;
 @end
 @implementation iCalStoreDialog
@@ -43,23 +42,27 @@
 }
 - (void)okClicked:(id)sender
 {
-  [NSApp stopModalWithCode:1];
+  NSURL *tmp;
+  WebDAVResource *resource;
+
+  tmp = [NSURL URLWithString:[url stringValue]];
+  resource = AUTORELEASE([[WebDAVResource alloc] initWithURL:tmp]);
+  if ([resource readable])
+    [NSApp stopModalWithCode:1];
+  else {
+    [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [tmp propertyForKey:NSHTTPPropertyStatusReasonKey]]];
+    [warning setHidden:NO];
+  }
 }
 - (void)cancelClicked:(id)sender
 {
   [NSApp stopModalWithCode:0];
 }
-- (void)setError:(NSString *)errorText
-{
-  [error setStringValue:errorText];
-  [warning setHidden:NO];
-}
 - (void)controlTextDidChange:(NSNotification *)notification
 {
   NS_DURING
     {
-      NSURL *storeUrl = [NSURL URLWithString:[url stringValue]];
-      [ok setEnabled:(storeUrl != nil)];
+      [ok setEnabled:[NSURL stringIsValidURL:[url stringValue]]];
     }
   NS_HANDLER
     {
@@ -74,12 +77,6 @@
 @end
 
 @interface iCalStore(Private)
-+ (NSURL *)getRealURL:(NSURL *)url;
-+ (BOOL)canReadFromURL:(NSURL *)url;
-+ (BOOL)canWriteToURL:(NSURL *)url;
-- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node;
-- (NSDate *)getLastModified;
-- (BOOL)needsRefresh;
 - (void)fetchData:(id)object;
 - (void)parseData:(NSData *)data;
 - (void)initTimer:(id)object;
@@ -102,8 +99,6 @@
   self = [super initWithName:name];
   if (self) {
     _tree = [iCalTree new];
-    _retrievedData = nil;
-    _lastModified = nil;
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;
@@ -115,19 +110,20 @@
   iCalStoreDialog *dialog;
   NSURL *storeURL;
   BOOL writable = NO;
+  WebDAVResource *resource;
+  NSData *data;
 
   dialog = [[iCalStoreDialog alloc] initWithName:name];
- error:
   if ([dialog show] == YES) {
-    storeURL = [iCalStore getRealURL:[NSURL URLWithString:[dialog url]]];
-    writable = YES;
-    if ([iCalStore canWriteToURL:storeURL] == NO) {
-      writable = NO;
-      if ([iCalStore canReadFromURL:storeURL] == NO) {
-	[dialog setError:@"Unable to read at this url"];
-	goto error;
-      }
+    storeURL = [NSURL URLWithString:[dialog url]];
+    resource = [[WebDAVResource alloc] initWithURL:storeURL];
+    data = [resource get];
+    writable = NO;
+    if (data) {
+      writable = [resource writableWithData:data];
+      [data release];
     }
+    [resource release];
     [dialog release];
     cm = [[ConfigManager alloc] initForKey:name withParent:nil];
     [cm setObject:[storeURL description] forKey:ST_URL];
@@ -148,9 +144,9 @@
 {
   [_refreshTimer invalidate];
   [self write];
-  [_url release];
-  [_lastModified release];
-  [_tree release];
+  DESTROY(_resource);
+  DESTROY(_url);
+  DESTROY(_tree);
   [super dealloc];
 }
 
@@ -168,11 +164,6 @@
   }
 }
 
-/*
- * FIXME : we should probably write asynchronously on
- * every change or every x minutes.
- * Do we need to read before writing ?
- */
 - (void)remove:(Element *)elt
 {
   if ([_tree remove:elt]) {
@@ -193,33 +184,33 @@
 
 - (BOOL)read
 {
-  if ([self needsRefresh]) {
-    [self fetchData:nil];
-    return YES;
-  }
-  return NO;
+  [self fetchData:nil];
+  return [_resource dataChanged];
 }
 
 - (BOOL)write
 {
   NSData *data;
-  NSURLHandle *handle;
+  NSData *read;
 
   if (![self modified] || ![self writable])
     return YES;
-  data = [[_tree iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
+  data = [_tree iCalTreeAsData];
   if (data) {
-    handle = [_url URLHandleUsingCache:NO];
-    [handle writeProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-    [handle writeData:data];
-    [handle loadInForeground];
-    if ([handle status] == NSURLHandleLoadSucceeded) {
+    read = [_resource put:data];
+    DESTROY(read);
+    if ([_resource status] == NSURLHandleLoadSucceeded) {
+      [_resource updateAttributes];
       [self setModified:NO];
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
       return YES;
     }
-    [self setWritable:NO];
+    if ([_resource httpStatus] == 412) {
+      NSRunAlertPanel(@"Error : data source modified", @"To prevent losing modifications, this agenda\nwill be updated and marked as read-only. ", @"Ok", nil, nil);
+      [self read];
+    }
     NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
+    [self setWritable:NO];
     return NO;
   }
   return YES;
@@ -227,141 +218,26 @@
 @end
 
 
-@implementation iCalStore(NSURLClient)
-- (void)URL:(NSURL *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
-{
-  [_retrievedData appendData:newBytes];
-}
-- (void)URL:(NSURL *)sender resourceDidFailLoadingWithReason:(NSString *)reason
-{
-  NSLog(@"resourceDidFailLoadingWithReason %@", reason);
-  [_retrievedData release];
-}
-- (void)URLResourceDidCancelLoading:(NSURL *)sender
-{
-  NSLog(@"URLResourceDidCancelLoading");
-  [_retrievedData release];
-}
-- (void)URLResourceDidFinishLoading:(NSURL *)sender
-{
-  [self parseData:_retrievedData];
-  [_retrievedData release];
-}
-@end
-
 @implementation iCalStore(Private)
-+ (NSURL *)getRealURL:(NSURL *)url
-{
-  NSString *location;
-
-  location = [url propertyForKey:@"Location"];
-  if (location) {
-    NSLog(@"Redirected to %@", location);
-    return [iCalStore getRealURL:[NSURL URLWithString:location]];
-  }
-  return url;
-}
-+ (BOOL)canReadFromURL:(NSURL *)url
-{
-  if ([url resourceDataUsingCache:NO] == nil)
-      return NO;
-  return YES;
-}
-
-+ (BOOL)canWriteToURL:(NSURL *)url
-{
-  BOOL ret;
-  NSURL *tmp = AUTORELEASE([[NSURL alloc] initWithString:@"sa.write" relativeToURL:url]);
-
-  [tmp setProperty:@"PUT" forKey:GSHTTPPropertyMethodKey];
-  ret = [tmp setResourceData:[NSData data]];
-  if (ret) {
-    [tmp setProperty:@"DELETE" forKey:GSHTTPPropertyMethodKey];
-    [tmp setResourceData:nil];
-    return YES;
-  }
-  return NO;
-}
-- (BOOL)needsRefresh
-{
-  NSDate *lm = [self getLastModified];
-
-  if (!_lastModified) {
-    if (lm)
-      _lastModified = [lm copy];
-    return YES;
-  }
-  if (!lm)
-    return YES;
-  if ([_lastModified compare:lm] == NSOrderedAscending) {
-    [_lastModified release];
-    _lastModified = [lm copy];
-    return YES;
-  }
-  return NO;
-}
-- (GSXMLNode *)getLastModifiedElement:(GSXMLNode *)node
-{
-  GSXMLNode *inter;
-
-  while (node) {
-    if ([node type] == [GSXMLNode typeFromDescription:@"XML_ELEMENT_NODE"] && 
-	[@"getlastmodified" isEqualToString:[node name]])
-      return node;
-    if ([node firstChild]) {
-      inter = [self getLastModifiedElement:[node firstChild]];
-      if (inter)
-	return inter;
-    }
-    node = [node next];
-  }
-  return nil;
-}
-- (NSDate *)getLastModified
-{
-  GSXMLParser *parser;
-  GSXMLNode *node;
-  NSDate *date;
-  NSData *data;
-
-  [_url setProperty:@"PROPFIND" forKey:GSHTTPPropertyMethodKey];
-  data = [_url resourceDataUsingCache:NO];
-  [_url setProperty:@"GET" forKey:GSHTTPPropertyMethodKey];
-  if (data) {
-    parser = [GSXMLParser parserWithData:data];
-    if ([parser parse]) {
-      node = [self getLastModifiedElement:[[parser document] root]];
-      date = [NSDate dateWithNaturalLanguageString:[node content]];
-      return date;
-    }
-  }
-  return nil;
-}
 - (void)fetchData:(id)object
 {
-  _retrievedData = [[NSMutableData alloc] initWithCapacity:16384];
-  [_url loadResourceDataNotifyingClient:self usingCache:NO]; 
+  [self parseData:AUTORELEASE([_resource get])];
 }
 - (void)parseData:(NSData *)data
 {
-  NSString *text;
-
-  text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-  if (text && [_tree parseString:text]) {
+  if ([_tree parseData:data]) {
     [self fillWithElements:[_tree components]];
     NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
     NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
   } else
     NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-  if (text)
-    [text release];
 }
 - (void)initTimer:(id)object
 {
   if ([_config objectForKey:ST_REFRESH])
     _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
   else
-    _minutesBeforeRefresh = 60;
+    _minutesBeforeRefresh = 30;
   _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				   interval:_minutesBeforeRefresh * 60
 				   target:self selector:@selector(refreshData:) 
@@ -371,16 +247,8 @@
 - (void)initStoreAsync:(id)object
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  NSURL *realURL;
-
-  realURL = [iCalStore getRealURL:[NSURL URLWithString:[_config objectForKey:ST_URL]]];
-  if (realURL == nil) {
-    NSLog(@"%@ isn't a valid url", [_config objectForKey:ST_URL]);
-    [self release];
-    [pool release];
-    return;
-  }
-  _url = [realURL copy];
+  _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
+  _resource = [[WebDAVResource alloc] initWithURL:_url];
   [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];

@@ -148,6 +148,15 @@ static NSMutableDictionary *backends = nil;
     [store write];
 }
 
+- (void)refresh
+{
+  NSEnumerator *enumerator = [_stores objectEnumerator];
+  id <AgendaStore> store;
+
+  while ((store = [enumerator nextObject]))
+    [store read];
+}
+
 - (id <AgendaStore>)storeContainingElement:(Element *)elt
 {
   NSEnumerator *enumerator = [_stores objectEnumerator];

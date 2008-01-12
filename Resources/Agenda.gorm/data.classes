@@ -16,7 +16,8 @@
 	    "delAppointment:",
 	    "exportAppointment:",
 	    "doSearch:",
-	    "clearSearch:"
+	    "clearSearch:",
+	    "reloadAll:"
 	);
 	Outlets = (
 	    calendar,
@@ -60,13 +61,14 @@
     FirstResponder = {
 	Actions = (
 	    "addAppointment:",
+	    "addTask:",
 	    "clearSearch:",
 	    "createOrEditAnAppointment:",
 	    "delAppointment:",
 	    "doSearch:",
 	    "editAppointment:",
 	    "exportAppointment:",
-	    "addTask:",
+	    "reloadAll:",
 	    "orderFrontFontPanel:",
 	    "saveAll:",
 	    "setDataSource:",

@@ -23,6 +23,7 @@
     RETAIN(storePreferences);
     RETAIN(storeFactory);
     [self selectItem:itemPopUp];
+    [panel setFrameAutosaveName:@"preferencesPanel"];
     /* FIXME : I can't set these within Gorm */
     [dayStart setContinuous:YES];
     [dayEnd setContinuous:YES];

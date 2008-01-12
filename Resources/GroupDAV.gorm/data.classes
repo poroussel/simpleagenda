@@ -1,0 +1,27 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonClicked:",
+	    "selectItem:"
+	);
+	Super = NSObject;
+    };
+    GroupDAVDialog = {
+	Actions = (
+	    "buttonClicked:",
+	    "selectItem:"
+	);
+	Outlets = (
+	    cancel,
+	    name,
+	    ok,
+	    panel,
+	    url,
+	    check,
+	    calendar,
+	    task
+	);
+	Super = NSObject;
+    };
+}

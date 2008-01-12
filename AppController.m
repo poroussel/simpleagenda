@@ -315,6 +315,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_sm synchronise];
 }
 
+- (void)reloadAll:(id)sender
+{
+  [_sm refresh];
+}
+
 - (void)copy:(id)sender
 {
   _selection = (Event *)_clickedElement;

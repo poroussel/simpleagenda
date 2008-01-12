@@ -27,6 +27,7 @@ Resources/Appointment.gorm \
 Resources/Preferences.gorm \
 Resources/iCalendar.gorm \
 Resources/Task.gorm \
+Resources/GroupDAV.gorm \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff \
 Resources/check.tiff \
@@ -56,7 +57,9 @@ DataTree.h \
 Element.h \
 Task.h \
 TaskEditor.h \
-MemoryStore.h
+MemoryStore.h \
+WebDAVResource.h \
+GroupDAVStore.h
 
 #
 # Class files
@@ -79,7 +82,9 @@ DataTree.m \
 Element.m \
 Task.m \
 TaskEditor.m \
-MemoryStore.m
+MemoryStore.m \
+WebDAVResource.m \
+GroupDAVStore.m
 
 #
 # Other sources

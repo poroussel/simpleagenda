@@ -25,6 +25,7 @@
 - (id <AgendaStore>)defaultStore;
 - (NSEnumerator *)storeEnumerator;
 - (void)synchronise;
+- (void)refresh;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;
 - (NSArray *)allEvents;
 - (NSArray *)allTasks;

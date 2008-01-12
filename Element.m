@@ -102,10 +102,7 @@
       counter = 0;
     }
   }
-  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@%d-%@", 
-			 [now description], 
-			 counter,
-			 [[NSHost currentHost] name]]];
+  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@-%d-%@", [now description], counter, [[NSHost currentHost] address]]];
 }
 - (NSString *)UID
 {

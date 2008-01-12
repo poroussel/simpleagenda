@@ -8,6 +8,10 @@ version 0.36
 	  all fits whatever the user choose as a default size.
 	* Day view : circle through appointments with TAB and edit the 
 	  selected one with enter
+	* Change license for future GNUstep GPLv3 release compatibility
+	  Thanks to Yavor Doganov for pointing out the issue.
+	* Use ETags to prevent overwriting distant modifications
+	* Add a menu item to force agendas to reload their data
 
 version 0.35 (2007/12/31)
 	* Fix (fingers crossed) timezone bugs and current day timer

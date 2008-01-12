@@ -41,10 +41,23 @@
   return NO;
 }
 
+- (BOOL)parseData:(NSData *)data
+{
+  NSString *text;
+
+  text = AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+  return [self parseString:text];
+}
+
 - (NSString *)iCalTreeAsString
 {
   icalcomponent_strip_errors(root);
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
+}
+
+- (NSData *)iCalTreeAsData;
+{
+  return [[self iCalTreeAsString] dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 - (NSSet *)components
@@ -57,14 +70,18 @@
   for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT); 
        ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VEVENT_COMPONENT)) {
     ev = [[Event alloc] initWithICalComponent:ic];
-    if (ev)
+    if (ev) {
       [work addObject:ev];
+      [ev release];
+    }
   }
   for (ic = icalcomponent_get_first_component(root, ICAL_VTODO_COMPONENT); 
        ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VTODO_COMPONENT)) {
     task = [[Task alloc] initWithICalComponent:ic];
-    if (task)
+    if (task) {
       [work addObject:task];
+      [task release];
+    }
   }
   return [NSSet setWithSet:work];
 }

@@ -10,7 +10,9 @@
 }
 
 - (BOOL)parseString:(NSString *)string;
+- (BOOL)parseData:(NSData *)data;
 - (NSString *)iCalTreeAsString;
+- (NSData *)iCalTreeAsData;
 - (NSSet *)components;
 - (BOOL)add:(Element *)event;
 - (BOOL)remove:(Element *)event;
