@@ -30,7 +30,6 @@ Resources/Task.gorm \
 Resources/GroupDAV.gorm \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff \
-Resources/check.tiff \
 Resources/repeat.tiff 
 
 
