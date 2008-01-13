@@ -399,7 +399,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   events = [dataSource scheduledAppointmentsForDay:nil];
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
-    if (![events containsObject:[aptv appointment]]) {
+    if (![events containsObject:[aptv appointment]] || ![[[aptv appointment] store] displayed]) {
       if (aptv == _selected)
 	_selected = nil;
       [aptv removeFromSuperviewWithoutNeedingDisplay];
