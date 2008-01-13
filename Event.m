@@ -215,6 +215,7 @@
   struct icaldurationtype diff;
   struct icalrecurrencetype rec;
   Date *date;
+  const char *location;
 
   self = [super initWithICalComponent:ic];
   if (self == nil)
@@ -271,6 +272,9 @@
     }
   }
   [date release];
+  location = icalcomponent_get_location(ic);
+  if (location)
+    [self setLocation:[NSString stringWithCString:location encoding:NSUTF8StringEncoding]];
   return self;
 
  init_error:
