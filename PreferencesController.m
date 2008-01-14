@@ -206,6 +206,7 @@
     [slot setContentView:storeFactory];
     break;
   }
+  [itemPopUp setNextKeyView:[slot contentView]];
 }
 
 -(void)controlTextDidChange:(NSNotification *)notification
