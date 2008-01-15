@@ -423,6 +423,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)dataChanged:(NSNotification *)not
 {
+  _clickedElement = nil;
   [dayView reloadData];
   [taskView reloadData];
   [self performSearch];
@@ -524,6 +525,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date
 {
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
+  _clickedElement = nil;
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [dayTab setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
