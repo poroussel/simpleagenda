@@ -226,16 +226,12 @@
   tree = [iCalTree new];
   if ([tree add:elt]) {
     [resource put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObjectsAndKeys:@"text/calendar; charset=utf-8", @"Content-Type", @"*", @"If-None-Match", nil, nil]];
-    if ([resource httpStatus] > 199 && [resource httpStatus] < 300) {
-      if ([resource location])
-	url = [NSURL URLWithString:[resource location] possiblyRelativeToURL:_url];
-      [_hreftree setObject:tree forKey:[url absoluteString]];
-      [_hrefresource setObject:resource forKey:[url absoluteString]];
-      [_uidhref setObject:[url absoluteString] forKey:[elt UID]];
-      /* FIXME : force a visual refresh ? */
-      [resource updateAttributes];
-      [super add:elt];
-    }
+    if ([resource httpStatus] > 199 && [resource httpStatus] < 300)
+      /* FIXME : this is extremely slow. We should only load attributes and fetch new or modified elements */
+      /* Reloading all data is a way to handle href and uid modification done by the server */
+      [self fetchData:nil];
+    else
+      NSLog(@"Error %d writing event to %@", [resource httpStatus], [url absoluteString]);
   }
   [tree release];
   [resource release];
@@ -286,7 +282,6 @@
   iCalTree *tree;
   NSString *href;
   NSArray *copy;
-  NSData *data;
 
   copy = [_modifiedhref copy];
   enumerator = [copy objectEnumerator];
@@ -296,8 +291,7 @@
     [element put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"]];
     /* Read it back to update the attributes */ 
     /* FIXME : RFC says we should update the list instead */
-    data = [element get];
-    DESTROY(data);
+    [element updateAttributes];
     [_modifiedhref removeObject:href];
     NSLog(@"Written %@", href);
   }
