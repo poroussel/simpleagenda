@@ -231,7 +231,7 @@
   [self setStartDate:date];
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
   pdur = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-  if (!pend && !pdur)
+  if ((!pend && !pdur) || [date isDate])
     [self setAllDay:YES];
   else {
     if (!pend)
@@ -241,7 +241,8 @@
       diff = icaltime_subtract(end, start);
     }
     [self setDuration:icaldurationtype_as_int(diff) / 60];
-  }  
+  }
+
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
   if (prop) {
     rec = icalproperty_get_rrule(prop);
@@ -299,7 +300,9 @@
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
+  Date *end;
   struct icalrecurrencetype irec;
+  icalproperty *prop;
 
   if (![super updateICalComponent:ic])
     return NO;
@@ -315,6 +318,21 @@
   [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
   if (![self allDay])
     icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60))));
+  else {
+    end = [startDate copy];
+    [end incrementDay];
+    icalcomponent_add_property(ic, icalproperty_new_dtend([end iCalTime]));
+    [end release];
+    /* OGo workaround ? */
+    prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
+    while (prop) {
+      if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT"))
+	icalcomponent_remove_property(ic, prop); 
+      prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+    }
+    prop = icalproperty_new_from_string("X-MICROSOFT-CDO-ALLDAYEVENT:TRUE");
+    icalcomponent_add_property(ic, prop);
+  }
 
   [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
   if (interval != RI_NONE) {

@@ -51,6 +51,10 @@
 
 - (NSString *)iCalTreeAsString
 {
+  /* OGo workaround  ? */
+  icalproperty *prop = icalcomponent_get_first_property(root, ICAL_METHOD_PROPERTY);
+  if (prop)
+    icalcomponent_remove_property(root, prop); 
   icalcomponent_strip_errors(root);
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
 }
