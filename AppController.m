@@ -47,16 +47,17 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Date *today = [Date today];
   NSMutableDictionary *attributes = [NSMutableDictionary new];
   NSString *details;
+  NSString *title;
 
   [date setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
   [attributes setValue:AUTORELEASE([date copy]) forKey:@"date"];
-  [attributes setValue:[event summary] forKey:@"title"];
   if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
-    details = [[date calendarDate] descriptionWithCalendarFormat:@"%Y/%m/%d %H:%M"];
+    details = [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
   else
     details = [[date calendarDate] descriptionWithCalendarFormat:@"%H:%M"];
-  [attributes setValue:details forKey:@"details"];
+  title = [NSString stringWithFormat:@"%@ : %@", details, [event summary]];
+  [attributes setValue:title forKey:@"title"];
   return AUTORELEASE(attributes);
 }
 
@@ -138,9 +139,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:92];
   [taskView setTarget:self];
   [taskView setDoubleAction:@selector(editAppointment:)];
-  [summary setAutoresizesAllColumnsToFit:YES];
-  [summary setAutosaveName:@"summary"];
-  [summary setAutosaveTableColumns:YES];
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
