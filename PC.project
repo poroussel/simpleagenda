@@ -20,7 +20,9 @@
 	Element.m,
 	Task.m,
 	TaskEditor.m,
-	MemoryStore.m
+	MemoryStore.m,
+	GroupDAVStore.m,
+	WebDAVResource.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -49,12 +51,13 @@
 	Element.h,
 	Task.h,
 	TaskEditor.h,
-	MemoryStore.h
+	MemoryStore.h,
+	GroupDAVStore.h,
+	WebDAVResource.h
     );
     IMAGES = (
 	Calendar.tiff,
 	"ical-file.tiff",
-	check.tiff,
 	repeat.tiff
     );
     INSTALLDIR = "$(HOME)/GNUstep";
@@ -63,10 +66,11 @@
 	Appointment.gorm,
 	Preferences.gorm,
 	iCalendar.gorm,
-	Task.gorm
+	Task.gorm,
+	GroupDAV.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2007-12-31 13:52:39 +0100";
+    LAST_EDITING = "2008-01-20 00:51:43 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -84,7 +88,7 @@
 	SimpleAgenda.m
     );
     PC_WINDOWS = {
-	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 297}";
+	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 409}";
 	ProjectWindow = "285 87 842 913 0 0  1280 1024 ";
 	ShowToolbar = YES;
     };
@@ -111,7 +115,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.35;
+    PROJECT_RELEASE = 0.36;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/simpleagenda/";

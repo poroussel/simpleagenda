@@ -7,7 +7,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #
 # Application
 #
-VERSION = 0.35
+VERSION = 0.36
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff
@@ -57,8 +57,8 @@ Element.h \
 Task.h \
 TaskEditor.h \
 MemoryStore.h \
-WebDAVResource.h \
-GroupDAVStore.h
+GroupDAVStore.h \
+WebDAVResource.h
 
 #
 # Class files
@@ -82,8 +82,8 @@ Element.m \
 Task.m \
 TaskEditor.m \
 MemoryStore.m \
-WebDAVResource.m \
-GroupDAVStore.m
+GroupDAVStore.m \
+WebDAVResource.m
 
 #
 # Other sources

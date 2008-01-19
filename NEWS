@@ -1,4 +1,4 @@
-version 0.36
+version 0.36 (2008/01/20)
 	* Calendar UI changes : to reduce calendar size, use different
 	  visual hints. Today has a yellow background (unchanged), the 
 	  selected day cell is bezeled/pushed (was a bold font) and busy 
