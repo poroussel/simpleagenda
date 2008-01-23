@@ -67,7 +67,7 @@
 - (BOOL)isScheduledForDay:(Date *)day
 {
   NSAssert(day != nil, @"Empty day argument");
-  if ([day daysUntil:startDate] > 0 || (endDate && [day daysSince:endDate] > 0))
+  if ([startDate compare:day] > 0 || (endDate && [endDate compare:day] < 0))
     return NO;
   switch (interval) {
   case RI_NONE:
