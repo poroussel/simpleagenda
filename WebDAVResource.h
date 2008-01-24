@@ -18,6 +18,7 @@
   NSString *_location;
   NSString *_user;
   NSString *_password;
+  NSData *_data;
   BOOL _debug;
 }
 
@@ -27,20 +28,21 @@
 /* WARNING Destructive */
 - (BOOL)writableWithData:(NSData *)data;
 - (int)httpStatus;
+- (NSData *)data;
 - (NSString *)reason;
 - (NSString *)location;
 - (NSURLHandleStatus)status;
 - (BOOL)dataChanged;
 - (NSURL *)url;
-- (NSData *)options;
-- (NSData *)getWithAttributes:(NSDictionary *)attributes;
-- (NSData *)get;
-- (NSData *)put:(NSData *)data;
-- (NSData *)put:(NSData *)data attributes:(NSDictionary *)attributes;
-- (NSData *)delete;
-- (NSData *)deleteWithAttributes:(NSDictionary *)attributes;
-- (NSData *)propfind:(NSData *)data;
-- (NSData *)propfind:(NSData *)data attributes:(NSDictionary *)attributes;
+- (BOOL)options;
+- (BOOL)getWithAttributes:(NSDictionary *)attributes;
+- (BOOL)get;
+- (BOOL)put:(NSData *)data;
+- (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
+- (BOOL)delete;
+- (BOOL)deleteWithAttributes:(NSDictionary *)attributes;
+- (BOOL)propfind:(NSData *)data;
+- (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes;
 - (NSArray *)listICalItems;
 - (void)updateAttributes;
 - (void)setUser:(NSString *)user password:(NSString *)password;

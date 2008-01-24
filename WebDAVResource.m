@@ -11,6 +11,7 @@
   DESTROY(_url);
   DESTROY(_lastModified);
   DESTROY(_location);
+  DESTROY(_data);
   [super dealloc];
 }
 
@@ -36,6 +37,7 @@
     _lock = [NSLock new];
     _user = nil;
     _password = nil;
+    _data = nil;
     _debug = NO;
   }
   return self;
@@ -61,7 +63,7 @@
   return authorisation;
 }
 
-- (NSData *)requestWithMethod:(NSString *)method body:(NSData *)body attributes:(NSDictionary *)attributes
+- (BOOL)requestWithMethod:(NSString *)method body:(NSData *)body attributes:(NSDictionary *)attributes
 {
   NSEnumerator *keys;
   NSString *key;
@@ -85,7 +87,8 @@
     [handle writeData:body];
   if (_debug)
     NSLog(@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]);
-  data = RETAIN([handle resourceData]);
+  DESTROY(_data);
+  data = [handle resourceData];
   _status = [handle status];
   _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
   if (_debug) {
@@ -99,7 +102,16 @@
     ASSIGNCOPY(_reason, property);
   else
     DESTROY(_reason);
+  if (_httpStatus < 200 || _httpStatus > 299) {
+    if (_reason)
+      NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
+    else
+      NSLog(@"%s %@ : %d", __PRETTY_FUNCTION__, method, _httpStatus);
+    return NO;
+  }
 
+  if (data)
+    ASSIGN(_data, data);
   if ([method isEqual:@"GET"]) {
     property = [handle propertyForKeyIfAvailable:@"Last-Modified"];
     if (!_lastModified || (property && ![property isEqual:_lastModified])) {
@@ -123,7 +135,7 @@
   }
   [handle release];
   [_lock unlock];
-  return data;
+  return YES;
 }
 
 /*
@@ -138,14 +150,9 @@
  */
 - (BOOL)readable
 {
-  NSData *data;
-  
-  data = [self get];
-  if (data) {
-    [data release];
-    if ((_httpStatus > 199 && _httpStatus < 300) || _httpStatus == 404)
-      return YES;
-  }
+  [self get];
+  if ((_httpStatus > 199 && _httpStatus < 300) || _httpStatus == 404)
+    return YES;
   return NO;
 }
 
@@ -159,18 +166,17 @@
  */
 - (BOOL)writableWithData:(NSData *)data
 {
-  NSData *read;
-
-  read = [self put:data];
-  [read release];
-  if (_httpStatus > 199 && _httpStatus < 300)
-    return YES;
-  return NO;
+  return [self put:data];
 }
 
 - (int)httpStatus
 {
   return _httpStatus;
+}
+
+- (NSData *)data
+{
+  return _data;
 }
 
 - (NSString *)reason
@@ -198,48 +204,47 @@
   return _url;
 }
 
-- (NSData *)options
+- (BOOL)options
 {
   return [self requestWithMethod:@"OPTIONS" body:nil attributes:nil];
 }
 
-- (NSData *)getWithAttributes:(NSDictionary *)attributes
+- (BOOL)getWithAttributes:(NSDictionary *)attributes
 {
   return [self requestWithMethod:@"GET" body:nil attributes:attributes];
 }
 
-- (NSData *)get
+- (BOOL)get
 {
   return [self requestWithMethod:@"GET" body:nil attributes:nil];
 }
 
-/* FIXME : change put and delete into void methods */
-- (NSData *)put:(NSData *)data
+- (BOOL)put:(NSData *)data
 {
   return [self requestWithMethod:@"PUT" body:data attributes:nil];
 }
 
-- (NSData *)put:(NSData *)data attributes:(NSDictionary *)attributes
+- (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes
 {
   return [self requestWithMethod:@"PUT" body:data attributes:attributes];
 }
 
-- (NSData *)delete
+- (BOOL)delete
 {
   return [self requestWithMethod:@"DELETE" body:nil attributes:nil];
 }
 
-- (NSData *)deleteWithAttributes:(NSDictionary *)attributes
+- (BOOL)deleteWithAttributes:(NSDictionary *)attributes
 {
   return [self requestWithMethod:@"DELETE" body:nil attributes:attributes];
 }
 
-- (NSData *)propfind:(NSData *)data
+- (BOOL)propfind:(NSData *)data
 {
   return [self requestWithMethod:@"PROPFIND" body:data attributes:nil];
 }
 
-- (NSData *)propfind:(NSData *)data attributes:(NSDictionary *)attributes
+- (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes
 {
   return [self requestWithMethod:@"PROPFIND" body:data attributes:attributes];
 }
@@ -249,15 +254,15 @@
   int i;
   NSString *body = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
   GSXMLParser *parser;
-  NSData *propfind;
   NSMutableArray *result;
   GSXPathContext *xpc;
   GSXPathNodeSet *set;
   NSURL *elementURL;
 
   result = [NSMutableArray new];
-  propfind = [self propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]];
-  parser = [GSXMLParser parserWithData:propfind];
+  if (![self propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
+    return result;
+  parser = [GSXMLParser parserWithData:[self data]];
   if ([parser parse]) {
     if (_debug)
       NSLog(@"%s xml document \n%@", __PRETTY_FUNCTION__, [[[parser document] strippedDocument] description]);
@@ -275,7 +280,6 @@
     }
     [xpc release];
   }
-  [propfind release];
   return result;
 }
 
@@ -283,13 +287,12 @@ static NSString *GETETAG = @"string(/multistatus/response/propstat/prop/getetag/
 static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/getlastmodified/text())";
 - (void)updateAttributes;
 {
-  NSData *propfind = [self propfind:nil];
   GSXMLParser *parser;
   GSXPathContext *xpc;
   GSXPathString *result;
 
-  if (propfind) {
-    parser = [GSXMLParser parserWithData:propfind];
+  if ([self propfind:nil]) {
+    parser = [GSXMLParser parserWithData:[self data]];
     if ([parser parse]) {
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
       result = (GSXPathString *)[xpc evaluateExpression:GETETAG];
@@ -300,8 +303,7 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
 	ASSIGNCOPY(_lastModified, [result stringValue]);
     }
     [parser release];
-    [propfind release];
-  }  
+  }
 }
 
 - (void)setUser:(NSString *)user password:(NSString *)password

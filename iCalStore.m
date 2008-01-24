@@ -111,18 +111,14 @@
   NSURL *storeURL;
   BOOL writable = NO;
   WebDAVResource *resource;
-  NSData *data;
 
   dialog = [[iCalStoreDialog alloc] initWithName:name];
   if ([dialog show] == YES) {
     storeURL = [NSURL URLWithString:[dialog url]];
     resource = [[WebDAVResource alloc] initWithURL:storeURL];
-    data = [resource get];
     writable = NO;
-    if (data) {
-      writable = [resource writableWithData:data];
-      [data release];
-    }
+    if ([resource get])
+      writable = [resource writableWithData:[resource data]];
     [resource release];
     [dialog release];
     cm = [[ConfigManager alloc] initForKey:name withParent:nil];
@@ -191,15 +187,12 @@
 - (BOOL)write
 {
   NSData *data;
-  NSData *read;
 
   if (![self modified] || ![self writable])
     return YES;
   data = [_tree iCalTreeAsData];
   if (data) {
-    read = [_resource put:data];
-    DESTROY(read);
-    if ([_resource status] == NSURLHandleLoadSucceeded) {
+    if ([_resource put:data]) {
       [_resource updateAttributes];
       [self setModified:NO];
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
@@ -221,7 +214,8 @@
 @implementation iCalStore(Private)
 - (void)fetchData:(id)object
 {
-  [self parseData:AUTORELEASE([_resource get])];
+  if ([_resource get])
+    [self parseData:[_resource data]];
 }
 - (void)parseData:(NSData *)data
 {

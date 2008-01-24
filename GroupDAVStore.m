@@ -1,6 +1,5 @@
 #import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
-#import "GNUstepBase/GSMime.h"
 #import "Event.h"
 #import "Task.h"
 #import "GroupDAVStore.h"
@@ -288,12 +287,13 @@
   while ((href = [enumerator nextObject])) {
     element = [_hrefresource objectForKey:href];
     tree = [_hreftree objectForKey:href];
-    [element put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"]];
-    /* Read it back to update the attributes */ 
-    /* FIXME : RFC says we should update the list instead */
-    [element updateAttributes];
-    [_modifiedhref removeObject:href];
-    NSLog(@"Written %@", href);
+    if ([element put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"]]) {
+      /* Read it back to update the attributes */ 
+      /* FIXME : RFC says we should update the list instead */
+      [element updateAttributes];
+      [_modifiedhref removeObject:href];
+      NSLog(@"Written %@", href);
+    }
   }
   [copy release];
   return YES;
@@ -329,7 +329,6 @@
 - (void)fetchList:(NSArray *)items
 {
   WebDAVResource *element;
-  NSData *ical;
   iCalTree *tree;
   NSEnumerator *enumerator;
   NSString *href;
@@ -340,14 +339,12 @@
     if ([_url user])
       [element setUser:[_url user] password:[_url password]];
     tree = [iCalTree new];
-    ical = [element get];
-    if (ical && [tree parseData:ical]) {
+    if ([element get] && [tree parseData:[element data]]) {
       [self fillWithElements:[tree components]];
       [_hreftree setObject:tree forKey:href];
       [_hrefresource setObject:element forKey:href];
       [_uidhref setObject:href forKey:[[[tree components] anyObject] UID]];
     }
-    DESTROY(ical);
     [tree release];
     [element release];
   }
