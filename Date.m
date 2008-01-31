@@ -162,8 +162,11 @@
 }
 - (int)weekOfYear
 {
-  /* FIXME : ical function doesn't work. See ticket #3 */
-  return icaltime_week_number(_time);
+  char week[3];
+  time_t tmt = icaltime_as_timet(_time);
+  struct tm *tm = gmtime(&tmt);
+  strftime(week, sizeof(week), "%V", tm);
+  return atoi(week);
 }
 - (int)numberOfDaysInMonth
 {
@@ -176,9 +179,7 @@
   struct icaldurationtype dt;
 
   dt = icaltime_subtract(date->_time, _time);
-  if (dt.is_neg)
-    return -dt.days;
-  return dt.days;
+  return icaldurationtype_as_int(dt) / 86400;
 }
 
 - (int)daysSince:(Date *)date
@@ -186,9 +187,7 @@
   struct icaldurationtype dt;
 
   dt = icaltime_subtract(_time, date->_time);
-  if (dt.is_neg)
-    return -dt.days;
-  return dt.days;
+  return icaldurationtype_as_int(dt) / 86400;
 }
 
 - (int)weeksUntil:(Date *)date

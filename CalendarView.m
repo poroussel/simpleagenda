@@ -195,12 +195,12 @@
   today = [Date today];
   day = [monthDisplayed copy];
   [day setDay: 1];
-  week = [day weekOfYear];
   column = [day weekday];
   if (!column)
     column = 7;
   [day changeDayBy:1-column];
-  for (row = 1; row < 7; row++, week++) {
+  for (row = 1; row < 7; row++) {
+    week = [day weekOfYear];
     [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
     for (column = 1; column < 8; column++, [day incrementDay]) {
       cell = [matrix cellAtRow: row column: column];
