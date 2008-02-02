@@ -196,8 +196,6 @@
   day = [monthDisplayed copy];
   [day setDay: 1];
   column = [day weekday];
-  if (!column)
-    column = 7;
   [day changeDayBy:1-column];
   for (row = 1; row < 7; row++) {
     week = [day weekOfYear];

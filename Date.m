@@ -155,10 +155,15 @@
 {
   return _time.day;
 }
-/* 0 = sunday */
+/*
+ * 1 : Monday
+ * ...
+ * 7 : Sunday
+ */
 - (int)weekday
 {
-  return icaltime_day_of_week(_time) - 1;
+  int dow = icaltime_day_of_week(_time) - 1;
+  return dow ? dow : 7;
 }
 - (int)weekOfYear
 {
