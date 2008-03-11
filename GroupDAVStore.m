@@ -88,7 +88,6 @@
   int i;
   WebDAVResource *resource;
   GSXMLParser *parser;
-  NSData *propfind;
   NSString *body = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getlastmodified/><executable/><resourcetype/></prop></propfind>";
   GSXPathContext *xpc;
   GSXPathNodeSet *set;
@@ -97,19 +96,19 @@
   [task removeAllItems];
   if (isURL) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
-    propfind = [resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
-    parser = [GSXMLParser parserWithData:propfind];
-    if ([parser parse]) {
-      xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
-      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
-      for (i = 0; i < [set count]; i++)
-	[calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
-      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
-      for (i = 0; i < [set count]; i++)
-	[task addItemWithTitle:[[set nodeAtIndex:i] content]];
-      [xpc release];
+    if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
+      parser = [GSXMLParser parserWithData:[resource data]];
+      if ([parser parse]) {
+	xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
+	for (i = 0; i < [set count]; i++)
+	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
+	for (i = 0; i < [set count]; i++)
+	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
+	[xpc release];
+      }
     }
-    [propfind release];
     [resource release];
   }
   [self updateOK];
@@ -219,9 +218,7 @@
     url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[_calendar url] absoluteString], [elt UID]]];
   else
     url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[_task url] absoluteString], [elt UID]]];
-  resource = [[WebDAVResource alloc] initWithURL:url];
-  if ([_url user])
-    [resource setUser:[_url user] password:[_url password]];
+  resource = [[WebDAVResource alloc] initWithURL:url authFromURL:_url];
   tree = [iCalTree new];
   if ([tree add:elt]) {
     [resource put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObjectsAndKeys:@"text/calendar; charset=utf-8", @"Content-Type", @"*", @"If-None-Match", nil, nil]];
@@ -309,18 +306,12 @@
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
   _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
-  if ([_config objectForKey:ST_CALENDAR_URL]) {
-    _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]]];
-    if ([_url user])
-      [_calendar setUser:[_url user] password:[_url password]];
-  } else
-    _calendar = nil;
-  if ([_config objectForKey:ST_TASK_URL]) {
-    _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]]];
-    if ([_url user])
-      [_task setUser:[_url user] password:[_url password]];
-  } else
-    _task = nil;
+  _calendar = nil;
+  _task = nil;
+  if ([_config objectForKey:ST_CALENDAR_URL])
+    _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
+  if ([_config objectForKey:ST_TASK_URL])
+    _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
   [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];
@@ -335,9 +326,7 @@
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
-    element = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:href]];
-    if ([_url user])
-      [element setUser:[_url user] password:[_url password]];
+    element = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:href] authFromURL:_url];
     tree = [iCalTree new];
     if ([element get] && [tree parseData:[element data]]) {
       [self fillWithElements:[tree components]];

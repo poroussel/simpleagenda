@@ -43,6 +43,14 @@
   return self;
 }
 
+- (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent
+{
+  self = [self initWithURL:anUrl];
+  if (self && [parent user])
+    [self setUser:[parent user] password:[parent password]];
+  return self;
+}
+
 - (void)setDebug:(BOOL)debug
 {
   _debug = debug;

@@ -23,6 +23,7 @@
 }
 
 - (id)initWithURL:(NSURL *)url;
+- (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent;
 - (void)setDebug:(BOOL)debug;
 - (BOOL)readable;
 /* WARNING Destructive */
