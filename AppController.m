@@ -149,6 +149,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [self updateSummaryData];
   [dayView reloadData];
+  [taskView reloadData];
   [NSApp setServicesProvider: self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
 }
