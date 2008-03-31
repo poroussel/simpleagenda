@@ -61,6 +61,10 @@ static NSMutableDictionary *backends = nil;
   self = [super init];
   if (self) {
     [config registerDefaults:[self defaults]];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					  selector:@selector(dataChanged:) 
+					  name:SADataChangedInStore 
+					  object:nil];
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
@@ -68,19 +72,15 @@ static NSMutableDictionary *backends = nil;
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
     [self setDefaultStore:defaultStore];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					  selector:@selector(dataChanged:) 
-					  name:SADataChangedInStore 
-					  object:nil];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_defaultStore);
   [_stores release];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 }
 
