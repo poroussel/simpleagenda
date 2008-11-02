@@ -101,7 +101,12 @@
       _time.hour = [cd hourOfDay];
       _time.minute = [cd minuteOfHour];
       _time.second = [cd secondOfMinute];
+    } else {
+      _time.hour = 0;
+      _time.minute = 0;
+      _time.second = 0;
     }
+      
   }
   return self;
 }
@@ -247,14 +252,15 @@
 
 - (void)setSecondOfMinute:(int)second
 {
+  [self setDate:NO];
   _time.second = second;
   _time = icaltime_normalize(_time);
 }
 
 - (void)setMinute:(int)minute
 {
-  int old = [self minuteOfDay];
-  struct icaldurationtype dt = {0, 0, 0, 0, minute - old, 0};
+  [self setDate:NO];
+  struct icaldurationtype dt = {0, 0, 0, 0, minute - [self minuteOfDay], 0};
   _time = icaltime_add(_time, dt);
 }
 
