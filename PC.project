@@ -70,7 +70,7 @@
 	GroupDAV.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2008-01-20 00:51:43 +0100";
+    LAST_EDITING = "2008-11-02 22:18:58 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -89,15 +89,15 @@
     );
     PC_WINDOWS = {
 	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 409}";
-	ProjectWindow = "285 87 842 913 0 0  1280 1024 ";
+	ProjectWindow = "285 0 842 775 0 0  1280 800 ";
 	ShowToolbar = YES;
     };
     PRINCIPAL_CLASS = NSApplication;
     PROJECT_AUTHORS = (
 	"Philippe Roussel <p.o.roussel@free.fr>"
     );
-    PROJECT_COPYRIGHT = "Copyright (C) 2007";
-    PROJECT_COPYRIGHT_DESC = "Released under GPL Version 2";
+    PROJECT_COPYRIGHT = "Copyright (C) 2007, 2008";
+    PROJECT_COPYRIGHT_DESC = "Released under GPL Version 2 or any later version";
     PROJECT_CREATOR = "Philippe Roussel";
     PROJECT_DESCRIPTION = "Simple agenda and calendar application";
     PROJECT_DOCUMENTTYPES = (
@@ -115,7 +115,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.36;
+    PROJECT_RELEASE = 0.37;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/simpleagenda/";
