@@ -1,4 +1,5 @@
 version 0.37
+	* Fix summary view size on startup
 	* Fix method used to compare dates. Should fix multiple bugs
 	  with recurrent events
 	* Better error handling on webdav resources

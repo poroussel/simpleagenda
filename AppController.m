@@ -139,6 +139,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:92];
   [taskView setTarget:self];
   [taskView setDoubleAction:@selector(editAppointment:)];
+  [summary sizeLastColumnToFit];
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
