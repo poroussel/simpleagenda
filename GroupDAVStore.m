@@ -26,6 +26,13 @@
 - (void)selectItem:(id)sender;
 @end
 @implementation GroupDAVDialog
+- (void)clearPopUps
+{
+  [calendar removeAllItems];
+  [task removeAllItems];
+  [calendar addItemWithTitle:@"None"];
+  [task addItemWithTitle:@"None"];
+}
 - (id)initWithName:(NSString *)storeName
 {
   self = [super init];
@@ -34,8 +41,7 @@
       return nil;
     [name setStringValue:storeName];
     [url setStringValue:@"http://"];
-    [calendar removeAllItems];
-    [task removeAllItems];
+    [self clearPopUps];
     isURL = NO;
   }
   return self;
@@ -60,21 +66,9 @@
     [self controlTextDidEndEditing:nil];
 }
 
-- (void)controlTextDidChange:(NSNotification *)notification
-{
-  NS_DURING
-    {
-      isURL = [NSURL stringIsValidURL:[url stringValue]];
-    }
-  NS_HANDLER
-    {
-      isURL = NO;
-    }
-  NS_ENDHANDLER
-}
 - (void)updateOK
 {
-  if ([calendar indexOfSelectedItem] != -1 || [task indexOfSelectedItem] != -1)
+  if ([calendar indexOfSelectedItem] > 0 || [task indexOfSelectedItem] > 0)
     [ok setEnabled:YES];
   else
     [ok setEnabled:NO];
@@ -92,8 +86,16 @@
   GSXPathContext *xpc;
   GSXPathNodeSet *set;
 
-  [calendar removeAllItems];
-  [task removeAllItems];
+  [self clearPopUps];
+  NS_DURING
+    {
+      isURL = [NSURL stringIsValidURL:[url stringValue]];
+    }
+  NS_HANDLER
+    {
+      isURL = NO;
+    }
+  NS_ENDHANDLER
   if (isURL) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
@@ -119,10 +121,14 @@
 }
 - (NSString *)calendar
 {
+  if ([calendar indexOfItem:[calendar selectedItem]] == 0)
+    return nil;
   return [calendar titleOfSelectedItem];
 }
 - (NSString *)task
 {
+  if ([task indexOfItem:[task selectedItem]] == 0)
+    return nil;
   return [task titleOfSelectedItem];;
 }
 @end
@@ -161,15 +167,17 @@
 {
   ConfigManager *cm;
   GroupDAVDialog *dialog;
-  NSURL *calendarURL;
-  NSURL *taskURL;
+  NSURL *calendarURL = nil;
+  NSURL *taskURL = nil;
   NSURL *baseURL;
 
   dialog = [[GroupDAVDialog alloc] initWithName:name];
   if ([dialog show] == YES) {
     baseURL = [NSURL URLWithString:[dialog url]];
-    calendarURL = [NSURL URLWithString:[dialog calendar] possiblyRelativeToURL:baseURL];
-    taskURL = [NSURL URLWithString:[dialog task] possiblyRelativeToURL:baseURL];
+    if ([dialog calendar])
+      calendarURL = [NSURL URLWithString:[dialog calendar] possiblyRelativeToURL:baseURL];
+    if ([dialog task])
+      taskURL = [NSURL URLWithString:[dialog task] possiblyRelativeToURL:baseURL];
     [dialog release];
     cm = [[ConfigManager alloc] initForKey:name withParent:nil];
     [cm setObject:[dialog url] forKey:ST_URL];
