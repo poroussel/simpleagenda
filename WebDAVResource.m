@@ -115,6 +115,7 @@
       NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
     else
       NSLog(@"%s %@ : %d", __PRETTY_FUNCTION__, method, _httpStatus);
+    [_lock unlock];
     return NO;
   }
 
