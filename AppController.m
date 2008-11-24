@@ -9,11 +9,6 @@
 #import "PreferencesController.h"
 #import "iCalTree.h"
 
-NSComparisonResult compareAppointments(id a, id b, void *data)
-{
-  return [[a startDate] compareTime:[b startDate]];
-}
-
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   return [[[a valueForKey:@"object"] startDate] compareTime:[[b valueForKey:@"object"] startDate]];
@@ -150,6 +145,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [self updateSummaryData];
   [dayView reloadData];
+  [weekView reloadData];
   [taskView reloadData];
   [NSApp setServicesProvider: self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
@@ -406,25 +402,30 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   return YES;
 }
 
-/* DayViewDataSource protocol */
-- (NSSet *)scheduledAppointmentsForDay:(Date *)day
+/* AgendaDataSource protocol */
+- (NSSet *)scheduledAppointmentsForDay:(Date *)date
 {
   NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   Event *event;
 
-  if (day == nil)
-    day = _selectedDay;
+  if (date == nil)
+    date = _selectedDay;
   while ((event = [enumerator nextObject]))
-    if ([event isScheduledForDay:day])
+    if ([event isScheduledForDay:date])
       [dayEvents addObject:event];
   return dayEvents;
+}
+- (Date *)selectedDate
+{
+  return [calendar date];
 }
 
 - (void)dataChanged:(NSNotification *)not
 {
   _clickedElement = nil;
   [dayView reloadData];
+  [weekView reloadData];
   [taskView reloadData];
   [self performSearch];
   [self updateSummaryData];
@@ -528,6 +529,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   _clickedElement = nil;
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
+  [weekView reloadData];
   [dayTab setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
   /* FIXME : this, somehow, prevents the selected month to show up in the popup */
   /* [tabs selectTabViewItem:dayTab]; */
@@ -622,6 +624,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [taskView deselectAll:self];
   if ([[tabViewItem identifier] isEqualToString:@"Tasks"])
     [dayView deselectAll:self];
+  if ([[tabViewItem identifier] isEqualToString:@"Week"])
+    [weekView deselectAll:self];
   _clickedElement = nil;
 }
 @end

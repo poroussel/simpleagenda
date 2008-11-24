@@ -58,7 +58,9 @@ Task.h \
 TaskEditor.h \
 MemoryStore.h \
 GroupDAVStore.h \
-WebDAVResource.h
+WebDAVResource.h \
+WeekView.h \
+AppointmentView.h
 
 #
 # Class files
@@ -83,7 +85,9 @@ Task.m \
 TaskEditor.m \
 MemoryStore.m \
 GroupDAVStore.m \
-WebDAVResource.m
+WebDAVResource.m \
+WeekView.m \
+AppointmentView.m
 
 #
 # Other sources

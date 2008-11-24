@@ -22,7 +22,9 @@
 	TaskEditor.m,
 	MemoryStore.m,
 	GroupDAVStore.m,
-	WebDAVResource.m
+	WebDAVResource.m,
+	WeekView.m,
+	AppointmentView.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -53,7 +55,9 @@
 	TaskEditor.h,
 	MemoryStore.h,
 	GroupDAVStore.h,
-	WebDAVResource.h
+	WebDAVResource.h,
+	WeekView.h,
+	AppointmentView.h
     );
     IMAGES = (
 	Calendar.tiff,
@@ -70,7 +74,7 @@
 	GroupDAV.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2008-11-02 22:18:58 +0100";
+    LAST_EDITING = "2008-11-23 18:28:06 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -88,7 +92,7 @@
 	SimpleAgenda.m
     );
     PC_WINDOWS = {
-	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 409}";
+	ProjectBrowser = "{x = 0; y = 0; width = 838; height = 192}";
 	ProjectWindow = "285 0 842 775 0 0  1280 800 ";
 	ShowToolbar = YES;
     };

@@ -4,6 +4,7 @@
 #import "DayView.h"
 #import "ConfigManager.h"
 #import "iCalTree.h"
+#import "AppointmentView.h"
 #import "defines.h"
 
 static NSImage *repeatImage;
@@ -11,38 +12,12 @@ static NSImage *repeatImage;
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 10)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height - 2)
 
-@interface AppointmentView : NSView
+@interface AppDayView : AppointmentView
 {
-  Event *_apt;
-  BOOL _selected;
 }
-- (Event *)appointment;
-- (void)setSelected:(BOOL)selected;
 @end
 
-@implementation AppointmentView
-- (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
-{
-  self = [super initWithFrame:frameRect];
-  if (self) {
-    ASSIGN(_apt, apt);
-    _selected = NO;
-  }
-  return self;
-}
-- (void)dealloc
-{
-  RELEASE(_apt);
-  [super dealloc];
-}
-- (BOOL)selected
-{
-  return _selected;
-}
-- (void)setSelected:(BOOL)selected
-{
-  _selected = selected;
-}
+@implementation AppDayView
 #define CEC_BORDERSIZE 1
 #define RADIUS 5
 - (void)drawRect:(NSRect)rect
@@ -183,14 +158,6 @@ static NSImage *repeatImage;
   [NSCursor pop];
   if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
     [delegate dayView:parent modifyEvent:_apt];
-}
-- (Event *)appointment
-{
-  return _apt;
-}
-- (BOOL)acceptsFirstResponder
-{
-  return YES;
 }
 @end
 
@@ -420,7 +387,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       /* FIXME : probably shouldn't be there */
       [config registerClient:self forKey:[[apt store] description]];
       if ([[apt store] displayed])
-	[self addSubview:[[AppointmentView alloc] initWithFrame:NSZeroRect appointment:apt]];
+	[self addSubview:[[AppDayView alloc] initWithFrame:NSZeroRect appointment:apt]];
     }
   }
   [self setNeedsDisplay:YES];

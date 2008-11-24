@@ -4,7 +4,8 @@
 #import "Element.h"
 
 @protocol AgendaDataSource
-- (NSSet *)scheduledAppointmentsForDay:(Date *)day;
+- (NSSet *)scheduledAppointmentsForDay:(Date *)date;
+- (Date *)selectedDate;
 @end
 
 #define SADataChanged @"DataDidChanged"

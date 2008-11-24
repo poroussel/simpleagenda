@@ -5,6 +5,7 @@
 #import "TaskEditor.h"
 #import "CalendarView.h"
 #import "DayView.h"
+#import "WeekView.h"
 #import "Element.h"
 #import "Event.h"
 #import "PreferencesController.h"
@@ -14,6 +15,7 @@
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
+  IBOutlet WeekView *weekView;
   IBOutlet NSOutlineView *summary;
   IBOutlet NSTextField *search;
   IBOutlet NSTableView *taskView;

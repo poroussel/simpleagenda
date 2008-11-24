@@ -4,8 +4,7 @@
 #import "ConfigManager.h"
 #import "Event.h"
 #import "StoreManager.h"
-
-@class AppointmentView;
+#import "AppointmentView.h"
 
 @interface DayView : NSView <ConfigListener>
 {
