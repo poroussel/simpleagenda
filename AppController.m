@@ -155,10 +155,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_summaryRoot release];
-  [_today release];
-  [_tomorrow release];
-  [_soon release];
-  [_results release];
   [_pc release];
   /* 
    * Ugly workaround : [_sm release] should force the
