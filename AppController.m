@@ -481,6 +481,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
+  if (item == nil)
+    return YES;
   return [[item children] count] > 0;
 }
 - (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
