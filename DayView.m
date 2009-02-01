@@ -120,6 +120,7 @@
 	if (minutes != [_apt duration]) {
 	  [_apt setDuration:minutes];
 	  modified = YES;
+	  [self setFrame:[parent frameForAppointment:_apt]];
 	  [parent setNeedsDisplay:YES];
 	}
 	break;
@@ -143,6 +144,7 @@
 	if (minutes != [[_apt startDate] minuteOfDay]) {
 	  [[_apt startDate] setMinute:minutes];
 	  modified = YES;
+	  [self setFrame:[parent frameForAppointment:_apt]];
 	  [parent setNeedsDisplay:YES];
 	}
 	break;
@@ -227,7 +229,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   int i, j, k, n;
   NSArray *subviews;
   AppointmentView *view, *next;
-  NSRect fview, fnext;
+  NSRect fview, fnext, frame;
   float width, x;
 
   subviews = [[self subviews] sortedArrayUsingFunction:compareAppointmentViews context:NULL];
@@ -245,8 +247,9 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       fview = NSUnionRect(fview, fnext);
     }
     if (n != 1) {
-      width = [view frame].size.width / n;
-      x = [view frame].origin.x;
+      frame = [self frameForAppointment:[view appointment]];
+      width  = frame.size.width / n;
+      x = frame.origin.x;
       for (k = i; k < i + n; k++) {
 	view = [subviews objectAtIndex:k];
 	fview = [view frame];
@@ -278,19 +281,10 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 {
   NSSize size;
   NSString *hour;
-  AppointmentView *aptv; 
-  NSEnumerator *enumerator;
   int h, start;
   int hrow;
   float miny, maxy;
 
-  /* 
-   * FIXME : this is ugly and slow, we're doing
-   * work when it's not needed and probably twice.
-   */
-  enumerator = [[self subviews] objectEnumerator];
-  while ((aptv = [enumerator nextObject]))
-    [aptv setFrame:[self frameForAppointment:[aptv appointment]]];
   [self fixFrames];
   /*
    * FIXME : if we draw the string in the same
@@ -356,6 +350,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   Event *apt;
   NSSet *events;
   BOOL found;
+  NSView *subview;
 
   events = [dataSource scheduledAppointmentsForDay:nil];
   enumerator = [[self subviews] objectEnumerator];
@@ -380,8 +375,11 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     if (found == NO) {
       /* FIXME : probably shouldn't be there */
       [config registerClient:self forKey:[[apt store] description]];
-      if ([[apt store] displayed])
-	[self addSubview:[[AppDayView alloc] initWithFrame:NSZeroRect appointment:apt]];
+      if ([[apt store] displayed]) {
+	subview = [[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt];
+	[subview setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
+	[self addSubview:subview];
+      }
     }
   }
   [self setNeedsDisplay:YES];
@@ -431,7 +429,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   switch (character) {
   case '\r':
   case NSEnterCharacter: 
-    NSLog(@"enter");
     if (_selected != nil) {
       if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
 	[delegate dayView:self editEvent:[_selected appointment]];
