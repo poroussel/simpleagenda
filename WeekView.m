@@ -7,7 +7,6 @@
 #import "AppointmentView.h"
 #import "defines.h"
 
-static NSImage *repeatImage;
 
 @interface AppWeekView : AppointmentView
 {
@@ -22,11 +21,6 @@ static NSImage *repeatImage;
 {
   self = [super initWithFrame:frameRect];
   if (self) {
-    if (!repeatImage) {
-      NSString *path = [[NSBundle mainBundle] pathForImageResource:@"repeat"];
-      repeatImage = [[NSImage alloc] initWithContentsOfFile:path];
-      [repeatImage setFlipped:YES];
-    }
     [self reloadData];
   }
   return self;

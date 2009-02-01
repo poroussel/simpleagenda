@@ -8,6 +8,7 @@
   Event *_apt;
   BOOL _selected;
 }
+- (NSImage *)repeatImage;
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
 - (Event *)appointment;
 - (void)setSelected:(BOOL)selected;

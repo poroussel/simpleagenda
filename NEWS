@@ -1,3 +1,7 @@
+version 0.38
+	* Fix tickets #6 and #7
+	* Add a preliminary week view
+
 version 0.37 (2008/11/02)
 	* Fix buglets uncovered by libical 0.41
 	* Fix summary view size on startup

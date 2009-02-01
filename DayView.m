@@ -7,7 +7,6 @@
 #import "AppointmentView.h"
 #import "defines.h"
 
-static NSImage *repeatImage;
 
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 10)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height - 2)
@@ -82,7 +81,7 @@ static NSImage *repeatImage;
   }
   [label drawInRect:TextRect(rect) withAttributes:textAttributes];
   if ([_apt interval] != RI_NONE)
-    [repeatImage compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
+    [[self repeatImage] compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -196,11 +195,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 					 blue:[_backgroundColor blueComponent] + 0.05
 					 alpha:[_backgroundColor alphaComponent]] retain];
 
-    if (!repeatImage) {
-      NSString *path = [[NSBundle mainBundle] pathForImageResource:@"repeat"];
-      repeatImage = [[NSImage alloc] initWithContentsOfFile:path];
-      [repeatImage setFlipped:YES];
-    }
     [self reloadData];
   }
   return self;
