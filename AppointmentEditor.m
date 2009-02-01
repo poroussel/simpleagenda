@@ -17,8 +17,6 @@
   if (self) {
     if (![NSBundle loadNibNamed:@"Appointment" owner:self])
       return nil;
-    /* FIXME : shouldn't be needed but Gorm just won't set it */
-    [duration setContinuous:YES];
     formatter = [[[HourFormatter alloc] init] autorelease];
     dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO] autorelease];
     [durationText setFormatter:formatter];
