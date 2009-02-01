@@ -524,14 +524,17 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date
 {
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
+  NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
   _clickedElement = nil;
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [weekView reloadData];
   [dayTab setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
-  /* FIXME : this, somehow, prevents the selected month to show up in the popup */
-  /* [tabs selectTabViewItem:dayTab]; */
-  [tabs setNeedsDisplay:YES];
+  
+  if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab) {
+    [tabs selectTabViewItem:dayTab];
+    [tabs setNeedsDisplay:YES];
+  }
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
