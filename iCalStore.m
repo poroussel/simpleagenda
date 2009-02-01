@@ -216,6 +216,8 @@
 {
   if ([_resource get])
     [self parseData:[_resource data]];
+  else
+    [self setWritable:NO];
 }
 - (void)parseData:(NSData *)data
 {
