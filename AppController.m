@@ -138,17 +138,14 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
-  [[tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]] setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
 {
-  [self updateSummaryData];
-  [dayView reloadData];
-  [weekView reloadData];
-  [taskView reloadData];
   [NSApp setServicesProvider: self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
+  [self updateSummaryData];
+  [calendar setDate:[Date today]];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
@@ -531,6 +528,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [dayView reloadData];
   [weekView reloadData];
   [dayTab setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
+  [weekTab setLabel:[NSString stringWithFormat:@"Week %d", [_selectedDay weekOfYear]]];
   if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab)
     [tabs selectTabViewItem:dayTab];
   [tabs setNeedsDisplay:YES];
