@@ -525,16 +525,15 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
   NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
+
   _clickedElement = nil;
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [weekView reloadData];
-  [dayTab setLabel:[[date calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
-  
-  if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab) {
+  [dayTab setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
+  if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab)
     [tabs selectTabViewItem:dayTab];
-    [tabs setNeedsDisplay:YES];
-  }
+  [tabs setNeedsDisplay:YES];
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
