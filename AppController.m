@@ -8,6 +8,7 @@
 #import "Task.h"
 #import "PreferencesController.h"
 #import "iCalTree.h"
+#import "SelectionManager.h"
 
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
@@ -107,7 +108,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   self = [super init];
   if (self) {
     ASSIGNCOPY(_selectedDay, [Date today]);
-    _selection = nil;
+    selectionManager = [SelectionManager globalManager];
     _editor = [AppointmentEditor new];
     _taskEditor = [TaskEditor new];
     _sm = [StoreManager new];
@@ -217,9 +218,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   Date *date = [[calendar date] copy];
   [date setMinute:[self _sensibleStartForDuration:60]];
-  Event *apt = [[Event alloc] initWithStartDate:date 
-					  duration:60
-					  title:@"edit title..."];
+  Event *apt = [[Event alloc] initWithStartDate:date duration:60 title:@"edit title..."];
   if (apt && [_editor editAppointment:apt withStoreManager:_sm])
     [tabs selectTabViewItemWithIdentifier:@"Day"];
   [date release];
@@ -263,34 +262,43 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)editAppointment:(id)sender
 {
-  if (_clickedElement) {
-    if ([_clickedElement isKindOfClass:[Event class]])
-      [_editor editAppointment:(Event *)_clickedElement withStoreManager:_sm];
-    else if ([_clickedElement isKindOfClass:[Task class]])
-      [_taskEditor editTask:(Task *)_clickedElement withStoreManager:_sm];
+  id lastSelection = [selectionManager lastObject];
+
+  if (lastSelection) {
+    if ([lastSelection isKindOfClass:[Event class]])
+      [_editor editAppointment:(Event *)lastSelection withStoreManager:_sm];
+    else if ([lastSelection isKindOfClass:[Task class]])
+      [_taskEditor editTask:(Task *)lastSelection withStoreManager:_sm];
+    else
+      NSLog(@"We should never come here...");
   }
 }
 
 - (void)delAppointment:(id)sender
 {
-  if (_clickedElement) {
-    [[_clickedElement store] remove:_clickedElement];
-    _clickedElement = nil;
-  }
+  NSEnumerator *enumerator = [selectionManager enumerator];
+  Element *el;
+
+  while ((el = [enumerator nextObject]))
+    [[el store] remove:el];
+  [selectionManager clear];
 }
 
 - (void)exportAppointment:(id)sender;
 {
+  NSEnumerator *enumerator = [selectionManager enumerator];
   NSSavePanel *panel = [NSSavePanel savePanel];
   NSString *str;
   iCalTree *tree;
+  Element *el;
 
-  if (_clickedElement) {
+  if ([selectionManager count] > 0) {
     [panel setRequiredFileType:@"ics"];
     [panel setTitle:@"Export as"];
-    if ([panel runModalForDirectory:nil file:[_clickedElement summary]] == NSOKButton) {
+    if ([panel runModalForDirectory:nil file:[[selectionManager lastObject] summary]] == NSOKButton) {
       tree = [iCalTree new];
-      [tree add:_clickedElement];
+      while ((el = [enumerator nextObject]))
+	[tree add:el];
       str = [tree iCalTreeAsString];
       if (![str writeToFile:[panel filename] atomically:NO])
 	NSLog(@"Unable to write to file %@", [panel filename]);
@@ -311,31 +319,35 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)copy:(id)sender
 {
-  _selection = (Event *)_clickedElement;
-  _deleteSelection = NO;
+  [selectionManager copySelection];
 }
 
 - (void)cut:(id)sender
 {
-  _selection = (Event *)_clickedElement;
-  _deleteSelection = YES;
+  [selectionManager cutSelection];
 }
 
 - (void)paste:(id)sender
 {
-  if (_selection) {
+  if ([selectionManager copiedCount] > 0) {
+    NSEnumerator *enumerator = [[selectionManager paste] objectEnumerator];
     Date *date = [[calendar date] copy];
-    if (_deleteSelection) {
-      [date setMinute:[self _sensibleStartForDuration:[_selection duration]]];
-      [_selection setStartDate:date];
-      [[_selection store] update:_selection];
-      _selection = nil;
-    } else {
-      Event *new = [_selection copy];
-      [date setMinute:[self _sensibleStartForDuration:[new duration]]];
-      [new setStartDate:date];
-      [[_selection store] add:new];
-      [new release];
+    Event *el;
+    id <MemoryStore> store;
+
+    while ((el = [enumerator nextObject])) {
+      /* FIXME : store property could be handled by Event:copy ? */
+      store = [el store];
+      if ([selectionManager lastOperation] == SMCopy)
+	el = [el copy];
+      [date setMinute:[self _sensibleStartForDuration:[el duration]]];
+      [el setStartDate:date];
+      if ([selectionManager lastOperation] == SMCopy) {
+	[store add:el];
+	[el release];
+      } else {
+	[store update:el];
+      }     
     }
     [date release];
   }
@@ -377,21 +389,20 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
-  BOOL itemSelected = _clickedElement != nil;
   SEL action = [menuItem action];
 
   if (sel_eq(action, @selector(copy:)))
-    return itemSelected && [_clickedElement isKindOfClass:[Event class]] && [[_clickedElement store] writable];
+    return [selectionManager count] > 0;
   if (sel_eq(action, @selector(cut:)))
-    return itemSelected && [_clickedElement isKindOfClass:[Event class]] && [[_clickedElement store] writable];
+    return [selectionManager count] > 0;
   if (sel_eq(action, @selector(editAppointment:)))
-    return itemSelected;
+    return [selectionManager count] == 1;
   if (sel_eq(action, @selector(delAppointment:)))
-    return itemSelected;
+    return [selectionManager count] > 0;
   if (sel_eq(action, @selector(exportAppointment:)))
-    return itemSelected;
+    return [selectionManager count] > 0;
   if (sel_eq(action, @selector(paste:)))
-    return _selection != nil && [[_selection store] writable];
+    return [selectionManager copiedCount] > 0;
   return YES;
 }
 
@@ -416,7 +427,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)dataChanged:(NSNotification *)not
 {
-  _clickedElement = nil;
+  /* 
+   * FIXME : if a selected event was deleted by another application, 
+   * the selection will reference a non existing object
+   */
   [dayView reloadData];
   [weekView reloadData];
   [taskView reloadData];
@@ -426,23 +440,26 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
-  if (_clickedElement && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
+  if ([selectionManager count] && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
     return self;
   return nil;
 }
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
+  NSEnumerator *enumerator = [selectionManager enumerator];
+  Element *el;
   NSString *ical;
   NSString *filename;
   iCalTree *tree;
   NSFileWrapper *fw;
   BOOL written;
 
-  if (!_clickedElement)
+  if ([selectionManager count] == 0)
     return NO;
   NSAssert([types count] == 1, @"It seems our assumption was wrong");
   tree = AUTORELEASE([iCalTree new]);
-  [tree add:_clickedElement];
+  while ((el = [enumerator nextObject]))
+    [tree add:el];
   ical = [tree iCalTreeAsString];
 
   if ([types containsObject:NSFilenamesPboardType]) {
@@ -451,7 +468,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       NSLog(@"Unable to encode into NSFileWrapper");
       return NO;
     }
-    filename = [NSString stringWithFormat:@"%@/%@.ics", NSTemporaryDirectory(), [_clickedElement summary]];
+    filename = [NSString stringWithFormat:@"%@/%@.ics", NSTemporaryDirectory(), [[selectionManager lastObject] summary]];
     written = [fw writeToFile:filename atomically:YES updateFilenames:YES];
     [fw release];
     if (!written) {
@@ -504,13 +521,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [calendar setDate:[item valueForKey:@"date"]];
     if (![tabIdentifier isEqualToString:@"Day"])
       [tabs selectTabViewItemWithIdentifier:@"Day"];
-    _clickedElement = object;
+    [selectionManager set:object];
     return YES;
   }
   if (object && [object isKindOfClass:[Task class]]) {
     if (![tabIdentifier isEqualToString:@"Tasks"])
       [tabs selectTabViewItemWithIdentifier:@"Tasks"];
-    _clickedElement = object;
+    [selectionManager set:object];
     return YES;
   }
   return NO;
@@ -523,7 +540,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
   NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
 
-  _clickedElement = nil;
+  [selectionManager clear];
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [weekView reloadData];
@@ -546,7 +563,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(DayViewDelegate)
 - (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
-  _clickedElement = event;
   [_editor editAppointment:event withStoreManager:_sm];
 }
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
@@ -567,7 +583,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (void)dayView:(DayView *)dayview selectEvent:(Event *)event
 {
-  _clickedElement = event;
+  [selectionManager set:event];
 }
 @end
 
@@ -610,7 +626,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   int index = [taskView selectedRow];
   if (index > -1)
-    _clickedElement = [[_sm allTasks] objectAtIndex:index];
+    [selectionManager set:[[_sm allTasks] objectAtIndex:index]];
 }
 @end
 
@@ -624,6 +640,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [dayView deselectAll:self];
   if ([[tabViewItem identifier] isEqualToString:@"Week"])
     [weekView deselectAll:self];
-  _clickedElement = nil;
+  [selectionManager clear];
 }
 @end

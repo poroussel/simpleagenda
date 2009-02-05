@@ -24,7 +24,8 @@
 	GroupDAVStore.m,
 	WebDAVResource.m,
 	WeekView.m,
-	AppointmentView.m
+	AppointmentView.m,
+	SelectionManager.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -57,7 +58,8 @@
 	GroupDAVStore.h,
 	WebDAVResource.h,
 	WeekView.h,
-	AppointmentView.h
+	AppointmentView.h,
+	SelectionManager.h
     );
     IMAGES = (
 	Calendar.tiff,
@@ -74,7 +76,7 @@
 	GroupDAV.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2008-11-23 18:28:06 +0100";
+    LAST_EDITING = "2009-02-04 16:27:12 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",

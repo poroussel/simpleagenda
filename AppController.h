@@ -10,6 +10,7 @@
 #import "Event.h"
 #import "PreferencesController.h"
 #import "DataTree.h"
+#import "SelectionManager.h"
 
 @interface AppController : NSObject <AgendaDataSource>
 {
@@ -26,9 +27,7 @@
   AppointmentEditor *_editor;
   TaskEditor *_taskEditor;
   StoreManager *_sm;
-  Event *_selection;
-  Element *_clickedElement;
-  BOOL _deleteSelection;
+  SelectionManager *selectionManager;
   Date *_selectedDay;
   DataTree *_summaryRoot;
   DataTree *_today;

@@ -60,7 +60,8 @@ MemoryStore.h \
 GroupDAVStore.h \
 WebDAVResource.h \
 WeekView.h \
-AppointmentView.h
+AppointmentView.h \
+SelectionManager.h
 
 #
 # Class files
@@ -87,7 +88,8 @@ MemoryStore.m \
 GroupDAVStore.m \
 WebDAVResource.m \
 WeekView.m \
-AppointmentView.m
+AppointmentView.m \
+SelectionManager.m
 
 #
 # Other sources
