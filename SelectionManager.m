@@ -55,13 +55,6 @@ static SelectionManager *singleton;
   [_objects addObject:object];
 }
 
-- (id)pop
-{
-  id last = [_objects lastObject];
-  [_objects removeLastObject];
-  return last;
-}
-
 - (void)clear
 {
   [_objects removeAllObjects];

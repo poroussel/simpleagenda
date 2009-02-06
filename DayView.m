@@ -493,7 +493,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 {
   _firstH = [config integerForKey:FIRST_HOUR];
   _lastH = [config integerForKey:LAST_HOUR];
-  _minStep = [config integerForKey:MIN_STEP];
+  _minStep = [config integerForKey:MIN_STEP];  
   [self reloadData];
 }
 
