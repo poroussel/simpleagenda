@@ -32,6 +32,7 @@
   NSDictionary *textAttributes = [NSDictionary dictionaryWithObject:[[_apt store] textColor]
 					       forKey:NSForegroundColorAttributeName];
 
+
   if ([_apt allDay])
     title = [NSString stringWithFormat:@"All day : %@", [_apt summary]];
   else
@@ -160,6 +161,13 @@
   if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
     [delegate dayView:parent modifyEvent:_apt];
 }
+
+- (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
+{
+  DayView *parent = (DayView *)[self superview];
+  [self setFrame:[parent frameForAppointment:_apt]];
+}
+
 @end
 
 NSComparisonResult compareAppointmentViews(id a, id b, void *data)
@@ -196,7 +204,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 					 green:[_backgroundColor greenComponent] + 0.05
 					 blue:[_backgroundColor blueComponent] + 0.05
 					 alpha:[_backgroundColor alphaComponent]] retain];
-
     [self reloadData];
   }
   return self;
@@ -350,7 +357,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   Event *apt;
   NSSet *events;
   BOOL found;
-  NSView *subview;
 
   events = [dataSource scheduledAppointmentsForDay:nil];
   enumerator = [[self subviews] objectEnumerator];
@@ -375,11 +381,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     if (found == NO) {
       /* FIXME : probably shouldn't be there */
       [config registerClient:self forKey:[[apt store] description]];
-      if ([[apt store] displayed]) {
-	subview = [[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt];
-	[subview setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
-	[self addSubview:subview];
-      }
+      if ([[apt store] displayed])
+	[self addSubview:[[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt]];
     }
   }
   [self setNeedsDisplay:YES];
