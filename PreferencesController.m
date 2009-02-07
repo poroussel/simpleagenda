@@ -41,10 +41,9 @@
   [super dealloc];
 }
 
-- (void)setupStores
+- (void)setupDefaultStore
 {
-  ConfigManager *config = [ConfigManager globalConfig];
-  NSString *defaultStore = [config objectForKey:ST_DEFAULT];
+  NSString *defaultStore = [[ConfigManager globalConfig] objectForKey:ST_DEFAULT];
   NSEnumerator *list = [_sm storeEnumerator];
   id <AgendaStore> aStore;
 
@@ -54,7 +53,14 @@
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
+}
 
+- (void)setupStores
+{
+  NSEnumerator *list = [_sm storeEnumerator];
+  id <AgendaStore> aStore;
+
+  [self setupDefaultStore];
   list = [_sm storeEnumerator];
   [storePopUp removeAllItems];
   while ((aStore = [list nextObject]))
@@ -65,7 +71,7 @@
 
 - (void)storeStateChanged:(NSNotification *)notification
 {
-  [self setupStores];
+  [self setupDefaultStore];
 }
 
 -(void)showPreferences
