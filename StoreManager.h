@@ -18,6 +18,7 @@
 
 + (NSArray *)backends;
 + (Class)backendForName:(NSString *)name;
++ (StoreManager *)globalManager;
 
 - (void)addStoreNamed:(NSString *)name;
 - (void)removeStoreNamed:(NSString *)name;

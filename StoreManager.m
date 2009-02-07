@@ -38,6 +38,14 @@ static NSMutableDictionary *backends = nil;
 {
   return [backends valueForKey:name];
 }
++ (StoreManager *)globalManager
+{
+  static StoreManager *singleton;
+
+  if (singleton == nil)
+    singleton = [[StoreManager alloc] init];
+  return singleton;
+}
 
 - (NSDictionary *)defaults
 {
