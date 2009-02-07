@@ -24,6 +24,10 @@
     RETAIN(storeFactory);
     [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					  selector:@selector(storeStateChanged:) 
+					  name:SAStatusChangedForStore 
+					  object:nil];
   }
   return self;
 }
@@ -37,7 +41,7 @@
   [super dealloc];
 }
 
--(void)_setupStores
+- (void)setupStores
 {
   ConfigManager *config = [ConfigManager globalConfig];
   NSString *defaultStore = [config objectForKey:ST_DEFAULT];
@@ -46,7 +50,7 @@
 
   [defaultStorePopUp removeAllItems];
   while ((aStore = [list nextObject])) {
-    if ([aStore writable])
+    if ([aStore writable] && [aStore enabled])
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
   [defaultStorePopUp selectItemWithTitle:defaultStore];
@@ -57,6 +61,11 @@
     [storePopUp addItemWithTitle:[aStore description]];
   [storePopUp selectItemAtIndex:0];
   [self selectStore:self];
+}
+
+- (void)storeStateChanged:(NSNotification *)notification
+{
+  [self setupStores];
 }
 
 -(void)showPreferences
@@ -75,7 +84,7 @@
   [minStep setDoubleValue:step/60.0];
   [minStepText setDoubleValue:step/60.0];
 
-  [self _setupStores];
+  [self setupStores];
   [storeClass removeAllItems];
   while ((backend = [backends nextObject]))
     [storeClass addItemWithTitle:[backend storeTypeName]];
@@ -169,7 +178,7 @@
   [config removeObjectForKey:[store description]];
   [_sm removeStoreNamed:[store description]];
   /* FIXME : This could be done by registering STORES key */
-  [self _setupStores];
+  [self setupStores];
 }
 
 -(void)createStore:(id)sender
@@ -183,7 +192,7 @@
     [_sm addStoreNamed:[storeName stringValue]];
     [storeArray addObject:[storeName stringValue]];
     [config setObject:storeArray forKey:STORES];
-    [self _setupStores];
+    [self setupStores];
   }
   [storeName setStringValue:@""];
   [createButton setEnabled:NO];

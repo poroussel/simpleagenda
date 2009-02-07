@@ -3,6 +3,7 @@
 #import <AppKit/AppKit.h>
 
 #define SADataChangedInStore @"DataDidChangedInStore"
+#define SAStatusChangedForStore @"StatusChangedForStore"
 
 @class Element;
 
@@ -28,6 +29,8 @@
 - (void)setTextColor:(NSColor *)color;
 - (BOOL)displayed;
 - (void)setDisplayed:(BOOL)state;
+- (BOOL)enabled;
+- (void)setEnabled:(BOOL)state;
 @end
 
 @protocol StoreBackend

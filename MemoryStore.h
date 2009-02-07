@@ -12,5 +12,6 @@
   NSString *_name;
   BOOL _displayed;
   BOOL _writable;
+  BOOL _enabled;
 }
 @end

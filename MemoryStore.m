@@ -22,6 +22,7 @@
     [_config registerDefaults:[self defaults]];
     filename = [_config objectForKey:ST_FILE];
     _modified = NO;
+    _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     _tasks = [[NSMutableDictionary alloc] initWithCapacity:16];
     _writable = [[_config objectForKey:ST_RW] boolValue];
@@ -122,6 +123,7 @@
 {
   _writable = writable;
   [_config setObject:[NSNumber numberWithBool:_writable] forKey:ST_RW];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
 }
 
 - (BOOL)modified
@@ -172,6 +174,17 @@
 {
   _displayed = state;
   [_config setObject:[NSNumber numberWithBool:_displayed] forKey:ST_DISPLAY];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
 }
 
+- (BOOL)enabled
+{
+  return _enabled;
+}
+
+- (void)setEnabled:(BOOL)state
+{
+  _enabled = state;
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
+}
 @end
