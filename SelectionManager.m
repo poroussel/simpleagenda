@@ -18,10 +18,10 @@
 
 @implementation SelectionManager
 
-static SelectionManager *singleton;
-
 + (SelectionManager *)globalManager
 {
+  static SelectionManager *singleton;
+
   if (singleton == nil)
     singleton = [[SelectionManager alloc] init];
   return singleton;

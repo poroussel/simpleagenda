@@ -21,8 +21,6 @@
 
 @implementation ConfigManager
 
-static ConfigManager *singleton;
-
 - (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent
 {
   NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
@@ -42,6 +40,8 @@ static ConfigManager *singleton;
 
 + (ConfigManager *)globalConfig
 {
+  static ConfigManager *singleton;
+
   if (singleton == nil)
     singleton = [[ConfigManager alloc] initRoot];
   return singleton;
