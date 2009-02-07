@@ -407,6 +407,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 
 /* AgendaDataSource protocol */
+/* FIXME : this should probably go in StoreManager */
 - (NSSet *)scheduledAppointmentsForDay:(Date *)date
 {
   NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
