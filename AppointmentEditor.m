@@ -26,8 +26,9 @@
   return self;
 }
 
--(BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm
+-(BOOL)editAppointment:(Event *)data
 {
+  StoreManager *sm = [StoreManager globalManager];
   NSEnumerator *list = [sm storeEnumerator];
   id <MemoryStore> aStore;
   id <MemoryStore> originalStore;

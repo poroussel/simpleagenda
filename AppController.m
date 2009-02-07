@@ -219,7 +219,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Date *date = [[calendar date] copy];
   [date setMinute:[self _sensibleStartForDuration:60]];
   Event *apt = [[Event alloc] initWithStartDate:date duration:60 title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt withStoreManager:_sm])
+  if (apt && [_editor editAppointment:apt])
     [tabs selectTabViewItemWithIdentifier:@"Day"];
   [date release];
   [apt release];
@@ -228,7 +228,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)addTask:(id)sender
 {
   Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
-  if (task && [_taskEditor editTask:task withStoreManager:_sm])
+  if (task && [_taskEditor editTask:task])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
 }
@@ -255,7 +255,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [task setText:AUTORELEASE([[NSAttributedString alloc ] initWithString:aString])];
   } else
     [task setSummary:aString];
-  if (task && [_taskEditor editTask:task withStoreManager:_sm])
+  if (task && [_taskEditor editTask:task])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
 }
@@ -266,9 +266,9 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   if (lastSelection) {
     if ([lastSelection isKindOfClass:[Event class]])
-      [_editor editAppointment:(Event *)lastSelection withStoreManager:_sm];
+      [_editor editAppointment:(Event *)lastSelection];
     else if ([lastSelection isKindOfClass:[Task class]])
-      [_taskEditor editTask:(Task *)lastSelection withStoreManager:_sm];
+      [_taskEditor editTask:(Task *)lastSelection];
     else
       NSLog(@"We should never come here...");
   }
@@ -563,7 +563,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(DayViewDelegate)
 - (void)dayView:(DayView *)dayview editEvent:(Event *)event;
 {
-  [_editor editAppointment:event withStoreManager:_sm];
+  [_editor editAppointment:event];
 }
 - (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
 {
@@ -577,7 +577,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 			      duration:end - start 
 			      title:@"edit title..."];
   if (apt)
-    [_editor editAppointment:apt withStoreManager:_sm];
+    [_editor editAppointment:apt];
   [date release];
   [apt release];
 }

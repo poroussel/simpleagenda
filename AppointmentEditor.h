@@ -20,7 +20,7 @@
   Date *startDate;
 }
 
-- (BOOL)editAppointment:(Event *)data withStoreManager:(StoreManager *)sm;
+- (BOOL)editAppointment:(Event *)event;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 - (void)selectFrequency:(id)sender;

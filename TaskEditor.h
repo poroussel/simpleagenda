@@ -13,7 +13,7 @@
   id ok;
 }
 
-- (BOOL)editTask:(Task *)data withStoreManager:(StoreManager *)sm;
+- (BOOL)editTask:(Task *)task;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 

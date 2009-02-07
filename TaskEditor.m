@@ -14,8 +14,9 @@
   return self;
 }
 
--(BOOL)editTask:(Task *)task withStoreManager:(StoreManager *)sm
+-(BOOL)editTask:(Task *)task
 {
+  StoreManager *sm = [StoreManager globalManager];
   NSEnumerator *list = [sm storeEnumerator];
   id <MemoryStore> aStore;
   id <MemoryStore> originalStore;
