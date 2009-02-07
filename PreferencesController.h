@@ -31,9 +31,7 @@
   StoreManager *_sm;
 }
 
--(id)initWithStoreManager:(StoreManager *)sm;
 -(void)showPreferences;
-
 -(void)selectStore:(id)sender;
 -(void)changeColor:(id)sender;
 -(void)changeTextColor:(id)sender;

@@ -7,14 +7,14 @@
 
 @implementation PreferencesController
 
--(id)initWithStoreManager:(StoreManager *)sm
+-(id)init
 {
   self = [super init];
   if (self) {
     if (![NSBundle loadNibNamed:@"Preferences" owner:self])
       return nil;
 
-    ASSIGN(_sm, sm);
+    ASSIGN(_sm, [StoreManager globalManager]);
     HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];

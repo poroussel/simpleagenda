@@ -111,8 +111,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     selectionManager = [SelectionManager globalManager];
     _editor = [AppointmentEditor new];
     _taskEditor = [TaskEditor new];
-    _sm = [StoreManager new];
-    _pc = [[PreferencesController alloc] initWithStoreManager:_sm];
+    _sm = [StoreManager globalManager];
+    _pc = [PreferencesController new];
     [self initSummary];
     [self registerForServices];
   }
