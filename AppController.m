@@ -100,6 +100,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     if ([task state] != TK_COMPLETED)
       [_tasks addChild:[DataTree dataTreeWithAttributes:[self attributesFromTask:task]]];
   }
+  [_tasks setValue:[NSString stringWithFormat:@"Open tasks (%d)", [[_tasks children] count]] forKey:@"title"];
   [summary reloadData];
 }
 
@@ -365,10 +366,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       if ([event contains:[search stringValue]])
 	[_results addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:[event startDate]]]];
     }
-    [_results setValue:[NSString stringWithFormat:@"%d item(s)", [[_results children] count]] forKey:@"details"];;
     [_results sortChildrenUsingFunction:compareDataTreeElements context:nil];
     [summary expandItem:_results];
-  }
+    [_results setValue:[NSString stringWithFormat:@"Search results (%d items)", [[_results children] count]] forKey:@"title"];
+  } else
+    [_results setValue:@"Search results" forKey:@"title"];
 }
 
 - (void)doSearch:(id)sender
@@ -382,7 +384,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [search setStringValue:@""];
   [_results removeChildren];
-  [_results setValue:@"" forKey:@"details"];;
+  [_results setValue:@"Search results" forKey:@"title"];
   [summary reloadData];
   [window makeFirstResponder:search];
 }
