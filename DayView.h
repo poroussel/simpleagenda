@@ -31,7 +31,6 @@
 - (int)firstHour;
 - (int)lastHour;
 - (int)minimumStep;
-- (void)deselectAll:(id)sender;
 @end
 
 @interface NSObject(DayViewDelegate)

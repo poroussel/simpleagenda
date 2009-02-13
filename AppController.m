@@ -541,7 +541,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
   NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
 
-  [selectionManager clear];
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [weekView reloadData];
@@ -628,19 +627,5 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   int index = [taskView selectedRow];
   if (index > -1)
     [selectionManager set:[[_sm allTasks] objectAtIndex:index]];
-}
-@end
-
-/* FIXME : gross hack around selection problem */
-@implementation AppController(NSTabViewDelegate)
-- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-  if ([[tabViewItem identifier] isEqualToString:@"Day"])
-    [taskView deselectAll:self];
-  if ([[tabViewItem identifier] isEqualToString:@"Tasks"])
-    [dayView deselectAll:self];
-  if ([[tabViewItem identifier] isEqualToString:@"Week"])
-    [weekView deselectAll:self];
-  [selectionManager clear];
 }
 @end

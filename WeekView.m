@@ -33,6 +33,7 @@
 
 - (NSRect)frameForAppointment:(Event *)apt
 {
+  return NSZeroRect;
 }
 - (void)drawRect:(NSRect)rect
 {
@@ -130,14 +131,5 @@
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
   [self reloadData];
-}
-
-- (void)deselectAll:(id)sender
-{
-  if (_selected) {
-    [_selected setSelected:NO];
-    [self setNeedsDisplay:YES];
-    _selected = nil;
-  }
 }
 @end

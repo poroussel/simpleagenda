@@ -19,7 +19,6 @@ static NSImage *_repeatImage;
   self = [super initWithFrame:frameRect];
   if (self) {
     ASSIGN(_apt, apt);
-    _selected = NO;
   }
   return self;
 }
@@ -27,14 +26,6 @@ static NSImage *_repeatImage;
 {
   RELEASE(_apt);
   [super dealloc];
-}
-- (BOOL)selected
-{
-  return _selected;
-}
-- (void)setSelected:(BOOL)selected
-{
-  _selected = selected;
 }
 - (Event *)appointment
 {

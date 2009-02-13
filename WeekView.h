@@ -17,7 +17,6 @@
 - (NSRect)frameForAppointment:(Event *)apt;
 - (id)delegate;
 - (void)reloadData;
-- (void)deselectAll:(id)sender;
 @end
 
 @interface NSObject(WeekViewDelegate)

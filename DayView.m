@@ -5,6 +5,7 @@
 #import "ConfigManager.h"
 #import "iCalTree.h"
 #import "AppointmentView.h"
+#import "SelectionManager.h"
 #import "defines.h"
 
 
@@ -57,7 +58,7 @@
   PSsetalpha(0.7);
   PSfill();
   PSgrestore();
-  if (_selected)
+  if ([[[SelectionManager globalManager] selection] containsObject:_apt])
     [[NSColor whiteColor] set];
   else
     [darkColor set];
@@ -339,14 +340,11 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
-  if (_selected != aptv) {
-    [_selected setSelected:NO];
-    [aptv setSelected:YES];
-    [self setNeedsDisplay:YES];
-    _selected = aptv;
-    if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
-      [delegate dayView:self selectEvent:[aptv appointment]];
-  }
+  /* FIXME : why don't we add it to the SelectionManager ourselves ? */
+  _selected = aptv;
+  if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
+    [delegate dayView:self selectEvent:[aptv appointment]];
+  [self setNeedsDisplay:YES];
 }
 
 - (void)reloadData
@@ -508,14 +506,5 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 - (int)minimumStep
 {
   return _minStep;
-}
-
-- (void)deselectAll:(id)sender
-{
-  if (_selected) {
-    [_selected setSelected:NO];
-    [self setNeedsDisplay:YES];
-    _selected = nil;
-  }
 }
 @end

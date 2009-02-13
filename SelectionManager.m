@@ -51,7 +51,7 @@
 
 - (void)set:(id)object
 {
-  [self clear];
+  [_objects removeAllObjects];
   [_objects addObject:object];
 }
 
@@ -82,6 +82,11 @@
   NSArray *ret = [NSArray arrayWithArray:_copyarea];
   [_copyarea removeAllObjects];
   return ret;
+}
+
+- (NSArray *)selection
+{
+  return _objects;
 }
 
 - (NSEnumerator *)enumerator

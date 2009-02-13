@@ -24,6 +24,7 @@ typedef enum {
 - (void)copySelection;
 - (void)cutSelection;
 - (NSArray *)paste;
+- (NSArray *)selection;
 - (NSEnumerator *)enumerator;
 - (SMOperation)lastOperation;
 @end
