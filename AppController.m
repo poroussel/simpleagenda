@@ -383,8 +383,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)clearSearch:(id)sender
 {
   [search setStringValue:@""];
-  [_results removeChildren];
-  [_results setValue:@"Search results" forKey:@"title"];
+  [self performSearch];
   [summary reloadData];
   [window makeFirstResponder:search];
 }
