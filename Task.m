@@ -72,6 +72,10 @@ static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
   else
     _completionDate = nil;
 }
+- (NSString *)description
+{
+  return [self summary];
+}
 @end
 
 
