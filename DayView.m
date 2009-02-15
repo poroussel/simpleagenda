@@ -8,6 +8,18 @@
 #import "SelectionManager.h"
 #import "defines.h"
 
+@interface NSColor(SimpleAgenda)
+- (NSColor *)colorModifiedWithRed:(float)red green:(float)green blue:(float)blue alpha:(float)alpha;
+@end
+@implementation NSColor(SimpleAgenda)
+- (NSColor *)colorModifiedWithRed:(float)red green:(float)green blue:(float)blue alpha:(float)alpha;
+{
+  return [NSColor colorWithCalibratedRed:[self redComponent] + red
+                                   green:[self greenComponent] + green
+		                    blue:[self blueComponent] + blue
+		                   alpha:[self alphaComponent] + alpha];
+}
+@end
 
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 10)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height - 2)
@@ -26,10 +38,7 @@
   NSString *label;
   Date *start = [_apt startDate];
   NSColor *color = [[_apt store] eventColor];
-  NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
-				green:[color greenComponent] - 0.3
-				blue:[color blueComponent] - 0.3
-				alpha:[color alphaComponent]];
+  NSColor *darkColor = [color colorModifiedWithRed:-0.3 green:-0.3 blue:-0.3 alpha:-0.3];
   NSDictionary *textAttributes = [NSDictionary dictionaryWithObject:[[_apt store] textColor]
 					       forKey:NSForegroundColorAttributeName];
 
@@ -198,13 +207,9 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     _firstH = [config integerForKey:FIRST_HOUR];
     _lastH = [config integerForKey:LAST_HOUR];
     _minStep = [config integerForKey:MIN_STEP];
-    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor]
- 				     forKey:NSForegroundColorAttributeName] retain];
+    _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName] retain];
     _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
-    _alternateBackgroundColor = [[NSColor colorWithCalibratedRed:[_backgroundColor redComponent] + 0.05
-					 green:[_backgroundColor greenComponent] + 0.05
-					 blue:[_backgroundColor blueComponent] + 0.05
-					 alpha:[_backgroundColor alphaComponent]] retain];
+    _alternateBackgroundColor = [[_backgroundColor colorModifiedWithRed:0.05 green:0.05 blue:0.05 alpha:0] retain];
     [self reloadData];
   }
   return self;
