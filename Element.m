@@ -192,7 +192,6 @@
   if (prop)
       icalcomponent_remove_property(ic, prop);
   /*
-   * FIXME : not sure if the following is wise
    * while ((prop = icalcomponent_get_next_property(ic, kind)))
    *  icalcomponent_remove_property(ic, prop);
    */

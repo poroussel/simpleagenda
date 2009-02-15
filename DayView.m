@@ -218,7 +218,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   [super dealloc];
 }
 
-/* FIXME : the following could probably be simplified... */
 - (int)_minuteToSize:(int)minutes
 {
   return minutes * [self frame].size.height / ((_lastH - _firstH + 1) * 60);

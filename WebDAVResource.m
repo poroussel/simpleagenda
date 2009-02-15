@@ -258,10 +258,10 @@
   return [self requestWithMethod:@"PROPFIND" body:data attributes:attributes];
 }
 
+static NSString *PROPFINDGETETAG = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
 - (NSArray *)listICalItems
 {
   int i;
-  NSString *body = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
   GSXMLParser *parser;
   NSMutableArray *result;
   GSXPathContext *xpc;
@@ -269,7 +269,7 @@
   NSURL *elementURL;
 
   result = [NSMutableArray new];
-  if (![self propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
+  if (![self propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
     return result;
   parser = [GSXMLParser parserWithData:[self data]];
   if ([parser parse]) {
@@ -378,7 +378,6 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
 }
 @end
 
-/* FIXME : move this method to GSXMLParser ? */
 @implementation GSXMLDocument(SimpleAgenda)
 static GSXMLDocument *removeXSLT;
 static const NSString *removeString = @"<?xml version='1.0' encoding='UTF-8'?> \
