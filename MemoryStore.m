@@ -185,6 +185,7 @@
 - (void)setEnabled:(BOOL)state
 {
   _enabled = state;
+  NSLog(@"Store %@ %@", _name, state ? @"enabled" : @"disabled");
   [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
 }
 @end
