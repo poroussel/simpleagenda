@@ -26,6 +26,12 @@
   return self;
 }
 
+-(BOOL)canBeModified
+{
+  id <MemoryStore> selectedStore = [[StoreManager globalManager] storeForName:[store titleOfSelectedItem]];
+  return [selectedStore enabled] && [selectedStore writable];
+}
+
 -(BOOL)editAppointment:(Event *)data
 {
   StoreManager *sm = [StoreManager globalManager];
@@ -49,8 +55,7 @@
   originalStore = [data store];
   if (!originalStore)
     [data setStore:[sm defaultStore]];
-  else if (![originalStore writable])
-    [ok setEnabled:NO];
+  [ok setEnabled:[self canBeModified]];
     
   [store removeAllItems];
   while ((aStore = [list nextObject])) {
@@ -116,9 +121,8 @@
 
   if (end == nil || ![end isKindOfClass:[NSDate class]])
     [ok setEnabled:NO];
-  else {
-    [ok setEnabled:YES];
-  }
+  else
+    [ok setEnabled:[self canBeModified]];
 }
 
 - (void)selectFrequency:(id)sender
