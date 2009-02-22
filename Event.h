@@ -27,7 +27,6 @@ enum intervalType
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
 - (BOOL)isScheduledForDay:(Date *)day;
-- (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end;
 - (NSString *)details;
 - (BOOL)contains:(NSString *)text;
 

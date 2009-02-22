@@ -92,22 +92,6 @@
   return NO;
 }
 
-- (BOOL)isScheduledBetweenDay:(Date *)start andDay:(Date *)end
-{
-  int nd;
-  Date *work = [start copy];
-
-  for (nd = 0; nd < [start daysUntil:end] + 1; nd++) {
-    if ([self isScheduledForDay:work]) {
-      [work release];
-      return YES;
-    }
-    [work incrementDay];
-  }
-  [work release];
-  return NO;
-}
-
 - (NSString *)location
 {
   return _location;
