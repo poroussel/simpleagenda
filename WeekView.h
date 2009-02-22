@@ -10,7 +10,6 @@
 {
   IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
-  AppointmentView *_selected;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;

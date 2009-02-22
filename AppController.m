@@ -146,6 +146,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   [NSApp setServicesProvider: self];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
+  /* FIXME : this is overkill, we should only refresh the views... */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   [self updateSummaryData];
   [calendar setDate:[Date today]];
 }

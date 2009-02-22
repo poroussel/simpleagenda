@@ -183,7 +183,8 @@ static NSMutableDictionary *backends = nil;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    [all addObjectsFromArray:[store events]];
+    if ([store displayed])
+      [all addObjectsFromArray:[store events]];
   return all;
 }
 - (NSArray *)allTasks;
@@ -193,7 +194,8 @@ static NSMutableDictionary *backends = nil;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    [all addObjectsFromArray:[store tasks]];
+    if ([store displayed])
+      [all addObjectsFromArray:[store tasks]];
   return all;
 }
 @end
