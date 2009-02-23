@@ -41,17 +41,18 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (NSDictionary *)attributesFrom:(Event *)event and:(Date *)date
 {
   Date *today = [Date today];
+  Date *copy = AUTORELEASE([date copy]);
   NSMutableDictionary *attributes = [NSMutableDictionary new];
   NSString *details;
   NSString *title;
 
-  [date setMinute:[[event startDate] minuteOfDay]];
+  [copy setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
-  [attributes setValue:AUTORELEASE([date copy]) forKey:@"date"];
-  if ([today daysUntil:date] > 0 || [today daysSince:date] > 0)
-    details = [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
+  [attributes setValue:copy forKey:@"date"];
+  if ([today daysUntil:copy] > 0 || [today daysSince:copy] > 0)
+    details = [[copy calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
   else
-    details = [[date calendarDate] descriptionWithCalendarFormat:@"%H:%M"];
+    details = [[copy calendarDate] descriptionWithCalendarFormat:@"%H:%M"];
   title = [NSString stringWithFormat:@"%@ : %@", details, [event summary]];
   [attributes setValue:title forKey:@"title"];
   return AUTORELEASE(attributes);
