@@ -24,3 +24,8 @@ enum taskState
 - (Date *)completionDate;
 - (void)setCompletionDate:(Date *)cd;
 @end
+
+@interface Task(iCalendar)
+- (id)initWithICalComponent:(icalcomponent *)ic;
+- (BOOL)updateICalComponent:(icalcomponent *)ic;
+@end
