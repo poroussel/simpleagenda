@@ -2,6 +2,7 @@
 
 #import "Date.h"
 #import "Element.h"
+#import "AgendaStore.h"
 
 @protocol AgendaDataSource
 - (NSSet *)scheduledAppointmentsForDay:(Date *)date;

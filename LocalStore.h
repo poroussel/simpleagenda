@@ -1,6 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "MemoryStore.h"
+#import "AgendaStore.h"
 
 @interface LocalStore : MemoryStore <AgendaStore>
 {
@@ -9,4 +9,3 @@
   NSString *_globalTaskFile;
 }
 @end
-

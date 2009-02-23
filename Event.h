@@ -2,7 +2,6 @@
 
 #import "Date.h"
 #import "Element.h"
-#import "AgendaStore.h"
 
 enum intervalType
 {

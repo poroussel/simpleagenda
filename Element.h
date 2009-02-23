@@ -1,7 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <ical.h>
-#import "AgendaStore.h"
+#import "MemoryStore.h"
 #import "Date.h"
 
 enum classificationType
