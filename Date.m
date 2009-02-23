@@ -321,6 +321,21 @@
   _time.is_date = date;
   if (!date)
     icaltime_set_timezone(&_time, NULL);
+  else {
+    _time.hour = 0;
+    _time.minute = 0;
+    _time.second = 0;
+  }
+}
+
+- (NSTimeInterval)timeIntervalSince1970
+{
+  return icaltime_as_timet(_time);
+}
+
+- (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate
+{
+  return icaldurationtype_as_int(icaltime_subtract(_time, anotherDate->_time));
 }
 @end
 

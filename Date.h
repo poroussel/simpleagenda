@@ -45,6 +45,8 @@
 - (NSEnumerator *)enumeratorTo:(Date *)end;
 - (BOOL)isDate;
 - (void)setDate:(BOOL)date;
+- (NSTimeInterval)timeIntervalSince1970;
+- (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate;
 @end
 
 @interface Date(iCalendar)
