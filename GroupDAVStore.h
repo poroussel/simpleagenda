@@ -1,7 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "AgendaStore.h"
-#import "iCalTree.h"
 #import "WebDAVResource.h"
 
 @interface GroupDAVStore : MemoryStore <AgendaStore>
