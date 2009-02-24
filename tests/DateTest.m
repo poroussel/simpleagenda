@@ -37,6 +37,10 @@
 
 - (void)testDateManipulations
 {
+  NSCalendarDate *cdate = [NSCalendarDate calendarDate];
+  Date *date = [[Date alloc] initWithCalendarDate:cdate withTime:YES];
+  [self assertTrue:[cdate timeIntervalSinceDate:[date calendarDate]]<1 message:@"going from a calendarDate to a date and back, the difference should less than 1 second, because of precision"];
+  [date release];
 }
 
 @end
