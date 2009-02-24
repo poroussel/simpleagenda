@@ -11,6 +11,7 @@
 + (id)now;
 + (id)today;
 - (id)initWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time;
+- (id)initWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate;
 - (NSCalendarDate *)calendarDate;
 - (NSComparisonResult)compare:(id)aDate;
 - (NSComparisonResult)compareTime:(id)aTime;
