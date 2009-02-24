@@ -29,6 +29,10 @@
   [self assertInt:[now compare:copy] equals:0 message:@"comparing with date only we have equality"];
   [self assertInt:[now compareTime:copy] equals:-1];
   [copy release];
+
+  Date *distantDate = [[Date alloc] initWithTimeInterval:60 sinceDate:today];
+  [self assertInt:[today compareTime:distantDate] equals:-1 message:@"today must be inferior as distantDay is 1 hour later. bug if distantDate is a date as today, not a datetime"];
+  [distantDate release];
 }
 
 - (void)testDateManipulations
