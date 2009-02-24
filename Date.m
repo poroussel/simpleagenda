@@ -113,8 +113,11 @@
 - (id)initWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate
 {
   self = [super init];
-  if (self)
-    _time = icaltime_add(refDate->_time, icaldurationtype_from_int(seconds));
+  if (self) {
+    _time = refDate->_time;
+    [self setDate:NO];
+    _time = icaltime_add(_time, icaldurationtype_from_int(seconds));
+  }
   return self;
 }
 + (id)now
