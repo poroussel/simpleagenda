@@ -375,6 +375,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     found = NO;
     enm = [[self subviews] objectEnumerator];
     while ((aptv = [enm nextObject])) {
+      [aptv setFrame:[self frameForAppointment:apt]];
       if ([apt isEqual:[aptv appointment]]) {
 	found = YES;
 	break;
