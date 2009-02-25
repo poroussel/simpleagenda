@@ -309,6 +309,7 @@
 @implementation GroupDAVStore(Private)
 - (void)initTimer:(id)object
 {
+  /* TODO */
 }
 - (void)initStoreAsync:(id)object
 {
@@ -320,7 +321,7 @@
     _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
-  [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
+  [self fetchData:nil];
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];
 }
@@ -331,16 +332,20 @@
   iCalTree *tree;
   NSEnumerator *enumerator;
   NSString *href;
+  NSSet *components;
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
     element = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:href] authFromURL:_url];
     tree = [iCalTree new];
     if ([element get] && [tree parseData:[element data]]) {
-      [self fillWithElements:[tree components]];
-      [_hreftree setObject:tree forKey:href];
-      [_hrefresource setObject:element forKey:href];
-      [_uidhref setObject:href forKey:[[[tree components] anyObject] UID]];
+      components = [tree components];
+      if ([components count] > 0) {
+	[self fillWithElements:components];
+	[_hreftree setObject:tree forKey:href];
+	[_hrefresource setObject:element forKey:href];
+	[_uidhref setObject:href forKey:[[components anyObject] UID]];
+      }
     }
     [tree release];
     [element release];
