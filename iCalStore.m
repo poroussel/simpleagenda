@@ -77,7 +77,7 @@
 @end
 
 @interface iCalStore(Private)
-- (void)fetchData:(id)object;
+- (void)fetchData;
 - (void)parseData:(NSData *)data;
 - (void)initTimer:(id)object;
 - (void)initStoreAsync:(id)object;
@@ -99,6 +99,8 @@
   self = [super initWithName:name];
   if (self) {
     _tree = [iCalTree new];
+    _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
+    _resource = [[WebDAVResource alloc] initWithURL:_url];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;
@@ -180,7 +182,7 @@
 
 - (BOOL)read
 {
-  [self fetchData:nil];
+  [self fetchData];
   return [_resource dataChanged];
 }
 
@@ -212,7 +214,7 @@
 
 
 @implementation iCalStore(Private)
-- (void)fetchData:(id)object
+- (void)fetchData
 {
   if ([_resource get])
     [self parseData:[_resource data]];
@@ -243,9 +245,9 @@
 - (void)initStoreAsync:(id)object
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
-  _resource = [[WebDAVResource alloc] initWithURL:_url];
-  [self performSelectorOnMainThread:@selector(fetchData:) withObject:nil waitUntilDone:YES];
+  /* Read data on this second thread */
+  [self fetchData];
+  /* But create the refresh timer on the main thread */
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];
 }
