@@ -280,13 +280,6 @@ static NSTimeZone *gl_nstz = nil;
   return _time.year - date->_time.year;
 }
 
-- (void)clearTime
-{
-  _time.hour = 0;
-  _time.minute = 0;
-  _time.second = 0;
-}
-
 - (void)setSecondOfMinute:(int)second
 {
   [self setDate:NO];
