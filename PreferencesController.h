@@ -19,6 +19,7 @@
   IBOutlet id defaultStorePopUp;
   IBOutlet id storeDisplay;
   IBOutlet id storeWritable;
+  IBOutlet id storeRefresh;
   IBOutlet id removeButton;
   IBOutlet id storeClass;
   IBOutlet id storeName;
@@ -41,6 +42,7 @@
 -(void)selectDefaultStore:(id)sender;
 -(void)toggleDisplay:(id)sender;
 -(void)toggleWritable:(id)sender;
+-(void)toggleRefresh:(id)sender;
 -(void)removeStore:(id)sender;
 -(void)createStore:(id)sender;
 -(void)selectItem:(id)sender;

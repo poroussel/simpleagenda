@@ -7,5 +7,12 @@
 - (BOOL)write;
 @end
 
+@protocol PeriodicRefresh
+- (BOOL)periodicRefresh;
+- (void)setPeriodicRefresh:(BOOL)periodic;
+- (NSTimeInterval)refreshInterval;
+- (void)setRefreshInterval:(NSTimeInterval)interval;
+@end
+
 @protocol AgendaStore <MemoryStore, StoreBackend>
 @end

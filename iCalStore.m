@@ -91,6 +91,7 @@
 			 [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
+		       [NSNumber numberWithBool:NO], ST_REFRESH,
 		       nil, nil];
 }
 
@@ -101,6 +102,7 @@
     _tree = [iCalTree new];
     _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
+    [_config registerClient:self forKey:ST_REFRESH];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;
@@ -140,7 +142,9 @@
 
 - (void)dealloc
 {
+  [_config unregisterClient:self];
   [_refreshTimer invalidate];
+  [_refreshTimer release];
   [self write];
   DESTROY(_resource);
   DESTROY(_url);
@@ -210,6 +214,31 @@
   }
   return YES;
 }
+
+- (BOOL)periodicRefresh
+{
+  if ([_config objectForKey:ST_REFRESH])
+    return [[_config objectForKey:ST_REFRESH] boolValue];
+  return NO;
+}
+- (void)setPeriodicRefresh:(BOOL)periodic
+{
+  [_config setObject:[NSNumber numberWithBool:periodic] forKey:ST_REFRESH];
+}
+- (NSTimeInterval)refreshInterval
+{
+  if ([_config objectForKey:ST_REFRESH_INTERVAL])
+    return [_config integerForKey:ST_REFRESH_INTERVAL];
+  return 60 * 30;
+}
+- (void)setRefreshInterval:(NSTimeInterval)interval
+{
+  [_config setInteger:interval forKey:ST_REFRESH_INTERVAL];
+}
+- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+{
+  [self initTimer:nil];
+}
 @end
 
 
@@ -232,15 +261,21 @@
 }
 - (void)initTimer:(id)object
 {
-  if ([_config objectForKey:ST_REFRESH])
-    _minutesBeforeRefresh = [_config integerForKey:ST_REFRESH];
-  else
-    _minutesBeforeRefresh = 30;
-  _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
-				   interval:_minutesBeforeRefresh * 60
-				   target:self selector:@selector(refreshData:) 
-				   userInfo:nil repeats:YES];
-  [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+  [_refreshTimer invalidate];
+  [_refreshTimer release];
+  _refreshTimer = nil;
+  if ([self periodicRefresh]) {
+    _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
+				             interval:[self refreshInterval]
+                   			       target:self
+				             selector:@selector(refreshData:) 
+				             userInfo:nil 
+				              repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
+    NSLog(@"Store %@ will refresh every %d seconds", [self description], (int)[self refreshInterval]);
+  } else {
+    NSLog(@"Store %@ automatic refresh disabled", [self description]);
+  }
 }
 - (void)initStoreAsync:(id)object
 {

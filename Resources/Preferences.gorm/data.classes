@@ -6,9 +6,10 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "selectItem:",
+	    "toggleRefresh:",
 	    "removeStore:",
 	    "selectDefaultStore:",
+	    "selectItem:",
 	    "selectStore:",
 	    "setColor:",
 	    "toggleDisplay:",
@@ -29,7 +30,8 @@
 	    "toggleWritable:",
 	    "removeStore:",
 	    "createStore:",
-	    "selectItem:"
+	    "selectItem:",
+	    "toggleRefresh:"
 	);
 	Outlets = (
 	    panel,
@@ -53,7 +55,8 @@
 	    globalPreferences,
 	    itemPopUp,
 	    storeFactory,
-	    storePreferences
+	    storePreferences,
+	    storeRefresh
 	);
 	Super = NSObject;
     };

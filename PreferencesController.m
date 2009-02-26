@@ -111,6 +111,13 @@
     [removeButton setEnabled:NO];
   else
     [removeButton setEnabled:YES];
+  if ([store conformsToProtocol:@protocol(PeriodicRefresh)]) {
+    [storeRefresh setEnabled:YES];
+    [storeRefresh setState:[store periodicRefresh]];
+  } else {
+    [storeRefresh setEnabled:NO];
+    [storeRefresh setState:NO];
+  }
 }
 
 -(void)changeColor:(id)sender
@@ -170,6 +177,12 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setWritable:[storeWritable state]];
+}
+
+-(void)toggleRefresh:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setPeriodicRefresh:[storeRefresh state]];
 }
 
 /* We only allow the removal of non-default stores */
