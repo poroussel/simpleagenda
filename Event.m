@@ -251,10 +251,8 @@
       NSLog(@"ToDo");
       break;
     }
-    if (!icaltime_is_null_time(rec.until)) {
-      [date setDateToICalTime:rec.until];
-      [self setEndDate:date];
-    }
+    if (!icaltime_is_null_time(rec.until))
+      [self setEndDate:AUTORELEASE([[Date alloc] initWithICalTime:rec.until])];
   }
   [date release];
   location = icalcomponent_get_location(ic);

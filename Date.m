@@ -50,6 +50,23 @@
  */
 
 @implementation Date
+static icaltimezone *gl_tz = NULL;
+static icaltimezone *gl_utc = NULL;
+static NSTimeZone *gl_nstz = nil;
++ (void)initialize
+{
+  const char *tzone;
+
+  if (!gl_tz) {
+    gl_nstz = RETAIN([[NSCalendarDate calendarDate] timeZone]);
+    tzone = [[gl_nstz description] cString];
+    gl_utc = icaltimezone_get_utc_timezone();
+    gl_tz = icaltimezone_get_builtin_timezone(tzone);
+    if (!gl_tz)
+      NSLog(@"Couldn't get a timezone corresponding to %s", tzone);
+  }
+}
+
 - (id)copyWithZone:(NSZone *)zone
 {
   Date *new = [Date allocWithZone:zone];
@@ -62,9 +79,24 @@
   return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
 }
 
+/*
+ * This is a bit convoluted because icaltime_compare
+ * create to dates in utc timezone to do the comparison.
+ * The conversion to utc means a datetime will be modified
+ * (up or down, depending on the local time zone) and a
+ * date won't.
+ */
 - (NSComparisonResult)compareTime:(id)aDate
 {
-  return icaltime_compare(_time, ((Date *)aDate)->_time);
+  NSComparisonResult res;
+  int a_isdate = _time.is_date;
+  int b_isdate = ((Date *)aDate)->_time.is_date;
+  _time.is_date = 0;
+  ((Date *)aDate)->_time.is_date = 0;
+  res = icaltime_compare(_time, ((Date *)aDate)->_time);
+  _time.is_date = a_isdate;
+  ((Date *)aDate)->_time.is_date = b_isdate;
+  return res;
 }
 
 - (NSString *)description
@@ -74,18 +106,10 @@
 
 - (id)init
 {
-  const char *tzone;
-  icaltimezone *tz, *utc;
-
   self = [super init];
   if (self) {
-    tzone = [[[[NSCalendarDate calendarDate] timeZone] description] cString];
-    utc = icaltimezone_get_utc_timezone();
-    tz = icaltimezone_get_builtin_timezone(tzone);
-    if (!tz)
-      NSLog(@"Couldn't get a timezone corresponding to %s", tzone);
-    _time = icaltime_current_time_with_zone(NULL);
-    icaltimezone_convert_time(&_time, utc, tz);
+    _time = icaltime_current_time_with_zone(gl_tz);
+    _time = icaltime_set_timezone(&_time, gl_tz);
   }
   return self;
 }
@@ -93,7 +117,7 @@
 {
   self = [self init];
   if (self) {
-    [self setDate:!time];
+    _time.is_date = !time;
     _time.year = [cd yearOfCommonEra];
     _time.month = [cd monthOfYear];
     _time.day = [cd dayOfMonth];
@@ -106,7 +130,7 @@
       _time.minute = 0;
       _time.second = 0;
     }
-      
+    /* FIXME : use NSCalendarDate Timezone ? */
   }
   return self;
 }
@@ -115,7 +139,8 @@
   self = [super init];
   if (self) {
     _time = refDate->_time;
-    [self setDate:NO];
+    /* To be able to add hours and minutes, it has to be a datetime */
+    _time.is_date = 0;
     _time = icaltime_add(_time, icaldurationtype_from_int(seconds));
   }
   return self;
@@ -139,7 +164,7 @@
 			 hour:_time.hour
 			 minute:_time.minute
 			 second:_time.second
-			 timeZone:nil];
+			 timeZone:gl_nstz];
 }
 
 - (int)year
@@ -329,9 +354,7 @@
 - (void)setDate:(BOOL)date
 {
   _time.is_date = date;
-  if (!date)
-    icaltime_set_timezone(&_time, NULL);
-  else {
+  if (date) {
     _time.hour = 0;
     _time.minute = 0;
     _time.second = 0;
@@ -349,23 +372,21 @@
 }
 @end
 
+/*
+ * Dates are stored in the local timezone in memory
+ * and in utc in iCalTree. These methods do the
+ * necessary conversions
+ */
 @implementation Date(iCalendar)
 - (id)initWithICalTime:(struct icaltimetype)time
 {
   self = [super init];
   if (self)
-    [self setDateToICalTime:time];
+    _time = icaltime_convert_to_zone(time, gl_tz);
   return self;
 }
-
-- (void)setDateToICalTime:(struct icaltimetype)time
-{
-  _time = time;
-}
-
 - (struct icaltimetype)iCalTime
 {
-  return _time;
+  return icaltime_convert_to_zone(_time, gl_utc);
 }
 @end
-
