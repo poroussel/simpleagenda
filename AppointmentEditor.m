@@ -55,7 +55,6 @@
   originalStore = [data store];
   if (!originalStore)
     [data setStore:[sm defaultStore]];
-  [ok setEnabled:[self canBeModified]];
     
   [store removeAllItems];
   while ((aStore = [list nextObject])) {
@@ -73,6 +72,7 @@
     [endDate setObjectValue:nil];
   }
   [endDate setEnabled:[until state]];
+  [ok setEnabled:[self canBeModified]];
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
