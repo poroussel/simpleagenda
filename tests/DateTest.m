@@ -43,4 +43,28 @@
   [date release];
 }
 
+- (void)testDateEnumerator
+{
+  Date *start = [Date now];
+  Date *end, *tmp, *last = nil;
+  NSEnumerator *enumerator;
+
+  [start setYear:2009];
+  [start setMonth:1];
+  [start setDay:1];
+  end = [start copy];
+  [end changeDayBy:20];
+  enumerator = [start enumeratorTo:end];
+  while ((tmp = [enumerator nextObject])) {
+    [self assertTrue:[tmp isDate] message:@"Every object enumerated is a single Date, not a Datetime."];
+    if (last)
+      [self assertTrue:([tmp timeIntervalSinceDate:last]==86400) message:@"Each date returned is 86400 later than the preceding one."];
+    ASSIGNCOPY(last, tmp);
+  }
+  [self assertInt:[last year] equals:2009 message:@"Year is the same."];
+  [self assertInt:[last monthOfYear] equals:1 message:@"Month is the same."];
+  [self assertInt:[last dayOfMonth] equals:21 message:@"1 + 20 = 21."];
+  RELEASE(last);
+}
+
 @end

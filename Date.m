@@ -14,6 +14,8 @@
   if (self != nil) {
     _start = [start copy];
     _end = [end copy];
+    [_start setDate:YES];
+    [_end setDate:YES];
     [_start changeDayBy:-1];
   }
   return self;
