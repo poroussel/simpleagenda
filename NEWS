@@ -5,6 +5,8 @@ version 0.38
 	* Various code cleanups
 	* Asynchronous load for distant stores on startup (try #3)
 	* Add a tests/ folder with what should become a test suite
+	* Automatic refresh and refresh interval in the preferences
+	  panel, enabled only for the backends that support it
 
 version 0.37 (2008/11/02)
 	* Fix buglets uncovered by libical 0.41
