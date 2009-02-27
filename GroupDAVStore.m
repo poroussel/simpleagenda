@@ -17,7 +17,6 @@
   IBOutlet id check;
   IBOutlet id calendar;
   IBOutlet id task;
-  BOOL isURL;
 }
 - (BOOL)show;
 - (NSString *)url;
@@ -42,7 +41,6 @@
     [name setStringValue:storeName];
     [url setStringValue:@"http://"];
     [self clearPopUps];
-    isURL = NO;
   }
   return self;
 }
@@ -87,16 +85,7 @@
   GSXPathNodeSet *set;
 
   [self clearPopUps];
-  NS_DURING
-    {
-      isURL = [NSURL stringIsValidURL:[url stringValue]];
-    }
-  NS_HANDLER
-    {
-      isURL = NO;
-    }
-  NS_ENDHANDLER
-  if (isURL) {
+  if ([NSURL stringIsValidURL:[url stringValue]]) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
       parser = [GSXMLParser parserWithData:[resource data]];
