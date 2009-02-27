@@ -6,13 +6,14 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "toggleRefresh:",
+	    "changeInterval:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectItem:",
 	    "selectStore:",
 	    "setColor:",
 	    "toggleDisplay:",
+	    "toggleRefresh:",
 	    "toggleWritable:"
 	);
 	Super = NSObject;
@@ -31,7 +32,8 @@
 	    "removeStore:",
 	    "createStore:",
 	    "selectItem:",
-	    "toggleRefresh:"
+	    "toggleRefresh:",
+	    "changeInterval:"
 	);
 	Outlets = (
 	    panel,
@@ -56,7 +58,9 @@
 	    itemPopUp,
 	    storeFactory,
 	    storePreferences,
-	    storeRefresh
+	    storeRefresh,
+	    refreshInterval,
+	    refreshIntervalText
 	);
 	Super = NSObject;
     };

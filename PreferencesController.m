@@ -19,6 +19,7 @@
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];
     [[minStepText cell] setFormatter:formatter];
+    [[refreshIntervalText cell] setFormatter:formatter];
     RETAIN(globalPreferences);
     RETAIN(storePreferences);
     RETAIN(storeFactory);
@@ -100,6 +101,27 @@
 }
 
 
+-(void)periodicSetup
+{
+  id <SharedStore> store = (id <SharedStore>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
+
+  if ([store conformsToProtocol:@protocol(PeriodicRefresh)]) {
+    [storeRefresh setEnabled:YES];
+    [storeRefresh setState:[store periodicRefresh]];
+    [refreshInterval setEnabled:[store periodicRefresh]];
+    [refreshIntervalText setEnabled:[store periodicRefresh]];
+    [refreshIntervalText setDoubleValue:[store refreshInterval]/3600.0];
+    [refreshInterval setDoubleValue:[store refreshInterval]/3600.0];
+  } else {
+    [storeRefresh setEnabled:NO];
+    [storeRefresh setState:NO];
+    [refreshInterval setEnabled:NO];
+    [refreshIntervalText setEnabled:NO];
+    [refreshIntervalText setDoubleValue:0];
+    [refreshInterval setDoubleValue:0];
+  }
+}
+
 -(void)selectStore:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
@@ -111,13 +133,7 @@
     [removeButton setEnabled:NO];
   else
     [removeButton setEnabled:YES];
-  if ([store conformsToProtocol:@protocol(PeriodicRefresh)]) {
-    [storeRefresh setEnabled:YES];
-    [storeRefresh setState:[store periodicRefresh]];
-  } else {
-    [storeRefresh setEnabled:NO];
-    [storeRefresh setState:NO];
-  }
+  [self periodicSetup];
 }
 
 -(void)changeColor:(id)sender
@@ -161,6 +177,15 @@
   }
 }
 
+-(void)changeInterval:(id)sender
+{
+  double value = [refreshInterval doubleValue];
+  id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setRefreshInterval:value * 3600];
+  [refreshIntervalText setDoubleValue:value];
+  [refreshInterval setDoubleValue:value];
+}
+
 -(void)selectDefaultStore:(id)sender
 {
   [_sm setDefaultStore:[defaultStorePopUp titleOfSelectedItem]];
@@ -181,8 +206,9 @@
 
 -(void)toggleRefresh:(id)sender
 {
-  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setPeriodicRefresh:[storeRefresh state]];
+  [self periodicSetup];
 }
 
 /* We only allow the removal of non-default stores */

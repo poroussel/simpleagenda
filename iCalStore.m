@@ -103,6 +103,7 @@
     _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
     [_config registerClient:self forKey:ST_REFRESH];
+    [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;

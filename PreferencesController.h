@@ -20,6 +20,8 @@
   IBOutlet id storeDisplay;
   IBOutlet id storeWritable;
   IBOutlet id storeRefresh;
+  IBOutlet id refreshInterval;
+  IBOutlet id refreshIntervalText;
   IBOutlet id removeButton;
   IBOutlet id storeClass;
   IBOutlet id storeName;
@@ -39,6 +41,7 @@
 -(void)changeStart:(id)sender;
 -(void)changeEnd:(id)sender;
 -(void)changeStep:(id)sender;
+-(void)changeInterval:(id)sender;
 -(void)selectDefaultStore:(id)sender;
 -(void)toggleDisplay:(id)sender;
 -(void)toggleWritable:(id)sender;

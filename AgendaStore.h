@@ -16,3 +16,6 @@
 
 @protocol AgendaStore <MemoryStore, StoreBackend>
 @end
+
+@protocol SharedStore <AgendaStore, PeriodicRefresh>
+@end
