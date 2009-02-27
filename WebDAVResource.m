@@ -3,6 +3,15 @@
 #import "WebDAVResource.h"
 
 @implementation WebDAVResource
+- (void)debugLog:(NSString *)format,...
+{
+  va_list ap;
+  if (_debug) {
+    va_start(ap, format);
+    NSLogv(format, ap);
+    va_end(ap);
+  }
+}
 - (void)dealloc
 {
   DESTROY(_user);
@@ -93,18 +102,15 @@
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
   if (body)
     [handle writeData:body];
-  if (_debug)
-    NSLog(@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]);
+  [self debugLog:@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]];
   DESTROY(_data);
   data = [handle resourceData];
   _status = [handle status];
   _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
-  if (_debug) {
-    if (data)
-      NSLog(@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]));
-    else
-      NSLog(@"%@ status %d", method, _httpStatus);
-  }
+  if (data)
+    [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
+  else
+    [self debugLog:@"%@ status %d", method, _httpStatus];
   property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
   if (property)
     ASSIGNCOPY(_reason, property);
@@ -137,10 +143,10 @@
     property = [handle propertyForKeyIfAvailable:@"Location"];
     if (property) {
       ASSIGNCOPY(_location, property);
-      if (_debug)
-	NSLog(@"Location: %@", _location);
-    } else
+      [self debugLog:@"Location: %@", _location];
+    } else {
       DESTROY(_location);
+    }
   }
   [handle release];
   [_lock unlock];
@@ -273,18 +279,15 @@ static NSString *PROPFINDGETETAG = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><
     return result;
   parser = [GSXMLParser parserWithData:[self data]];
   if ([parser parse]) {
-    if (_debug)
-      NSLog(@"%s xml document \n%@", __PRETTY_FUNCTION__, [[[parser document] strippedDocument] description]);
+    [self debugLog:@"%s xml document \n%@", __PRETTY_FUNCTION__, [[[parser document] strippedDocument] description]];
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/getetag]/href/text()"];
-    if (_debug)
-      NSLog(@"found %d ical item(s)", [set count]);
+    [self debugLog:@"found %d ical item(s)", [set count]];
     for (i = 0; i < [set count]; i++) {
       elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:_url];
       if (elementURL) {
 	[result addObject:[elementURL absoluteString]];
-	if (_debug)
-	  NSLog([elementURL absoluteString]);
+	[self debugLog:[elementURL absoluteString]];
       }
     }
     [xpc release];
