@@ -61,7 +61,8 @@ GroupDAVStore.h \
 WebDAVResource.h \
 WeekView.h \
 AppointmentView.h \
-SelectionManager.h
+SelectionManager.h \
+RecurrenceRule.h
 
 #
 # Class files
@@ -89,7 +90,8 @@ GroupDAVStore.m \
 WebDAVResource.m \
 WeekView.m \
 AppointmentView.m \
-SelectionManager.m
+SelectionManager.m \
+RecurrenceRule.m
 
 #
 # Other sources

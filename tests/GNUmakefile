@@ -4,11 +4,14 @@ TOOL_NAME = SimpleAgendaTests
 
 SimpleAgendaTests_HEADER_FILES = \
 	AllTests.h \
-	DateTest.h
+	DateTest.h \
+	RecurrenceRuleTest.h
 
 SimpleAgendaTests_OBJC_FILES = \
 	../Date.m \
+	../RecurrenceRule.m \
 	DateTest.m \
+	RecurrenceRuleTest.m \
 	AllTests.m \
 	main.m
 
