@@ -159,11 +159,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_summaryRoot release];
   [_pc release];
   /* 
-   * Ugly workaround : [_sm release] should force the
-   * modified stores to synchronise their data but it 
-   * doesn't work. We're leaking a object reference.
+   * FIXME : we shouldn't have to release the store
+   * manager as we don't retain it. It's a global
+   * instance that should synchronise itself when
+   * it's freed
    */
-  [_sm synchronise];
   [_sm release];
   [_editor release];
   [_taskEditor release];

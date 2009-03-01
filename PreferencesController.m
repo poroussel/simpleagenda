@@ -14,7 +14,7 @@
     if (![NSBundle loadNibNamed:@"Preferences" owner:self])
       return nil;
 
-    ASSIGN(_sm, [StoreManager globalManager]);
+    _sm = [StoreManager globalManager];
     HourFormatter *formatter = [[[HourFormatter alloc] init] autorelease];
     [[dayStartText cell] setFormatter:formatter];
     [[dayEndText cell] setFormatter:formatter];
@@ -35,7 +35,6 @@
 
 - (void)dealloc
 {
-  RELEASE(_sm);
   RELEASE(globalPreferences);
   RELEASE(storePreferences);
   RELEASE(storeFactory);

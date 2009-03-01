@@ -86,6 +86,7 @@ static NSMutableDictionary *backends = nil;
 
 - (void)dealloc
 {
+  [self synchronise];
   RELEASE(_defaultStore);
   [_stores release];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
