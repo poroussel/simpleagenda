@@ -16,7 +16,7 @@
 #define ST_CALENDAR_URL @"storeCalendarURL"
 #define ST_TASK_URL @"storeTaskURL"
 #define ST_RW @"storeWritable"
-#define ST_REFRESH @"storeRefresh"
+#define ST_REFRESH @"storeAutomaticRefresh"
 #define ST_REFRESH_INTERVAL @"storeRefreshInterval"
 #define ST_DISPLAY @"storeDisplay"
 #define ST_VERSION @"storeVersion"
