@@ -43,6 +43,14 @@
     icalrecurrencetype_clear(&recur);
   return self;
 }
+- (id)initWithFrequency:(recurrenceFrequency)frequency
+{
+  NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
+  self = [self init];
+  if (self)
+    recur.freq = frequency;
+  return self;
+}
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
@@ -72,6 +80,20 @@
 {
   NSAssert([start isDate], @"Works on dates");
   return AUTORELEASE([[NSRecurrenceEnumerator alloc] initWithRule:self start:start]);
+}
+- (recurrenceFrequency)frequency
+{
+  return recur.freq;
+}
+- (Date *)until
+{
+  if (icaltime_is_null_time(recur.until))
+    return nil;
+  return AUTORELEASE([[Date alloc] initWithICalTime:recur.until]);
+}
+- (int)count
+{
+  return recur.count;
 }
 @end
 

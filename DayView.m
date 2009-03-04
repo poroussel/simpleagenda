@@ -91,7 +91,7 @@
     PSfill();
   }
   [label drawInRect:TextRect(rect) withAttributes:textAttributes];
-  if ([_apt interval] != RI_NONE)
+  if ([_apt rrule])
     [[self repeatImage] compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
 }
 

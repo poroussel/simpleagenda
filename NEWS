@@ -7,6 +7,8 @@ version 0.38
 	* Add a tests/ folder with what should become a test suite
 	* Automatic refresh and refresh interval in the preferences
 	  panel, enabled only for the backends that support it
+	* Fix ticket 8
+	* Use libical recurrence handling and remove our old junk
 
 version 0.37 (2008/11/02)
 	* Fix buglets uncovered by libical 0.41

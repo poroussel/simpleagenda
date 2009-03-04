@@ -23,7 +23,7 @@
 - (id)nextObject
 {
   [_start incrementDay];
-  if ([_start daysUntil:_end] < 0)
+  if ([_end timeIntervalSinceDate:_start] < 0)
     return nil;
   return _start;
 }
@@ -218,66 +218,6 @@ static NSTimeZone *gl_nstz = nil;
 - (int)numberOfDaysInMonth
 {
   return icaltime_days_in_month(_time.month, _time.year);
-}
-
-- (int)daysUntil:(Date *)date
-{
-  struct icaldurationtype dt;
-
-  dt = icaltime_subtract(date->_time, _time);
-  return icaldurationtype_as_int(dt) / 86400;
-}
-
-- (int)daysSince:(Date *)date
-{
-  struct icaldurationtype dt;
-
-  dt = icaltime_subtract(_time, date->_time);
-  return icaldurationtype_as_int(dt) / 86400;
-}
-
-- (int)weeksUntil:(Date *)date
-{
-  struct icaldurationtype dt;
-
-  dt = icaltime_subtract(date->_time, _time);
-  if (dt.is_neg)
-    return -dt.weeks;
-  return dt.weeks;
-}
-
-- (int)weeksSince:(Date *)date
-{
-  struct icaldurationtype dt;
-
-  dt = icaltime_subtract(_time, date->_time);
-  if (dt.is_neg)
-    return -dt.weeks;
-  return dt.weeks;
-}
-
-- (int)monthsUntil:(Date *)date
-{
-  int months = 0;
-  NSLog(@"monthsUntil");
-  return months;
-}
-
-- (int)monthsSince:(Date *)date
-{
-  int months = 0;
-  NSLog(@"monthsSince");
-  return months;
-}
-
-- (int)yearsUntil:(Date *)date
-{
-  return date->_time.year - _time.year;
-}
-
-- (int)yearSince:(Date *)date
-{
-  return _time.year - date->_time.year;
 }
 
 - (void)setSecondOfMinute:(int)second

@@ -5,31 +5,35 @@
 #import <Foundation/Foundation.h>
 #import "Event.h"
 
+@interface Event(BeforeRRule)
+- (void)initRRuleFromOldFormatWithCoder:(NSCoder *)coder;
+@end
+
 @implementation Event(NSCoding)
 -(void)encodeWithCoder:(NSCoder *)coder
 {
   [super encodeWithCoder:coder];
   [coder encodeObject:startDate forKey:@"sdate"];
-  [coder encodeObject:endDate forKey:@"edate"];
-  [coder encodeInt:interval forKey:@"interval"];
-  [coder encodeInt:frequency forKey:@"frequency"];
   [coder encodeInt:duration forKey:@"duration"];
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
+  [coder encodeObject:rrule forKey:@"rrule"];
 }
 -(id)initWithCoder:(NSCoder *)coder
 {
   [super initWithCoder:coder];
+  NSLog(_summary);
   startDate = [[coder decodeObjectForKey:@"sdate"] retain];
-  endDate = [[coder decodeObjectForKey:@"edate"] retain];
-  interval = [coder decodeIntForKey:@"interval"];
-  frequency = [coder decodeIntForKey:@"frequency"];
   duration = [coder decodeIntForKey:@"duration"];
   _location = [[coder decodeObjectForKey:@"location"] retain];
   if ([coder containsValueForKey:@"allDay"])
     _allDay = [coder decodeBoolForKey:@"allDay"];
   else
     _allDay = NO;
+  if ([coder containsValueForKey:@"rrule"])
+    rrule = [[coder decodeObjectForKey:@"rrule"] retain];
+  else
+    [self initRRuleFromOldFormatWithCoder:coder];
   return self;
 }
 @end
@@ -58,36 +62,26 @@
   [super dealloc];
   RELEASE(_location);
   RELEASE(startDate);
-  RELEASE(endDate);
+  RELEASE(rrule);
 }
 
-/*
- * Code adapted from ChronographerSource Appointment:isScheduledFor
- */
 - (BOOL)isScheduledForDay:(Date *)day
 {
+  NSEnumerator *enumerator;
+  Date *start;
+  Date *date;
+
   NSAssert(day != nil, @"Empty day argument");
-  if ([startDate compare:day] > 0 || (endDate && [endDate compare:day] < 0))
-    return NO;
-  switch (interval) {
-  case RI_NONE:
-    return [day compare:startDate] == 0;
-  case RI_DAILY:
-    return ((frequency == 1) ||
-	    ([startDate daysUntil: day] % frequency) == 0);
-  case RI_WEEKLY:
-    return (([startDate weekday] == [day weekday]) &&
-	    ((frequency == 1) ||
-	     (([startDate weeksUntil: day] % frequency) == 0)));
-  case RI_MONTHLY:
-    return (([startDate dayOfMonth] == [day dayOfMonth]) &&
-	    ((frequency == 1) ||
-	     (([startDate monthsUntil: day] % frequency) == 0)));
-  case RI_YEARLY:
-    return ((([startDate dayOfMonth] == [day dayOfMonth]) &&
-	     ([startDate monthOfYear] == [day monthOfYear])) &&
-	    ((frequency == 1) ||
-	     (([startDate yearsUntil: day] % frequency) == 0)));
+  start = AUTORELEASE([startDate copy]);
+  [start setDate:YES];
+  if (!rrule)
+    return [day compare:start] == 0;
+  enumerator = [rrule enumeratorFromDate:start];
+  while ((date = [enumerator nextObject])) {
+    if ([date compare:day] == 0)
+      return YES;
+    if ([date compare:day] > 0)
+      break;
   }
   return NO;
 }
@@ -114,7 +108,7 @@
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"<%@> from <%@> for <%d> to <%@> (%d)", [self summary], [startDate description], [self duration], [endDate description], interval];
+  return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self summary], [startDate description], [self duration]];
 }
 
 - (NSString *)details
@@ -141,24 +135,14 @@
   return duration;
 }
 
-- (int)frequency
-{
-  return frequency;
-}
-
 - (Date *)startDate
 {
   return startDate;
 }
 
-- (Date *)endDate
+- (RecurrenceRule *)rrule
 {
-  return endDate;
-}
-
-- (int)interval
-{
-  return interval;
+  return rrule;
 }
 
 - (void)setDuration:(int)newDuration
@@ -166,24 +150,14 @@
   duration = newDuration;
 }
 
-- (void)setFrequency:(int)newFrequency
-{
-  frequency = newFrequency;
-}
-
 - (void)setStartDate:(Date *)newStartDate
 {
   ASSIGNCOPY(startDate, newStartDate);
 }
 
-- (void)setEndDate:(Date *)date
+- (void)setRRule:(RecurrenceRule *)arule
 {
-  ASSIGNCOPY(endDate, date);
-}
-
-- (void)setInterval:(int)newInterval
-{
-  interval = newInterval;
+  ASSIGN(rrule, arule);
 }
 @end
 
@@ -197,7 +171,6 @@
   struct icaltimetype start;
   struct icaltimetype end;
   struct icaldurationtype diff;
-  struct icalrecurrencetype rec;
   Date *date;
   const char *location;
 
@@ -226,34 +199,9 @@
     }
     [self setDuration:icaldurationtype_as_int(diff) / 60];
   }
-
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
-  if (prop) {
-    rec = icalproperty_get_rrule(prop);
-    switch (rec.freq) {
-    case ICAL_DAILY_RECURRENCE:
-      [self setInterval:RI_DAILY];
-      [self setFrequency:rec.interval];
-      break;
-    case ICAL_WEEKLY_RECURRENCE:
-      [self setInterval:RI_WEEKLY];
-      [self setFrequency:rec.interval];
-      break;
-    case ICAL_MONTHLY_RECURRENCE:
-      [self setInterval:RI_MONTHLY];
-      [self setFrequency:rec.interval];
-      break;
-    case ICAL_YEARLY_RECURRENCE:
-      [self setInterval:RI_YEARLY];
-      [self setFrequency:rec.interval];
-      break;
-    default:
-      NSLog(@"ToDo");
-      break;
-    }
-    if (!icaltime_is_null_time(rec.until))
-      [self setEndDate:AUTORELEASE([[Date alloc] initWithICalTime:rec.until])];
-  }
+  if (prop)
+    rrule = [[RecurrenceRule alloc] initWithICalRRule:icalproperty_get_rrule(prop)];
   [date release];
   location = icalcomponent_get_location(ic);
   if (location)
@@ -283,7 +231,6 @@
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   Date *end;
-  struct icalrecurrencetype irec;
   icalproperty *prop;
 
   if (![super updateICalComponent:ic])
@@ -317,7 +264,21 @@
   }
 
   [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
-  if (interval != RI_NONE) {
+  if (rrule)
+    icalcomponent_add_property(ic, icalproperty_new_rrule([rrule iCalRRule]));
+  return YES;
+}
+
+- (int)iCalComponentType
+{
+  return ICAL_VEVENT_COMPONENT;
+}
+@end
+
+@implementation Event(BeforeRRule)
+
+
+/* Interne -> iCal
     icalrecurrencetype_clear(&irec);
     switch (interval) {
     case RI_DAILY:
@@ -340,13 +301,39 @@
     else
       irec.until = icaltime_null_time();
     icalcomponent_add_property(ic, icalproperty_new_rrule(irec));
-  }
-  return YES;
-}
-
-- (int)iCalComponentType
+*/
+enum intervalType
 {
-  return ICAL_VEVENT_COMPONENT;
+  RI_NONE = 0, 
+  RI_DAILY, 
+  RI_WEEKLY, 
+  RI_MONTHLY, 
+  RI_YEARLY
+};
+- (void)initRRuleFromOldFormatWithCoder:(NSCoder *)coder
+{
+  Date *end;
+  enum intervalType interval;
+  recurrenceFrequency frenquency;
+
+  interval = [coder decodeIntForKey:@"interval"];
+  end = [[coder decodeObjectForKey:@"edate"] retain];
+  switch (interval) {
+  case RI_DAILY:
+    frenquency = recurrenceFrequenceDaily;
+    break;
+  case RI_WEEKLY:
+    frenquency = recurrenceFrequenceWeekly;
+    break;
+  case RI_MONTHLY:
+    frenquency = recurrenceFrequenceMonthly;
+    break;
+  case RI_YEARLY:
+    frenquency = recurrenceFrequenceYearly;
+    break;
+  case RI_NONE:
+    return;
+  }
+  rrule = [[RecurrenceRule alloc] initWithFrequency:frenquency until:end];
 }
 @end
-

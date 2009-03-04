@@ -20,9 +20,13 @@ typedef enum
   struct icalrecurrencetype recur;
 }
 
+- (id)initWithFrequency:(recurrenceFrequency)frequency;
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate;
 - (id)initWithFrequency:(recurrenceFrequency)frequency count:(int)count;
 - (NSEnumerator *)enumeratorFromDate:(Date *)start;
+- (recurrenceFrequency)frequency;
+- (Date *)until;
+- (int)count;
 @end
 
 @interface RecurrenceRule(iCalendar)

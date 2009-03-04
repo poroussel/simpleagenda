@@ -49,7 +49,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [copy setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
   [attributes setValue:copy forKey:@"date"];
-  if ([today daysUntil:copy] > 0 || [today daysSince:copy] > 0)
+  if ([today timeIntervalSinceDate:copy] > 86400 || [today timeIntervalSinceDate:copy] < -86400)
     details = [[copy calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
   else
     details = [[copy calendarDate] descriptionWithCalendarFormat:@"%H:%M"];

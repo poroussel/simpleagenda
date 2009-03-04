@@ -8,7 +8,7 @@
 #import "defines.h"
 
 @implementation AppointmentEditor
--(id)init
+- (id)init
 {
   HourFormatter *formatter;
   NSDateFormatter *dateFormatter;
@@ -26,13 +26,13 @@
   return self;
 }
 
--(BOOL)canBeModified
+- (BOOL)canBeModified
 {
   id <MemoryStore> selectedStore = [[StoreManager globalManager] storeForName:[store titleOfSelectedItem]];
   return [selectedStore enabled] && [selectedStore writable];
 }
 
--(BOOL)editAppointment:(Event *)data
+- (BOOL)editAppointment:(Event *)data
 {
   StoreManager *sm = [StoreManager globalManager];
   NSEnumerator *list = [sm storeEnumerator];
@@ -43,9 +43,12 @@
   [title setStringValue:[data summary]];
   [duration setFloatValue:[data duration] / 60.0];
   [durationText setFloatValue:[data duration] / 60.0];
-  [repeat selectItemAtIndex:[data interval]];
   [location setStringValue:[data location]];
   [allDay setState:[data allDay]];
+  if (![data rrule])
+    [repeat selectItemAtIndex:0];
+  else
+    [repeat selectItemAtIndex:[[data rrule] frequency] - 2];
 
   [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
   [[description textStorage] appendAttributedString:[data text]];
@@ -63,28 +66,33 @@
   }
   [store selectItemWithTitle:[[data store] description]];
   startDate = [data startDate];
-  [until setEnabled:([data interval] != 0)];
-  if ([data interval] != 0 && [data endDate]) {
+
+  [until setEnabled:([data rrule] != nil)];
+  if ([data rrule] && [[data rrule] until]) {
     [until setState:YES];
-    [endDate setObjectValue:[[data endDate] calendarDate]];
+    [endDate setObjectValue:[[[data rrule] until] calendarDate]];
   } else {
     [until setState:NO];
     [endDate setObjectValue:nil];
   }
   [endDate setEnabled:[until state]];
+
   [ok setEnabled:[self canBeModified]];
   ret = [NSApp runModalForWindow:window];
   [window close];
   if (ret == NSOKButton) {
     [data setSummary:[title stringValue]];
     [data setDuration:[duration floatValue] * 60.0];
-    [data setInterval:[repeat indexOfSelectedItem]];
-    if ([repeat indexOfSelectedItem] != 0) {
-      [data setFrequency:1];
+
+    if (![repeat indexOfSelectedItem]) {
+      [data setRRule:nil];
+    } else {
+      RecurrenceRule *rule;
       if ([until state] && [endDate objectValue])
-	[data setEndDate:AUTORELEASE([[Date alloc] initWithCalendarDate:[endDate objectValue] withTime:NO])];
+	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2 until:AUTORELEASE([[Date alloc] initWithCalendarDate:[endDate objectValue] withTime:NO])];
       else
-	[data setEndDate:nil];
+	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2];
+      [data setRRule:AUTORELEASE(rule)];
     }
     /* FIXME : why do we copy one and not the other ? */
     [data setText:[[description textStorage] copy]];
@@ -105,12 +113,12 @@
   return NO;
 }
 
--(void)validate:(id)sender
+- (void)validate:(id)sender
 {
   [NSApp stopModalWithCode: NSOKButton];
 }
 
--(void)cancel:(id)sender
+- (void)cancel:(id)sender
 {
   [NSApp stopModalWithCode: NSCancelButton];
 }
