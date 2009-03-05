@@ -5,12 +5,13 @@
 #import <Foundation/Foundation.h>
 #import "Event.h"
 
+/* To be removed when in a few releases */
 @interface Event(BeforeRRule)
 - (void)initRRuleFromOldFormatWithCoder:(NSCoder *)coder;
 @end
 
 @implementation Event(NSCoding)
--(void)encodeWithCoder:(NSCoder *)coder
+- (void)encodeWithCoder:(NSCoder *)coder
 {
   [super encodeWithCoder:coder];
   [coder encodeObject:startDate forKey:@"sdate"];
@@ -19,10 +20,9 @@
   [coder encodeBool:_allDay forKey:@"allDay"];
   [coder encodeObject:rrule forKey:@"rrule"];
 }
--(id)initWithCoder:(NSCoder *)coder
+- (id)initWithCoder:(NSCoder *)coder
 {
   [super initWithCoder:coder];
-  NSLog(_summary);
   startDate = [[coder decodeObjectForKey:@"sdate"] retain];
   duration = [coder decodeIntForKey:@"duration"];
   _location = [[coder decodeObjectForKey:@"location"] retain];
@@ -134,29 +134,25 @@
 {
   return duration;
 }
-
 - (Date *)startDate
 {
   return startDate;
 }
-
 - (RecurrenceRule *)rrule
 {
   return rrule;
 }
-
 - (void)setDuration:(int)newDuration
 {
   duration = newDuration;
 }
-
 - (void)setStartDate:(Date *)newStartDate
 {
   ASSIGNCOPY(startDate, newStartDate);
 }
-
 - (void)setRRule:(RecurrenceRule *)arule
 {
+  /* RecurrenceRules can't be modified, no need to copy */
   ASSIGN(rrule, arule);
 }
 @end
@@ -276,32 +272,6 @@
 @end
 
 @implementation Event(BeforeRRule)
-
-
-/* Interne -> iCal
-    icalrecurrencetype_clear(&irec);
-    switch (interval) {
-    case RI_DAILY:
-      irec.freq = ICAL_DAILY_RECURRENCE;
-      break;
-    case RI_WEEKLY:
-      irec.freq = ICAL_WEEKLY_RECURRENCE;
-      break;
-    case RI_MONTHLY:
-      irec.freq = ICAL_MONTHLY_RECURRENCE;
-      break;
-    case RI_YEARLY:
-      irec.freq = ICAL_YEARLY_RECURRENCE;
-      break;
-    default:
-      NSLog(@"ToDo");
-    }
-    if (endDate != nil)
-      irec.until = [endDate iCalTime];
-    else
-      irec.until = icaltime_null_time();
-    icalcomponent_add_property(ic, icalproperty_new_rrule(irec));
-*/
 enum intervalType
 {
   RI_NONE = 0, 
