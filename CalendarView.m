@@ -1,7 +1,6 @@
 #import <AppKit/AppKit.h>
 #import "Date.h"
 #import "CalendarView.h"
-#import "StoreManager.h"
 
 @interface DayFormatter : NSFormatter
 @end
