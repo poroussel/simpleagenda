@@ -3,7 +3,7 @@
 #import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
 
-@interface WebDAVResource : NSObject <NSURLHandleClient>
+@interface WebDAVResource : NSObject
 {
 @private
   NSURL *_url;

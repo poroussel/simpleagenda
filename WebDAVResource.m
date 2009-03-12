@@ -318,22 +318,6 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
   ASSIGNCOPY(_user, user);
   ASSIGNCOPY(_password, password);
 }
-
-- (void)URLHandle:(NSURLHandle *)sender resourceDataDidBecomeAvailable:(NSData *)newData
-{
-}
-- (void)URLHandle:(NSURLHandle *)sender resourceDidFailLoadingWithReason:(NSString *)reason
-{
-}
-- (void)URLHandleResourceDidBeginLoading:(NSURLHandle *)sender
-{
-}
-- (void)URLHandleResourceDidCancelLoading:(NSURLHandle *)sender
-{
-}
-- (void)URLHandleResourceDidFinishLoading:(NSURLHandle *)sender
-{
-}
 @end
 
 @implementation NSURL(SimpleAgenda)
