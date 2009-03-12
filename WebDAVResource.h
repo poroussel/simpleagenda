@@ -36,13 +36,9 @@
 - (BOOL)dataChanged;
 - (NSURL *)url;
 - (BOOL)options;
-- (BOOL)getWithAttributes:(NSDictionary *)attributes;
 - (BOOL)get;
-- (BOOL)put:(NSData *)data;
-- (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
 - (BOOL)delete;
-- (BOOL)deleteWithAttributes:(NSDictionary *)attributes;
-- (BOOL)propfind:(NSData *)data;
+- (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
 - (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes;
 - (NSArray *)listICalItems;
 - (void)updateAttributes;

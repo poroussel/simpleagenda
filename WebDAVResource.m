@@ -176,7 +176,7 @@
  */
 - (BOOL)writableWithData:(NSData *)data
 {
-  return [self put:data];
+  return [self put:data attributes:nil];
 }
 
 - (int)httpStatus
@@ -219,19 +219,9 @@
   return [self requestWithMethod:@"OPTIONS" body:nil attributes:nil];
 }
 
-- (BOOL)getWithAttributes:(NSDictionary *)attributes
-{
-  return [self requestWithMethod:@"GET" body:nil attributes:attributes];
-}
-
 - (BOOL)get
 {
   return [self requestWithMethod:@"GET" body:nil attributes:nil];
-}
-
-- (BOOL)put:(NSData *)data
-{
-  return [self requestWithMethod:@"PUT" body:data attributes:nil];
 }
 
 - (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes
@@ -242,16 +232,6 @@
 - (BOOL)delete
 {
   return [self requestWithMethod:@"DELETE" body:nil attributes:nil];
-}
-
-- (BOOL)deleteWithAttributes:(NSDictionary *)attributes
-{
-  return [self requestWithMethod:@"DELETE" body:nil attributes:attributes];
-}
-
-- (BOOL)propfind:(NSData *)data
-{
-  return [self requestWithMethod:@"PROPFIND" body:data attributes:nil];
 }
 
 - (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes
@@ -298,7 +278,7 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
   GSXPathContext *xpc;
   GSXPathString *result;
 
-  if ([self propfind:nil]) {
+  if ([self propfind:nil attributes:nil]) {
     parser = [GSXMLParser parserWithData:[self data]];
     if ([parser parse]) {
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];

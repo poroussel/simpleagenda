@@ -199,7 +199,7 @@
     return YES;
   data = [_tree iCalTreeAsData];
   if (data) {
-    if ([_resource put:data]) {
+    if ([_resource put:data attributes:nil]) {
       [_resource updateAttributes];
       [self setModified:NO];
       NSLog(@"iCalStore written to %@", [_url absoluteString]);
