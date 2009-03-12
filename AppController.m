@@ -18,9 +18,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController
 - (void)registerForServices
 {
-  NSArray *sendTypes = [NSArray arrayWithObjects:NSStringPboardType, NSFilenamesPboardType, nil];
-  NSArray *returnTypes = [NSArray arrayWithObjects:nil];
-  [NSApp registerServicesMenuSendTypes: sendTypes returnTypes: returnTypes];
+  [NSApp registerServicesMenuSendTypes: [NSArray arrayWithObjects:NSStringPboardType, NSFilenamesPboardType, nil]
+	                   returnTypes: [NSArray arrayWithObjects:nil]];
 }
 
 - (void)initSummary

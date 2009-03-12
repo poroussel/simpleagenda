@@ -135,10 +135,11 @@
     [self setDate:now];
     [now incrementDay];
     _dayTimer = [[NSTimer alloc] initWithFireDate:[now calendarDate]
-				 interval:86400 target:self 
-				 selector:@selector(dayChanged:) 
-				 userInfo:nil 
-				 repeats:YES];
+				         interval:86400
+				           target:self
+				         selector:@selector(dayChanged:)
+				         userInfo:nil
+				          repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
@@ -228,6 +229,7 @@
 - (void)selectMonth:(id)sender
 {
   int idx = [month indexOfSelectedItem] + 1;
+
   [date setMonth: idx];
   [monthDisplayed setMonth: idx];
   [self updateView];
@@ -238,6 +240,7 @@
 - (void)selectYear:(id)sender
 {
   int year = [stepper intValue];
+
   [text setIntValue: year];
   [date setYear: year];
   [monthDisplayed setYear: year];
@@ -249,6 +252,7 @@
 - (void)selectDay:(id)sender
 {
   id day = [[matrix selectedCell] objectValue];
+
   if ([day isKindOfClass:[Date class]]) {
     [self clearSelectedDay];
     ASSIGNCOPY(date, day);

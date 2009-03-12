@@ -26,13 +26,8 @@
 
 - (void)fixURLScheme
 {
-  NSString *fixed;
-
-  if ([[_url scheme] hasPrefix:@"webcal"]) {
-    fixed = [[_url absoluteString] stringByReplacingString:@"webcal" withString:@"http"];
-    DESTROY(_url);
-    _url = [[NSURL alloc] initWithString:fixed];
-  }
+  if ([[_url scheme] hasPrefix:@"webcal"])
+    ASSIGN(_url, [NSURL URLWithString:[[_url absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
 }
 
 - (id)initWithURL:(NSURL *)anUrl

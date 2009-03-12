@@ -22,9 +22,8 @@
 
 - (void)dealloc
 {
+  icalcomponent_free(root);
   [super dealloc];
-  if (root)
-    icalcomponent_free(root);
 }
 
 - (BOOL)parseString:(NSString *)string;
@@ -33,8 +32,7 @@
 
   icomp = icalparser_parse_string([string cStringUsingEncoding:NSUTF8StringEncoding]);
   if (icomp) {
-    if (root)
-      icalcomponent_free(root);
+    icalcomponent_free(root);
     root = icomp;
     return YES;
   }
