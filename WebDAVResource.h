@@ -5,17 +5,14 @@
 
 @interface WebDAVResource : NSObject
 {
-@private
   NSURL *_url;
   Class _handleClass;
   NSLock *_lock;
   BOOL _dataChanged;
-  NSURLHandleStatus _status;
   int _httpStatus;
   NSString *_reason;
   NSString *_lastModified;
   NSString *_etag;
-  NSString *_location;
   NSString *_user;
   NSString *_password;
   NSData *_data;
@@ -31,8 +28,6 @@
 - (int)httpStatus;
 - (NSData *)data;
 - (NSString *)reason;
-- (NSString *)location;
-- (NSURLHandleStatus)status;
 - (BOOL)dataChanged;
 - (NSURL *)url;
 - (BOOL)options;

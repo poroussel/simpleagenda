@@ -19,7 +19,6 @@
   DESTROY(_lock);
   DESTROY(_url);
   DESTROY(_lastModified);
-  DESTROY(_location);
   DESTROY(_data);
   [super dealloc];
 }
@@ -100,7 +99,6 @@
   [self debugLog:@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]];
   DESTROY(_data);
   data = [handle resourceData];
-  _status = [handle status];
   _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
   if (data)
     [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
@@ -132,15 +130,6 @@
     if (!_etag || (property && ![property isEqual:_etag])) {
       _dataChanged = YES;
       ASSIGNCOPY(_etag, property);
-    }
-  }
-  if ([method isEqual:@"PUT"]) {
-    property = [handle propertyForKeyIfAvailable:@"Location"];
-    if (property) {
-      ASSIGNCOPY(_location, property);
-      [self debugLog:@"Location: %@", _location];
-    } else {
-      DESTROY(_location);
     }
   }
   [handle release];
@@ -192,16 +181,6 @@
 - (NSString *)reason
 {
   return _reason;
-}
-
-- (NSString *)location
-{
-  return _location;
-}
-
-- (NSURLHandleStatus)status
-{
-  return _status;
 }
 
 - (BOOL)dataChanged
