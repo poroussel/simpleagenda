@@ -62,7 +62,8 @@ WebDAVResource.h \
 WeekView.h \
 AppointmentView.h \
 SelectionManager.h \
-RecurrenceRule.h
+RecurrenceRule.h \
+NSColor+SimpleAgenda.h
 
 #
 # Class files
@@ -91,7 +92,8 @@ WebDAVResource.m \
 WeekView.m \
 AppointmentView.m \
 SelectionManager.m \
-RecurrenceRule.m
+RecurrenceRule.m \
+NSColor+SimpleAgenda.m
 
 #
 # Other sources

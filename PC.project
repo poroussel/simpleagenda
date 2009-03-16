@@ -26,6 +26,8 @@
 	WeekView.m,
 	AppointmentView.m,
 	SelectionManager.m
+	RecurrenceRule.m
+	NSColor+SimpleAgenda.m
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -60,6 +62,8 @@
 	WeekView.h,
 	AppointmentView.h,
 	SelectionManager.h
+	RecurrenceRule.h
+	NSColor+SimpleAgenda.h
     );
     IMAGES = (
 	Calendar.tiff,

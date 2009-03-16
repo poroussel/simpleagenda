@@ -5,6 +5,7 @@
 #import "ConfigManager.h"
 #import "iCalTree.h"
 #import "AppointmentView.h"
+#import "NSColor+SimpleAgenda.h"
 #import "defines.h"
 
 @interface AppWeekView : AppointmentView
@@ -23,10 +24,7 @@
   NSString *label;
   Date *start = [_apt startDate];
   NSColor *color = [[_apt store] eventColor];
-  NSColor *darkColor = [NSColor colorWithCalibratedRed:[color redComponent] - 0.3
-				                 green:[color greenComponent] - 0.3
-				                  blue:[color blueComponent] - 0.3
-				                 alpha:[color alphaComponent]];
+  NSColor *darkColor = [color colorModifiedWithDeltaRed:-0.3 green:-0.3 blue:-0.3 alpha:-0.3];
   NSDictionary *textAttributes = [NSDictionary dictionaryWithObject:[[_apt store] textColor]
 					                     forKey:NSForegroundColorAttributeName];
 
