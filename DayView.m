@@ -210,7 +210,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName] retain];
     _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
     _alternateBackgroundColor = [[_backgroundColor colorModifiedWithRed:0.05 green:0.05 blue:0.05 alpha:0] retain];
-    [self reloadData];
   }
   return self;
 }
@@ -388,7 +387,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 	[self addSubview:[[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt]];
     }
   }
-  [self setNeedsDisplay:YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
