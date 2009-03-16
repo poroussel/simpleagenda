@@ -10,10 +10,10 @@
 {
   IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
+  AppointmentView *_selected;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
-- (NSRect)frameForAppointment:(Event *)apt;
 - (id)delegate;
 - (void)reloadData;
 @end
