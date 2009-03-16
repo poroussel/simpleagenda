@@ -375,6 +375,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 	[self addSubview:[[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt]];
     }
   }
+  [self setNeedsDisplay:YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
