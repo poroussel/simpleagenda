@@ -76,7 +76,6 @@ static struct {
 
 @interface WeekDayView : NSView
 {
-  int wd; /* 1 = monday ... 7 = sunday */
   Date *date;
 }
 - (id)initWithFrame:(NSRect)frame forDay:(Date *)day;
@@ -96,10 +95,8 @@ static struct {
 - (id)initWithFrame:(NSRect)frame forDay:(Date *)day
 {
   self = [super initWithFrame:[WeekDayView rectForDay:[day weekday] frame:frame]];
-  if (self) {
-    wd = [day weekday];
+  if (self)
     date = [day copy];
-  }
   return self;
 }
 
@@ -127,7 +124,7 @@ static struct {
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
 {
-  [self setFrame:[WeekDayView rectForDay:wd frame:[[self superview] frame]]];
+  [self setFrame:[WeekDayView rectForDay:[date weekday] frame:[[self superview] frame]]];
 }
 
 - (void)clear
@@ -145,7 +142,6 @@ static struct {
   return NSMakeRect(0, 0 + 20 * [[self subviews] count] , [self frame].size.width, 20);
 }
 
-
 - (void)addAppointment:(Event *)apt
 {
   AppWeekView *awv;
@@ -162,22 +158,34 @@ static struct {
 @end
 
 @implementation WeekView
-- (id)initWithFrame:(NSRect)frameRect
+- (void)setDate:(Date *)aDate
 {
+  NSRect frame = [self frame];
+  NSEnumerator *enumerator;
+  NSView *view;
   int nday;
   Date *date;
-  NSRect frame = [self frame];
 
-  self = [super initWithFrame:frameRect];
-  if (self) {
-    /* Select monday */
-    date = [Date today];
+  if ([aDate weekOfYear] != weekNumber) {
+    weekNumber = [aDate weekOfYear];
+    enumerator = [[self subviews] objectEnumerator];
+    while ((view = [enumerator nextObject]))
+      [view removeFromSuperviewWithoutNeedingDisplay];
+    /* Start with monday */
+    date = [aDate copy];
     [date changeDayBy: 1 - [date weekday]];
     for (nday = 0; nday < 7; nday++) {
       [self addSubview:AUTORELEASE([[WeekDayView alloc] initWithFrame:frame forDay:date])];
       [date incrementDay];
     }
+    [date release];
   }
+}
+- (id)initWithFrame:(NSRect)frameRect
+{
+  self = [super initWithFrame:frameRect];
+  if (self)
+    [self setDate:[Date today]];
   return self;
 }
 
@@ -215,6 +223,7 @@ static struct {
   Event *apt;
   NSSet *events;
 
+  [self setDate:[dataSource selectedDate]];
   enumerator = [[self subviews] objectEnumerator];
   while ((wdv = [enumerator nextObject])) {
     [wdv clear];
@@ -223,11 +232,6 @@ static struct {
     while ((apt = [enm nextObject]))
       [wdv addAppointment:apt];
   }
-  [self setNeedsDisplay:YES];
-}
-
-- (void)mouseDown:(NSEvent *)theEvent
-{
 }
 
 - (BOOL)acceptsFirstResponder
