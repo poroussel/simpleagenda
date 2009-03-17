@@ -226,11 +226,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)addAppointment:(id)sender
 {
-  Date *date = [[calendar date] copy];
+  Date *date;
+
+  date = [[calendar date] copy];
   [date setMinute:[self _sensibleStartForDuration:60]];
   Event *apt = [[Event alloc] initWithStartDate:date duration:60 title:@"edit title..."];
-  if (apt && [_editor editAppointment:apt])
-    [tabs selectTabViewItemWithIdentifier:@"Day"];
+  if (apt && [_editor editAppointment:apt]) {
+    if (![[[tabs selectedTabViewItem] identifier] isEqualToString:@"Day"] && 
+	![[[tabs selectedTabViewItem] identifier] isEqualToString:@"Week"])
+      [tabs selectTabViewItemWithIdentifier:@"Day"];
+  }
   [date release];
   [apt release];
 }
@@ -526,11 +531,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
   id object = [item valueForKey:@"object"];
-  NSString *tabIdentifier = [[tabs selectedTabViewItem] identifier];;
+  NSString *tabIdentifier = [[tabs selectedTabViewItem] identifier];
 
   if (object && [object isKindOfClass:[Event class]]) {
     [calendar setDate:[item valueForKey:@"date"]];
-    if (![tabIdentifier isEqualToString:@"Day"])
+    if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
       [tabs selectTabViewItemWithIdentifier:@"Day"];
     [selectionManager set:object];
     return YES;
@@ -584,8 +589,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Date *date = [[calendar date] copy];
   [date setMinute:start];
   Event *apt = [[Event alloc] initWithStartDate:date 
-			      duration:end - start 
-			      title:@"edit title..."];
+   			               duration:end - start 
+			                  title:@"edit title..."];
   if (apt)
     [_editor editAppointment:apt];
   [date release];
