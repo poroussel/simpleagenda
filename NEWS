@@ -10,6 +10,7 @@ version 0.38
 	* Fix ticket 8
 	* Use libical recurrence handling and remove our old junk
 	* Add menu entries to quickly change the selected date
+	* Change date navigation in the calendar and reduce its size
 
 version 0.37 (2008/11/02)
 	* Fix buglets uncovered by libical 0.41

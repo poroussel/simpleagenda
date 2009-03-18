@@ -20,7 +20,26 @@
 }
 @end
 
+
 @implementation CalendarView
+static NSImage *_1left;
+static NSImage *_2left;
+static NSImage *_1right;
+static NSImage *_2right;
++ (void)initialize
+{
+  NSString *path;
+
+  path = [[NSBundle mainBundle] pathForImageResource:@"1left"];
+  _1left = [[NSImage alloc] initWithContentsOfFile:path];
+  path = [[NSBundle mainBundle] pathForImageResource:@"2left"];
+  _2left = [[NSImage alloc] initWithContentsOfFile:path];
+  path = [[NSBundle mainBundle] pathForImageResource:@"1right"];
+  _1right = [[NSImage alloc] initWithContentsOfFile:path];
+  path = [[NSBundle mainBundle] pathForImageResource:@"2right"];
+  _2right = [[NSImage alloc] initWithContentsOfFile:path];
+}
+
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -34,8 +53,10 @@
   [normalFont release];
   [title release];
   [matrix release];
-  [month release];
-  [stepper release];
+  [obl release];
+  [tbl release];
+  [obr release];
+  [tbr release];
   [super dealloc];
 }
 
@@ -49,14 +70,13 @@
 
   self = [super initWithFrame:frame];
   if (self) {
-    NSArray *months = [[NSUserDefaults standardUserDefaults] objectForKey:NSMonthNameArray];
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
     delegate = nil;
     dataSource = nil;
 
-    title = [[NSTextField alloc] initWithFrame: NSMakeRect(85, 142, 80, 20)];
+    title = [[NSTextField alloc] initWithFrame: NSMakeRect(40, 128, 155, 20)];
     [title setEditable:NO];
     [title setDrawsBackground:NO];
     [title setBezeled:NO];
@@ -66,26 +86,31 @@
     [title setAlignment: NSCenterTextAlignment];
     [self addSubview: title];
 
-    month = [[NSPopUpButton alloc] initWithFrame: NSMakeRect(8, 140, 80, 25)];
-    [month setFont:normalFont];
-    [month addItemsWithTitles: months];
-    [month setTarget: self];
-    [month setAction: @selector(selectMonth:)];
-    [self addSubview: month];
-
-    text = [[NSTextField alloc] initWithFrame: NSMakeRect(164, 142, 40, 21)];
-    [text setEditable: NO];
-    [text setAlignment: NSRightTextAlignment];
-    [text setFont:normalFont];
-    [self addSubview: text];
-
-    stepper = [[NSStepper alloc] initWithFrame: NSMakeRect(206, 140, 16, 25)];
-    [stepper setMinValue: 1970];
-    [stepper setMaxValue: 2037];
-    [stepper setTarget: self];
-    [stepper setAction: @selector(selectYear:)];
-    [stepper setFont:normalFont];
-    [self addSubview: stepper];
+    tbl = [[NSButton alloc] initWithFrame:NSMakeRect(9, 128, 12, 20)];
+    [tbl setImage:_2left];
+    [tbl setBordered:NO];
+    [tbl setTarget:self];
+    [tbl setAction:@selector(previousYear:)];
+    [self addSubview:tbl];
+    obl = [[NSButton alloc] initWithFrame:NSMakeRect(23, 128, 12, 20)];
+    [obl setImage:_1left];
+    [obl setBordered:NO];
+    [obl setTarget:self];
+    [obl setAction:@selector(previousMonth:)];
+    [self addSubview:obl];
+    obr = [[NSButton alloc] initWithFrame:NSMakeRect(200, 128, 12, 20)];
+    [obr setButtonType:NSMomentaryPushInButton];
+    [obr setImage:_1right];
+    [obr setBordered:NO];
+    [obr setTarget:self];
+    [obr setAction:@selector(nextMonth:)];
+    [self addSubview:obr];
+    tbr = [[NSButton alloc] initWithFrame:NSMakeRect(214, 128, 12, 20)];
+    [tbr setImage:_2right];
+    [tbr setBordered:NO];
+    [tbr setTarget:self];
+    [tbr setAction:@selector(nextYear:)];
+    [self addSubview:tbr];
 
     NSTextFieldCell *cell = [NSTextFieldCell new];
     [cell setEditable: NO];
@@ -93,7 +118,7 @@
     [cell setAlignment: NSRightTextAlignment];
     [cell setFont:normalFont];
 
-    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 8, 220, 128)
+    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
 			       mode: NSListModeMatrix
 			       prototype: cell
 			       numberOfRows: 7
@@ -226,27 +251,33 @@
     [delegate calendarView:self currentDateChanged:[Date today]];
 }
 
-- (void)selectMonth:(id)sender
+- (void)previousYear:(id)sender
 {
-  int idx = [month indexOfSelectedItem] + 1;
+  Date *cdate = AUTORELEASE([date copy]);
 
-  [date setMonth: idx];
-  [monthDisplayed setMonth: idx];
-  [self updateView];
-  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
-    [delegate calendarView:self selectedDateChanged:date];
+  [cdate setYear:[cdate year]-1];
+  [self setDate:cdate];
 }
-
-- (void)selectYear:(id)sender
+- (void)previousMonth:(id)sender
 {
-  int year = [stepper intValue];
+  Date *cdate = AUTORELEASE([date copy]);
 
-  [text setIntValue: year];
-  [date setYear: year];
-  [monthDisplayed setYear: year];
-  [self updateView];
-  if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
-    [delegate calendarView:self selectedDateChanged:date];
+  [cdate setMonth:[cdate monthOfYear]-1];
+  [self setDate:cdate];
+}
+- (void)nextMonth:(id)sender
+{
+  Date *cdate = AUTORELEASE([date copy]);
+
+  [cdate setMonth:[cdate monthOfYear]+1];
+  [self setDate:cdate];
+}
+- (void)nextYear:(id)sender
+{
+  Date *cdate = AUTORELEASE([date copy]);
+
+  [cdate setYear:[cdate year]+1];
+  [self setDate:cdate];
 }
 
 - (void)selectDay:(id)sender
@@ -281,9 +312,6 @@
 {
   ASSIGNCOPY(date, nDate);
   ASSIGNCOPY(monthDisplayed, nDate);
-  [text setIntValue: [nDate year]];
-  [stepper setIntValue: [nDate year]];
-  [month selectItemAtIndex: [nDate monthOfYear] - 1];
   [self updateView];
   if ([delegate respondsToSelector:@selector(calendarView:selectedDateChanged:)])
     [delegate calendarView:self selectedDateChanged:date];
@@ -295,7 +323,7 @@
 
 - (NSString *)dateAsString
 {
-  return [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
+  return [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]];
 }
 
 - (void)setDataSource:(NSObject <AgendaDataSource> *)source

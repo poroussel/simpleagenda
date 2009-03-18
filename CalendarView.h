@@ -6,11 +6,12 @@
 @interface CalendarView : NSView
 {
   NSTextField *title;
+  NSButton *obl;
+  NSButton *tbl;
+  NSButton *obr;
+  NSButton *tbr;
   Date *date;
   Date *monthDisplayed;
-  NSPopUpButton *month;
-  NSStepper *stepper;
-  NSTextField *text;
   NSMatrix *matrix;
   NSFont *normalFont;
   NSFont *boldFont;
