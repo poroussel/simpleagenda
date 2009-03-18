@@ -17,7 +17,12 @@
 	    "exportAppointment:",
 	    "doSearch:",
 	    "clearSearch:",
-	    "reloadAll:"
+	    "reloadAll:",
+	    "previousWeek:",
+	    "nextDay:",
+	    "nextWeek:",
+	    "previousDay:",
+	    "today:"
 	);
 	Outlets = (
 	    calendar,
@@ -69,12 +74,17 @@
 	    "doSearch:",
 	    "editAppointment:",
 	    "exportAppointment:",
-	    "reloadAll:",
+	    "previousWeek:",
+	    "nextDay:",
+	    "nextWeek:",
 	    "orderFrontFontPanel:",
+	    "previousDay:",
+	    "reloadAll:",
 	    "saveAll:",
 	    "setDataSource:",
 	    "setDelegate:",
 	    "showPrefPanel:",
+	    "today:",
 	    "updateDate:",
 	    "updateView:"
 	);

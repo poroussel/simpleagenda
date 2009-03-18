@@ -53,5 +53,10 @@
 - (void)exportAppointment:(id)sender;
 - (void)doSearch:(id)sender;
 - (void)clearSearch:(id)sender;
+- (void)today:(id)sender;
+- (void)nextDay:(id)sender;
+- (void)previousDay:(id)sender;
+- (void)nextWeek:(id)sender;
+- (void)previousWeek:(id)sender;
 - (void)updateSummaryData;
 @end

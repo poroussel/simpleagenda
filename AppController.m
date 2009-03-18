@@ -368,6 +368,38 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   }
 }
 
+- (void)today:(id)sender
+{
+  [calendar setDate:[Date today]];
+}
+- (void)nextDay:(id)sender
+{
+  Date *cd = [calendar date];
+  [cd incrementDay];
+  [calendar setDate:cd];
+}
+
+- (void)previousDay:(id)sender
+{
+  Date *cd = [calendar date];
+  [cd changeDayBy:-1];
+  [calendar setDate:cd];
+}
+
+- (void)nextWeek:(id)sender
+{
+  Date *cd = [[Date alloc] initWithTimeInterval:86400*7 sinceDate:[calendar date]];
+  [calendar setDate:cd];
+  [cd release];
+}
+
+- (void)previousWeek:(id)sender
+{
+  Date *cd = [[Date alloc] initWithTimeInterval:86400*-7 sinceDate:[calendar date]];
+  [calendar setDate:cd];
+  [cd release];
+}
+
 - (void)performSearch
 {
   NSEnumerator *enumerator;
@@ -564,6 +596,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab)
     [tabs selectTabViewItem:dayTab];
   [tabs setNeedsDisplay:YES];
+  /* [[NSApp mainWindow] setTitle:[NSString stringWithFormat:@"SimpleAgenda - %@", [calendar dateAsString]]]; */
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
