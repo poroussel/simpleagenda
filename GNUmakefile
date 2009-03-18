@@ -7,7 +7,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 #
 # Application
 #
-VERSION = 0.37
+VERSION = 0.38
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff
@@ -32,9 +32,9 @@ Resources/Calendar.tiff \
 Resources/ical-file.tiff \
 Resources/repeat.tiff \
 Resources/1left.tiff \
-Resources/2left.tiff \
 Resources/1right.tiff \
-Resources/2right.tiff
+Resources/2left.tiff \
+Resources/2right.tiff 
 
 
 #

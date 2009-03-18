@@ -1,4 +1,4 @@
-version 0.38
+version 0.38 (2009/03/18)
 	* Fix tickets #6 and #7
 	* Add a preliminary week view
 	* Use a SelectionManager instead of various workarounds
@@ -7,7 +7,7 @@ version 0.38
 	* Add a tests/ folder with what should become a test suite
 	* Automatic refresh and refresh interval in the preferences
 	  panel, enabled only for the backends that support it
-	* Fix ticket 8
+	* Fix ticket #8
 	* Use libical recurrence handling and remove our old junk
 	* Add menu entries to quickly change the selected date
 	* Change date navigation in the calendar and reduce its size

@@ -25,9 +25,9 @@
 	WebDAVResource.m,
 	WeekView.m,
 	AppointmentView.m,
-	SelectionManager.m
-	RecurrenceRule.m
-	NSColor+SimpleAgenda.m
+	SelectionManager.m,
+	RecurrenceRule.m,
+	"NSColor+SimpleAgenda.m"
     );
     COMPILEROPTIONS = "";
     CPPOPTIONS = "";
@@ -61,14 +61,18 @@
 	WebDAVResource.h,
 	WeekView.h,
 	AppointmentView.h,
-	SelectionManager.h
-	RecurrenceRule.h
-	NSColor+SimpleAgenda.h
+	SelectionManager.h,
+	RecurrenceRule.h,
+	"NSColor+SimpleAgenda.h"
     );
     IMAGES = (
 	Calendar.tiff,
 	"ical-file.tiff",
-	repeat.tiff
+	repeat.tiff,
+	1left.tiff,
+	1right.tiff,
+	2left.tiff,
+	2right.tiff
     );
     INSTALLDIR = "$(HOME)/GNUstep";
     INTERFACES = (
@@ -80,7 +84,7 @@
 	GroupDAV.gorm
     );
     LANGUAGE = English;
-    LAST_EDITING = "2009-02-04 16:27:12 +0100";
+    LAST_EDITING = "2009-03-18 21:07:34 +0100";
     LIBRARIES = (
 	"gnustep-base",
 	"gnustep-gui",
@@ -106,7 +110,7 @@
     PROJECT_AUTHORS = (
 	"Philippe Roussel <p.o.roussel@free.fr>"
     );
-    PROJECT_COPYRIGHT = "Copyright (C) 2007, 2008";
+    PROJECT_COPYRIGHT = "Copyright (C) 2007-2009";
     PROJECT_COPYRIGHT_DESC = "Released under GPL Version 2 or any later version";
     PROJECT_CREATOR = "Philippe Roussel";
     PROJECT_DESCRIPTION = "Simple agenda and calendar application";
@@ -125,7 +129,7 @@
     PROJECT_GROUP = "No group avaliable!";
     PROJECT_MAINTAINER = "Philippe Roussel <p.o.rousse@free.fr>";
     PROJECT_NAME = SimpleAgenda;
-    PROJECT_RELEASE = 0.37;
+    PROJECT_RELEASE = 0.38;
     PROJECT_SUMMARY = "No summary avaliable!";
     PROJECT_TYPE = Application;
     PROJECT_URL = "http://coyote.octets.fr/simpleagenda/";
