@@ -4,13 +4,15 @@
 #import "MemoryStore.h"
 #import "Date.h"
 
-enum classificationType
-{
-  CT_NONE = 0, 
-  CT_PUBLIC, 
-  CT_PRIVATE, 
-  CT_CONFIDENTIAL 
-};
+/*
+  icalproperty_class
+
+  ICAL_CLASS_X = 10006,
+  ICAL_CLASS_PUBLIC = 10007,
+  ICAL_CLASS_PRIVATE = 10008,
+  ICAL_CLASS_CONFIDENTIAL = 10009,
+  ICAL_CLASS_NONE = 10010
+*/
 
 @interface Element : NSObject <NSCoding>
 {
@@ -18,7 +20,7 @@ enum classificationType
   NSString *_uid;
   NSString *_summary;
   NSAttributedString *_text;
-  enum classificationType _classification;
+  icalproperty_class _classification;
   Date *_stamp;
 }
 
@@ -28,14 +30,14 @@ enum classificationType
 - (NSAttributedString *)text;
 - (NSString *)summary;
 - (NSString *)UID;
-- (enum classificationType)classification;
+- (icalproperty_class)classification;
 - (Date *)dateStamp;
 
 - (void)setStore:(id <MemoryStore>)store;
 - (void)setText:(NSAttributedString *)text;
 - (void)setSummary:(NSString *)summary;
 - (void)setUID:(NSString *)uid;
-- (void)setClassification:(enum classificationType)classification;
+- (void)setClassification:(icalproperty_class)classification;
 - (void)setDateStamp:(Date *)stamp;
 
 - (id)initWithICalComponent:(icalcomponent *)ic;

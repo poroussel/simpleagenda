@@ -23,7 +23,7 @@
   if ([coder containsValueForKey:@"classification"])
     _classification = [coder decodeIntForKey:@"classification"];
   else
-    _classification = CT_PUBLIC;
+    _classification = ICAL_CLASS_PUBLIC;
   if ([coder containsValueForKey:@"dtstamp"])
     _stamp = [[coder decodeObjectForKey:@"dtstamp"] retain];
   else
@@ -113,11 +113,11 @@
   ASSIGNCOPY(_uid, aUid);
 }
 
-- (enum classificationType)classification
+- (icalproperty_class)classification
 {
   return _classification;
 }
-- (void)setClassification:(enum classificationType)classification
+- (void)setClassification:(icalproperty_class)classification
 {
   _classification = classification;
 }
@@ -165,6 +165,9 @@
     [self setDateStamp:date];
     [date release];
   }
+  prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
+  if (prop)
+    [self setClassification:icalproperty_get_class(prop)];
   return self;
  init_error:
   NSLog(@"Error creating Element from iCal component");
@@ -208,6 +211,7 @@
     icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
   [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp iCalTime]));
+  icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   return YES;
 }
 - (int)iCalComponentType
