@@ -1,8 +1,8 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <Foundation/Foundation.h>
+#import <ical.h>
 #import "Element.h"
-#import "ical.h"
 
 @interface iCalTree : NSObject
 {
