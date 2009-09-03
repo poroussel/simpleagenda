@@ -49,7 +49,7 @@
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle
 {
-  self = [self initWithSummary:aTitle];
+  self = [super initWithSummary:aTitle];
   if (self) {
     [self setStartDate:start];
     [self setDuration:minutes];
