@@ -211,6 +211,7 @@
     icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
   [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp iCalTime]));
+  [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   return YES;
 }
