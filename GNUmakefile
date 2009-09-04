@@ -56,7 +56,8 @@ WeekView.h \
 AppointmentView.h \
 SelectionManager.h \
 RecurrenceRule.h \
-NSColor+SimpleAgenda.h
+NSColor+SimpleAgenda.h \
+config.h
 
 #
 # Class files

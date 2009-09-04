@@ -3,7 +3,10 @@
 #
 
 # Things to do before compiling
-# before-all::
+before-all:: config.h
+
+config.h: config.h.in
+	./configure
 
 # Things to do after compiling
 # after-all::
@@ -30,7 +33,8 @@
 # before-distclean::
 
 # Things to do after distcleaning
-# after-distclean::
+after-distclean::
+	-rm -f config.h config.log config.status
   
 # Things to do before checking
 # before-check::
