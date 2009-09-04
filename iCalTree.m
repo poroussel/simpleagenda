@@ -128,8 +128,10 @@
 - (BOOL)update:(Element *)elt
 {
   icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic)
+  if (!ic) {
+    NSLog(@"No iCal component found for %@", [elt description]);
     return NO;
+  }
   return [elt updateICalComponent:ic];
 }
 @end
