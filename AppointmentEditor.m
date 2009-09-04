@@ -89,7 +89,7 @@
     } else {
       RecurrenceRule *rule;
       if ([until state] && [endDate objectValue])
-	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2 until:AUTORELEASE([[Date alloc] initWithCalendarDate:[endDate objectValue] withTime:NO])];
+	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2 until:[Date dateWithCalendarDate:[endDate objectValue] withTime:NO]];
       else
 	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2];
       [data setRRule:AUTORELEASE(rule)];

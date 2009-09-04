@@ -388,16 +388,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)nextWeek:(id)sender
 {
-  Date *cd = [[Date alloc] initWithTimeInterval:86400*7 sinceDate:[calendar date]];
-  [calendar setDate:cd];
-  [cd release];
+  [calendar setDate:[Date dateWithTimeInterval:86400*7 sinceDate:[calendar date]]];
 }
 
 - (void)previousWeek:(id)sender
 {
-  Date *cd = [[Date alloc] initWithTimeInterval:86400*-7 sinceDate:[calendar date]];
-  [calendar setDate:cd];
-  [cd release];
+  [calendar setDate:[Date dateWithTimeInterval:86400*-7 sinceDate:[calendar date]]];
 }
 
 - (void)performSearch

@@ -115,46 +115,47 @@ static NSTimeZone *gl_nstz = nil;
   }
   return self;
 }
-- (id)initWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
-{
-  self = [self init];
-  if (self) {
-    _time.is_date = !time;
-    _time.year = [cd yearOfCommonEra];
-    _time.month = [cd monthOfYear];
-    _time.day = [cd dayOfMonth];
-    if (time) {
-      _time.hour = [cd hourOfDay];
-      _time.minute = [cd minuteOfHour];
-      _time.second = [cd secondOfMinute];
-    } else {
-      _time.hour = 0;
-      _time.minute = 0;
-      _time.second = 0;
-    }
-    /* FIXME : use NSCalendarDate Timezone ? */
-  }
-  return self;
-}
-- (id)initWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate
-{
-  self = [super init];
-  if (self) {
-    _time = refDate->_time;
-    /* To be able to add hours and minutes, it has to be a datetime */
-    _time.is_date = 0;
-    _time = icaltime_add(_time, icaldurationtype_from_int(seconds));
-  }
-  return self;
-}
+
 + (id)now
 {
   return AUTORELEASE([[Date alloc] init]);
 }
+
 + (id)today
 {
   Date *d = [[Date alloc] init];
   [d setDate:YES];
+  return AUTORELEASE(d);
+}
+
++ (id)dateWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate
+{
+  Date *d = [[Date alloc] init];
+  
+  d->_time = refDate->_time;
+  /* To be able to add hours and minutes, it has to be a datetime */
+  d-> _time.is_date = 0;
+  d->_time = icaltime_add(d->_time, icaldurationtype_from_int(seconds));
+  return AUTORELEASE(d);
+}
+
++ (id)dateWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
+{
+  Date *d = [[Date alloc] init];
+  
+  d->_time.is_date = !time;
+  d->_time.year = [cd yearOfCommonEra];
+  d->_time.month = [cd monthOfYear];
+  d->_time.day = [cd dayOfMonth];
+  if (time) {
+    d->_time.hour = [cd hourOfDay];
+    d->_time.minute = [cd minuteOfHour];
+    d->_time.second = [cd secondOfMinute];
+  } else {
+    d->_time.hour = 0;
+    d->_time.minute = 0;
+    d->_time.second = 0;
+  }
   return AUTORELEASE(d);
 }
 
