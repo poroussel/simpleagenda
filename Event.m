@@ -5,11 +5,6 @@
 #import <Foundation/Foundation.h>
 #import "Event.h"
 
-/* To be removed when in a few releases */
-@interface Event(BeforeRRule)
-- (void)initRRuleFromOldFormatWithCoder:(NSCoder *)coder;
-@end
-
 @implementation Event(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
 {
@@ -32,8 +27,6 @@
     _allDay = NO;
   if ([coder containsValueForKey:@"rrule"])
     rrule = [[coder decodeObjectForKey:@"rrule"] retain];
-  else
-    [self initRRuleFromOldFormatWithCoder:coder];
   return self;
 }
 @end
@@ -268,42 +261,5 @@
 - (int)iCalComponentType
 {
   return ICAL_VEVENT_COMPONENT;
-}
-@end
-
-@implementation Event(BeforeRRule)
-enum intervalType
-{
-  RI_NONE = 0, 
-  RI_DAILY, 
-  RI_WEEKLY, 
-  RI_MONTHLY, 
-  RI_YEARLY
-};
-- (void)initRRuleFromOldFormatWithCoder:(NSCoder *)coder
-{
-  Date *end;
-  enum intervalType interval;
-  recurrenceFrequency frenquency;
-
-  interval = [coder decodeIntForKey:@"interval"];
-  end = [[coder decodeObjectForKey:@"edate"] retain];
-  switch (interval) {
-  case RI_DAILY:
-    frenquency = recurrenceFrequenceDaily;
-    break;
-  case RI_WEEKLY:
-    frenquency = recurrenceFrequenceWeekly;
-    break;
-  case RI_MONTHLY:
-    frenquency = recurrenceFrequenceMonthly;
-    break;
-  case RI_YEARLY:
-    frenquency = recurrenceFrequenceYearly;
-    break;
-  case RI_NONE:
-    return;
-  }
-  rrule = [[RecurrenceRule alloc] initWithFrequency:frenquency until:end];
 }
 @end
