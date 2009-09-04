@@ -27,39 +27,6 @@ Resources/2left.tiff \
 Resources/2right.tiff 
 
 #
-# Header files
-#
-SimpleAgenda_HEADER_FILES = \
-AppController.h \
-AgendaStore.h \
-LocalStore.h \
-AppointmentEditor.h \
-CalendarView.h \
-StoreManager.h \
-DayView.h \
-Event.h \
-PreferencesController.h \
-HourFormatter.h \
-UserDefaults.h \
-iCalStore.h \
-ConfigManager.h \
-Date.h \
-iCalTree.h \
-DataTree.h \
-Element.h \
-Task.h \
-TaskEditor.h \
-MemoryStore.h \
-GroupDAVStore.h \
-WebDAVResource.h \
-WeekView.h \
-AppointmentView.h \
-SelectionManager.h \
-RecurrenceRule.h \
-NSColor+SimpleAgenda.h \
-config.h
-
-#
 # Class files
 #
 SimpleAgenda_OBJC_FILES = \
