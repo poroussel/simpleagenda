@@ -5,7 +5,6 @@
 #import "defines.h"
 
 @implementation MemoryStore
-
 - (NSDictionary *)defaults
 {
   return nil;
@@ -13,14 +12,11 @@
 
 - (id)initWithName:(NSString *)name
 {
-  NSString *filename;
-
   self = [super init];
   if (self) {
     _name = [name copy];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
     [_config registerDefaults:[self defaults]];
-    filename = [_config objectForKey:ST_FILE];
     _modified = NO;
     _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
@@ -118,7 +114,6 @@
 {
   return _writable;
 }
-
 - (void)setWritable:(BOOL)writable
 {
   _writable = writable;
@@ -130,12 +125,10 @@
 {
   return _modified;
 }
-
 - (void)setModified:(BOOL)modified
 {
   _modified = modified;
 }
-
 - (NSString *)description
 {
   return _name;
@@ -143,33 +136,26 @@
 
 - (NSColor *)eventColor
 {
-  NSData *theData =[_config objectForKey:ST_COLOR];
-  return [NSUnarchiver unarchiveObjectWithData:theData];
+  return [NSUnarchiver unarchiveObjectWithData:[_config objectForKey:ST_COLOR]];
 }
-
 - (void)setEventColor:(NSColor *)color
 {
-  NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_config setObject:data forKey:ST_COLOR];
+  [_config setObject:[NSArchiver archivedDataWithRootObject:color] forKey:ST_COLOR];
 }
 
 - (NSColor *)textColor
 {
-  NSData *theData =[_config objectForKey:ST_TEXT_COLOR];
-  return [NSUnarchiver unarchiveObjectWithData:theData];
+  return [NSUnarchiver unarchiveObjectWithData:[_config objectForKey:ST_TEXT_COLOR]];
 }
-
 - (void)setTextColor:(NSColor *)color
 {
-  NSData *data = [NSArchiver archivedDataWithRootObject:color];
-  [_config setObject:data forKey:ST_TEXT_COLOR];
+  [_config setObject:[NSArchiver archivedDataWithRootObject:color] forKey:ST_TEXT_COLOR];
 }
 
 - (BOOL)displayed
 {
   return _displayed;
 }
-
 - (void)setDisplayed:(BOOL)state
 {
   _displayed = state;
@@ -181,7 +167,6 @@
 {
   return _enabled;
 }
-
 - (void)setEnabled:(BOOL)state
 {
   _enabled = state;
