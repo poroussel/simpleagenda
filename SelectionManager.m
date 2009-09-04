@@ -1,9 +1,8 @@
 #import <Foundation/Foundation.h>
 #import "SelectionManager.h"
 
-
 @implementation SelectionManager(Private)
-- (SelectionManager *)init
+- (id)init
 {
   self = [super init];
   if (self) {
@@ -14,10 +13,7 @@
 }
 @end
 
-
-
 @implementation SelectionManager
-
 + (SelectionManager *)globalManager
 {
   static SelectionManager *singleton;
