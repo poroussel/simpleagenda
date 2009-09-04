@@ -1,7 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <Foundation/Foundation.h>
-#import <ical.h>
+#import "ical.h"
 #import "Date.h"
 
 typedef enum 

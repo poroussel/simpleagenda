@@ -1,6 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import <ical.h>
+#import "ical.h"
 #import "MemoryStore.h"
 #import "Date.h"
 
