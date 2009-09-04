@@ -5,10 +5,10 @@
 #import "defines.h"
 
 #define CurrentVersion 2
+/* FIXME : this shouldn't be hardcoded */
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
 @implementation LocalStore
-
 - (NSDictionary *)defaults
 {
   return [NSDictionary dictionaryWithObjectsAndKeys:
@@ -22,13 +22,10 @@
 
 - (id)initWithName:(NSString *)name
 {
-  NSString *filename;
-
   self = [super initWithName:name];
   if (self) {
-    filename = [_config objectForKey:ST_FILE];
     _globalPath = [[LocalAgendaPath stringByExpandingTildeInPath] retain];
-    _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, filename, nil]] retain];
+    _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, [_config objectForKey:ST_FILE], nil]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
     [self read];
   }
@@ -42,6 +39,7 @@
   cm = [[ConfigManager alloc] initForKey:name withParent:nil];
   [cm setObject:[name copy] forKey:ST_FILE];
   [cm setObject:[[self class] description] forKey:ST_CLASS];
+  /* FIXME : shouldn't we release cm ? */
   return YES;
 }
 
