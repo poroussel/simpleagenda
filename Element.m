@@ -195,10 +195,6 @@
   prop = icalcomponent_get_first_property(ic, kind);
   if (prop)
       icalcomponent_remove_property(ic, prop);
-  /*
-   * while ((prop = icalcomponent_get_next_property(ic, kind)))
-   *  icalcomponent_remove_property(ic, prop);
-   */
 }
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
