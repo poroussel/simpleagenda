@@ -12,6 +12,7 @@
   if (_stamp)
     [coder encodeObject:_stamp forKey:@"dtstamp"];
 }
+
 -(id)initWithCoder:(NSCoder *)coder
 {
   _summary = [[coder decodeObjectForKey:@"title"] retain];
@@ -64,6 +65,7 @@
 {
   return _store;
 }
+
 - (void)setStore:(id <MemoryStore>)store
 {
   ASSIGN(_store, store);
@@ -73,6 +75,7 @@
 {
   return _text;
 }
+
 - (void)setText:(NSAttributedString *)text
 {
   ASSIGN(_text, text);
@@ -82,6 +85,7 @@
 {
   return _summary;
 }
+
 - (void)setSummary:(NSString *)summary
 {
   ASSIGN(_summary, summary);
@@ -105,10 +109,12 @@
   }
   [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@-%d-%@", [now description], counter, [[NSHost currentHost] address]]];
 }
+
 - (NSString *)UID
 {
   return _uid;
 }
+
 - (void)setUID:(NSString *)aUid;
 {
   ASSIGNCOPY(_uid, aUid);
@@ -118,6 +124,7 @@
 {
   return _classification;
 }
+
 - (void)setClassification:(icalproperty_class)classification
 {
   _classification = classification;
@@ -127,6 +134,7 @@
 {
   return _stamp;
 }
+
 - (void)setDateStamp:(Date *)stamp;
 {
   ASSIGNCOPY(_stamp, stamp);
@@ -135,37 +143,28 @@
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
-  Date *date;
 
   self = [self init];
   if (self == nil)
     return nil;
-
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
   if (!prop) {
     NSLog(@"No UID");
     goto init_error;
   }
-  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
-    
+  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];    
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
   if (!prop) {
     NSLog(@"No summary");
     goto init_error;
   }
-  [self setSummary:[NSString stringWithCString:icalproperty_get_summary(prop) encoding:NSUTF8StringEncoding]];
+  [self setSummary:[NSString stringWithUTF8String:icalproperty_get_summary(prop)]];
   prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-  if (prop) {
-    NSAttributedString *as = [[NSAttributedString alloc] initWithString:[NSString stringWithCString:icalproperty_get_description(prop) encoding:NSUTF8StringEncoding]];
-    [self setText:as];
-    [as release];
-  }
+  if (prop)
+    [self setText:AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]])];
   prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
-  if (prop) {
-    date = [[Date alloc] initWithICalTime:icalproperty_get_dtstamp(prop)];
-    [self setDateStamp:date];
-    [date release];
-  }
+  if (prop)
+    [self setDateStamp:AUTORELEASE([[Date alloc] initWithICalTime:icalproperty_get_dtstamp(prop)])];
   prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
   if (prop)
     [self setClassification:icalproperty_get_class(prop)];
@@ -189,6 +188,7 @@
   }
   return ic;
 }
+
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
@@ -196,6 +196,7 @@
   if (prop)
       icalcomponent_remove_property(ic, prop);
 }
+
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];
@@ -212,6 +213,7 @@
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   return YES;
 }
+
 - (int)iCalComponentType
 {
   NSLog(@"Shouldn't be used");

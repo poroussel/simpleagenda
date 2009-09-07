@@ -93,6 +93,7 @@
 {
   return _allDay;
 }
+
 - (void)setAllDay:(BOOL)allDay
 {
   [startDate setDate:allDay];
@@ -127,22 +128,27 @@
 {
   return duration;
 }
+
 - (Date *)startDate
 {
   return startDate;
 }
+
 - (RecurrenceRule *)rrule
 {
   return rrule;
 }
+
 - (void)setDuration:(int)newDuration
 {
   duration = newDuration;
 }
+
 - (void)setStartDate:(Date *)newStartDate
 {
   ASSIGNCOPY(startDate, newStartDate);
 }
+
 - (void)setRRule:(RecurrenceRule *)arule
 {
   /* RecurrenceRules can't be modified, no need to copy */
@@ -194,7 +200,7 @@
   [date release];
   location = icalcomponent_get_location(ic);
   if (location)
-    [self setLocation:[NSString stringWithCString:location encoding:NSUTF8StringEncoding]];
+    [self setLocation:[NSString stringWithUTF8String:location]];
   return self;
 
  init_error:
