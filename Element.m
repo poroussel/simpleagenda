@@ -127,6 +127,10 @@
 
 - (void)setClassification:(icalproperty_class)classification
 {
+  if (classification < ICAL_CLASS_X || classification > ICAL_CLASS_NONE) {
+    NSLog(@"Wrong classification value %d, change it to ICAL_CLASS_PUBLIC", classification);
+    classification = ICAL_CLASS_PUBLIC;
+  }
   _classification = classification;
 }
 
