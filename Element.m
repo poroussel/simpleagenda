@@ -169,7 +169,7 @@
   prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
   if (prop)
     [self setDateStamp:AUTORELEASE([[Date alloc] initWithICalTime:icalproperty_get_dtstamp(prop)])];
-  prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
+  prop = icalcomponent_get_first_property(ic, ICAL_CLASS_PROPERTY);
   if (prop)
     [self setClassification:icalproperty_get_class(prop)];
   return self;
