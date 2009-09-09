@@ -8,10 +8,8 @@
 {
   self = [super init];
   if (self) {
-    root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT,
-			       icalproperty_new_version("1.0"),
-			       icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"),
-			       0);
+    root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("1.0"),
+			       icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
     if (!root) {
       [self release];
       return nil;
@@ -30,7 +28,7 @@
 {
   icalcomponent *icomp;
 
-  icomp = icalparser_parse_string([string cStringUsingEncoding:NSUTF8StringEncoding]);
+  icomp = icalparser_parse_string([string UTF8String]);
   if (icomp) {
     icalcomponent_free(root);
     root = icomp;
@@ -41,10 +39,7 @@
 
 - (BOOL)parseData:(NSData *)data
 {
-  NSString *text;
-
-  text = AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-  return [self parseString:text];
+  return [self parseString:AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
 }
 
 - (NSString *)iCalTreeAsString
