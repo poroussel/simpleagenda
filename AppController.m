@@ -152,11 +152,17 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)applicationDidFinishLaunching:(NSNotification *)not
 {
   [NSApp setServicesProvider: self];
+  /*
+   * We should register these notifications before allocating
+   * the StoreManager to get all data updates. To avoid
+   * numerous invisible updates which would slow the startup,
+   * register only when the application is ready and force
+   * a global refresh with a false notification
+   */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
-  /* FIXME : this is overkill, we should only refresh the views... */
+  /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  [self updateSummaryData];
-  [calendar setDate:[Date today]];
+  [self dataChanged:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
