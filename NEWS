@@ -1,3 +1,9 @@
+version 0.39
+	* Code cleanups (as always)
+	* Fix empty Task tab on startup bug
+	* Add configure step to locate libical header and clean
+	  the makefile while we're at it
+
 version 0.38 (2009/03/18)
 	* Fix tickets #6 and #7
 	* Add a preliminary week view
