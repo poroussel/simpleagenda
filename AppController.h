@@ -59,4 +59,5 @@
 - (void)nextWeek:(id)sender;
 - (void)previousWeek:(id)sender;
 - (void)updateSummaryData;
+- (void)dataChanged:(NSNotification *)not;
 @end
