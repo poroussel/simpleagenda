@@ -32,10 +32,3 @@
 - (int)lastHour;
 - (int)minimumStep;
 @end
-
-@interface NSObject(DayViewDelegate)
-- (void)dayView:(DayView *)dayview editEvent:(Event *)event;
-- (void)dayView:(DayView *)dayview modifyEvent:(Event *)event;
-- (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end;
-- (void)dayView:(DayView *)dayview selectEvent:(Event *)event;
-@end

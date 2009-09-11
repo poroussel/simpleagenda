@@ -96,8 +96,8 @@
   BOOL inResize;
 
   if ([theEvent clickCount] > 1) {
-    if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
-      [delegate dayView:parent editEvent:_apt];
+    if ([delegate respondsToSelector:@selector(viewEditEvent:)])
+      [delegate viewEditEvent:_apt];
     return;
   }
   [self becomeFirstResponder];
@@ -156,8 +156,8 @@
     }
   }
   [NSCursor pop];
-  if (modified && [delegate respondsToSelector:@selector(dayView:modifyEvent:)])
-    [delegate dayView:parent modifyEvent:_apt];
+  if (modified && [delegate respondsToSelector:@selector(viewModifyEvent:)])
+    [delegate viewModifyEvent:_apt];
 }
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
@@ -333,8 +333,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 {
   /* FIXME : why don't we add it to the SelectionManager ourselves ? */
   _selected = aptv;
-  if ([delegate respondsToSelector:@selector(dayView:selectEvent:)])
-    [delegate dayView:self selectEvent:[aptv appointment]];
+  if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
+    [delegate viewSelectEvent:[aptv appointment]];
   [self setNeedsDisplay:YES];
 }
 
@@ -404,8 +404,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   if (ABS(_startPt.y - _endPt.y) > 7 && [self mouse:_endPt inRect:[self bounds]]) {
     start = [self positionToMinute:MAX(_startPt.y, _endPt.y)];
     end = [self positionToMinute:MIN(_startPt.y, _endPt.y)];
-    if ([delegate respondsToSelector:@selector(dayView:createEventFrom:to:)])
-      [delegate dayView:self createEventFrom:[self roundMinutes:start] to:[self roundMinutes:end]];
+    if ([delegate respondsToSelector:@selector(viewCreateEventFrom:to:)])
+      [delegate viewCreateEventFrom:[self roundMinutes:start] to:[self roundMinutes:end]];
   }
   _startPt = _endPt = NSMakePoint(0, 0);
   [self setNeedsDisplay:YES];
@@ -423,8 +423,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   case '\r':
   case NSEnterCharacter: 
     if (_selected != nil) {
-      if ([delegate respondsToSelector:@selector(dayView:editEvent:)])
-	[delegate dayView:self editEvent:[_selected appointment]];
+      if ([delegate respondsToSelector:@selector(viewEditEvent:)])
+	[delegate viewEditEvent:[_selected appointment]];
       return;
     }
   case NSUpArrowFunctionKey:
@@ -459,8 +459,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:-_minStep];
     [_selected setFrame:[self frameForAppointment:[_selected appointment]]];
-    if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
-      [delegate dayView:self modifyEvent:[_selected appointment]];
+    if ([delegate respondsToSelector:@selector(viewModifyEvent:)])
+      [delegate viewModifyEvent:[_selected appointment]];
   }
 }
 
@@ -469,8 +469,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   if (_selected != nil) {
     [[[_selected appointment] startDate] changeMinuteBy:_minStep];
     [_selected setFrame:[self frameForAppointment:[_selected appointment]]];
-    if ([delegate respondsToSelector:@selector(dayView:modifyEvent:)])
-      [delegate dayView:self modifyEvent:[_selected appointment]];
+    if ([delegate respondsToSelector:@selector(viewModifyEvent:)])
+      [delegate viewModifyEvent:[_selected appointment]];
   }
 }
 

@@ -610,16 +610,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 @end
 
-@implementation AppController(DayViewDelegate)
-- (void)dayView:(DayView *)dayview editEvent:(Event *)event;
+@implementation AppController(AppointmentViewDelegate)
+- (void)viewEditEvent:(Event *)event;
 {
   [_editor editAppointment:event];
 }
-- (void)dayView:(DayView *)dayview modifyEvent:(Event *)event
+- (void)viewModifyEvent:(Event *)event
 {
   [[event store] update:event];
 }
-- (void)dayView:(DayView *)dayview createEventFrom:(int)start to:(int)end
+- (void)viewCreateEventFrom:(int)start to:(int)end
 {
   Date *date = [[calendar date] copy];
   [date setMinute:start];
@@ -631,7 +631,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [date release];
   [apt release];
 }
-- (void)dayView:(DayView *)dayview selectEvent:(Event *)event
+- (void)viewSelectEvent:(Event *)event
 {
   [selectionManager set:event];
 }
