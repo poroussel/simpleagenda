@@ -331,8 +331,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
-  /* FIXME : why don't we add it to the SelectionManager ourselves ? */
   _selected = aptv;
+  [[SelectionManager globalManager] set:[aptv appointment]];
   if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
     [delegate viewSelectEvent:[aptv appointment]];
   [self setNeedsDisplay:YES];

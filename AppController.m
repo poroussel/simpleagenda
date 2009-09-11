@@ -633,7 +633,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (void)viewSelectEvent:(Event *)event
 {
-  [selectionManager set:event];
 }
 @end
 

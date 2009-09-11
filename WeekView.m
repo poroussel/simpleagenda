@@ -5,12 +5,12 @@
 #import "ConfigManager.h"
 #import "iCalTree.h"
 #import "AppointmentView.h"
+#import "SelectionManager.h"
 #import "NSColor+SimpleAgenda.h"
 #import "defines.h"
 
 @interface AppWeekView : AppointmentView
 {
-  BOOL _selected;
 }
 @end
 
@@ -52,7 +52,7 @@
   PSsetalpha(0.7);
   PSfill();
   PSgrestore();
-  if (_selected)
+  if ([[[SelectionManager globalManager] selection] containsObject:_apt])
     [[NSColor whiteColor] set];
   else
     [darkColor set];
@@ -62,6 +62,20 @@
   [label drawInRect:TextRect(rect) withAttributes:textAttributes];
   if ([_apt rrule] != nil)
     [[self repeatImage] compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  WeekView *parent = (WeekView *)[[self superview] superview];
+  id delegate = [parent delegate];
+   
+  if ([theEvent clickCount] > 1) {
+    if ([delegate respondsToSelector:@selector(viewEditEvent:)])
+      [delegate viewEditEvent:_apt];
+    return;
+  }
+  [self becomeFirstResponder];
+  [parent selectAppointmentView:self];
 }
 @end
 
@@ -212,6 +226,10 @@ static struct {
 
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
+  [[SelectionManager globalManager] set:[aptv appointment]];
+  if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
+    [delegate viewSelectEvent:[aptv appointment]];
+  [self setNeedsDisplay:YES];
 }
 
 - (void)reloadData
