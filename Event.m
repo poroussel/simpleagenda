@@ -4,6 +4,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Event.h"
+#import "DateRange.h"
 
 @implementation Event(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -60,19 +61,15 @@
 - (BOOL)isScheduledForDay:(Date *)day
 {
   NSEnumerator *enumerator;
-  Date *start;
-  Date *date;
+  DateRange *range = AUTORELEASE([[DateRange alloc] initWithStart:_startDate duration:[self duration]*60]);
 
-  NSAssert(day != nil, @"Empty day argument");
-  start = AUTORELEASE([_startDate copy]);
-  [start setDate:YES];
   if (!_rrule)
-    return [day compare:start] == 0;
-  enumerator = [_rrule enumeratorFromDate:start];
-  while ((date = [enumerator nextObject])) {
-    if ([date compare:day] == 0)
+    return [range intersectsWithDay:day];
+  enumerator = [_rrule enumeratorFromDate:_startDate length:[self duration]*60];
+  while ((range = [enumerator nextObject])) {
+    if ([range intersectsWithDay:day])
       return YES;
-    if ([date compare:day] > 0)
+    if ([[range start] compare:day] > 0)
       break;
   }
   return NO;
@@ -125,6 +122,8 @@
 
 - (int)duration
 {
+  if (_allDay)
+    return 1440;
   return _duration;
 }
 

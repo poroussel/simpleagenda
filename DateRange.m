@@ -60,7 +60,7 @@
   NSTimeInterval e2 = s2 + [range length];
   NSTimeInterval s = MAX(s1, s2);
   NSTimeInterval e = MIN(e1, e2);
-  if (e < s)
+  if (e <= s)
     return NO;
   return YES;
 }
@@ -74,7 +74,7 @@
   NSTimeInterval e2 = s2 + 86400;
   NSTimeInterval s = MAX(s1, s2);
   NSTimeInterval e = MIN(e1, e2);
-  if (e < s)
+  if (e <= s)
     return NO;
   return YES;
 }
