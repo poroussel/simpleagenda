@@ -8,10 +8,10 @@
 {
   NSString *_location;
   BOOL _allDay;
-  Date *startDate;
-  int duration;
-  int scheduleLevel;
-  RecurrenceRule *rrule;
+  Date *_startDate;
+  int _duration;
+  int _scheduleLevel;
+  RecurrenceRule *_rrule;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;

@@ -9,24 +9,24 @@
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   [super encodeWithCoder:coder];
-  [coder encodeObject:startDate forKey:@"sdate"];
-  [coder encodeInt:duration forKey:@"duration"];
+  [coder encodeObject:_startDate forKey:@"sdate"];
+  [coder encodeInt:_duration forKey:@"duration"];
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
-  [coder encodeObject:rrule forKey:@"rrule"];
+  [coder encodeObject:_rrule forKey:@"rrule"];
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
   [super initWithCoder:coder];
-  startDate = [[coder decodeObjectForKey:@"sdate"] retain];
-  duration = [coder decodeIntForKey:@"duration"];
+  _startDate = [[coder decodeObjectForKey:@"sdate"] retain];
+  _duration = [coder decodeIntForKey:@"duration"];
   _location = [[coder decodeObjectForKey:@"location"] retain];
   if ([coder containsValueForKey:@"allDay"])
     _allDay = [coder decodeBoolForKey:@"allDay"];
   else
     _allDay = NO;
   if ([coder containsValueForKey:@"rrule"])
-    rrule = [[coder decodeObjectForKey:@"rrule"] retain];
+    _rrule = [[coder decodeObjectForKey:@"rrule"] retain];
   return self;
 }
 @end
@@ -52,8 +52,8 @@
 - (void)dealloc
 {
   RELEASE(_location);
-  RELEASE(startDate);
-  RELEASE(rrule);
+  RELEASE(_startDate);
+  RELEASE(_rrule);
   [super dealloc];
 }
 
@@ -64,11 +64,11 @@
   Date *date;
 
   NSAssert(day != nil, @"Empty day argument");
-  start = AUTORELEASE([startDate copy]);
+  start = AUTORELEASE([_startDate copy]);
   [start setDate:YES];
-  if (!rrule)
+  if (!_rrule)
     return [day compare:start] == 0;
-  enumerator = [rrule enumeratorFromDate:start];
+  enumerator = [_rrule enumeratorFromDate:start];
   while ((date = [enumerator nextObject])) {
     if ([date compare:day] == 0)
       return YES;
@@ -95,20 +95,20 @@
 
 - (void)setAllDay:(BOOL)allDay
 {
-  [startDate setDate:allDay];
+  [_startDate setDate:allDay];
   _allDay = allDay;
 }
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self summary], [startDate description], [self duration]];
+  return [NSString stringWithFormat:@"<%@> from <%@> for <%d>", [self summary], [_startDate description], [self duration]];
 }
 
 - (NSString *)details
 {
-  if ([self allDay])
+  if (_allDay)
     return @"all day";
-  int minute = [[self startDate] minuteOfDay];
+  int minute = [_startDate minuteOfDay];
   return [NSString stringWithFormat:@"%dh%02d", minute / 60, minute % 60];
 }
 
@@ -125,43 +125,43 @@
 
 - (int)duration
 {
-  return duration;
+  return _duration;
 }
 
 - (Date *)startDate
 {
-  return startDate;
+  return _startDate;
 }
 
 - (RecurrenceRule *)rrule
 {
-  return rrule;
+  return _rrule;
 }
 
 - (void)setDuration:(int)newDuration
 {
-  duration = newDuration;
+  _duration = newDuration;
 }
 
 - (void)setStartDate:(Date *)newStartDate
 {
-  ASSIGNCOPY(startDate, newStartDate);
+  ASSIGNCOPY(_startDate, newStartDate);
 }
 
 - (void)setRRule:(RecurrenceRule *)arule
 {
   /* RecurrenceRules can't be modified, no need to copy */
-  ASSIGN(rrule, arule);
+  ASSIGN(_rrule, arule);
 }
 
 - (NSEnumerator *)dateEnumerator
 {
-  return [rrule enumeratorFromDate:startDate];
+  return [_rrule enumeratorFromDate:_startDate];
 }
 
 - (NSEnumerator *)dateRangeEnumerator
 {
-  return [rrule enumeratorFromDate:startDate length:_allDay?86400:duration*60];
+  return [_rrule enumeratorFromDate:_startDate length:_allDay?86400:_duration*60];
 }
 @end
 
@@ -205,7 +205,7 @@
   }
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
   if (prop)
-    rrule = [[RecurrenceRule alloc] initWithICalRRule:icalproperty_get_rrule(prop)];
+    _rrule = [[RecurrenceRule alloc] initWithICalRRule:icalproperty_get_rrule(prop)];
   [date release];
   location = icalcomponent_get_location(ic);
   if (location)
@@ -245,14 +245,14 @@
     icalcomponent_add_property(ic, icalproperty_new_location([[self location] UTF8String]));
 
   [self deleteProperty:ICAL_DTSTART_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstart([startDate iCalTime]));
+  icalcomponent_add_property(ic, icalproperty_new_dtstart([_startDate iCalTime]));
 
   [self deleteProperty:ICAL_DTEND_PROPERTY fromComponent:ic];
   [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
   if (![self allDay])
-    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([startDate iCalTime], icaldurationtype_from_int(duration * 60))));
+    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate iCalTime], icaldurationtype_from_int(_duration * 60))));
   else {
-    end = [startDate copy];
+    end = [_startDate copy];
     [end incrementDay];
     icalcomponent_add_property(ic, icalproperty_new_dtend([end iCalTime]));
     [end release];
@@ -268,8 +268,8 @@
   }
 
   [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
-  if (rrule)
-    icalcomponent_add_property(ic, icalproperty_new_rrule([rrule iCalRRule]));
+  if (_rrule)
+    icalcomponent_add_property(ic, icalproperty_new_rrule([_rrule iCalRRule]));
   return YES;
 }
 
