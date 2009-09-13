@@ -1,12 +1,12 @@
 #import "RecurrenceRule.h"
 
-@interface NSRecurrenceEnumerator : NSEnumerator
+@interface DateRecurrenceEnumerator : NSEnumerator
 {
-  icalrecur_iterator *iterator;
+  icalrecur_iterator *_iterator;
 }
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start;
 @end
-@implementation NSRecurrenceEnumerator
+@implementation DateRecurrenceEnumerator
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start;
 {
   self = [super init];
@@ -15,7 +15,7 @@
      * It's OK to use Date iCaltime: here as timezone modifications
      * only affect datetimes, not dates
      */
-    iterator = icalrecur_iterator_new([rule iCalRRule],  [start iCalTime]);
+    _iterator = icalrecur_iterator_new([rule iCalRRule],  [start iCalTime]);
   }
   return self;
 }
@@ -23,14 +23,14 @@
 {
   struct icaltimetype next;
   
-  next = icalrecur_iterator_next(iterator);
+  next = icalrecur_iterator_next(_iterator);
   if (icaltime_is_null_time(next))
     return nil;
   return AUTORELEASE([[Date alloc] initWithICalTime:next]);
 }
 - (void)dealloc
 {
-  icalrecur_iterator_free(iterator);
+  icalrecur_iterator_free(_iterator);
   [super dealloc];
 }
 @end
@@ -79,7 +79,7 @@
 - (NSEnumerator *)enumeratorFromDate:(Date *)start
 {
   NSAssert([start isDate], @"Works on dates");
-  return AUTORELEASE([[NSRecurrenceEnumerator alloc] initWithRule:self start:start]);
+  return AUTORELEASE([[DateRecurrenceEnumerator alloc] initWithRule:self start:start]);
 }
 - (recurrenceFrequency)frequency
 {
