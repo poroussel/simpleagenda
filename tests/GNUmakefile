@@ -9,6 +9,7 @@ SimpleAgendaTests_HEADER_FILES = \
 
 SimpleAgendaTests_OBJC_FILES = \
 	../Date.m \
+	../DateRange.m \
 	../RecurrenceRule.m \
 	DateTest.m \
 	RecurrenceRuleTest.m \

@@ -34,8 +34,7 @@
 @implementation Event
 - (id)copy
 {
-  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:self];
-  Event *new = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  Event *new = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
   [new generateUID];
   return new;
 }
@@ -52,10 +51,10 @@
 
 - (void)dealloc
 {
-  [super dealloc];
   RELEASE(_location);
   RELEASE(startDate);
   RELEASE(rrule);
+  [super dealloc];
 }
 
 - (BOOL)isScheduledForDay:(Date *)day
@@ -153,6 +152,16 @@
 {
   /* RecurrenceRules can't be modified, no need to copy */
   ASSIGN(rrule, arule);
+}
+
+- (NSEnumerator *)dateEnumerator
+{
+  return [rrule enumeratorFromDate:startDate];
+}
+
+- (NSEnumerator *)dateRangeEnumerator
+{
+  return [rrule enumeratorFromDate:startDate length:_allDay?86400:duration*60];
 }
 @end
 

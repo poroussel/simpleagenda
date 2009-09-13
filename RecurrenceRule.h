@@ -29,6 +29,7 @@ typedef enum
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate;
 - (id)initWithFrequency:(recurrenceFrequency)frequency count:(int)count;
 - (NSEnumerator *)enumeratorFromDate:(Date *)start;
+- (NSEnumerator *)enumeratorFromDate:(Date *)start length:(NSTimeInterval)length;
 - (recurrenceFrequency)frequency;
 - (Date *)until;
 - (int)count;

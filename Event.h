@@ -30,6 +30,9 @@
 - (void)setDuration:(int)duration;
 - (void)setStartDate:(Date *)startDate;
 - (void)setRRule:(RecurrenceRule *)rrule;
+
+- (NSEnumerator *)dateEnumerator;
+- (NSEnumerator *)dateRangeEnumerator;
 @end
 
 @interface Event(iCalendar)
