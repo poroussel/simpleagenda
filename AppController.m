@@ -380,16 +380,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (void)nextDay:(id)sender
 {
-  Date *cd = [calendar date];
-  [cd incrementDay];
-  [calendar setDate:cd];
+  [calendar setDate:[Date dateWithTimeInterval:86400 sinceDate:[calendar date]]];
 }
 
 - (void)previousDay:(id)sender
 {
-  Date *cd = [calendar date];
-  [cd changeDayBy:-1];
-  [calendar setDate:cd];
+  [calendar setDate:[Date dateWithTimeInterval:-86400 sinceDate:[calendar date]]];
 }
 
 - (void)nextWeek:(id)sender
