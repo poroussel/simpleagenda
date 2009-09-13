@@ -54,7 +54,8 @@ WeekView.m \
 AppointmentView.m \
 SelectionManager.m \
 RecurrenceRule.m \
-NSColor+SimpleAgenda.m
+NSColor+SimpleAgenda.m \
+DateRange.m
 
 #
 # Other sources
