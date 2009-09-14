@@ -86,10 +86,10 @@ static NSMutableDictionary *backends = nil;
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self synchronise];
   RELEASE(_defaultStore);
   [_stores release];
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 }
 
@@ -111,7 +111,6 @@ static NSMutableDictionary *backends = nil;
     if (store) {
       [_stores setObject:store forKey:name];
       NSLog(@"Added %@ to StoreManager", name);
-      [self dataChanged:nil];
     } else
       NSLog(@"Unable to initialize store %@", name);
   }
@@ -200,4 +199,3 @@ static NSMutableDictionary *backends = nil;
   return all;
 }
 @end
-
