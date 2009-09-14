@@ -39,7 +39,7 @@
   cm = [[ConfigManager alloc] initForKey:name withParent:nil];
   [cm setObject:[name copy] forKey:ST_FILE];
   [cm setObject:[[self class] description] forKey:ST_CLASS];
-  /* FIXME : shouldn't we release cm ? */
+  [cm release];
   return YES;
 }
 

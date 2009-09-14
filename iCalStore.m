@@ -130,6 +130,7 @@
     [cm setObject:[storeURL description] forKey:ST_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
+    [cm release];
     return YES;
   }
   [dialog release];
