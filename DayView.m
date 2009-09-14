@@ -30,7 +30,6 @@
   NSDictionary *textAttributes = [NSDictionary dictionaryWithObject:[[_apt store] textColor]
 					       forKey:NSForegroundColorAttributeName];
 
-
   if ([_apt allDay])
     title = [NSString stringWithFormat:@"All day : %@", [_apt summary]];
   else
@@ -165,7 +164,6 @@
   DayView *parent = (DayView *)[self superview];
   [self setFrame:[parent frameForAppointment:_apt]];
 }
-
 @end
 
 NSComparisonResult compareAppointmentViews(id a, id b, void *data)
@@ -176,10 +174,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 @implementation DayView
 - (NSDictionary *)defaults
 {
-  NSDictionary *dict = [NSDictionary 
-			 dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
-			 forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
-  return dict;
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
+		       forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -204,6 +200,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (void)dealloc
 {
+  [[ConfigManager globalConfig] unregisterClient:self];
   [_backgroundColor release];
   [_alternateBackgroundColor release];
   [_textAttributes release];
@@ -260,6 +257,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     }
   }
 }
+
 - (NSRect)frameForAppointment:(Event *)apt
 {
   int size, start;
@@ -270,6 +268,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   size = [self _minuteToSize:[apt duration]];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
+
 - (int)roundMinutes:(int)minutes
 {
   int rounded = minutes / _minStep * _minStep;
