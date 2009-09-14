@@ -3,7 +3,9 @@ version 0.39
 	* Fix empty Task tab on startup bug
 	* Add configure step to locate libical header and clean
 	  the makefile while we're at it
-	* Allow event selection and edition in the week view  
+	* Allow event selection and edition in the week view
+	* Fix ticket #10 (appointment going past midnight not
+	  shown in the second day view)
 
 version 0.38 (2009/03/18)
 	* Fix tickets #6 and #7
