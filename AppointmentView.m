@@ -5,15 +5,19 @@
 static NSImage *_repeatImage;
 
 @implementation AppointmentView
-- (NSImage *)repeatImage
++ (void)initialize
 {
   if (!_repeatImage) {
-    NSString *path = [[NSBundle mainBundle] pathForImageResource:@"repeat"];
-    _repeatImage = [[NSImage alloc] initWithContentsOfFile:path];
+    _repeatImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForImageResource:@"repeat"]];
     [_repeatImage setFlipped:YES];
   }
+}
+
+- (NSImage *)repeatImage
+{
   return _repeatImage;
 }
+
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt
 {
   self = [super initWithFrame:frameRect];
@@ -22,15 +26,18 @@ static NSImage *_repeatImage;
   }
   return self;
 }
+
 - (void)dealloc
 {
   RELEASE(_apt);
   [super dealloc];
 }
+
 - (Event *)appointment
 {
   return _apt;
 }
+
 - (BOOL)acceptsFirstResponder
 {
   return YES;
