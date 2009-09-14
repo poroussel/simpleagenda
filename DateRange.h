@@ -18,4 +18,5 @@
 - (BOOL)contains:(Date *)date;
 - (BOOL)intersectsWith:(DateRange *)range;
 - (BOOL)intersectsWithDay:(Date *)day;
+- (NSRange)intersectionWithDay:(Date *)day;
 @end

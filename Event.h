@@ -16,6 +16,7 @@
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
 - (BOOL)isScheduledForDay:(Date *)day;
+- (NSRange)intersectionWithDay:(Date *)day;
 - (NSString *)details;
 - (BOOL)contains:(NSString *)text;
 

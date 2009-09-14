@@ -75,6 +75,28 @@
   return NO;
 }
 
+/*
+ * Values are in seconds whereas time granularity in
+ * all other Event methods is minute.
+ * Worth changing ?
+ */
+- (NSRange)intersectionWithDay:(Date *)day
+{
+  NSEnumerator *enumerator;
+  DateRange *range = AUTORELEASE([[DateRange alloc] initWithStart:_startDate duration:[self duration]*60]);
+
+  if (!_rrule)
+    return [range intersectionWithDay:day];
+  enumerator = [_rrule enumeratorFromDate:_startDate length:[self duration]*60];
+  while ((range = [enumerator nextObject])) {
+    if ([range intersectsWithDay:day])
+      return [range intersectionWithDay:day];
+    if ([[range start] compare:day] > 0)
+      break;
+  }
+  return NSMakeRange(0, 0);
+}
+
 - (NSString *)location
 {
   return _location;

@@ -260,12 +260,14 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (NSRect)frameForAppointment:(Event *)apt
 {
+  NSRange range;
   int size, start;
 
   if ([apt allDay])
     return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
-  start = [self minuteToPosition:[[apt startDate] minuteOfDay]];
-  size = [self _minuteToSize:[apt duration]];
+  range = [apt intersectionWithDay:[dataSource selectedDate]];
+  start = [self minuteToPosition:range.location/60];
+  size = [self _minuteToSize:range.length/60];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
 

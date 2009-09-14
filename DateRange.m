@@ -79,6 +79,20 @@
   return YES;
 }
 
+- (NSRange)intersectionWithDay:(Date *)day
+{
+  NSAssert([day isDate], @"This method expects a date, not a datetime");
+  NSTimeInterval s1 = [_start timeIntervalSince1970];
+  NSTimeInterval e1 = s1 + _length;
+  NSTimeInterval s2 = [day timeIntervalSince1970];
+  NSTimeInterval e2 = s2 + 86400;
+  NSTimeInterval s = MAX(s1, s2);
+  NSTimeInterval e = MIN(e1, e2);
+  if (e <= s)
+    return NSMakeRange(0, 0);
+  return NSMakeRange(s - s2, e - s);
+}
+
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"DateRange starting %@ for %d seconds", [_start description], (int)_length];
