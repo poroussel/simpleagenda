@@ -7,6 +7,8 @@ version 0.39
 	* Fix ticket #10 (appointment going past midnight not
 	  shown in the second day view)
 	* Add a slider in the appointment editor to modify the start time
+	* Use a bigger step in the appointment editor sliders
+	  when holding the alt key
 
 version 0.38 (2009/03/18)
 	* Fix tickets #6 and #7
