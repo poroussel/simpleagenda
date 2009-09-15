@@ -6,6 +6,7 @@ version 0.39
 	* Allow event selection and edition in the week view
 	* Fix ticket #10 (appointment going past midnight not
 	  shown in the second day view)
+	* Add a slider in the appointment editor to modify the start time
 
 version 0.38 (2009/03/18)
 	* Fix tickets #6 and #7

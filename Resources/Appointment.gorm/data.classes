@@ -19,7 +19,9 @@
 	    store,
 	    allDay,
 	    ok,
-	    until
+	    until,
+	    timeText,
+	    time
 	);
 	Super = NSWindowController;
     };

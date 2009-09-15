@@ -20,6 +20,7 @@
     formatter = [[[HourFormatter alloc] init] autorelease];
     dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO] autorelease];
     [durationText setFormatter:formatter];
+    [timeText setFormatter:formatter];
     [endDate setFormatter:dateFormatter];
     [endDate setObjectValue:[NSDate date]];
   }
@@ -39,12 +40,15 @@
   id <MemoryStore> aStore;
   id <MemoryStore> originalStore;
   int ret;
+  Date *date;
 
   [title setStringValue:[data summary]];
   [duration setFloatValue:[data duration] / 60.0];
   [durationText setFloatValue:[data duration] / 60.0];
   [location setStringValue:[data location]];
   [allDay setState:[data allDay]];
+  [time setFloatValue:([[data startDate] hourOfDay]*60 + [[data startDate] minuteOfHour]) / 60.0];
+  [timeText setFloatValue:([[data startDate] hourOfDay]*60 + [[data startDate] minuteOfHour]) / 60.0];
   if (![data rrule])
     [repeat selectItemAtIndex:0];
   else
@@ -98,6 +102,10 @@
     [data setText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
     [data setAllDay:[allDay state]];
+    date = [[data startDate] copy];
+    [date setMinute:[time floatValue] * 60.0];
+    [data setStartDate:date];
+    [date release];
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
     if (!originalStore)
@@ -173,12 +181,18 @@
 {
   if ([allDay state]) {
     [duration setEnabled:NO];
-    [duration setIntValue:0];
-    [durationText setIntValue:0];
+    [duration setFloatValue:0];
+    [durationText setFloatValue:0];
+    [time setEnabled:NO];
+    [time setFloatValue:0];
+    [timeText setFloatValue:0];
   } else {
     [duration setEnabled:YES];
     [duration setFloatValue:1];
     [durationText setFloatValue:1];
+    [time setEnabled:YES];
+    [time setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
+    [timeText setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
     [startDate setMinute:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR] * 60];
   }
 }

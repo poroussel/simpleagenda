@@ -17,6 +17,8 @@
   id allDay;
   id ok;
   id until;
+  id time;
+  id timeText;
   Date *startDate;
 }
 
