@@ -53,12 +53,11 @@
 
 - (void)dealloc
 {
-  [super dealloc];
   RELEASE(_summary);
   RELEASE(_text);
-  RELEASE(_store);
   RELEASE(_uid);
   RELEASE(_stamp);
+  [super dealloc];
 }
 
 - (id <MemoryStore>)store
@@ -68,7 +67,7 @@
 
 - (void)setStore:(id <MemoryStore>)store
 {
-  ASSIGN(_store, store);
+  _store = store;
 }
 
 - (NSAttributedString *)text
