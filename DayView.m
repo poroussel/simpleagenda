@@ -348,7 +348,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   NSSet *events;
   BOOL found;
 
-  events = [dataSource scheduledAppointmentsForDay:nil];
+  events = [dataSource scheduledAppointmentsForDay:[dataSource selectedDate]];
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
     if (![events containsObject:[aptv appointment]] || ![[[aptv appointment] store] displayed]) {

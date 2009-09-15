@@ -217,7 +217,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSEnumerator *enumerator = [[self scheduledAppointmentsForDay:nil] objectEnumerator];
+  NSEnumerator *enumerator = [[self scheduledAppointmentsForDay:_selectedDay] objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
@@ -459,8 +459,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
   Event *event;
 
-  if (date == nil)
-    date = _selectedDay;
+  NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
   while ((event = [enumerator nextObject]))
     if ([event isScheduledForDay:date])
       [dayEvents addObject:event];
