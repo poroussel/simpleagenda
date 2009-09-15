@@ -310,6 +310,7 @@ static NSImage *_2right;
 
 - (void)setDate:(Date *)nDate
 {
+  NSAssert([nDate isDate], @"Calender expects a date");
   ASSIGNCOPY(date, nDate);
   ASSIGNCOPY(monthDisplayed, nDate);
   [self updateView];

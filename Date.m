@@ -228,14 +228,14 @@ static NSTimeZone *gl_nstz = nil;
 
 - (void)setSecondOfMinute:(int)second
 {
-  [self setDate:NO];
+  NSAssert(!_time.is_date, @"Works only with datetimes");
   _time.second = second;
   _time = icaltime_normalize(_time);
 }
 
 - (void)setMinute:(int)minute
 {
-  [self setDate:NO];
+  NSAssert(!_time.is_date, @"Works only with datetimes");
   struct icaldurationtype dt = {0, 0, 0, 0, minute - [self minuteOfDay], 0};
   _time = icaltime_add(_time, dt);
 }

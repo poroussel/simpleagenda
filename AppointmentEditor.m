@@ -102,10 +102,13 @@
     [data setText:[[description textStorage] copy]];
     [data setLocation:[location stringValue]];
     [data setAllDay:[allDay state]];
-    date = [[data startDate] copy];
-    [date setMinute:[time floatValue] * 60.0];
-    [data setStartDate:date];
-    [date release];
+    if (![data allDay]) {
+      date = [[data startDate] copy];
+      [date setDate:NO];
+      [date setMinute:[time floatValue] * 60.0];
+      [data setStartDate:date];
+      [date release];
+    }
 
     aStore = [sm storeForName:[store titleOfSelectedItem]];
     if (!originalStore)
@@ -193,7 +196,6 @@
     [time setEnabled:YES];
     [time setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
     [timeText setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
-    [startDate setMinute:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR] * 60];
   }
 }
 @end
