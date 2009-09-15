@@ -60,19 +60,7 @@
 
 - (BOOL)isScheduledForDay:(Date *)day
 {
-  NSEnumerator *enumerator;
-  DateRange *range = AUTORELEASE([[DateRange alloc] initWithStart:_startDate duration:[self duration]*60]);
-
-  if (!_rrule)
-    return [range intersectsWithDay:day];
-  enumerator = [_rrule enumeratorFromDate:_startDate length:[self duration]*60];
-  while ((range = [enumerator nextObject])) {
-    if ([range intersectsWithDay:day])
-      return YES;
-    if ([[range start] compare:day] > 0)
-      break;
-  }
-  return NO;
+  return [self intersectionWithDay:day].length > 0;
 }
 
 /*
