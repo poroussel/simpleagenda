@@ -358,6 +358,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     Event *el;
     id <MemoryStore> store;
 
+    [date setDate:NO];
     while ((el = [enumerator nextObject])) {
       /* FIXME : store property could be handled by Event:copy ? */
       store = [el store];
