@@ -362,9 +362,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     while ((el = [enumerator nextObject])) {
       /* FIXME : store property could be handled by Event:copy ? */
       store = [el store];
-      if ([selectionManager lastOperation] == SMCopy)
+      if ([selectionManager lastOperation] == SMCopy) {
 	el = [el copy];
-      [date setMinute:[self _sensibleStartForDuration:[el duration]]];
+	[date setMinute:[self _sensibleStartForDuration:[el duration]]];
+      } else {
+	[date setMinute:[[el startDate] minuteOfDay]];
+      }
       [el setStartDate:date];
       if ([selectionManager lastOperation] == SMCopy) {
 	[store add:el];
