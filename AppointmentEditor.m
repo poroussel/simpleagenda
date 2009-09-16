@@ -104,7 +104,7 @@
     [data setAllDay:[allDay state]];
     if (![data allDay]) {
       date = [[data startDate] copy];
-      [date setDate:NO];
+      [date setIsDate:NO];
       [date setMinute:[time floatValue] * 60.0];
       [data setStartDate:date];
       [date release];

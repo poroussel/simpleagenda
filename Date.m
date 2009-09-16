@@ -14,8 +14,8 @@
   if (self != nil) {
     _start = [start copy];
     _end = [end copy];
-    [_start setDate:YES];
-    [_end setDate:YES];
+    [_start setIsDate:YES];
+    [_end setIsDate:YES];
     [_start changeDayBy:-1];
   }
   return self;
@@ -124,7 +124,7 @@ static NSTimeZone *gl_nstz = nil;
 + (id)today
 {
   Date *d = [[Date alloc] init];
-  [d setDate:YES];
+  [d setIsDate:YES];
   return AUTORELEASE(d);
 }
 
@@ -292,7 +292,7 @@ static NSTimeZone *gl_nstz = nil;
 {
   return _time.is_date;
 }
-- (void)setDate:(BOOL)date
+- (void)setIsDate:(BOOL)date
 {
   _time.is_date = date;
   if (date) {

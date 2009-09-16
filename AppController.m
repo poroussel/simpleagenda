@@ -45,7 +45,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSString *details;
   NSString *title;
 
-  [copy setDate:NO];
+  [copy setIsDate:NO];
   [copy setMinute:[[event startDate] minuteOfDay]];
   [attributes setValue:event forKey:@"object"];
   [attributes setValue:copy forKey:@"date"];
@@ -236,7 +236,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Date *date;
 
   date = [[calendar date] copy];
-  [date setDate:NO];
+  [date setIsDate:NO];
   [date setMinute:[self _sensibleStartForDuration:60]];
   Event *apt = [[Event alloc] initWithStartDate:date duration:60 title:@"edit title..."];
   if (apt && [_editor editAppointment:apt]) {
@@ -358,7 +358,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     Event *el;
     id <MemoryStore> store;
 
-    [date setDate:NO];
+    [date setIsDate:NO];
     while ((el = [enumerator nextObject])) {
       /* FIXME : store property could be handled by Event:copy ? */
       store = [el store];
@@ -568,7 +568,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   if (object && [object isKindOfClass:[Event class]]) {
     date = [[item valueForKey:@"date"] copy];
-    [date setDate:YES];
+    [date setIsDate:YES];
     [calendar setDate:date];
     [date release];
     if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
@@ -624,7 +624,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)viewCreateEventFrom:(int)start to:(int)end
 {
   Date *date = [[calendar date] copy];
-  [date setDate:NO];
+  [date setIsDate:NO];
   [date setMinute:start];
   Event *apt = [[Event alloc] initWithStartDate:date 
    			               duration:end - start 

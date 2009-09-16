@@ -102,7 +102,12 @@
 
 - (void)setAllDay:(BOOL)allDay
 {
-  [_startDate setDate:allDay];
+  /*
+   * FIXME : why do we force startDate to being a date ?
+   * What is the relation with the appointment being an
+   * all day one ?
+   */
+  [_startDate setIsDate:allDay];
   _allDay = allDay;
 }
 

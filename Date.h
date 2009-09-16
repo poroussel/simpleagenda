@@ -41,7 +41,7 @@
 - (void)changeMinuteBy:(int)diff;
 - (NSEnumerator *)enumeratorTo:(Date *)end;
 - (BOOL)isDate;
-- (void)setDate:(BOOL)date;
+- (void)setIsDate:(BOOL)date;
 - (NSTimeInterval)timeIntervalSince1970;
 - (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate;
 @end
