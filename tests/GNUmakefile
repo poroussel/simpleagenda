@@ -20,7 +20,5 @@ SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical
 
 ADDITIONAL_OBJCFLAGS = -Wno-import -Wall
 
--include GNUmakefile.preamble
--include GNUmakefile.local
 include $(GNUSTEP_MAKEFILES)/tool.make
 -include GNUmakefile.postamble
