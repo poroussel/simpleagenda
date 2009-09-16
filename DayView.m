@@ -87,7 +87,6 @@
   DayView *parent = (DayView *)[self superview];
   id delegate = [parent delegate];
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-  int diff;
   int start;
   int minutes;
   BOOL keepOn = YES;
@@ -130,18 +129,20 @@
       }
     }
   } else {
+    int startM, currentM, roundedDiffM;
+    Date *date = [[_apt startDate] copy];
+
     [[NSCursor openHandCursor] push];
-    mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
-    diff = [parent minuteToPosition:[[_apt startDate] minuteOfDay]] - mouseLoc.y;
+    startM = [parent positionToMinute:[theEvent locationInWindow].y];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-      mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	minutes = [parent roundMinutes:[parent positionToMinute:mouseLoc.y + diff]];
-	if (minutes != [[_apt startDate] minuteOfDay]) {
-	  [[_apt startDate] setMinute:minutes];
+	currentM = [parent positionToMinute:[theEvent locationInWindow].y];
+	roundedDiffM = [parent roundMinutes:currentM-startM];
+	if (roundedDiffM != 0) {
 	  modified = YES;
+	  [_apt setStartDate:[Date dateWithTimeInterval:roundedDiffM*60 sinceDate:date]];
 	  [self setFrame:[parent frameForAppointment:_apt]];
 	  [parent setNeedsDisplay:YES];
 	}
@@ -153,6 +154,7 @@
 	break;
       }
     }
+    [date release];
   }
   [NSCursor pop];
   if (modified && [delegate respondsToSelector:@selector(viewModifyEvent:)])
@@ -207,13 +209,13 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   [super dealloc];
 }
 
-- (int)_minuteToSize:(int)minutes
+- (int)minuteToSize:(int)minutes
 {
   return minutes * [self frame].size.height / ((_lastH - _firstH + 1) * 60);
 }
 - (int)minuteToPosition:(int)minutes
 {
-  return [self frame].size.height - [self _minuteToSize:minutes - (_firstH * 60)] - 1;
+  return [self frame].size.height - [self minuteToSize:minutes - (_firstH * 60)] - 1;
 }
 - (int)positionToMinute:(float)position
 {
@@ -267,14 +269,13 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
   range = [apt intersectionWithDay:[dataSource selectedDate]];
   start = [self minuteToPosition:range.location/60];
-  size = [self _minuteToSize:range.length/60];
+  size = [self minuteToSize:range.length/60];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
 
 - (int)roundMinutes:(int)minutes
 {
-  int rounded = minutes / _minStep * _minStep;
-  return (rounded < _minStep) ? _minStep : rounded;
+  return minutes / _minStep * _minStep;
 }
 
 - (void)drawRect:(NSRect)rect
@@ -290,7 +291,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
    * FIXME : if we draw the string in the same
    * loop it doesn't appear on the screen.
    */
-  hrow = [self _minuteToSize:60];
+  hrow = [self minuteToSize:60];
   for (h = _firstH; h <= _lastH + 1; h++) {
     start = [self minuteToPosition:h * 60];
     if (h % 2)
