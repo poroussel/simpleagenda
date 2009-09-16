@@ -76,7 +76,8 @@
 - (NSArray *)paste
 {
   NSArray *ret = [NSArray arrayWithArray:_copyarea];
-  [_copyarea removeAllObjects];
+  if (_operation == SMCut)
+    [_copyarea removeAllObjects];
   return ret;
 }
 
