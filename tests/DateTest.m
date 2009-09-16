@@ -20,7 +20,7 @@
   [self assertFalse:[now isDate]];
   [self assertTrue:[today isDate]];
 
-  [now setDate:YES];
+  [now setIsDate:YES];
   [self assertTrue:[now isDate] message:@"now is a date"];
   [self assertInt:[now hourOfDay] equals:0 message:@"a date hourOfDay is 0"];
   [self assertInt:[now minuteOfHour] equals:0 message:@"a date minuteOfHour is 0"];
