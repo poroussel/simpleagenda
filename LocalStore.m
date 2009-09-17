@@ -4,7 +4,6 @@
 #import "Task.h"
 #import "defines.h"
 
-#define CurrentVersion 2
 /* FIXME : this shouldn't be hardcoded */
 #define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
 
@@ -16,7 +15,6 @@
 			 [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:YES], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
-		       [NSNumber numberWithInt:CurrentVersion], ST_VERSION,
 		       nil, nil];
 }
 
@@ -62,7 +60,6 @@
   NSFileManager *fm = [NSFileManager defaultManager];
   NSSet *savedData;
   BOOL isDir;
-  int version;
 
   if (![fm fileExistsAtPath:_globalPath]) {
     if (![fm createDirectoryAtPath:_globalPath attributes:nil]) {
@@ -76,11 +73,6 @@
     if (savedData) {
       [self fillWithElements:savedData];
       NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [[self events] count]);
-      version = [_config integerForKey:ST_VERSION];
-      if (version < CurrentVersion) {
-	[_config setInteger:CurrentVersion forKey:ST_VERSION];
-	[self write];
-      }
     }
   }
   if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {

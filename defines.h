@@ -19,4 +19,3 @@
 #define ST_REFRESH @"storeAutomaticRefresh"
 #define ST_REFRESH_INTERVAL @"storeRefreshInterval"
 #define ST_DISPLAY @"storeDisplay"
-#define ST_VERSION @"storeVersion"
