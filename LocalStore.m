@@ -4,9 +4,6 @@
 #import "Task.h"
 #import "defines.h"
 
-/* FIXME : this shouldn't be hardcoded */
-#define LocalAgendaPath @"~/GNUstep/Library/SimpleAgenda"
-
 @implementation LocalStore
 - (NSDictionary *)defaults
 {
@@ -22,8 +19,9 @@
 {
   self = [super initWithName:name];
   if (self) {
-    _globalPath = [[LocalAgendaPath stringByExpandingTildeInPath] retain];
-    _globalFile = [[NSString pathWithComponents:[NSArray arrayWithObjects:_globalPath, [_config objectForKey:ST_FILE], nil]] retain];
+    _globalPath = [[[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,  
+                     NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"SimpleAgenda"] retain];
+    _globalFile = [[_globalPath stringByAppendingPathComponent:[_config objectForKey:ST_FILE]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
     [self read];
   }
