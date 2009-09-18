@@ -371,7 +371,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       [el setStartDate:date];
       if ([selectionManager lastOperation] == SMCopy) {
 	[store add:el];
-	[el release];
+	/*
+	 * FIXME : the new event is now in store's dictionary, we 
+	 * should be able to release it. If we do, the application 
+	 * crashes when we delete this event, trying to release it
+	 * one time too many. I can't find the bug
+	 * [el release];
+	 */
       } else {
 	[store update:el];
       }     
