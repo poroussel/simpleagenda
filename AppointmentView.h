@@ -8,6 +8,7 @@
 - (void)viewModifyEvent:(Event *)event;
 - (void)viewCreateEventFrom:(int)start to:(int)end;
 - (void)viewSelectEvent:(Event *)event;
+- (void)viewSelectDate:(Date *)date;
 @end
 
 @interface AppointmentView : NSView

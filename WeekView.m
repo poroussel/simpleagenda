@@ -167,6 +167,15 @@ static struct {
 {
   return date;
 }
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  WeekView *parent = (WeekView *)[self superview];
+  id delegate = [parent delegate];
+
+  if ([delegate respondsToSelector:@selector(viewSelectDate:)])
+    [delegate viewSelectDate:date];
+}
 @end
 
 @implementation WeekView
@@ -226,6 +235,8 @@ static struct {
 
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
+  if ([delegate respondsToSelector:@selector(viewSelectDate:)])
+    [delegate viewSelectDate:[(WeekDayView *)[aptv superview] day]];
   [[SelectionManager globalManager] set:[aptv appointment]];
   if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
     [delegate viewSelectEvent:[aptv appointment]];

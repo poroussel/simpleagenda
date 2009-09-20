@@ -646,6 +646,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)viewSelectEvent:(Event *)event
 {
 }
+- (void)viewSelectDate:(Date *)date
+{
+  [calendar setDate:date];
+}
 @end
 
 @implementation AppController(NSTableDataSource)
