@@ -2,7 +2,6 @@
 
 #import <AppKit/AppKit.h>
 #import "ConfigManager.h"
-#import "Event.h"
 #import "StoreManager.h"
 #import "AppointmentView.h"
 
@@ -14,6 +13,6 @@
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
-- (id)delegate;
 - (void)reloadData;
+- (id)delegate;
 @end
