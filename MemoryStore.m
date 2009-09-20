@@ -5,24 +5,27 @@
 #import "defines.h"
 
 @implementation MemoryStore
-- (NSDictionary *)defaults
-{
-  return nil;
-}
-
-- (id)initWithName:(NSString *)name
+- (id)init
 {
   self = [super init];
   if (self) {
-    _name = [name copy];
-    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
-    [_config registerDefaults:[self defaults]];
+    _name = nil;
     _modified = NO;
     _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     _tasks = [[NSMutableDictionary alloc] initWithCapacity:16];
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
+  }
+  return self;
+}
+
+- (id)initWithName:(NSString *)name
+{
+  self = [self init];
+  if (self) {
+    _name = [name copy];
+    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
   }
   return self;
 }
@@ -68,9 +71,9 @@
   while ((elt = [enumerator nextObject])) {
     [elt setStore:self];
     if ([elt isKindOfClass:[Event class]])
-      [_data setValue:elt forKey:[elt UID]];
+      [_data setObject:elt forKey:[elt UID]];
     else
-      [_tasks setValue:elt forKey:[elt UID]];
+      [_tasks setObject:elt forKey:[elt UID]];
   }
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
 }
