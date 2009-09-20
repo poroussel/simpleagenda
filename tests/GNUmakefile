@@ -2,17 +2,18 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 TOOL_NAME = SimpleAgendaTests
 
-SimpleAgendaTests_HEADER_FILES = \
-	AllTests.h \
-	DateTest.h \
-	RecurrenceRuleTest.h
-
 SimpleAgendaTests_OBJC_FILES = \
 	../Date.m \
 	../DateRange.m \
 	../RecurrenceRule.m \
+	../MemoryStore.m \
+	../ConfigManager.m \
+	../Event.m \
+	../Element.m \
 	DateTest.m \
+	ElementTest.m \
 	RecurrenceRuleTest.m \
+	MemoryStoreTest.m \
 	AllTests.m \
 	main.m
 
