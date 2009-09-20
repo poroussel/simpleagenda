@@ -1,4 +1,4 @@
-#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #import <GNUstepBase/GSXML.h>
 #import "Event.h"
 #import "Task.h"

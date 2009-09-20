@@ -1,12 +1,13 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
 #import "ConfigManager.h"
 
 #define SADataChangedInStore @"DataDidChangedInStore"
 #define SAStatusChangedForStore @"StatusChangedForStore"
 
 @class Element;
+@class NSColor;
 
 @protocol MemoryStore <NSObject>
 + (id)storeNamed:(NSString *)name;
