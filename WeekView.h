@@ -17,10 +17,3 @@
 - (id)delegate;
 - (void)reloadData;
 @end
-
-@interface NSObject(WeekViewDelegate)
-- (void)editEvent:(Event *)event;
-- (void)modifyEvent:(Event *)event;
-- (void)createEvent;
-- (void)selectEvent:(Event *)event;
-@end
