@@ -7,14 +7,22 @@
 - (void)setUp
 {
   testStore = [[MemoryStore alloc] initWithName:@"testStore"];
-
-  [self assertTrue:(testStore != nil) message:@"MemoryStore created."];
-  [self assertTrue:([[testStore events] count] == 0 && [[testStore tasks] count] == 0) message:@"MemoryStore is empty on creation."];
 }
 
 - (void)tearDown
 {
   [testStore release];
+}
+
+- (void)testStoreCreation
+{
+  MemoryStore *ms = [[MemoryStore alloc] initWithName:@"elementCount"];
+
+
+  [self assertTrue:(ms != nil) message:@"MemoryStore created."];
+  [self assertTrue:[ms events] && [ms tasks] message:@"Events and tasks dictionaries exist."];
+  [self assertTrue:([[ms events] count] == 0 && [[ms tasks] count] == 0) message:@"MemoryStore is empty on creation."];
+  [ms release];
 }
 
 - (void)testStoreRetainCount
