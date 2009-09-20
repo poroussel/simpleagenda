@@ -427,14 +427,14 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     if (_selected != nil) {
       if ([delegate respondsToSelector:@selector(viewEditEvent:)])
 	[delegate viewEditEvent:[_selected appointment]];
-      return;
     }
+    break;
   case NSUpArrowFunctionKey:
     [self moveUp:self];
-    return;
+    break;
   case NSDownArrowFunctionKey:
     [self moveDown:self];
-    return;
+    break;
   case NSTabCharacter:
     if (_selected != nil) {
       unsigned int index = [[self subviews] indexOfObject:_selected];
@@ -449,11 +449,14 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 	    index = 0;
 	}
 	[self selectAppointmentView:[[self subviews] objectAtIndex:index]];
-      }
-      return;
+      } 
+    } else {
+      [self selectAppointmentView:[[self subviews] lastObject]];
     }
+    break;
+  default:
+    [super keyDown:theEvent];
   }
-  [super keyDown:theEvent];
 }
 
 - (void)moveUp:(id)sender
