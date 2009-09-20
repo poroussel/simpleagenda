@@ -2,7 +2,8 @@
 # before-all::
 
 # Things to do after compiling
-# after-all::
+after-all::
+	./obj/$(TOOL_NAME)
 
 # Things to do before installing
 # before-install::
