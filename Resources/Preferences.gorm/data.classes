@@ -3,10 +3,11 @@
     FirstResponder = {
 	Actions = (
 	    "changeEnd:",
+	    "changeInterval:",
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "changeInterval:",
+	    "toggleTooltip:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectItem:",
@@ -33,7 +34,8 @@
 	    "createStore:",
 	    "selectItem:",
 	    "toggleRefresh:",
-	    "changeInterval:"
+	    "changeInterval:",
+	    "toggleTooltip:"
 	);
 	Outlets = (
 	    panel,
@@ -60,7 +62,8 @@
 	    storePreferences,
 	    storeRefresh,
 	    refreshInterval,
-	    refreshIntervalText
+	    refreshIntervalText,
+	    showTooltip
 	);
 	Super = NSObject;
     };

@@ -2,6 +2,7 @@
 
 #import <AppKit/AppKit.h>
 #import "Event.h"
+#import "ConfigManager.h"
 
 @interface NSObject(AppointmentViewDelegate)
 - (void)viewEditEvent:(Event *)event;
@@ -11,11 +12,12 @@
 - (void)viewSelectDate:(Date *)date;
 @end
 
-@interface AppointmentView : NSView
+@interface AppointmentView : NSView <ConfigListener>
 {
   Event *_apt;
 }
 - (NSImage *)repeatImage;
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
 - (Event *)appointment;
+- (void)tooltipSetup;
 @end

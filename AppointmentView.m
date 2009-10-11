@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "AppointmentView.h"
+#import "defines.h"
 
 static NSImage *_repeatImage;
 
@@ -23,12 +24,15 @@ static NSImage *_repeatImage;
   self = [super initWithFrame:frameRect];
   if (self) {
     ASSIGN(_apt, apt);
+    [self tooltipSetup];
+    [[ConfigManager globalConfig] registerClient:self forKey:TOOLTIP];
   }
   return self;
 }
 
 - (void)dealloc
 {
+  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_apt);
   [super dealloc];
 }
@@ -41,5 +45,21 @@ static NSImage *_repeatImage;
 - (BOOL)acceptsFirstResponder
 {
   return YES;
+}
+
+- (void)tooltipSetup
+{
+  NSAttributedString *as = [_apt text];
+
+  if ([[ConfigManager globalConfig] integerForKey:TOOLTIP] && as && [as length] > 0)
+    [self setToolTip:[as string]];
+  else
+    [self setToolTip:nil];
+}
+
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+{
+  if ([key isEqualToString:TOOLTIP])
+    [self tooltipSetup];
 }
 @end

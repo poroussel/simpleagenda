@@ -3,6 +3,7 @@
 #define FIRST_HOUR @"firstHour"
 #define LAST_HOUR @"lastHour"
 #define MIN_STEP @"minimumStep"
+#define TOOLTIP @"showTooltip"
 
 #define STORE_CLASSES @"storeClasses"
 

@@ -31,6 +31,7 @@
   IBOutlet id storePreferences;
   IBOutlet id storeFactory;
   IBOutlet id itemPopUp;
+  IBOutlet id showTooltip;
   StoreManager *_sm;
 }
 
@@ -49,5 +50,6 @@
 -(void)removeStore:(id)sender;
 -(void)createStore:(id)sender;
 -(void)selectItem:(id)sender;
+-(void)toggleTooltip:(id)sender;
 
 @end

@@ -81,6 +81,7 @@
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
+  int showtt = [config integerForKey:TOOLTIP];
   Class backend;
 
   [dayStart setIntValue:start];
@@ -89,6 +90,7 @@
   [dayEndText setIntValue:end];
   [minStep setDoubleValue:step/60.0];
   [minStepText setDoubleValue:step/60.0];
+  [showTooltip setState:showtt];
 
   [self setupStores];
   [storeClass removeAllItems];
@@ -208,6 +210,12 @@
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setPeriodicRefresh:[storeRefresh state]];
   [self periodicSetup];
+}
+
+-(void)toggleTooltip:(id)sender
+{
+  ConfigManager *config = [ConfigManager globalConfig];
+  [config setInteger:[showTooltip state] forKey:TOOLTIP];
 }
 
 /* We only allow the removal of non-default stores */
