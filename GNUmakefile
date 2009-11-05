@@ -55,7 +55,8 @@ AppointmentView.m \
 SelectionManager.m \
 RecurrenceRule.m \
 NSColor+SimpleAgenda.m \
-DateRange.m
+DateRange.m \
+SAAlarm.m
 
 #
 # Other sources
