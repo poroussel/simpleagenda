@@ -4,6 +4,9 @@
 #import "Task.h"
 #import "defines.h"
 
+NSString * const SADataChangedInStore = @"DataDidChangedInStore";
+NSString * const SAStatusChangedForStore = @"StatusChangedForStore";
+
 @implementation MemoryStore
 - (NSDictionary *)defaults
 {

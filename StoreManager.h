@@ -9,7 +9,7 @@
 - (Date *)selectedDate;
 @end
 
-#define SADataChanged @"DataDidChanged"
+extern NSString * const SADataChanged;
 
 @interface StoreManager : NSObject
 {

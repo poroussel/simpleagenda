@@ -3,8 +3,8 @@
 #import <Foundation/Foundation.h>
 #import "ConfigManager.h"
 
-#define SADataChangedInStore @"DataDidChangedInStore"
-#define SAStatusChangedForStore @"StatusChangedForStore"
+extern NSString * const SADataChangedInStore;
+extern NSString * const SAStatusChangedForStore;
 
 @class Element;
 @class NSColor;

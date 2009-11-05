@@ -8,12 +8,12 @@
 #import "LocalStore.h"
 #import "iCalStore.h"
 
+NSString * const SADataChanged = @"DataDidChanged";
+static NSString * const PERSONAL_AGENDA = @"Personal Agenda";
+
 static NSMutableDictionary *backends = nil;
 
 @implementation StoreManager
-
-#define PERSONAL_AGENDA @"Personal Agenda"
-
 + (void)initialize
 {
   NSArray *classes = GSObjCAllSubclassesOfClass([MemoryStore class]);
