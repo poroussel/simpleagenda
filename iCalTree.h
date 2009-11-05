@@ -2,11 +2,6 @@
 
 #import "config.h"
 #import <Foundation/Foundation.h>
-#ifdef HAVE_LIBICAL_ICAL_H
-#import <libical/ical.h>
-#else
-#import <ical.h>
-#endif
 #import "Element.h"
 
 @interface iCalTree : NSObject
