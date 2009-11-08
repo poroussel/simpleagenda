@@ -17,6 +17,8 @@ extern NSString *SAActionSound;
   NSString *_emailaddress;
   NSString *_sound;
   NSURL *_url;
+  int _repeatCount;
+  NSTimeInterval _repeatInterval;
 }
 
 + (id)alarm;
@@ -32,5 +34,9 @@ extern NSString *SAActionSound;
 - (void)setSound:(NSString *)sound;
 - (NSURL *)url;
 - (void)setUrl:(NSURL *)url;
+- (int)repeatCount;
+- (void)setRepeatCount:(int)count;
+- (NSTimeInterval)repeatInterval;
+- (void)setRepeatInterval:(NSTimeInterval)interval;
 - (Date *)triggerDateRelativeTo:(Date *)date;
 @end

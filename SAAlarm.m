@@ -104,6 +104,26 @@ NSString *SAActionSound = @"AUDIO";
   [self setAction:SAActionProcedure];
 }
 
+- (int)repeatCount
+{
+  return _repeatCount;
+}
+
+- (void)setRepeatCount:(int)count
+{
+  _repeatCount = count;
+}
+
+- (NSTimeInterval)repeatInterval
+{
+  return _repeatInterval;
+}
+
+- (void)setRepeatInterval:(NSTimeInterval)interval
+{
+  _repeatInterval = interval;
+}
+
 - (Date *)triggerDateRelativeTo:(Date *)date
 {
   return [Date dateWithTimeInterval:_relativeTrigger sinceDate:date];
