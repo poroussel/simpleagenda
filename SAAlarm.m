@@ -106,7 +106,6 @@ NSString *SAActionSound = @"AUDIO";
 
 - (Date *)triggerDateRelativeTo:(Date *)date
 {
-  /* FIXME */
-  return date;
+  return [Date dateWithTimeInterval:_relativeTrigger sinceDate:date];
 }
 @end
