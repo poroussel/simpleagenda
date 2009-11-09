@@ -9,6 +9,7 @@
 #import "PreferencesController.h"
 #import "iCalTree.h"
 #import "SelectionManager.h"
+#import "AlarmManager.h"
 
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
@@ -164,6 +165,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   [self dataChanged:nil];
+  /* This will init the alarms for all loaded elements needing one */
+  [AlarmManager globalManager];
 }
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification

@@ -56,7 +56,8 @@ SelectionManager.m \
 RecurrenceRule.m \
 NSColor+SimpleAgenda.m \
 DateRange.m \
-SAAlarm.m
+SAAlarm.m \
+AlarmManager.m
 
 #
 # Other sources

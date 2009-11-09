@@ -134,4 +134,11 @@ NSString *SAActionSound = @"AUDIO";
 {
   return [Date dateWithTimeInterval:_relativeTrigger sinceDate:date];
 }
+
+- (NSString *)description
+{
+  if ([self isAbsoluteTrigger])
+    return [NSString stringWithFormat:@"Absolute trigger set to %@ repeat %d interval %f", [_absoluteTrigger description], _repeatCount, _repeatInterval];
+  return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f", _relativeTrigger, _repeatCount, _repeatInterval];
+}
 @end

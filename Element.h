@@ -14,6 +14,8 @@
   ICAL_CLASS_NONE = 10010
 */
 
+@class SAAlarm;
+
 @interface Element : NSObject <NSCoding>
 {
   id <MemoryStore> _store;
@@ -22,6 +24,7 @@
   NSAttributedString *_text;
   icalproperty_class _classification;
   Date *_stamp;
+  NSMutableArray *_alarms;
 }
 
 - (id)initWithSummary:(NSString *)summary;
@@ -39,6 +42,11 @@
 - (void)setUID:(NSString *)uid;
 - (void)setClassification:(icalproperty_class)classification;
 - (void)setDateStamp:(Date *)stamp;
+
+- (BOOL)hasAlarms;
+- (NSArray *)alarms;
+- (void)addAlarm:(SAAlarm *)alarm;
+- (void)removeAlarm:(SAAlarm *)alarm;
 
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;

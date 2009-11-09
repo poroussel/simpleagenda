@@ -4,8 +4,11 @@
 #import "Task.h"
 #import "defines.h"
 
-NSString * const SADataChangedInStore = @"DataDidChangedInStore";
-NSString * const SAStatusChangedForStore = @"StatusChangedForStore";
+NSString * const SADataChangedInStore = @"SADataDidChangedInStore";
+NSString * const SAStatusChangedForStore = @"SAStatusChangedForStore";
+NSString * const SAElementAddedToStore = @"SAElementAddedToStore";
+NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
+NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 @implementation MemoryStore
 - (NSDictionary *)defaults
@@ -62,6 +65,15 @@ NSString * const SAStatusChangedForStore = @"StatusChangedForStore";
   return [_tasks allValues];
 }
 
+- (Element *)elementWithUID:(NSString *)uid
+{
+  if ([_data objectForKey:uid] != nil)
+    return [_data objectForKey:uid];
+  if ([_tasks objectForKey:uid] != nil)
+    return [_tasks objectForKey:uid];
+  return nil;
+}
+
 /* Should be used only when loading data */
 - (void)fillWithElements:(NSSet *)set
 {
@@ -80,23 +92,33 @@ NSString * const SAStatusChangedForStore = @"StatusChangedForStore";
 
 - (void)add:(Element *)elt
 {
+  NSString *uid = [elt UID];
+
   [elt setStore:self];
   if ([elt isKindOfClass:[Event class]])
-    [_data setValue:elt forKey:[elt UID]];
+    [_data setValue:elt forKey:uid];
   else
-    [_tasks setValue:elt forKey:[elt UID]];
+    [_tasks setValue:elt forKey:uid];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAElementAddedToStore 
+					              object:self
+					            userInfo:[NSDictionary dictionaryWithObject:uid forKey:@"UID"]];
 }
 
 - (void)remove:(Element *)elt
 {
+  NSString *uid = [elt UID];
+
   if ([elt isKindOfClass:[Event class]])
-    [_data removeObjectForKey:[elt UID]];
+    [_data removeObjectForKey:uid];
   else
-    [_tasks removeObjectForKey:[elt UID]];
+    [_tasks removeObjectForKey:uid];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAElementRemovedFromStore 
+					              object:self
+					            userInfo:[NSDictionary dictionaryWithObject:uid forKey:@"UID"]];
 }
 
 - (void)update:(Element *)elt;
@@ -104,6 +126,9 @@ NSString * const SAStatusChangedForStore = @"StatusChangedForStore";
   [elt setDateStamp:[Date now]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAElementRemovedFromStore 
+					              object:self
+					            userInfo:[NSDictionary dictionaryWithObject:[elt UID] forKey:@"UID"]];
 }
 
 - (BOOL)contains:(Element *)elt

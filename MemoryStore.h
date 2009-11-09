@@ -5,6 +5,9 @@
 
 extern NSString * const SADataChangedInStore;
 extern NSString * const SAStatusChangedForStore;
+extern NSString * const SAElementAddedToStore;
+extern NSString * const SAElementRemovedFromStore;
+extern NSString * const SAElementUpdatedInStore;
 
 @class Element;
 @class NSColor;
@@ -16,6 +19,7 @@ extern NSString * const SAStatusChangedForStore;
 + (NSString *)storeTypeName;
 - (NSArray *)events;
 - (NSArray *)tasks;
+- (Element *)elementWithUID:(NSString *)uid;
 - (void)fillWithElements:(NSSet *)set;
 - (void)add:(Element *)evt;
 - (void)remove:(Element *)elt;

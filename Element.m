@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "Date.h"
 #import "Element.h"
+#import "SAAlarm.h"
 
 @implementation Element
 -(void)encodeWithCoder:(NSCoder *)coder
@@ -39,6 +40,14 @@
     [self generateUID];
     [self setDateStamp:[Date now]];
     [self setClassification: ICAL_CLASS_PUBLIC];
+#if 0
+    static NSTimeInterval diff = 2.0;
+    _alarms = [[NSMutableArray alloc] initWithCapacity:1];
+    SAAlarm *alarm = [SAAlarm alarm];
+    [alarm setAbsoluteTrigger:[Date dateWithTimeInterval:diff sinceDate:[Date now]]];
+    [_alarms addObject:alarm];
+    diff += 0.1;
+#endif
   }
   return self;
 }
@@ -57,6 +66,7 @@
   RELEASE(_text);
   RELEASE(_uid);
   RELEASE(_stamp);
+  RELEASE(_alarms);
   [super dealloc];
 }
 
@@ -141,6 +151,25 @@
 - (void)setDateStamp:(Date *)stamp;
 {
   ASSIGNCOPY(_stamp, stamp);
+}
+
+- (BOOL)hasAlarms
+{
+  return [_alarms count] > 0;
+}
+
+- (NSArray *)alarms
+{
+  return [_alarms copy];
+}
+
+- (void)addAlarm:(SAAlarm *)alarm
+{
+  [_alarms addObject:alarm];
+}
+
+- (void)removeAlarm:(SAAlarm *)alarm
+{
 }
 
 - (id)initWithICalComponent:(icalcomponent *)ic
