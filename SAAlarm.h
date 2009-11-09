@@ -22,6 +22,7 @@ extern NSString *SAActionSound;
 }
 
 + (id)alarm;
+- (BOOL)isAbsoluteTrigger;
 - (Date *)absoluteTrigger;
 - (void)setAbsoluteTrigger:(Date *)trigger;
 - (NSTimeInterval)relativeTrigger;

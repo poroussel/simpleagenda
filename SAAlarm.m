@@ -34,6 +34,11 @@ NSString *SAActionSound = @"AUDIO";
   return AUTORELEASE([[SAAlarm alloc] init]);
 }
 
+- (BOOL)isAbsoluteTrigger
+{
+  return _absoluteTrigger != nil;
+}
+
 - (Date *)absoluteTrigger
 {
   return _absoluteTrigger;
