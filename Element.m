@@ -111,7 +111,7 @@
 
 - (NSString *)UID
 {
-  return _uid;
+  return [NSString stringWithString:_uid];
 }
 
 - (void)setUID:(NSString *)aUid;
