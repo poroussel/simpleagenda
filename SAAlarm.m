@@ -53,6 +53,7 @@ NSString *SAActionSound = @"AUDIO";
 - (void)setRelativeTrigger:(NSTimeInterval)trigger
 {
   _relativeTrigger = trigger;
+  DESTROY(_absoluteTrigger);
 }
 
 - (NSString *)action
