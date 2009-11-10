@@ -322,6 +322,7 @@
   NSEnumerator *enumerator;
   NSString *href;
   NSSet *components;
+  NSMutableSet *global = [NSMutableSet setWithCapacity:32];
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
@@ -330,7 +331,7 @@
     if ([element get] && [tree parseData:[element data]]) {
       components = [tree components];
       if ([components count] > 0) {
-	[self fillWithElements:components];
+	[global unionSet:components];
 	[_hreftree setObject:tree forKey:href];
 	[_hrefresource setObject:element forKey:href];
 	[_uidhref setObject:href forKey:[[components anyObject] UID]];
@@ -339,6 +340,8 @@
     [tree release];
     [element release];
   }
+  if ([global count] > 0)
+    [self fillWithElements:global];      
 }
 - (void)fetchData:(id)object
 {
