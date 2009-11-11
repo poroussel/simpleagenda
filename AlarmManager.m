@@ -6,61 +6,59 @@
 #import "SAAlarm.h"
 
 @interface AlarmManager(Private)
-- (void)setAlarmsFromElements:(NSArray *)elements;
+- (void)setAlarmsForElement:(Element *)element;
+- (void)setAlarmsForElements:(NSArray *)elements;
 - (id)init;
 @end
 
 @implementation AlarmManager(Private)
-- (void)absoluteTimer:(NSTimer *)timer
+- (void)absoluteTrigger:(SAAlarm *)alarm
 {
-  SAAlarm *alarm = [timer userInfo];
   NSLog([alarm description]);
 }
 
-- (void)setAlarmsFromElements:(NSArray *)elements
+- (void)setAlarmsForElement:(Element *)element
 {
-  NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-  NSEnumerator *enumerator = [elements objectEnumerator];
   NSEnumerator *enumAlarm;
-  Element *element;
   SAAlarm *alarm;
-  NSTimer *timer;
   NSDate *date;
 
-  while ((element = [enumerator nextObject])) {
-    if (![[element store] displayed] || ![element hasAlarms])
-      continue;
-    enumAlarm = [[element alarms] objectEnumerator];
-    while ((alarm = [enumAlarm nextObject])) {
-      if ([alarm isAbsoluteTrigger]) {
-	date = [[alarm absoluteTrigger] calendarDate];
-	if ([date timeIntervalSinceNow] < 0)
-	  break;
-	NSLog(@"absoluteTrigger %@", [date description]);
-	timer = [[NSTimer alloc] initWithFireDate:date
-				         interval:0
-				           target:self
-				         selector:@selector(absoluteTimer:)
-				         userInfo:alarm
-				          repeats:NO];
-	if (timer == nil)
-	  NSLog(@"Erreur creation timer");
-	[runLoop addTimer:timer forMode:NSDefaultRunLoopMode];
-	[timer release];
-      } else {
-	NSLog(@"relativeTrigger");
-      }
+  if (![[element store] displayed] || ![element hasAlarms])
+    return;
+  enumAlarm = [[element alarms] objectEnumerator];
+  while ((alarm = [enumAlarm nextObject])) {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self 
+	                                     selector:@selector(absoluteTrigger:) 
+	                                       object:alarm]; 
+    if ([alarm isAbsoluteTrigger]) {
+      date = [[alarm absoluteTrigger] calendarDate];
+      if ([date timeIntervalSinceNow] < 0)
+	break;
+      [self performSelector:@selector(absoluteTrigger:) 
+	    withObject:alarm 
+	    afterDelay:[date timeIntervalSinceNow]];
+      NSLog(@"absoluteTrigger %@", [date description]);
+    } else {
+      NSLog(@"relativeTrigger");
     }
   }
 }
 
+- (void)setAlarmsForElements:(NSArray *)elements
+{
+  NSEnumerator *enumerator = [elements objectEnumerator];
+  Element *element;
+
+  while ((element = [enumerator nextObject]))
+    [self setAlarmsForElement:element];
+}
 
 - (void)dataChanged:(NSNotification *)not
 {
   MemoryStore *store = [not object];
   NSLog(@"AlarmManager dataChanged:");
-  [self setAlarmsFromElements:[store events]];
-  [self setAlarmsFromElements:[store tasks]];
+  [self setAlarmsForElements:[store events]];
+  [self setAlarmsForElements:[store tasks]];
 }
 
 - (id)init
@@ -70,8 +68,8 @@
   self = [super init];
   if (self) {
     sm = [StoreManager globalManager];
-    [self setAlarmsFromElements:[sm allEvents]];
-    [self setAlarmsFromElements:[sm allTasks]];
+    [self setAlarmsForElements:[sm allEvents]];
+    [self setAlarmsForElements:[sm allTasks]];
     /*
      * FIXME : s'inscrire aux 
      * notifications de detail (ajout/suppression/modification) ?
