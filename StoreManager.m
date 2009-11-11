@@ -70,9 +70,21 @@ static NSMutableDictionary *backends = nil;
   if (self) {
     [config registerDefaults:[self defaults]];
     [[NSNotificationCenter defaultCenter] addObserver:self 
-					  selector:@selector(dataChanged:) 
-					  name:SADataChangedInStore 
-					  object:nil];
+					     selector:@selector(dataChanged:)
+					         name:SADataChangedInStore
+					       object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(dataChanged:)
+					         name:SAElementAddedToStore
+					       object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(dataChanged:)
+					         name:SAElementRemovedFromStore
+					       object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(dataChanged:)
+					         name:SAElementUpdatedInStore
+					       object:nil];
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
