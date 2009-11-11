@@ -4,6 +4,7 @@
 
 @interface AlarmManager : NSObject
 {
+  NSMutableDictionary *_activeAlarms;
 }
 
 + (AlarmManager *)globalManager;
