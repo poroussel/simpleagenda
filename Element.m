@@ -41,12 +41,12 @@
     [self setDateStamp:[Date now]];
     [self setClassification: ICAL_CLASS_PUBLIC];
 #if 0
-    static NSTimeInterval diff = 2.0;
+    static NSTimeInterval diff = 1.0;
     _alarms = [[NSMutableArray alloc] initWithCapacity:1];
     SAAlarm *alarm = [SAAlarm alarm];
     [alarm setAbsoluteTrigger:[Date dateWithTimeInterval:diff sinceDate:[Date now]]];
     [_alarms addObject:alarm];
-    diff += 0.1;
+    diff += 1.0;
 #endif
   }
   return self;
