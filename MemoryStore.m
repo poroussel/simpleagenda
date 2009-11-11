@@ -126,7 +126,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   [elt setDateStamp:[Date now]];
   _modified = YES;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStore object:self];
-  [[NSNotificationCenter defaultCenter] postNotificationName:SAElementRemovedFromStore 
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAElementUpdatedInStore 
 					              object:self
 					            userInfo:[NSDictionary dictionaryWithObject:[elt UID] forKey:@"UID"]];
 }
