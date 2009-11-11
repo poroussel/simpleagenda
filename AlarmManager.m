@@ -5,16 +5,38 @@
 #import "Element.h"
 #import "SAAlarm.h"
 
-@interface AlarmManager(Private)
-- (void)setAlarmsForElement:(Element *)element;
-- (void)setAlarmsForElements:(NSArray *)elements;
-- (id)init;
-@end
-
 @implementation AlarmManager(Private)
 - (void)absoluteTrigger:(SAAlarm *)alarm
 {
   NSLog([alarm description]);
+}
+
+- (void)addAlarm:(SAAlarm *)alarm forUID:(NSString *)uid
+{
+  NSMutableArray *alarms = [_activeAlarms objectForKey:uid];
+
+  if (!alarms) {
+    alarms = [NSMutableArray arrayWithCapacity:2];
+    [_activeAlarms setObject:alarms forKey:uid];
+  }
+  [alarms addObject:alarm];
+}
+
+- (void)removeAlarmsforUID:(NSString *)uid
+{
+  NSMutableArray *alarms = [_activeAlarms objectForKey:uid];
+  NSEnumerator *enumerator;
+  SAAlarm *alarm;
+  
+  if (alarms) {
+    enumerator = [alarms objectEnumerator];
+    while ((alarm = [enumerator nextObject])) {
+      [NSObject cancelPreviousPerformRequestsWithTarget:self 
+	                                       selector:@selector(absoluteTrigger:) 
+	                                         object:alarm]; 
+    }
+    [_activeAlarms removeObjectForKey:uid];
+  }
 }
 
 - (void)setAlarmsForElement:(Element *)element
@@ -34,9 +56,10 @@
       date = [[alarm absoluteTrigger] calendarDate];
       if ([date timeIntervalSinceNow] < 0)
 	break;
+      [self addAlarm:alarm forUID:[element UID]];
       [self performSelector:@selector(absoluteTrigger:) 
-	    withObject:alarm 
-	    afterDelay:[date timeIntervalSinceNow]];
+   	         withObject:alarm 
+	         afterDelay:[date timeIntervalSinceNow]];
       NSLog(@"absoluteTrigger %@", [date description]);
     } else {
       NSLog(@"relativeTrigger");
@@ -53,31 +76,54 @@
     [self setAlarmsForElement:element];
 }
 
-- (void)dataChanged:(NSNotification *)not
+- (void)elementAdded:(NSNotification *)not
 {
   MemoryStore *store = [not object];
-  NSLog(@"AlarmManager dataChanged:");
-  [self setAlarmsForElements:[store events]];
-  [self setAlarmsForElements:[store tasks]];
+  NSString *uid = [[not userInfo] objectForKey:@"UID"];
+
+  NSLog(@"Add alarms for %@", uid);
+  [self setAlarmsForElement:[store elementWithUID:uid]];
+}
+
+- (void)elementRemoved:(NSNotification *)not
+{
+  NSString *uid = [[not userInfo] objectForKey:@"UID"];
+
+  NSLog(@"Remove alarms for %@", uid);
+  [self removeAlarmsforUID:uid];
+}
+
+- (void)elementUpdated:(NSNotification *)not
+{
+  //MemoryStore *store = [not object];
+  NSString *uid = [[not userInfo] objectForKey:@"UID"];
+
+  NSLog(@"Update alarms for %@", uid);
 }
 
 - (id)init
 {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   StoreManager *sm;
 
   self = [super init];
   if (self) {
+    _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
     sm = [StoreManager globalManager];
+    [nc addObserver:self 
+	   selector:@selector(elementAdded:) 
+	       name:SAElementAddedToStore
+	     object:nil];
+    [nc addObserver:self 
+	   selector:@selector(elementRemoved:) 
+	       name:SAElementRemovedFromStore
+	     object:nil];
+    [nc addObserver:self 
+	   selector:@selector(elementUpdated:) 
+	       name:SAElementUpdatedInStore
+	     object:nil];
     [self setAlarmsForElements:[sm allEvents]];
     [self setAlarmsForElements:[sm allTasks]];
-    /*
-     * FIXME : s'inscrire aux 
-     * notifications de detail (ajout/suppression/modification) ?
-     */
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:) 
-					         name:SADataChangedInStore 
-					       object:nil];
   }
   return self;
 }
@@ -91,5 +137,12 @@
   if (singleton == nil)
     singleton = [[AlarmManager alloc] init];
   return singleton;
+}
+
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  RELEASE(_activeAlarms);
+  [super dealloc];
 }
 @end
