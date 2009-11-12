@@ -9,6 +9,9 @@ extern NSString *SAActionEmail;
 extern NSString *SAActionProcedure;
 extern NSString *SAActionSound;
 
+@class Date;
+@class Element;
+
 @interface SAAlarm : NSObject
 {
   Date *_absoluteTrigger;
@@ -19,6 +22,7 @@ extern NSString *SAActionSound;
   NSURL *_url;
   int _repeatCount;
   NSTimeInterval _repeatInterval;
+  Element *_element;
 }
 
 + (id)alarm;
@@ -39,5 +43,7 @@ extern NSString *SAActionSound;
 - (void)setRepeatCount:(int)count;
 - (NSTimeInterval)repeatInterval;
 - (void)setRepeatInterval:(NSTimeInterval)interval;
+- (Element *)element;
+- (void)setElement:(Element *)element;
 - (Date *)triggerDateRelativeTo:(Date *)date;
 @end

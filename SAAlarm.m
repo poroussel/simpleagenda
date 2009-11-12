@@ -26,6 +26,7 @@ NSString *SAActionSound = @"AUDIO";
   _emailaddress = nil;
   _sound = nil;
   _url = nil;
+  _element = nil;
   return self;
 }
 
@@ -128,6 +129,16 @@ NSString *SAActionSound = @"AUDIO";
 - (void)setRepeatInterval:(NSTimeInterval)interval
 {
   _repeatInterval = interval;
+}
+
+- (Element *)element
+{
+  return _element;
+}
+
+- (void)setElement:(Element *)element
+{
+  _element = element;
 }
 
 - (Date *)triggerDateRelativeTo:(Date *)date

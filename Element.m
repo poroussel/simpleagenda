@@ -165,6 +165,7 @@
 
 - (void)addAlarm:(SAAlarm *)alarm
 {
+  [alarm setElement:self];
   [_alarms addObject:alarm];
 }
 
