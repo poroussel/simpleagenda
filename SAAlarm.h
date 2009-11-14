@@ -1,8 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "config.h"
 #import <Foundation/Foundation.h>
-#import "Date.h"
 
 extern NSString *SAActionDisplay;
 extern NSString *SAActionEmail;

@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "SAAlarm.h"
+#import "Date.h"
 
 NSString *SAActionDisplay = @"DISPLAY";
 NSString *SAActionEmail = @"EMAIL";
