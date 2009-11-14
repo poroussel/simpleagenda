@@ -4,6 +4,7 @@
 #define LAST_HOUR @"lastHour"
 #define MIN_STEP @"minimumStep"
 #define TOOLTIP @"showTooltip"
+#define ALARMS @"activateAlarms"
 
 #define STORE_CLASSES @"storeClasses"
 

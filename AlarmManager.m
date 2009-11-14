@@ -1,9 +1,11 @@
 #import <Foundation/Foundation.h>
 #import "AlarmManager.h"
 #import "StoreManager.h"
+#import "ConfigManager.h"
 #import "MemoryStore.h"
 #import "Element.h"
 #import "SAAlarm.h"
+#import "defines.h"
 
 @implementation AlarmManager(Private)
 - (void)runAlarm:(SAAlarm *)alarm
@@ -113,13 +115,22 @@
   [self setAlarmsForElement:[store elementWithUID:uid]];
 }
 
+- (NSDictionary *)defaults
+{
+  return [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:ALARMS];
+}
+
 - (id)init
 {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   StoreManager *sm = [StoreManager globalManager];
+  ConfigManager *cm = [ConfigManager globalConfig];
 
   self = [super init];
   if (self) {
+    [cm registerDefaults:[self defaults]];
+    [cm registerClient:self forKey:ALARMS];
+    _active = [[cm objectForKey:ALARMS] boolValue];
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
     [nc addObserver:self 
 	   selector:@selector(elementAdded:) 
@@ -139,6 +150,13 @@
   }
   return self;
 }
+
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  RELEASE(_activeAlarms);
+  [super dealloc];
+}
 @end
 
 @implementation AlarmManager
@@ -151,10 +169,8 @@
   return singleton;
 }
 
-- (void)dealloc
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key;
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
-  RELEASE(_activeAlarms);
-  [super dealloc];
+  _active = [[config objectForKey:ALARMS] boolValue];
 }
 @end

@@ -3,7 +3,7 @@
 @class ConfigManager;
 
 @protocol ConfigListener
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key;
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key;
 @end
 
 @interface ConfigManager : NSObject
@@ -19,7 +19,7 @@
 + (ConfigManager *)globalConfig;
 - (void)registerDefaults:(NSDictionary *)defaults;
 - (void)registerClient:(id <ConfigListener>)client forKey:(NSString *)key;
-- (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString*)key;
+- (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString *)key;
 - (void)unregisterClient:(id <ConfigListener>)client;
 - (id)objectForKey:(NSString *)key;
 - (void)removeObjectForKey:(NSString *)key;
@@ -28,6 +28,5 @@
 - (void)setInteger:(int)value forKey:(NSString *)key;
 - (NSDictionary *)dictionaryForKey:(NSString *)key;
 - (void)setDictionary:(NSDictionary *)dict forKey:(NSString *)key;
-
 @end
 
