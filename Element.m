@@ -87,7 +87,7 @@
 
 - (void)setText:(NSAttributedString *)text
 {
-  ASSIGN(_text, text);
+  ASSIGNCOPY(_text, text);
 }
 
 - (NSString *)summary
@@ -97,7 +97,7 @@
 
 - (void)setSummary:(NSString *)summary
 {
-  ASSIGN(_summary, summary);
+  ASSIGNCOPY(_summary, summary);
 }
 
 - (void)generateUID
@@ -160,7 +160,7 @@
 
 - (NSArray *)alarms
 {
-  return [_alarms copy];
+  return [NSArray arrayWithArray:_alarms];
 }
 
 - (void)addAlarm:(SAAlarm *)alarm
