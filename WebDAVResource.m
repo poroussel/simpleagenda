@@ -1,5 +1,5 @@
 #import <GNUstepBase/GSXML.h>
-#import "GNUstepBase/GSMime.h"
+#import <GNUstepBase/GSMime.h>
 #import "WebDAVResource.h"
 
 @implementation WebDAVResource
