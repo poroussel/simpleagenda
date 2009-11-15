@@ -7,6 +7,11 @@
 #import "SAAlarm.h"
 #import "defines.h"
 
+@interface AlarmManager(Private)
+- (void)removeAlarms;
+- (void)createAlarms;
+@end
+
 @implementation AlarmManager(Private)
 - (void)runAlarm:(SAAlarm *)alarm
 {
@@ -90,29 +95,35 @@
 
 - (void)elementAdded:(NSNotification *)not
 {
-  MemoryStore *store = [not object];
-  NSString *uid = [[not userInfo] objectForKey:@"UID"];
-
-  NSLog(@"Add alarms for %@", uid);
-  [self setAlarmsForElement:[store elementWithUID:uid]];
+  if (_active) {
+    MemoryStore *store = [not object];
+    NSString *uid = [[not userInfo] objectForKey:@"UID"];
+    
+    NSLog(@"Add alarms for %@", uid);
+    [self setAlarmsForElement:[store elementWithUID:uid]];
+  }
 }
 
 - (void)elementRemoved:(NSNotification *)not
 {
-  NSString *uid = [[not userInfo] objectForKey:@"UID"];
+  if (_active) {
+    NSString *uid = [[not userInfo] objectForKey:@"UID"];
 
-  NSLog(@"Remove alarms for %@", uid);
-  [self removeAlarmsforUID:uid];
+    NSLog(@"Remove alarms for %@", uid);
+    [self removeAlarmsforUID:uid];
+  }
 }
 
 - (void)elementUpdated:(NSNotification *)not
 {
-  MemoryStore *store = [not object];
-  NSString *uid = [[not userInfo] objectForKey:@"UID"];
+  if (_active) {
+    MemoryStore *store = [not object];
+    NSString *uid = [[not userInfo] objectForKey:@"UID"];
 
-  NSLog(@"Update alarms for %@", uid);
-  [self removeAlarmsforUID:uid];
-  [self setAlarmsForElement:[store elementWithUID:uid]];
+    NSLog(@"Update alarms for %@", uid);
+    [self removeAlarmsforUID:uid];
+    [self setAlarmsForElement:[store elementWithUID:uid]];
+  }
 }
 
 - (NSDictionary *)defaults
@@ -123,7 +134,6 @@
 - (id)init
 {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-  StoreManager *sm = [StoreManager globalManager];
   ConfigManager *cm = [ConfigManager globalConfig];
 
   self = [super init];
@@ -144,8 +154,8 @@
 	   selector:@selector(elementUpdated:) 
 	       name:SAElementUpdatedInStore
 	     object:nil];
-    [self setAlarmsForElements:[sm allEvents]];
-    [self setAlarmsForElements:[sm allTasks]];
+    if (_active)
+      [self createAlarms];
     /* FIXME : what happens when a store is reloaded ? */
   }
   return self;
@@ -156,6 +166,21 @@
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_activeAlarms);
   [super dealloc];
+}
+
+- (void)createAlarms
+{
+  StoreManager *sm = [StoreManager globalManager];
+
+  [self removeAlarms];
+  [self setAlarmsForElements:[sm allEvents]];
+  [self setAlarmsForElements:[sm allTasks]];
+}
+
+- (void)removeAlarms
+{
+  [NSObject cancelPreviousPerformRequestsWithTarget:self];
+  [_activeAlarms removeAllObjects];
 }
 @end
 
@@ -169,8 +194,12 @@
   return singleton;
 }
 
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key;
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
   _active = [[config objectForKey:ALARMS] boolValue];
+  if (_active)
+    [self createAlarms];
+  else
+    [self removeAlarms];
 }
 @end
