@@ -269,7 +269,6 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
       if (result)
 	ASSIGNCOPY(_lastModified, [result stringValue]);
     }
-    [parser release];
   }
 }
 
