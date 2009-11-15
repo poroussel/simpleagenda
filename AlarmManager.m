@@ -164,6 +164,7 @@
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_activeAlarms);
   [super dealloc];
 }
