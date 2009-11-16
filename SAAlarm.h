@@ -2,10 +2,10 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *SAActionDisplay;
-extern NSString *SAActionEmail;
-extern NSString *SAActionProcedure;
-extern NSString *SAActionSound;
+extern NSString * const SAActionDisplay;
+extern NSString * const SAActionEmail;
+extern NSString * const SAActionProcedure;
+extern NSString * const SAActionSound;
 
 @class Date;
 @class Element;

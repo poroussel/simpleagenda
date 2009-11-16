@@ -3,10 +3,10 @@
 #import "SAAlarm.h"
 #import "Date.h"
 
-NSString *SAActionDisplay = @"DISPLAY";
-NSString *SAActionEmail = @"EMAIL";
-NSString *SAActionProcedure = @"PROCEDURE";
-NSString *SAActionSound = @"AUDIO";
+NSString * const SAActionDisplay = @"DISPLAY";
+NSString * const SAActionEmail = @"EMAIL";
+NSString * const SAActionProcedure = @"PROCEDURE";
+NSString * const SAActionSound = @"AUDIO";
 
 @implementation SAAlarm
 - (void)dealloc
