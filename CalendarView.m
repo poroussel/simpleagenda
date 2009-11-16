@@ -229,7 +229,7 @@ static NSImage *_2right;
 	[cell setBackgroundColor:clear];
 	[cell setDrawsBackground:NO];
       }
-      [cell setObjectValue:[day copy]];
+      [cell setObjectValue:AUTORELEASE([day copy])];
       if (dataSource && [[dataSource scheduledAppointmentsForDay:day] count])
 	[cell setFont:boldFont];
       else
@@ -299,7 +299,7 @@ static NSImage *_2right;
     [delegate calendarView:self userActionForDate:date];
 }
 
-- (void)setDelegate: (id)aDelegate
+- (void)setDelegate:(id)aDelegate
 {
   ASSIGN(delegate, aDelegate);
 }
