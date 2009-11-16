@@ -83,7 +83,7 @@ static NSTimeZone *gl_nstz = nil;
 
 /*
  * This is a bit convoluted because icaltime_compare
- * create to dates in utc timezone to do the comparison.
+ * creates two dates in utc timezone to do the comparison.
  * The conversion to utc means a datetime will be modified
  * (up or down, depending on the local time zone) and a
  * date won't.
