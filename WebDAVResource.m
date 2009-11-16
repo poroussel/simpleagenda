@@ -106,7 +106,7 @@
     [self debugLog:@"%@ status %d", method, _httpStatus];
   property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
   if (property)
-    ASSIGNCOPY(_reason, property);
+    ASSIGN(_reason, property);
   else
     DESTROY(_reason);
   if (_httpStatus < 200 || _httpStatus > 299) {
@@ -125,12 +125,12 @@
     property = [handle propertyForKeyIfAvailable:@"Last-Modified"];
     if (!_lastModified || (property && ![property isEqual:_lastModified])) {
       _dataChanged = YES;
-      ASSIGNCOPY(_lastModified, property);
+      ASSIGN(_lastModified, property);
     }
     property = [handle propertyForKeyIfAvailable:@"ETag"];
     if (!_etag || (property && ![property isEqual:_etag])) {
       _dataChanged = YES;
-      ASSIGNCOPY(_etag, property);
+      ASSIGN(_etag, property);
     }
   }
   [handle release];
@@ -264,18 +264,18 @@ static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
       result = (GSXPathString *)[xpc evaluateExpression:GETETAG];
       if (result)
-	ASSIGNCOPY(_etag, [result stringValue]);
+	ASSIGN(_etag, [result stringValue]);
       result = (GSXPathString *)[xpc evaluateExpression:GETLASTMODIFIED];
       if (result)
-	ASSIGNCOPY(_lastModified, [result stringValue]);
+	ASSIGN(_lastModified, [result stringValue]);
     }
   }
 }
 
 - (void)setUser:(NSString *)user password:(NSString *)password
 {
-  ASSIGNCOPY(_user, user);
-  ASSIGNCOPY(_password, password);
+  ASSIGN(_user, user);
+  ASSIGN(_password, password);
 }
 @end
 

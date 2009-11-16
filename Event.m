@@ -92,7 +92,7 @@
 
 - (void)setLocation:(NSString *)location
 {
-  ASSIGNCOPY(_location, location);
+  ASSIGN(_location, location);
 }
 
 - (BOOL)allDay
@@ -164,7 +164,7 @@
 
 - (void)setRRule:(RecurrenceRule *)arule
 {
-  ASSIGNCOPY(_rrule, arule);
+  ASSIGN(_rrule, arule);
 }
 
 - (NSEnumerator *)dateEnumerator

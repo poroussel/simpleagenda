@@ -6,7 +6,7 @@
   self = [super init];
   if (self) {
     _length = seconds;
-    ASSIGNCOPY(_start, date);
+    _start = [date retain];
   }
   return self;
 }
@@ -19,7 +19,7 @@
 
 - (void)dealloc
 {
-  RELEASE(_start);
+  [_start release];
   [super dealloc];
 }
 
@@ -30,7 +30,7 @@
 
 - (void)setStart:(Date *)start
 {
-  ASSIGNCOPY(_start, start);
+  ASSIGN(_start, start);
 }
 
 - (NSTimeInterval)length

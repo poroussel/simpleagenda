@@ -70,7 +70,7 @@ NSString *SAActionSound = @"AUDIO";
 
 - (void)setAction:(NSString *)action
 {
-  ASSIGNCOPY(_action, action);
+  ASSIGN(_action, action);
 }
 
 - (NSString *)emailAddress
@@ -80,7 +80,7 @@ NSString *SAActionSound = @"AUDIO";
 
 - (void)setEmailAddress:(NSString *)emailAddress
 {
-  ASSIGNCOPY(_emailaddress, emailAddress);
+  ASSIGN(_emailaddress, emailAddress);
   DESTROY(_sound);
   DESTROY(_url);
   [self setAction:SAActionEmail];
@@ -93,7 +93,7 @@ NSString *SAActionSound = @"AUDIO";
 
 - (void)setSound:(NSString *)sound
 {
-  ASSIGNCOPY(_sound, sound);
+  ASSIGN(_sound, sound);
   DESTROY(_emailaddress);
   DESTROY(_url);
   [self setAction:SAActionSound];
@@ -106,7 +106,7 @@ NSString *SAActionSound = @"AUDIO";
 
 - (void)setUrl:(NSURL *)url
 {
-  ASSIGNCOPY(_url, url);
+  ASSIGN(_url, url);
   DESTROY(_emailaddress);
   DESTROY(_sound);
   [self setAction:SAActionProcedure];

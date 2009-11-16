@@ -87,7 +87,7 @@
 
 - (void)setText:(NSAttributedString *)text
 {
-  ASSIGNCOPY(_text, text);
+  ASSIGN(_text, text);
 }
 
 - (NSString *)summary
@@ -97,7 +97,7 @@
 
 - (void)setSummary:(NSString *)summary
 {
-  ASSIGNCOPY(_summary, summary);
+  ASSIGN(_summary, summary);
 }
 
 - (void)generateUID
@@ -126,7 +126,7 @@
 
 - (void)setUID:(NSString *)aUid;
 {
-  ASSIGNCOPY(_uid, aUid);
+  ASSIGN(_uid, aUid);
 }
 
 - (icalproperty_class)classification
