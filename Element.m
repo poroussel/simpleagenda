@@ -38,7 +38,6 @@
 {
   self = [super init];
   if (self) {
-    [self generateUID];
     [self setDateStamp:[Date now]];
     [self setClassification: ICAL_CLASS_PUBLIC];
 #if 0
@@ -108,6 +107,8 @@
 
 - (NSString *)UID
 {
+  if (!_uid)
+    [self generateUID];
   return _uid;
 }
 
