@@ -1,4 +1,5 @@
 include $(GNUSTEP_MAKEFILES)/common.make
+include local.make
 
 #
 # Application
@@ -57,7 +58,8 @@ RecurrenceRule.m \
 NSColor+SimpleAgenda.m \
 DateRange.m \
 SAAlarm.m \
-AlarmManager.m
+AlarmManager.m \
+NSString+SimpleAgenda.m
 
 #
 # Other sources

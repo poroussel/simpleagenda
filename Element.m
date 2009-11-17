@@ -2,6 +2,7 @@
 #import "Date.h"
 #import "Element.h"
 #import "SAAlarm.h"
+#import "NSString+SimpleAgenda.h"
 
 @implementation Element
 -(void)encodeWithCoder:(NSCoder *)coder
@@ -102,26 +103,12 @@
 
 - (void)generateUID
 {
-  Date *now = [Date now];
-  static Date *lastDate;
-  static int counter;
-
-  if (!lastDate)
-    ASSIGNCOPY(lastDate, now);
-  else {
-    if (![lastDate compareTime:now])
-      counter++;
-    else {
-      ASSIGNCOPY(lastDate, now);
-      counter = 0;
-    }
-  }
-  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@-%d-%@", [now description], counter, [[NSHost currentHost] address]]];
+  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@", [NSString uuid]]];
 }
 
 - (NSString *)UID
 {
-  return [NSString stringWithString:_uid];
+  return _uid;
 }
 
 - (void)setUID:(NSString *)aUid;
