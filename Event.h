@@ -10,7 +10,6 @@
   BOOL _allDay;
   Date *_startDate;
   int _duration;
-  int _scheduleLevel;
   RecurrenceRule *_rrule;
 }
 
