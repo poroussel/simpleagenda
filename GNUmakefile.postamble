@@ -3,10 +3,13 @@
 #
 
 # Things to do before compiling
-before-all:: config.h
+before-all:: config.h local.make
 
 config.h: config.h.in
 	./configure
+
+local.make: local.make.in
+	./configure    
 
 # Things to do after compiling
 # after-all::
@@ -34,7 +37,7 @@ config.h: config.h.in
 
 # Things to do after distcleaning
 after-distclean::
-	-rm -f config.h config.log config.status
+	-rm -f config.h config.log config.status local.make
   
 # Things to do before checking
 # before-check::
