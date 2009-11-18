@@ -1,14 +1,17 @@
 #import "ElementTest.h"
+#import "../MemoryStore.h"
 #import "../Element.h"
 #import "../Date.h"
 
 @implementation ElementTest
 - (void)setUp
 {
+  testStore = [[MemoryStore alloc] initWithName:@"testStore"];
 }
 
 - (void)tearDown
 {
+  [testStore release];
 }
 
 - (void)testUID
@@ -18,9 +21,11 @@
   e1 = [[Element alloc] initWithSummary:@"1"];
   e2 = [[Element alloc] initWithSummary:@"2"];
 
-  [self assertTrue:([e1 UID] != nil) message:@"First element has an UID."];
-  [self assertTrue:([e2 UID] != nil) message:@"Second element has an UID."];
-  [self assertFalse:[[e2 UID] isEqualToString:[e1 UID]] message:@"But their UIDs are differents."];
+  [self assertTrue:([e1 UID] == nil) message:@"Element has no UID before its addition to a store."];
+  [testStore add:e1];
+  [self assertTrue:([e1 UID] != nil) message:@"Element has an UID after its addition to a store"];
+  [testStore add:e2];
+  [self assertFalse:[[e2 UID] isEqualToString:[e1 UID]] message:@"Elements UIDs are differents."];
 
   [e1 release];
   [e2 release];
