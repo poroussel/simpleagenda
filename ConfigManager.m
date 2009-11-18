@@ -2,7 +2,6 @@
 #import "ConfigManager.h"
 
 @implementation ConfigManager(Private)
-
 - (ConfigManager *)initRoot
 {
   self = [super init];
@@ -15,12 +14,10 @@
   }
   return self;
 }
-
 @end
 
 
 @implementation ConfigManager
-
 - (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent
 {
   NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
@@ -167,5 +164,4 @@
   while ((set = [enumerator nextObject]))
     [set removeObject:client];
 }
-
 @end

@@ -7,7 +7,7 @@ GNUstep frameworks. Its major features are:
 
     * multiple agendas with text and background colors
     * support local and iCalendar data sources
-    * calendar, day view, summary and tasks view
+    * calendar, day view, week view, summary and tasks view
     * create, resize and move appointments easily
     * export individual elements as files and to pasteboard
     * import .ics files
@@ -18,6 +18,7 @@ Dependencies
 
 GNUstep Startup 0.19.0
 libical 0.27
+libuuid (optional)
 
 
 Website

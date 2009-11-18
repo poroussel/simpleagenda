@@ -1,7 +1,3 @@
-/*
- * Based on ChronographerSource Appointment class
- */
-
 #import <Foundation/Foundation.h>
 #import "Event.h"
 #import "DateRange.h"

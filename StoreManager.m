@@ -1,5 +1,3 @@
-/* emacs buffer mode hint -*- objc -*- */
-
 #import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
@@ -30,14 +28,17 @@ static NSMutableDictionary *backends = nil;
     }
   }
 }
+
 + (NSArray *)backends
 {
   return [backends allValues];
 }
+
 + (Class)backendForName:(NSString *)name
 {
   return [backends valueForKey:name];
 }
+
 + (StoreManager *)globalManager
 {
   static StoreManager *singleton;
@@ -199,6 +200,7 @@ static NSMutableDictionary *backends = nil;
       [all addObjectsFromArray:[store events]];
   return all;
 }
+
 - (NSArray *)allTasks;
 {
   NSMutableArray *all = [NSMutableArray arrayWithCapacity:128];

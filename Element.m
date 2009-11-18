@@ -5,7 +5,7 @@
 #import "NSString+SimpleAgenda.h"
 
 @implementation Element
--(void)encodeWithCoder:(NSCoder *)coder
+- (void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:_summary forKey:@"title"];
   [coder encodeObject:[_text string] forKey:@"descriptionText"];
@@ -15,7 +15,7 @@
     [coder encodeObject:_stamp forKey:@"dtstamp"];
 }
 
--(id)initWithCoder:(NSCoder *)coder
+- (id)initWithCoder:(NSCoder *)coder
 {
   _summary = [[coder decodeObjectForKey:@"title"] retain];
   _text = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
