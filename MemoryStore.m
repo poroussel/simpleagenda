@@ -92,9 +92,13 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 - (void)add:(Element *)elt
 {
-  NSString *uid = [elt UID];
-
+  NSString *uid;
+  
+  [elt generateUID];
   [elt setStore:self];
+  [elt setDateStamp:[Date now]];
+  [elt setClassification: ICAL_CLASS_PUBLIC];
+  uid = [elt UID];
   if ([elt isKindOfClass:[Event class]])
     [_data setValue:elt forKey:uid];
   else

@@ -34,13 +34,12 @@
   return self;
 }
 
+/* FIXME : this method should disappear with the alarm debug code */
 - (id)init
 {
   self = [super init];
   if (self) {
-    [self setDateStamp:[Date now]];
-    [self setClassification: ICAL_CLASS_PUBLIC];
-#if 0
+ #if 0
     static NSTimeInterval diff = 1.0;
     _alarms = [[NSMutableArray alloc] initWithCapacity:1];
     SAAlarm *alarm = [SAAlarm alarm];
@@ -107,8 +106,6 @@
 
 - (NSString *)UID
 {
-  if (!_uid)
-    [self generateUID];
   return _uid;
 }
 
