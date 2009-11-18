@@ -89,6 +89,7 @@
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   int start;
   int minutes;
+  int minStep;
   BOOL keepOn = YES;
   BOOL modified = NO;
   BOOL inResize;
@@ -106,6 +107,7 @@
   inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];
   if (inResize) {
     [[NSCursor resizeUpDownCursor] push];
+    minStep = [parent minimumStep];
     start = [[_apt startDate] minuteOfDay];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -114,6 +116,8 @@
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
 	minutes = [parent roundMinutes:[parent positionToMinute:mouseLoc.y] - start];
+	if (minutes < minStep)
+	  minutes = minStep;
 	if (minutes != [_apt duration]) {
 	  [_apt setDuration:minutes];
 	  modified = YES;
