@@ -1,4 +1,5 @@
 include $(GNUSTEP_MAKEFILES)/common.make
+include ../local.make
 
 TOOL_NAME = SimpleAgendaTests
 
@@ -10,6 +11,7 @@ SimpleAgendaTests_OBJC_FILES = \
 	../ConfigManager.m \
 	../Event.m \
 	../Element.m \
+	../NSString+SimpleAgenda.m \
 	DateTest.m \
 	ElementTest.m \
 	RecurrenceRuleTest.m \
@@ -18,6 +20,9 @@ SimpleAgendaTests_OBJC_FILES = \
 	main.m
 
 SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical
+#ifeq(have_libuuid,yes)
+SimpleAgendaTests_TOOL_LIBS += -luuid
+#endif
 
 ADDITIONAL_OBJCFLAGS = -Wno-import -Wall
 
