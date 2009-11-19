@@ -1,0 +1,30 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AlarmEditor = {
+	Actions = (
+	);
+	Outlets = (
+	    panel,
+	    calendar,
+	    type,
+	    action
+	);
+	Super = NSObject;
+    };
+    CalendarView = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate,
+	    dataSource
+	);
+	Super = NSView;
+    };
+    FirstResponder = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Super = NSObject;
+    };
+}

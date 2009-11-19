@@ -19,6 +19,7 @@ Resources/Preferences.gorm \
 Resources/iCalendar.gorm \
 Resources/Task.gorm \
 Resources/GroupDAV.gorm \
+Resources/Alarm.gorm \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff \
 Resources/repeat.tiff \
@@ -59,7 +60,8 @@ NSColor+SimpleAgenda.m \
 DateRange.m \
 SAAlarm.m \
 AlarmManager.m \
-NSString+SimpleAgenda.m
+NSString+SimpleAgenda.m \
+AlarmEditor.m
 
 #
 # Other sources
