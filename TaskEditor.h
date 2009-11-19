@@ -1,7 +1,8 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "Task.h"
-#import "StoreManager.h"
+#import <Foundation/Foundation.h>
+
+@class Task;
 
 @interface TaskEditor : NSObject
 {
@@ -16,5 +17,4 @@
 - (BOOL)editTask:(Task *)task;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
-
 @end

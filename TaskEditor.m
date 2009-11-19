@@ -2,6 +2,8 @@
 
 #import <AppKit/AppKit.h>
 #import "TaskEditor.h"
+#import "StoreManager.h"
+#import "Task.h"
 
 @implementation TaskEditor
 -(id)init
