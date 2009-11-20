@@ -6,12 +6,10 @@
 @implementation ElementTest
 - (void)setUp
 {
-  testStore = [[MemoryStore alloc] initWithName:@"testStore"];
 }
 
 - (void)tearDown
 {
-  [testStore release];
 }
 
 - (void)testUID
@@ -21,10 +19,8 @@
   e1 = [[Element alloc] initWithSummary:@"1"];
   e2 = [[Element alloc] initWithSummary:@"2"];
 
-  [self assertTrue:([e1 UID] == nil) message:@"Element has no UID before its addition to a store."];
-  [testStore add:e1];
-  [self assertTrue:([e1 UID] != nil) message:@"Element has an UID after its addition to a store"];
-  [testStore add:e2];
+  [self assertTrue:([e1 UID] != nil)];
+  [self assertTrue:([e1 UID] != nil)];
   [self assertFalse:[[e2 UID] isEqualToString:[e1 UID]] message:@"Elements UIDs are differents."];
 
   [e1 release];

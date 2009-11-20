@@ -106,6 +106,11 @@
 
 - (NSString *)UID
 {
+  if (!_uid) {
+    [self generateUID];
+    [self setClassification: ICAL_CLASS_PUBLIC];
+    [self setDateStamp:[Date now]];
+  }
   return _uid;
 }
 

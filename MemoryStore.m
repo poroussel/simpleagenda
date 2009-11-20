@@ -94,14 +94,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 {
   NSString *uid = [elt UID];
   
-  if (uid == nil) {
-    /* FIXME : this has nothing to do here */
-    [elt setClassification: ICAL_CLASS_PUBLIC];
-    [elt generateUID];
-    uid = [elt UID];
-  }
   [elt setStore:self];
-  [elt setDateStamp:[Date now]];
   if ([elt isKindOfClass:[Event class]])
     [_data setValue:elt forKey:uid];
   else
