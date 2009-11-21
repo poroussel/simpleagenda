@@ -219,39 +219,8 @@
   return [self requestWithMethod:@"PROPFIND" body:data attributes:attributes];
 }
 
-static NSString *PROPFINDGETETAG = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
-- (NSArray *)listICalItems
-{
-  int i;
-  GSXMLParser *parser;
-  NSMutableArray *result;
-  GSXPathContext *xpc;
-  GSXPathNodeSet *set;
-  NSURL *elementURL;
-
-  result = [NSMutableArray new];
-  if (![self propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
-    return result;
-  parser = [GSXMLParser parserWithData:[self data]];
-  if ([parser parse]) {
-    [self debugLog:@"%s xml document \n%@", __PRETTY_FUNCTION__, [[[parser document] strippedDocument] description]];
-    xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
-    set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/getetag]/href/text()"];
-    [self debugLog:@"found %d ical item(s)", [set count]];
-    for (i = 0; i < [set count]; i++) {
-      elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:_url];
-      if (elementURL) {
-	[result addObject:[elementURL absoluteString]];
-	[self debugLog:[elementURL absoluteString]];
-      }
-    }
-    [xpc release];
-  }
-  return result;
-}
-
-static NSString *GETETAG = @"string(/multistatus/response/propstat/prop/getetag/text())";
-static NSString *GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/getlastmodified/text())";
+static NSString * const GETETAG = @"string(/multistatus/response/propstat/prop/getetag/text())";
+static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/getlastmodified/text())";
 - (void)updateAttributes;
 {
   GSXMLParser *parser;

@@ -123,6 +123,7 @@
 @end
 
 @interface GroupDAVStore(Private)
+- (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource;
 - (void)initTimer:(id)object;
 - (void)initStoreAsync:(id)object;
 - (void)fetchData:(id)object;
@@ -296,6 +297,34 @@
 
 
 @implementation GroupDAVStore(Private)
+static NSString * const PROPFINDGETETAG = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
+static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/text()";
+- (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource
+{
+  int i;
+  GSXMLParser *parser;
+  NSMutableArray *result;
+  GSXPathContext *xpc;
+  GSXPathNodeSet *set;
+  NSURL *elementURL;
+
+  result = [NSMutableArray arrayWithCapacity:256];
+  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
+    return result;
+  parser = [GSXMLParser parserWithData:[ressource data]];
+  if ([parser parse]) {
+    xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+    set = (GSXPathNodeSet *)[xpc evaluateExpression:EXPRGETHREF];
+    for (i = 0; i < [set count]; i++) {
+      elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[ressource url]];
+      if (elementURL)
+	[result addObject:[elementURL absoluteString]];
+    }
+    [xpc release];
+  }
+  return result;
+}
+
 - (void)initTimer:(id)object
 {
   /* TODO */
@@ -310,6 +339,7 @@
     _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
+  [_calendar setDebug:YES];
   [self fetchData:nil];
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];
@@ -346,9 +376,9 @@
 - (void)fetchData:(id)object
 {
   if (_calendar)
-    [self fetchList:AUTORELEASE([_calendar listICalItems])];
+    [self fetchList:[self itemsUnderRessource:_calendar]];
   if (_task)
-    [self fetchList:AUTORELEASE([_task listICalItems])];
+    [self fetchList:[self itemsUnderRessource:_task]];
   NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
   NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
 }

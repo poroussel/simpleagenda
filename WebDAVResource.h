@@ -35,7 +35,6 @@
 - (BOOL)delete;
 - (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
 - (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes;
-- (NSArray *)listICalItems;
 - (void)updateAttributes;
 - (void)setUser:(NSString *)user password:(NSString *)password;
 @end
