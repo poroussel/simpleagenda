@@ -339,7 +339,6 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
-  [_calendar setDebug:YES];
   [self fetchData:nil];
   [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
   [pool release];
