@@ -34,26 +34,9 @@
   return self;
 }
 
-/* FIXME : this method should disappear with the alarm debug code */
-- (id)init
-{
-  self = [super init];
-  if (self) {
- #if 0
-    static NSTimeInterval diff = 1.0;
-    _alarms = [[NSMutableArray alloc] initWithCapacity:1];
-    SAAlarm *alarm = [SAAlarm alarm];
-    [alarm setAbsoluteTrigger:[Date dateWithTimeInterval:diff sinceDate:[Date now]]];
-    [_alarms addObject:alarm];
-    diff += 1.0;
-#endif
-  }
-  return self;
-}
-
 - (id)initWithSummary:(NSString *)summary
 {
-  self = [self init];
+  self = [super init];
   if (self)
     [self setSummary:summary];
   return self;
@@ -161,13 +144,14 @@
 
 - (void)removeAlarm:(SAAlarm *)alarm
 {
+  /* FIXME : do something */
 }
 
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
 
-  self = [self init];
+  self = [super init];
   if (self == nil)
     return nil;
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
