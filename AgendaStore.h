@@ -3,7 +3,7 @@
 #import "MemoryStore.h"
 
 @protocol StoreBackend
-- (BOOL)read;
+- (void)read;
 - (BOOL)write;
 @end
 

@@ -27,16 +27,12 @@
 - (BOOL)writableWithData:(NSData *)data;
 - (int)httpStatus;
 - (NSData *)data;
-- (NSString *)reason;
-- (BOOL)dataChanged;
 - (NSURL *)url;
-- (BOOL)options;
 - (BOOL)get;
 - (BOOL)delete;
 - (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
 - (BOOL)propfind:(NSData *)data attributes:(NSDictionary *)attributes;
 - (void)updateAttributes;
-- (void)setUser:(NSString *)user password:(NSString *)password;
 @end
 
 @interface NSURL(SimpleAgenda)

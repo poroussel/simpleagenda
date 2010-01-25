@@ -49,8 +49,10 @@
 - (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent
 {
   self = [self initWithURL:anUrl];
-  if (self && [parent user])
-    [self setUser:[parent user] password:[parent password]];
+  if (self && [parent user]) {
+      ASSIGN(_user, [parent user]);
+      ASSIGN(_password, [parent password]);
+  }
   return self;
 }
 
@@ -184,19 +186,9 @@
   return _reason;
 }
 
-- (BOOL)dataChanged
-{
-  return _dataChanged;
-}
-
 - (NSURL *)url
 {
   return _url;
-}
-
-- (BOOL)options
-{
-  return [self requestWithMethod:@"OPTIONS" body:nil attributes:nil];
 }
 
 - (BOOL)get
@@ -239,12 +231,6 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 	ASSIGN(_lastModified, [result stringValue]);
     }
   }
-}
-
-- (void)setUser:(NSString *)user password:(NSString *)password
-{
-  ASSIGN(_user, user);
-  ASSIGN(_password, password);
 }
 @end
 

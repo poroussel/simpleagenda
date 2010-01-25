@@ -186,10 +186,9 @@
   }
 }
 
-- (BOOL)read
+- (void)read
 {
   [self fetchData];
-  return [_resource dataChanged];
 }
 
 - (BOOL)write

@@ -53,7 +53,7 @@
   [super dealloc];
 }
 
-- (BOOL)read
+- (void)read
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   NSSet *savedData;
@@ -62,7 +62,7 @@
   if (![fm fileExistsAtPath:_globalPath]) {
     if (![fm createDirectoryAtPath:_globalPath attributes:nil]) {
       NSLog(@"Error creating dir %@", _globalPath);
-      return NO;
+      return;
     }
     NSLog(@"Created directory %@", _globalPath);
   }
@@ -80,7 +80,6 @@
       NSLog(@"LocalStore from %@ : loaded %d tasks(s)", _globalTaskFile, [[self tasks] count]);
     }
   }
-  return YES;
 }
 
 - (BOOL)write

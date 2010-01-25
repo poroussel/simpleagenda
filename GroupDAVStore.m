@@ -261,12 +261,11 @@
   }
 }
 
-- (BOOL)read
+- (void)read
 {
   /* FIXME : this should call something else, same thing for iCalStore ? */
   /* This version won't work for deleted elements etc */
   [self fetchData:nil];
-  return YES;
 }
 
 - (BOOL)write
