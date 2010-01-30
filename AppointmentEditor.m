@@ -7,7 +7,15 @@
 #import "ConfigManager.h"
 #import "defines.h"
 
+static NSMutableDictionary *editors;
+
 @implementation AppointmentEditor
+- (BOOL)canBeModified
+{
+  id <MemoryStore> selectedStore = [[StoreManager globalManager] storeForName:[store titleOfSelectedItem]];
+  return [selectedStore enabled] && [selectedStore writable];
+}
+
 - (id)init
 {
   HourFormatter *formatter;
@@ -27,111 +35,131 @@
   return self;
 }
 
-- (BOOL)canBeModified
-{
-  id <MemoryStore> selectedStore = [[StoreManager globalManager] storeForName:[store titleOfSelectedItem]];
-  return [selectedStore enabled] && [selectedStore writable];
-}
-
-- (BOOL)editAppointment:(Event *)data
+- (id)initWithEvent:(Event *)event
 {
   StoreManager *sm = [StoreManager globalManager];
   NSEnumerator *list = [sm storeEnumerator];
   id <MemoryStore> aStore;
   id <MemoryStore> originalStore;
-  int ret;
-  Date *date;
 
-  [title setStringValue:[data summary]];
-  [duration setFloatValue:[data duration] / 60.0];
-  [durationText setFloatValue:[data duration] / 60.0];
-  [location setStringValue:[data location]];
-  [allDay setState:[data allDay]];
-  [time setFloatValue:([[data startDate] hourOfDay]*60 + [[data startDate] minuteOfHour]) / 60.0];
-  [timeText setFloatValue:([[data startDate] hourOfDay]*60 + [[data startDate] minuteOfHour]) / 60.0];
-  if (![data rrule])
-    [repeat selectItemAtIndex:0];
-  else
-    [repeat selectItemAtIndex:[[data rrule] frequency] - 2];
+  self = [self init];
+  if (self) {
+    ASSIGN(_event , event);
+    [title setStringValue:[event summary]];
+    [duration setFloatValue:[event duration] / 60.0];
+    [durationText setFloatValue:[event duration] / 60.0];
+    [location setStringValue:[event location]];
+    [allDay setState:[event allDay]];
+    [time setFloatValue:([[event startDate] hourOfDay]*60 + [[event startDate] minuteOfHour]) / 60.0];
+    [timeText setFloatValue:([[event startDate] hourOfDay]*60 + [[event startDate] minuteOfHour]) / 60.0];
+    if (![event rrule])
+      [repeat selectItemAtIndex:0];
+    else
+      [repeat selectItemAtIndex:[[event rrule] frequency] - 2];
 
-  [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
-  [[description textStorage] appendAttributedString:[data text]];
+    [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
+    [[description textStorage] appendAttributedString:[event text]];
 
-  [window makeFirstResponder:title];
+    [window makeFirstResponder:title];
 
-  originalStore = [data store];
-  if (!originalStore)
-    [data setStore:[sm defaultStore]];
-    
-  [store removeAllItems];
-  while ((aStore = [list nextObject])) {
-    if ([aStore writable] || aStore == originalStore)
-      [store addItemWithTitle:[aStore description]];
-  }
-  [store selectItemWithTitle:[[data store] description]];
-  startDate = [data startDate];
+    originalStore = [event store];
+    [store removeAllItems];
+    while ((aStore = [list nextObject])) {
+      if ([aStore writable] || aStore == originalStore)
+	[store addItemWithTitle:[aStore description]];
+    }
+    if ([event store])
+      [store selectItemWithTitle:[[event store] description]];
+    else
+      [store selectItemWithTitle:[[sm defaultStore] description]];
+    startDate = [event startDate];
 
-  [until setEnabled:([data rrule] != nil)];
-  if ([data rrule] && [[data rrule] until]) {
-    [until setState:YES];
-    [endDate setObjectValue:[[[data rrule] until] calendarDate]];
-  } else {
-    [until setState:NO];
-    [endDate setObjectValue:nil];
-  }
-  [endDate setEnabled:[until state]];
-
-  [ok setEnabled:[self canBeModified]];
-  ret = [NSApp runModalForWindow:window];
-  [window close];
-  if (ret == NSOKButton) {
-    [data setSummary:[title stringValue]];
-    [data setDuration:[duration floatValue] * 60.0];
-
-    if (![repeat indexOfSelectedItem]) {
-      [data setRRule:nil];
+    [until setEnabled:([event rrule] != nil)];
+    if ([event rrule] && [[event rrule] until]) {
+      [until setState:YES];
+      [endDate setObjectValue:[[[event rrule] until] calendarDate]];
     } else {
-      RecurrenceRule *rule;
-      if ([until state] && [endDate objectValue])
-	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2 until:[Date dateWithCalendarDate:[endDate objectValue] withTime:NO]];
-      else
-	rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2];
-      [data setRRule:AUTORELEASE(rule)];
+      [until setState:NO];
+      [endDate setObjectValue:nil];
     }
-    /* FIXME : why do we copy one and not the other ? */
-    [data setText:[[description textStorage] copy]];
-    [data setLocation:[location stringValue]];
-    [data setAllDay:[allDay state]];
-    if (![data allDay]) {
-      date = [[data startDate] copy];
-      [date setIsDate:NO];
-      [date setMinute:[time floatValue] * 60.0];
-      [data setStartDate:date];
-      [date release];
-    }
-
-    aStore = [sm storeForName:[store titleOfSelectedItem]];
-    if (!originalStore)
-      [aStore add:data];
-    else if (originalStore == aStore)
-      [aStore update:data];
-    else {
-      [originalStore remove:data];
-      [aStore add:data];
-    }
-    return YES;
+    [endDate setEnabled:[until state]];
+    [ok setEnabled:[self canBeModified]];
+    [window makeKeyAndOrderFront:self];
   }
-  return NO;
+  return self;
+}
+
+- (void)dealloc
+{
+  RELEASE(_event);
+  [super dealloc];
+}
+
++ (void)initialize
+{
+  editors = [[NSMutableDictionary alloc] initWithCapacity:2];
+}
+
++ (AppointmentEditor *)editorForEvent:(Event *)event
+{
+  AppointmentEditor *editor;
+
+  if ((editor = [editors objectForKey:[event UID]])) {
+    [editor->window makeKeyAndOrderFront:self];
+    return editor;
+  }
+  editor = AUTORELEASE([[AppointmentEditor alloc] initWithEvent:event]);
+  [editors setObject:editor forKey:[event UID]];
+  return editor;
 }
 
 - (void)validate:(id)sender
 {
-  [NSApp stopModalWithCode: NSOKButton];
+  StoreManager *sm = [StoreManager globalManager];
+  id <MemoryStore> originalStore = [_event store];
+  id <MemoryStore> aStore;
+  Date *date;
+
+  [_event setSummary:[title stringValue]];
+  [_event setDuration:[duration floatValue] * 60.0];
+
+  if (![repeat indexOfSelectedItem]) {
+    [_event setRRule:nil];
+  } else {
+    RecurrenceRule *rule;
+    if ([until state] && [endDate objectValue])
+      rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2 until:[Date dateWithCalendarDate:[endDate objectValue] withTime:NO]];
+    else
+      rule = [[RecurrenceRule alloc] initWithFrequency:[repeat indexOfSelectedItem]+2];
+    [_event setRRule:AUTORELEASE(rule)];
+  }
+  [_event setText:[description textStorage]];
+  [_event setLocation:[location stringValue]];
+  [_event setAllDay:[allDay state]];
+  if (![_event allDay]) {
+    date = [[_event startDate] copy];
+    [date setIsDate:NO];
+    [date setMinute:[time floatValue] * 60.0];
+    [_event setStartDate:date];
+    [date release];
+  }
+  aStore = [sm storeForName:[store titleOfSelectedItem]];
+  if (!originalStore)
+    [aStore add:_event];
+  else if (originalStore == aStore)
+    [aStore update:_event];
+  else {
+    [originalStore remove:_event];
+    [aStore add:_event];
+  }
+  [window release];
+  [editors removeObjectForKey:[_event UID]];
 }
 
 - (void)cancel:(id)sender
 {
-  [NSApp stopModalWithCode: NSCancelButton];
+  [window release];
+  [editors removeObjectForKey:[_event UID]];
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification

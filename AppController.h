@@ -1,7 +1,6 @@
 /* emacs objective-c mode -*- objc -*- */
 
 #import "AgendaStore.h"
-#import "AppointmentEditor.h"
 #import "TaskEditor.h"
 #import "CalendarView.h"
 #import "DayView.h"
@@ -24,7 +23,6 @@
   IBOutlet NSTabView *tabs;
 
   PreferencesController *_pc;
-  AppointmentEditor *_editor;
   TaskEditor *_taskEditor;
   StoreManager *_sm;
   SelectionManager *selectionManager;

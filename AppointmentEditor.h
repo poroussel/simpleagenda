@@ -20,9 +20,10 @@
   id time;
   id timeText;
   Date *startDate;
+  Event *_event;
 }
 
-- (BOOL)editAppointment:(Event *)event;
++ (AppointmentEditor *)editorForEvent:(Event *)event;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 - (void)selectFrequency:(id)sender;
