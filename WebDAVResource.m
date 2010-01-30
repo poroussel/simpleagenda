@@ -101,7 +101,11 @@
   [self debugLog:@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]];
   DESTROY(_data);
   data = [handle resourceData];
-  _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
+  /* FIXME : this is more than ugly */
+  if ([_url isFileURL])
+    _httpStatus = data ? 200 : 199;
+  else
+    _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
   if (data)
     [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
   else
