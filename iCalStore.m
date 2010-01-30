@@ -188,8 +188,7 @@
 {
   if ([_tree update:(Event *)elt]) {
     [super update:elt];
-    if (![_url isFileURL])
-      [self write];
+    [self write];
   }
 }
 
