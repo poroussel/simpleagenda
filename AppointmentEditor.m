@@ -21,12 +21,14 @@ static NSMutableDictionary *editors;
   HourFormatter *formatter;
   NSDateFormatter *dateFormatter;
 
+  if (![NSBundle loadNibNamed:@"Appointment" owner:self]) {
+    NSLog(@"Unable to load Appointment.gorm");
+    return nil;
+  }
   self = [super init];
   if (self) {
-    if (![NSBundle loadNibNamed:@"Appointment" owner:self])
-      return nil;
-    formatter = [[[HourFormatter alloc] init] autorelease];
-    dateFormatter = [[[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO] autorelease];
+    formatter = AUTORELEASE([[HourFormatter alloc] init]);
+    dateFormatter = AUTORELEASE([[[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO] autorelease]);
     [durationText setFormatter:formatter];
     [timeText setFormatter:formatter];
     [endDate setFormatter:dateFormatter];
@@ -108,9 +110,9 @@ static NSMutableDictionary *editors;
     [editor->window makeKeyAndOrderFront:self];
     return editor;
   }
-  editor = AUTORELEASE([[AppointmentEditor alloc] initWithEvent:event]);
+  editor = [[AppointmentEditor alloc] initWithEvent:event];
   [editors setObject:editor forKey:[event UID]];
-  return editor;
+  return AUTORELEASE(editor);
 }
 
 - (void)validate:(id)sender
@@ -152,14 +154,14 @@ static NSMutableDictionary *editors;
     [originalStore remove:_event];
     [aStore add:_event];
   }
-  [window release];
   [editors removeObjectForKey:[_event UID]];
+  [window close];
 }
 
 - (void)cancel:(id)sender
 {
-  [window release];
   [editors removeObjectForKey:[_event UID]];
+  [window close];
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
