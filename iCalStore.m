@@ -170,8 +170,7 @@
 {
   if ([_tree add:elt]) {
     [super add:elt];
-    if (![_url isFileURL])
-      [self write];
+    [self write];
   }
 }
 
@@ -179,8 +178,7 @@
 {
   if ([_tree remove:elt]) {
     [super remove:elt];
-    if (![_url isFileURL])
-      [self write];
+    [self write];
   }
 }
 
