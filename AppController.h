@@ -1,7 +1,6 @@
 /* emacs objective-c mode -*- objc -*- */
 
 #import "AgendaStore.h"
-#import "TaskEditor.h"
 #import "CalendarView.h"
 #import "DayView.h"
 #import "WeekView.h"
@@ -23,7 +22,6 @@
   IBOutlet NSTabView *tabs;
 
   PreferencesController *_pc;
-  TaskEditor *_taskEditor;
   StoreManager *_sm;
   SelectionManager *selectionManager;
   Date *_selectedDay;

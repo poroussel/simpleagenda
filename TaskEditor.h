@@ -12,9 +12,10 @@
   id store;
   id state;
   id ok;
+  Task *_task;
 }
 
-- (BOOL)editTask:(Task *)task;
++ (TaskEditor *)editorForTask:(Task *)task;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 @end

@@ -2,6 +2,7 @@
 
 #import <AppKit/AppKit.h>
 #import "AppointmentEditor.h"
+#import "TaskEditor.h"
 #import "StoreManager.h"
 #import "AppController.h"
 #import "Event.h"
@@ -112,7 +113,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if (self) {
     ASSIGNCOPY(_selectedDay, [Date today]);
     selectionManager = [SelectionManager globalManager];
-    _taskEditor = [TaskEditor new];
     _sm = [StoreManager globalManager];
     _pc = [PreferencesController new];
     [self initSummary];
@@ -180,7 +180,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    * it's freed
    */
   [_sm release];
-  [_taskEditor release];
   RELEASE(_selectedDay);
 }
 
@@ -249,7 +248,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)addTask:(id)sender
 {
   Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
-  if (task && [_taskEditor editTask:task])
+  if (task && [TaskEditor editorForTask:task])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
 }
@@ -276,7 +275,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [task setText:AUTORELEASE([[NSAttributedString alloc ] initWithString:aString])];
   } else
     [task setSummary:aString];
-  if (task && [_taskEditor editTask:task])
+  if (task && [TaskEditor editorForTask:task])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
 }
@@ -289,7 +288,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     if ([lastSelection isKindOfClass:[Event class]])
       [AppointmentEditor editorForEvent:(Event *)lastSelection];
     else if ([lastSelection isKindOfClass:[Task class]])
-      [_taskEditor editTask:(Task *)lastSelection];
+      [TaskEditor editorForTask:(Task *)lastSelection];
     else
       NSLog(@"We should never come here...");
   }

@@ -5,8 +5,10 @@
 #import "StoreManager.h"
 #import "Task.h"
 
+static NSMutableDictionary *editors;
+
 @implementation TaskEditor
--(id)init
+- (id)init
 {
   self = [super init];
   if (self) {
@@ -16,64 +18,92 @@
   return self;
 }
 
--(BOOL)editTask:(Task *)task
+- (id)initWithTask:(Task *)task
 {
   StoreManager *sm = [StoreManager globalManager];
   NSEnumerator *list = [sm storeEnumerator];
   id <MemoryStore> aStore;
   id <MemoryStore> originalStore;
-  int ret;
 
-  [summary setStringValue:[task summary]];
+  self = [self init];
+  if (self) {
+    ASSIGN(_task, task);
+    [summary setStringValue:[task summary]];
 
-  [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
-  [[description textStorage] appendAttributedString:[task text]];
+    [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
+    [[description textStorage] appendAttributedString:[task text]];
 
-  [window makeFirstResponder:summary];
+    [window makeFirstResponder:summary];
 
-  originalStore = [task store];
-  if (!originalStore)
-    [task setStore:[sm defaultStore]];
-  else if (![originalStore writable])
-    [ok setEnabled:NO];
-    
-  [store removeAllItems];
-  while ((aStore = [list nextObject])) {
-    if ([aStore writable] || aStore == originalStore)
-      [store addItemWithTitle:[aStore description]];
-  }
-  [store selectItemWithTitle:[[task store] description]];
-
-  [state removeAllItems];
-  [state addItemsWithTitles:[Task stateNamesArray]];
-  [state selectItemWithTitle:[task stateAsString]];
-
-  ret = [NSApp runModalForWindow:window];
-  [window close];
-  if (ret == NSOKButton) {
-    [task setSummary:[summary stringValue]];
-    [task setText:[[description textStorage] copy]];
-    [task setState:[state indexOfSelectedItem]];
-    aStore = [sm storeForName:[store titleOfSelectedItem]];
+    originalStore = [task store];
     if (!originalStore)
-      [aStore add:task];
-    else if (originalStore == aStore)
-      [aStore update:task];
-    else {
-      [originalStore remove:task];
-      [aStore add:task];
+      [task setStore:[sm defaultStore]];
+    else if (![originalStore writable])
+      [ok setEnabled:NO];
+    
+    [store removeAllItems];
+    while ((aStore = [list nextObject])) {
+      if ([aStore writable] || aStore == originalStore)
+	[store addItemWithTitle:[aStore description]];
     }
-    return YES;
+    [store selectItemWithTitle:[[task store] description]];
+
+    [state removeAllItems];
+    [state addItemsWithTitles:[Task stateNamesArray]];
+    [state selectItemWithTitle:[task stateAsString]];
+    [window makeKeyAndOrderFront:self];
   }
-  return NO;
+  return self;
 }
 
--(void)validate:(id)sender
+- (void)dealloc 
+{ 
+  RELEASE(_task); 
+  [super dealloc]; 
+} 
+
++ (void)initialize
 {
-  [NSApp stopModalWithCode: NSOKButton];
+  editors = [[NSMutableDictionary alloc] initWithCapacity:2];
 }
--(void)cancel:(id)sender
+
++ (TaskEditor *)editorForTask:(Task *)task
 {
-  [NSApp stopModalWithCode: NSCancelButton];
+  TaskEditor *editor;
+
+  if ((editor = [editors objectForKey:[task UID]])) {
+    [editor->window makeKeyAndOrderFront:self];
+    return editor;
+  }
+  editor = [[TaskEditor alloc] initWithTask:task];
+  [editors setObject:editor forKey:[task UID]];
+  return AUTORELEASE(editor);
+}
+
+- (void)validate:(id)sender
+{
+  StoreManager *sm = [StoreManager globalManager];
+  id <MemoryStore> originalStore = [_task store];
+  id <MemoryStore> aStore;
+
+  [_task setSummary:[summary stringValue]];
+  [_task setText:[[description textStorage] copy]];
+  [_task setState:[state indexOfSelectedItem]];
+  aStore = [sm storeForName:[store titleOfSelectedItem]];
+  if (!originalStore)
+    [aStore add:_task];
+  else if (originalStore == aStore)
+    [aStore update:_task];
+  else {
+    [originalStore remove:_task];
+    [aStore add:_task];
+  }
+  [editors removeObjectForKey:[_task UID]];
+  [window close];
+}
+- (void)cancel:(id)sender
+{
+  [editors removeObjectForKey:[_task UID]]; 
+  [window close]; 
 }
 @end

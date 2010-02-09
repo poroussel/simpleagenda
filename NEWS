@@ -3,6 +3,7 @@ version 0.40
 	* Use libuuid to generate unique event ids if available
 	* Fix ticket #13 : iCalendar stores can use local files
 	* The appointment editor becomes non modal
+	* The task editor becomes non modal
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)
