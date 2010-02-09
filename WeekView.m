@@ -187,8 +187,9 @@ static struct {
   int nday;
   Date *date;
 
-  if ([aDate weekOfYear] != weekNumber) {
+  if ([aDate weekOfYear] != weekNumber || [aDate year] != year) {
     weekNumber = [aDate weekOfYear];
+    year = [aDate year];
     enumerator = [[self subviews] objectEnumerator];
     while ((view = [enumerator nextObject]))
       [view removeFromSuperviewWithoutNeedingDisplay];
@@ -266,7 +267,7 @@ static struct {
   return YES;
 }
 
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
   [self reloadData];
 }

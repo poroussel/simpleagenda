@@ -10,6 +10,7 @@
   IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
   int weekNumber;
+  int year;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
