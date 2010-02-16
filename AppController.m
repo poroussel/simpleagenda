@@ -26,11 +26,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)initSummary
 {
-  _today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Today" forKey:@"title"]];
-  _tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Tomorrow" forKey:@"title"]];
-  _soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Soon" forKey:@"title"]];
-  _results = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Search results" forKey:@"title"]];
-  _tasks = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:@"Open tasks" forKey:@"title"]];
+  _today = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:_(@"Today") forKey:@"title"]];
+  _tomorrow = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:_(@"Tomorrow") forKey:@"title"]];
+  _soon = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:_(@"Soon") forKey:@"title"]];
+  _results = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:_(@"Search results") forKey:@"title"]];
+  _tasks = [DataTree dataTreeWithAttributes:[NSDictionary dictionaryWithObject:_(@"Open tasks") forKey:@"title"]];
   _summaryRoot = [DataTree new];
   [_summaryRoot addChild:_today];
   [_summaryRoot addChild:_tomorrow];
@@ -103,7 +103,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     if ([task state] != TK_COMPLETED)
       [_tasks addChild:[DataTree dataTreeWithAttributes:[self attributesFromTask:task]]];
   }
-  [_tasks setValue:[NSString stringWithFormat:@"Open tasks (%d)", [[_tasks children] count]] forKey:@"title"];
+  [_tasks setValue:[NSString stringWithFormat:_(@"Open tasks (%d)"), [[_tasks children] count]] forKey:@"title"];
   [summary reloadData];
 }
 
@@ -239,7 +239,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   date = [[calendar date] copy];
   [date setIsDate:NO];
   [date setMinute:[self _sensibleStartForDuration:60]];
-  apt = [[Event alloc] initWithStartDate:date duration:60 title:@"edit title..."];
+  apt = [[Event alloc] initWithStartDate:date duration:60 title:_(@"edit title...")];
   [AppointmentEditor editorForEvent:apt];
   [date release];
   [apt release];
@@ -247,7 +247,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)addTask:(id)sender
 {
-  Task *task = [[Task alloc] initWithSummary:@"edit summary..."];
+  Task *task = [[Task alloc] initWithSummary:_(@"edit summary...")];
   if (task && [TaskEditor editorForTask:task])
     [tabs selectTabViewItemWithIdentifier:@"Tasks"];
   [task release];
@@ -271,7 +271,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   }
   task = [Task new];
   if ([aString length] > 40) {
-    [task setSummary:@"New note"];
+    [task setSummary:_(@"New task")];
     [task setText:AUTORELEASE([[NSAttributedString alloc ] initWithString:aString])];
   } else
     [task setSummary:aString];
@@ -314,7 +314,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   if ([selectionManager count] > 0) {
     [panel setRequiredFileType:@"ics"];
-    [panel setTitle:@"Export as"];
+    [panel setTitle:_(@"Export as")];
     if ([panel runModalForDirectory:nil file:[[selectionManager lastObject] summary]] == NSOKButton) {
       tree = [iCalTree new];
       while ((el = [enumerator nextObject]))
@@ -421,9 +421,9 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     }
     [_results sortChildrenUsingFunction:compareDataTreeElements context:nil];
     [summary expandItem:_results];
-    [_results setValue:[NSString stringWithFormat:@"Search results (%d items)", [[_results children] count]] forKey:@"title"];
+    [_results setValue:[NSString stringWithFormat:_(@"Search results (%d items)"), [[_results children] count]] forKey:@"title"];
   } else
-    [_results setValue:@"Search results" forKey:@"title"];
+    [_results setValue:_(@"Search results") forKey:@"title"];
 }
 
 - (void)doSearch:(id)sender
@@ -602,7 +602,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [dayView reloadData];
   [weekView reloadData];
   [dayTab setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
-  [weekTab setLabel:[NSString stringWithFormat:@"Week %d", [_selectedDay weekOfYear]]];
+  [weekTab setLabel:[NSString stringWithFormat:_(@"Week %d"), [_selectedDay weekOfYear]]];
   if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab)
     [tabs selectTabViewItem:dayTab];
   [tabs setNeedsDisplay:YES];
@@ -633,8 +633,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [date setIsDate:NO];
   [date setMinute:start];
   Event *apt = [[Event alloc] initWithStartDate:date 
-   			               duration:end - start 
-			                  title:@"edit title..."];
+			               duration:end - start 
+			                  title:_(@"edit title...")];
   if (apt)
     [AppointmentEditor editorForEvent:apt];
   [date release];

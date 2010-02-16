@@ -29,7 +29,7 @@
 					                     forKey:NSForegroundColorAttributeName];
 
   if ([_apt allDay])
-    title = [NSString stringWithFormat:@"All day : %@", [_apt summary]];
+    title = [NSString stringWithFormat:_(@"All day : %@"), [_apt summary]];
   else
     title = [NSString stringWithFormat:@"%2dh%0.2d : %@", [start hourOfDay], [start minuteOfHour], [_apt summary]];
   if ([_apt text])

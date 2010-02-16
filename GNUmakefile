@@ -28,6 +28,10 @@ Resources/1right.tiff \
 Resources/2left.tiff \
 Resources/2right.tiff 
 
+SimpleAgenda_LANGUAGES = English French
+
+SimpleAgenda_LOCALIZED_RESOURCE_FILES = Localizable.strings
+
 #
 # Class files
 #

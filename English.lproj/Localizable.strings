@@ -1,0 +1,59 @@
+/*  -*- coding: utf-16 -*- */
+
+/***
+English.lproj/Localizable.strings
+updated by make_strings 2010-02-13 21:38:34 +0100
+add comments above this one
+***/
+
+
+/*** Keys found in multiple places ***/
+
+/* File: AppController.m:32 */
+/* Flag: untranslated */
+/* File: AppController.m:426 */
+/* Flag: untranslated */
+"Search results" = "Search results";
+
+
+/*** Unmatched/untranslated keys ***/
+
+/* File: AppController.m:29 */
+/* Flag: untranslated */
+"Today" = "Today";
+
+/* File: AppController.m:30 */
+/* Flag: untranslated */
+"Tomorrow" = "Tomorrow";
+
+/* File: AppController.m:31 */
+/* Flag: untranslated */
+"Soon" = "Soon";
+
+/* File: AppController.m:33 */
+/* Flag: untranslated */
+"Open tasks" = "Open tasks";
+
+/* File: AppController.m:106 */
+/* Flag: untranslated */
+"Open tasks (%d)" = "Open tasks (%d)";
+
+/* File: AppController.m:242 */
+/* Flag: untranslated */
+"edit title..." = "edit title...";
+
+/* File: AppController.m:250 */
+/* Flag: untranslated */
+"edit summary..." = "edit summary...";
+
+/* File: AppController.m:274 */
+/* Flag: untranslated */
+"New note" = "New note";
+
+/* File: AppController.m:317 */
+/* Flag: untranslated */
+"Export as" = "Export as";
+
+/* File: AppController.m:424 */
+/* Flag: untranslated */
+"Search results (%d items)" = "Search results (%d items)";
