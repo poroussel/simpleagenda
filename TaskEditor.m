@@ -8,6 +8,12 @@
 static NSMutableDictionary *editors;
 
 @implementation TaskEditor
+- (BOOL)canBeModified
+{
+  id <MemoryStore> selectedStore = [[StoreManager globalManager] storeForName:[store titleOfSelectedItem]];
+  return [selectedStore enabled] && [selectedStore writable];
+}
+
 - (id)init
 {
   self = [super init];
@@ -36,21 +42,20 @@ static NSMutableDictionary *editors;
     [window makeFirstResponder:summary];
 
     originalStore = [task store];
-    if (!originalStore)
-      [task setStore:[sm defaultStore]];
-    else if (![originalStore writable])
-      [ok setEnabled:NO];
-    
     [store removeAllItems];
     while ((aStore = [list nextObject])) {
       if ([aStore writable] || aStore == originalStore)
 	[store addItemWithTitle:[aStore description]];
     }
-    [store selectItemWithTitle:[[task store] description]];
+    if ([task store])
+      [store selectItemWithTitle:[[task store] description]];
+    else
+      [store selectItemWithTitle:[[sm defaultStore] description]];
 
     [state removeAllItems];
     [state addItemsWithTitles:[Task stateNamesArray]];
     [state selectItemWithTitle:[task stateAsString]];
+    [ok setEnabled:[self canBeModified]];
     [window makeKeyAndOrderFront:self];
   }
   return self;
