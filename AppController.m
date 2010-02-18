@@ -126,6 +126,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSPopUpButtonCell *cell = [NSPopUpButtonCell new];
   [cell addItemsWithTitles:[Task stateNamesArray]];
   [[taskView tableColumnWithIdentifier:@"state"] setDataCell:cell];
+  [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:128];
   [taskView setAutoresizesAllColumnsToFit:YES];
   /* 
    * FIXME : this shouldn't be needed but I can't make it
@@ -141,7 +142,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[[[taskView superview] superview] superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [[weekView superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [taskView setUsesAlternatingRowBackgroundColors:YES];
-  [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:92];
   [taskView setTarget:self];
   [taskView setDoubleAction:@selector(editAppointment:)];
   [summary sizeLastColumnToFit];
