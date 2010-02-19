@@ -1,38 +1,38 @@
 /***
 French.lproj/Localizable.strings
-updated by make_strings 2010-02-13 22:15:55 +0100
+updated by make_strings 2010-02-19 15:39:30 +0100
 add comments above this one
 ***/
 
 
 /*** Keys found in multiple places ***/
 
-/* File: AppController.m:242 */
-/* File: AppController.m:637 */
-"edit title..." = "modifier le titre...";
-
 /* File: DayView.m:34 */
 /* File: WeekView.m:32 */
 "All day : %@" = "Toute la journ\U00E9e : %@";
 
-/* File: AppController.m:274 */
-"New task" = "Nouvelle t\U00E2che";
-
-/* File: AppController.m:605 */
+/* File: AppController.m:118 */
+/* File: AppController.m:620 */
 "Week %d" = "Semaine %d";
+
+/* File: AppController.m:120 */
+/* File: AppController.m:618 */
+"Tasks" = "T\U00E2ches";
 
 
 /*** Strings from AppController.m ***/
-/* File: AppController.m:317 */
+/* File: AppController.m:329 */
 "Export as" = "Exporter sous";
+/* File: AppController.m:286 */
+"New task" = "Nouvelle t\U00E2che";
 /* File: AppController.m:33 */
 "Open tasks" = "T\U00E2ches en cours";
 /* File: AppController.m:106 */
 "Open tasks (%d)" = "T\U00E2ches en cours (%d)";
-/* File: AppController.m:426 */
+/* File: AppController.m:438 */
 /* File: AppController.m:32 */
 "Search results" = "R\U00E9sultats recherche";
-/* File: AppController.m:424 */
+/* File: AppController.m:436 */
 "Search results (%d items)" = "R\U00E9sultats (%d \U00E9l\U00E9ments)";
 /* File: AppController.m:31 */
 "Soon" = "Bient\U00F4t";
@@ -40,5 +40,8 @@ add comments above this one
 "Today" = "Aujourd'hui";
 /* File: AppController.m:30 */
 "Tomorrow" = "Demain";
-/* File: AppController.m:250 */
+/* File: AppController.m:262 */
 "edit summary..." = "modifier le r\U00E9sum\U00E9...";
+/* File: AppController.m:254 */
+/* File: AppController.m:652 */
+"edit title..." = "modifier le titre...";
