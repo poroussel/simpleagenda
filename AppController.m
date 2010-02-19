@@ -107,16 +107,27 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary reloadData];
 }
 
+- (void)setWindowTitle
+{
+  NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
+  NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
+
+  if ([tabs selectedTabViewItem] == dayTab)
+    [window setTitle:[NSString stringWithFormat:@"SimpleAgenda - %@", [calendar dateAsString]]];
+  else if ([tabs selectedTabViewItem] == weekTab)
+    [window setTitle:[@"SimpleAgenda - " stringByAppendingString:[NSString stringWithFormat:_(@"Week %d"), [_selectedDay weekOfYear]]]];
+  else
+    [window setTitle:[@"SimpleAgenda - " stringByAppendingString:_(@"Tasks")]];
+}
+
 - (id)init
 {
   self = [super init];
   if (self) {
-    ASSIGNCOPY(_selectedDay, [Date today]);
     selectionManager = [SelectionManager globalManager];
     _sm = [StoreManager globalManager];
     _pc = [PreferencesController new];
     [self initSummary];
-    [self registerForServices];
   }
   return self;
 }
@@ -152,18 +163,19 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
 {
+  [self registerForServices];
   [NSApp setServicesProvider: self];
   /*
    * We should register these notifications before allocating
    * the StoreManager to get all data updates. To avoid
    * numerous invisible updates which would slow the startup,
-   * register only when the application is ready and force
-   * a global refresh with a false notification
+   * register only when the application is ready.
    */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  [self dataChanged:nil];
+  /* Set the selected day : this will update all views and titles */
+  [calendar setDate:[Date today]];
   /* This will init the alarms for all loaded elements needing one */
   [AlarmManager globalManager];
 }
@@ -597,16 +609,19 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   NSTabViewItem *dayTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Day"]];
   NSTabViewItem *weekTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Week"]];
+  NSTabViewItem *taskTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Tasks"]];
 
   ASSIGNCOPY(_selectedDay, date);
   [dayView reloadData];
   [weekView reloadData];
+  /* Hack to enable translation of this tab's label */
+  [taskTab setLabel:_(@"Tasks")];
   [dayTab setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
   [weekTab setLabel:[NSString stringWithFormat:_(@"Week %d"), [_selectedDay weekOfYear]]];
   if ([tabs selectedTabViewItem] != dayTab && [tabs selectedTabViewItem] != weekTab)
     [tabs selectTabViewItem:dayTab];
   [tabs setNeedsDisplay:YES];
-  /* [[NSApp mainWindow] setTitle:[NSString stringWithFormat:@"SimpleAgenda - %@", [calendar dateAsString]]]; */
+  [self setWindowTitle];
 }
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
@@ -689,5 +704,12 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   int index = [taskView selectedRow];
   if (index > -1)
     [selectionManager set:[[_sm allTasks] objectAtIndex:index]];
+}
+@end
+
+@implementation AppController(NSTabViewDelegate)
+- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
+{
+  [self setWindowTitle];
 }
 @end

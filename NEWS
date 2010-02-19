@@ -6,6 +6,7 @@ version 0.40
 	* The task editor becomes non modal
 	* Internationalization infrastructure and beginning of a french
 	  translation
+	* Set application title from the selected date and tab
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)
