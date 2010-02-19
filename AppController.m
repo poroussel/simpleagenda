@@ -12,6 +12,31 @@
 #import "SelectionManager.h"
 #import "AlarmManager.h"
 
+@interface AppIcon : NSView
+{
+}
+@end
+@implementation AppIcon
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+  return YES;
+}
+- (void)drawRect:(NSRect)rect
+{
+  NSDictionary *attrs;
+  NSString *aString;
+
+  aString = [[[Date today] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
+  attrs = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize: 8]  forKey:NSFontAttributeName];
+  [aString drawAtPoint:NSMakePoint(8, 3) withAttributes:attrs];
+}
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if ([theEvent clickCount] > 1)
+    [NSApp unhide:self];
+}
+@end
+
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   return [[[a valueForKey:@"object"] startDate] compareTime:[[b valueForKey:@"object"] startDate]];
@@ -163,6 +188,15 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
 {
+  NSWindow *win;
+  unsigned int width, height;
+
+  win = [NSApp iconWindow];
+  width = [[win contentView] bounds].size.width;
+  height = [[win contentView] bounds].size.height;  
+  _appicon = [[AppIcon alloc] initWithFrame: NSMakeRect(1, 1, width - 2, height - 2)];
+  [[win contentView] addSubview:_appicon];
+
   [self registerForServices];
   [NSApp setServicesProvider: self];
   /*
@@ -626,6 +660,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
   [self updateSummaryData];
+  [_appicon setNeedsDisplay:YES];
 }
 - (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date
 {

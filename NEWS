@@ -7,6 +7,7 @@ version 0.40
 	* Internationalization infrastructure and beginning of a french
 	  translation
 	* Set application title from the selected date and tab
+	* Show today's date in the appicon
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)

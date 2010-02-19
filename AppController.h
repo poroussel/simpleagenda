@@ -31,6 +31,7 @@
   DataTree *_soon;
   DataTree *_results;
   DataTree *_tasks;
+  NSView *_appicon;
 }
 
 - (void)copy:(id)sender;
