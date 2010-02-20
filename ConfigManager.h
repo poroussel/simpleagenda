@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 @class ConfigManager;
+@class NSColor;
 
 @protocol ConfigListener
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key;
@@ -28,5 +29,6 @@
 - (void)setInteger:(int)value forKey:(NSString *)key;
 - (NSDictionary *)dictionaryForKey:(NSString *)key;
 - (void)setDictionary:(NSDictionary *)dict forKey:(NSString *)key;
+- (NSColor *)colorForKey:(NSString *)key;
+- (void)setColor:(NSColor *)value forKey:(NSString *)key;
 @end
-

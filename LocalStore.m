@@ -7,9 +7,8 @@
 @implementation LocalStore
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjectsAndKeys:
-			 [NSArchiver archivedDataWithRootObject:[NSColor yellowColor]], ST_COLOR,
-			 [NSArchiver archivedDataWithRootObject:[NSColor darkGrayColor]], ST_TEXT_COLOR,
+  return [NSDictionary dictionaryWithObjectsAndKeys:[[NSColor yellowColor] description], ST_COLOR,
+		       [[NSColor darkGrayColor] description], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:YES], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       nil, nil];

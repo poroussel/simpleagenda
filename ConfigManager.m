@@ -138,6 +138,20 @@
   [self setObject:dict forKey:key];
 }
 
+- (NSColor *)colorForKey:(NSString *)key
+{
+  id obj = [self objectForKey:key];
+
+  if ([obj isKindOfClass:[NSData class]])
+    return [NSUnarchiver unarchiveObjectWithData:obj];
+  return [NSColor colorFromString:obj];
+}
+
+- (void)setColor:(NSColor *)value forKey:(NSString *)key
+{
+  [self setObject:[value description] forKey:key];
+}
+
 - (void)registerClient:(id <ConfigListener>)client forKey:(NSString*)key
 {
   NSAssert(key != nil, @"You have to register for a specific key");

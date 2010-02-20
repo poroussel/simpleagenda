@@ -8,6 +8,7 @@ version 0.40
 	  translation
 	* Set application title from the selected date and tab
 	* Show today's date in the appicon
+	* Use a human readable description for colors in defaults
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)

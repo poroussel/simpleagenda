@@ -161,20 +161,20 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 - (NSColor *)eventColor
 {
-  return [NSUnarchiver unarchiveObjectWithData:[_config objectForKey:ST_COLOR]];
+  return [_config colorForKey:ST_COLOR];
 }
 - (void)setEventColor:(NSColor *)color
 {
-  [_config setObject:[NSArchiver archivedDataWithRootObject:color] forKey:ST_COLOR];
+  [_config setColor:color forKey:ST_COLOR];
 }
 
 - (NSColor *)textColor
 {
-  return [NSUnarchiver unarchiveObjectWithData:[_config objectForKey:ST_TEXT_COLOR]];
+  return [_config colorForKey:ST_TEXT_COLOR];
 }
 - (void)setTextColor:(NSColor *)color
 {
-  [_config setObject:[NSArchiver archivedDataWithRootObject:color] forKey:ST_TEXT_COLOR];
+  [_config setColor:color forKey:ST_TEXT_COLOR];
 }
 
 - (BOOL)displayed
