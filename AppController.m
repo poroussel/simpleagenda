@@ -744,10 +744,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   return [[_sm allTasks] count];
 }
-- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id <NSDraggingInfo>)info row:(int)row dropOperation:(NSTableViewDropOperation)operation
-{
-  return NO;
-}
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
   Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
