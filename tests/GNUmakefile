@@ -19,7 +19,7 @@ SimpleAgendaTests_OBJC_FILES = \
 	AllTests.m \
 	main.m
 
-SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical
+SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical -lgnustep-gui
 #ifeq(have_libuuid,yes)
 SimpleAgendaTests_TOOL_LIBS += -luuid
 #endif
