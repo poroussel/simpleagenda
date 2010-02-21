@@ -11,9 +11,11 @@
 #import "iCalTree.h"
 #import "SelectionManager.h"
 #import "AlarmManager.h"
+#import "defines.h"
 
 @interface AppIcon : NSView
 {
+  NSTimer *timer;
 }
 @end
 @implementation AppIcon
@@ -21,14 +23,36 @@
 {
   return YES;
 }
+- (void)secondChanged:(NSTimer *)timer
+{
+  [self setNeedsDisplay:YES];
+}
 - (void)drawRect:(NSRect)rect
 {
+  ConfigManager *config = [ConfigManager globalConfig];
+  NSCalendarDate *now = [[Date now] calendarDate];
   NSDictionary *attrs;
   NSString *aString;
 
-  aString = [[[Date today] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
   attrs = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize: 8]  forKey:NSFontAttributeName];
-  [aString drawAtPoint:NSMakePoint(8, 3) withAttributes:attrs];
+  if ([[config objectForKey:APPICON_DATE] boolValue]) {
+    aString = [now descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
+    [aString drawAtPoint:NSMakePoint(8, 3) withAttributes:attrs];
+  }
+  if ([[config objectForKey:APPICON_TIME] boolValue]) {
+    aString = [now descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSTimeFormatString]];
+    [aString drawAtPoint:NSMakePoint(11, 48) withAttributes:attrs];
+    if (timer == nil)
+      timer = [NSTimer scheduledTimerWithTimeInterval:1
+         			       	       target:self
+		                             selector:@selector(secondChanged:)
+				             userInfo:nil
+				              repeats:YES];
+  } else {
+    if (timer)
+      [timer invalidate];
+    timer = nil;
+  }
 }
 - (void)mouseDown:(NSEvent *)theEvent
 {
@@ -145,10 +169,20 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [window setTitle:[@"SimpleAgenda - " stringByAppendingString:_(@"Tasks")]];
 }
 
+- (NSDictionary *)defaults
+{
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[NSNumber numberWithBool:YES], [NSNumber numberWithBool:YES], [NSNumber numberWithBool:NO], nil]
+		       forKeys:[NSArray arrayWithObjects:APPICON_DATE, APPICON_TIME, TOOLTIP, nil]];
+}
+
 - (id)init
 {
   self = [super init];
   if (self) {
+    ConfigManager *config = [ConfigManager globalConfig];
+    [config registerDefaults:[self defaults]];
+    [config registerClient:self forKey:APPICON_DATE];
+    [config registerClient:self forKey:APPICON_TIME];
     selectionManager = [SelectionManager globalManager];
     _sm = [StoreManager globalManager];
     _pc = [PreferencesController new];
@@ -216,6 +250,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
+  [[ConfigManager globalConfig] unregisterClient:self];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_summaryRoot release];
   [_pc release];
@@ -583,6 +618,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     return [pboard setString:ical forType:NSStringPboardType];
   }
   return NO;
+}
+
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+{
+  [_appicon setNeedsDisplay:YES];
 }
 @end
 

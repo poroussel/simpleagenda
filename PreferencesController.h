@@ -32,6 +32,9 @@
   IBOutlet id storeFactory;
   IBOutlet id itemPopUp;
   IBOutlet id showTooltip;
+  IBOutlet id uiPreferences;
+  IBOutlet id showDateAppIcon;
+  IBOutlet id showTimeAppIcon;
   StoreManager *_sm;
 }
 
@@ -51,5 +54,6 @@
 -(void)createStore:(id)sender;
 -(void)selectItem:(id)sender;
 -(void)toggleTooltip:(id)sender;
-
+-(void)toggleShowDate:(id)sender;
+-(void)toggleShowTime:(id)sender;
 @end

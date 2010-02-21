@@ -9,8 +9,9 @@
 #import "PreferencesController.h"
 #import "DataTree.h"
 #import "SelectionManager.h"
+#import "ConfigManager.h"
 
-@interface AppController : NSObject <AgendaDataSource>
+@interface AppController : NSObject <AgendaDataSource, ConfigListener>
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;

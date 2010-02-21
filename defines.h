@@ -21,3 +21,5 @@
 #define ST_REFRESH @"storeAutomaticRefresh"
 #define ST_REFRESH_INTERVAL @"storeRefreshInterval"
 #define ST_DISPLAY @"storeDisplay"
+#define APPICON_DATE @"appIconShowDate"
+#define APPICON_TIME @"appIconShowTime"

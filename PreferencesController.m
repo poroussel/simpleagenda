@@ -81,7 +81,6 @@
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
-  int showtt = [config integerForKey:TOOLTIP];
   Class backend;
 
   [dayStart setIntValue:start];
@@ -90,7 +89,9 @@
   [dayEndText setIntValue:end];
   [minStep setDoubleValue:step/60.0];
   [minStepText setDoubleValue:step/60.0];
-  [showTooltip setState:showtt];
+  [showTooltip setState:[config integerForKey:TOOLTIP]];
+  [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
+  [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
 
   [self setupStores];
   [storeClass removeAllItems];
@@ -214,8 +215,17 @@
 
 -(void)toggleTooltip:(id)sender
 {
-  ConfigManager *config = [ConfigManager globalConfig];
-  [config setInteger:[showTooltip state] forKey:TOOLTIP];
+  [[ConfigManager globalConfig] setInteger:[showTooltip state] forKey:TOOLTIP];
+}
+
+- (void)toggleShowDate:(id)sender
+{
+  [[ConfigManager globalConfig] setInteger:[showDateAppIcon state] forKey:APPICON_DATE];
+}
+
+- (void)toggleShowTime:(id)sender
+{
+  [[ConfigManager globalConfig] setInteger:[showTimeAppIcon state] forKey:APPICON_TIME];
 }
 
 /* We only allow the removal of non-default stores */
@@ -261,6 +271,9 @@
     break;
   case 2:
     [slot setContentView:storeFactory];
+    break;
+  case 3:
+    [slot setContentView:uiPreferences];
     break;
   }
   [itemPopUp setNextKeyView:[slot contentView]];

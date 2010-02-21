@@ -7,7 +7,7 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "toggleTooltip:",
+	    "toggleShowTime:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectItem:",
@@ -15,6 +15,8 @@
 	    "setColor:",
 	    "toggleDisplay:",
 	    "toggleRefresh:",
+	    "toggleShowDate:",
+	    "toggleTooltip:",
 	    "toggleWritable:"
 	);
 	Super = NSObject;
@@ -35,7 +37,9 @@
 	    "selectItem:",
 	    "toggleRefresh:",
 	    "changeInterval:",
-	    "toggleTooltip:"
+	    "toggleTooltip:",
+	    "toggleShowTime:",
+	    "toggleShowDate:"
 	);
 	Outlets = (
 	    panel,
@@ -63,7 +67,10 @@
 	    storeRefresh,
 	    refreshInterval,
 	    refreshIntervalText,
-	    showTooltip
+	    showTooltip,
+	    showTimeAppIcon,
+	    showDateAppIcon,
+	    uiPreferences
 	);
 	Super = NSObject;
     };

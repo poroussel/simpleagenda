@@ -180,8 +180,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 @implementation DayView
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", [NSNumber numberWithBool:NO], nil]
-		       forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, TOOLTIP, nil]];
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"9", @"18", @"15", nil]
+		       forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
 }
 
 - (id)initWithFrame:(NSRect)frameRect
