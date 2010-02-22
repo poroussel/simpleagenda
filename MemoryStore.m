@@ -1,4 +1,4 @@
-#import <AppKit/AppKit.h>
+#import <AppKit/NSColor.h>
 #import "MemoryStore.h"
 #import "Event.h"
 #import "Task.h"
@@ -11,18 +11,12 @@ NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
 NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 @implementation MemoryStore
-- (NSDictionary *)defaults
-{
-  return nil;
-}
-
 - (id)initWithName:(NSString *)name
 {
   self = [super init];
   if (self) {
     _name = [name copy];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
-    [_config registerDefaults:[self defaults]];
     _modified = NO;
     _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
@@ -135,7 +129,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   return [_tasks objectForKey:[elt UID]] != nil;
 }
 
--(BOOL)writable
+- (BOOL)writable
 {
   return _writable;
 }
