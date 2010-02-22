@@ -12,6 +12,8 @@ version 0.40
 	* Show time in the appicon
 	* Add a new UI Preferences panel and use it for tooltips and 
 	  date and time in the appicon
+	* Full keyboard navigation in appointment and task dialogs
+ 	  (you can use the Tab key in the description fields, yeah !)
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)
