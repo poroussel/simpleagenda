@@ -106,9 +106,19 @@ static NSMutableDictionary *editors;
   [editors removeObjectForKey:[_task UID]];
   [window close];
 }
+
 - (void)cancel:(id)sender
 {
   [editors removeObjectForKey:[_task UID]]; 
   [window close]; 
+}
+
+- (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
+{
+  if ([NSStringFromSelector(aSelector) isEqualToString:@"insertTab:"]) {
+    [[description window] selectNextKeyView:self];
+    return YES;
+  }
+  return [description tryToPerform:aSelector with:aTextView];
 }
 @end

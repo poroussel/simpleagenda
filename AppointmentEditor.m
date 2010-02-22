@@ -228,4 +228,13 @@ static NSMutableDictionary *editors;
     [timeText setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
   }
 }
+
+- (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
+{
+  if ([NSStringFromSelector(aSelector) isEqualToString:@"insertTab:"]) {
+    [[description window] selectNextKeyView:self];
+    return YES;
+  }
+  return [description tryToPerform:aSelector with:aTextView];
+}
 @end
