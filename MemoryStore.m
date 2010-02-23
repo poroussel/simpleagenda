@@ -11,12 +11,23 @@ NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
 NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 @implementation MemoryStore
+- (NSDictionary *)defaults
+{
+  return nil;
+}
+
 - (id)initWithName:(NSString *)name
 {
   self = [super init];
   if (self) {
     _name = [name copy];
     _config = [[ConfigManager alloc] initForKey:name withParent:nil];
+    /*
+     * Don't remove this even if it's seems silly : it will
+     * call the subclass's -defaults method which will have
+     * values
+     */
+    [_config registerDefaults:[self defaults]];
     _modified = NO;
     _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
