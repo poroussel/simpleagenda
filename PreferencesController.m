@@ -6,8 +6,7 @@
 #import "defines.h"
 
 @implementation PreferencesController
-
--(id)init
+- (id)init
 {
   self = [super init];
   if (self) {
@@ -74,7 +73,7 @@
   [self setupDefaultStore];
 }
 
--(void)showPreferences
+- (void)showPreferences
 {
   NSEnumerator *backends = [[StoreManager backends] objectEnumerator];
   ConfigManager *config = [ConfigManager globalConfig];
@@ -103,7 +102,7 @@
 }
 
 
--(void)periodicSetup
+- (void)periodicSetup
 {
   id <SharedStore> store = (id <SharedStore>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
 
@@ -124,7 +123,7 @@
   }
 }
 
--(void)selectStore:(id)sender
+- (void)selectStore:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [storeColor setColor:[store eventColor]];
@@ -138,21 +137,21 @@
   [self periodicSetup];
 }
 
--(void)changeColor:(id)sender
+- (void)changeColor:(id)sender
 {
   NSColor *rgb = [[storeColor color] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setEventColor:rgb];
 }
 
--(void)changeTextColor:(id)sender
+- (void)changeTextColor:(id)sender
 {
   NSColor *rgb = [[storeTextColor color] colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setTextColor:rgb];
 }
 
--(void)changeStart:(id)sender
+- (void)changeStart:(id)sender
 {
   int value = [dayStart intValue];
   if (value != [[ConfigManager globalConfig] integerForKey:FIRST_HOUR]) {
@@ -161,7 +160,7 @@
   }
 }
 
--(void)changeEnd:(id)sender
+- (void)changeEnd:(id)sender
 {
   int value = [dayEnd intValue];
   if (value != [[ConfigManager globalConfig] integerForKey:LAST_HOUR]) {
@@ -170,7 +169,7 @@
   }
 }
 
--(void)changeStep:(id)sender
+- (void)changeStep:(id)sender
 {
   double value = [minStep doubleValue];
   if (value * 60 != [[ConfigManager globalConfig] integerForKey:MIN_STEP]) {
@@ -179,7 +178,7 @@
   }
 }
 
--(void)changeInterval:(id)sender
+- (void)changeInterval:(id)sender
 {
   double value = [refreshInterval doubleValue];
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
@@ -188,32 +187,32 @@
   [refreshInterval setDoubleValue:value];
 }
 
--(void)selectDefaultStore:(id)sender
+- (void)selectDefaultStore:(id)sender
 {
   [_sm setDefaultStore:[defaultStorePopUp titleOfSelectedItem]];
   [self selectStore:nil];
 }
 
--(void)toggleDisplay:(id)sender
+- (void)toggleDisplay:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setDisplayed:[storeDisplay state]];
 }
 
--(void)toggleWritable:(id)sender
+- (void)toggleWritable:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setWritable:[storeWritable state]];
 }
 
--(void)toggleRefresh:(id)sender
+- (void)toggleRefresh:(id)sender
 {
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setPeriodicRefresh:[storeRefresh state]];
   [self periodicSetup];
 }
 
--(void)toggleTooltip:(id)sender
+- (void)toggleTooltip:(id)sender
 {
   [[ConfigManager globalConfig] setInteger:[showTooltip state] forKey:TOOLTIP];
 }
@@ -229,7 +228,7 @@
 }
 
 /* We only allow the removal of non-default stores */
--(void)removeStore:(id)sender
+- (void)removeStore:(id)sender
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   ConfigManager *config = [ConfigManager globalConfig];
@@ -243,7 +242,7 @@
   [self setupStores];
 }
 
--(void)createStore:(id)sender
+- (void)createStore:(id)sender
 {
   ConfigManager *config = [ConfigManager globalConfig];
   NSMutableArray *storeArray = [NSMutableArray arrayWithArray:[config objectForKey:STORES]];
@@ -260,7 +259,7 @@
   [createButton setEnabled:NO];
 }
 
--(void)selectItem:(id)sender
+- (void)selectItem:(id)sender
 {
   switch ([sender indexOfSelectedItem]) {
   case 0:
@@ -279,7 +278,7 @@
   [itemPopUp setNextKeyView:[slot contentView]];
 }
 
--(void)controlTextDidChange:(NSNotification *)notification
+- (void)controlTextDidChange:(NSNotification *)notification
 {
   if ([notification object] == storeName) {
     if ([_sm storeForName:[storeName stringValue]] || ![[storeName stringValue] length])
@@ -288,5 +287,4 @@
       [createButton setEnabled:YES];
   }
 }
-
 @end

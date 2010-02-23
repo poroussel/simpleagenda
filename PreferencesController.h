@@ -38,22 +38,22 @@
   StoreManager *_sm;
 }
 
--(void)showPreferences;
--(void)selectStore:(id)sender;
--(void)changeColor:(id)sender;
--(void)changeTextColor:(id)sender;
--(void)changeStart:(id)sender;
--(void)changeEnd:(id)sender;
--(void)changeStep:(id)sender;
--(void)changeInterval:(id)sender;
--(void)selectDefaultStore:(id)sender;
--(void)toggleDisplay:(id)sender;
--(void)toggleWritable:(id)sender;
--(void)toggleRefresh:(id)sender;
--(void)removeStore:(id)sender;
--(void)createStore:(id)sender;
--(void)selectItem:(id)sender;
--(void)toggleTooltip:(id)sender;
--(void)toggleShowDate:(id)sender;
--(void)toggleShowTime:(id)sender;
+- (void)showPreferences;
+- (void)selectStore:(id)sender;
+- (void)changeColor:(id)sender;
+- (void)changeTextColor:(id)sender;
+- (void)changeStart:(id)sender;
+- (void)changeEnd:(id)sender;
+- (void)changeStep:(id)sender;
+- (void)changeInterval:(id)sender;
+- (void)selectDefaultStore:(id)sender;
+- (void)toggleDisplay:(id)sender;
+- (void)toggleWritable:(id)sender;
+- (void)toggleRefresh:(id)sender;
+- (void)removeStore:(id)sender;
+- (void)createStore:(id)sender;
+- (void)selectItem:(id)sender;
+- (void)toggleTooltip:(id)sender;
+- (void)toggleShowDate:(id)sender;
+- (void)toggleShowTime:(id)sender;
 @end
