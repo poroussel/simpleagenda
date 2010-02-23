@@ -5,6 +5,7 @@
 #import "defines.h"
 #import "LocalStore.h"
 #import "iCalStore.h"
+#import "Event.h"
 
 NSString * const SADataChanged = @"DataDidChanged";
 static NSString * const PERSONAL_AGENDA = @"Personal Agenda";
@@ -211,5 +212,18 @@ static NSMutableDictionary *backends = nil;
     if ([store displayed])
       [all addObjectsFromArray:[store tasks]];
   return all;
+}
+
+- (NSSet *)scheduledAppointmentsForDay:(Date *)date
+{
+  NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
+  NSEnumerator *enumerator = [[self allEvents] objectEnumerator];
+  Event *event;
+
+  NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
+  while ((event = [enumerator nextObject]))
+    if ([event isScheduledForDay:date])
+      [dayEvents addObject:event];
+  return dayEvents;
 }
 @end

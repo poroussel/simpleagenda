@@ -4,11 +4,6 @@
 #import "Element.h"
 #import "AgendaStore.h"
 
-@protocol AgendaDataSource
-- (NSSet *)scheduledAppointmentsForDay:(Date *)date;
-- (Date *)selectedDate;
-@end
-
 extern NSString * const SADataChanged;
 
 @interface StoreManager : NSObject
@@ -32,4 +27,5 @@ extern NSString * const SADataChanged;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;
 - (NSArray *)allEvents;
 - (NSArray *)allTasks;
+- (NSSet *)scheduledAppointmentsForDay:(Date *)date;
 @end

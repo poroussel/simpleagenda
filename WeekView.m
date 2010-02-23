@@ -179,7 +179,7 @@ static struct {
 @end
 
 @implementation WeekView
-- (void)setDate:(Date *)aDate
+- (void)setupSelectWeek
 {
   NSRect frame = [self frame];
   NSEnumerator *enumerator;
@@ -187,14 +187,14 @@ static struct {
   int nday;
   Date *date;
 
-  if ([aDate weekOfYear] != weekNumber || [aDate year] != year) {
-    weekNumber = [aDate weekOfYear];
-    year = [aDate year];
+  if ([_date weekOfYear] != weekNumber || [_date year] != year) {
+    weekNumber = [_date weekOfYear];
+    year = [_date year];
     enumerator = [[self subviews] objectEnumerator];
     while ((view = [enumerator nextObject]))
       [view removeFromSuperviewWithoutNeedingDisplay];
     /* Start with monday */
-    date = [aDate copy];
+    date = [_date copy];
     [date changeDayBy: 1 - [date weekday]];
     for (nday = 0; nday < 7; nday++) {
       [self addSubview:AUTORELEASE([[WeekDayView alloc] initWithFrame:frame forDay:date])];
@@ -203,28 +203,13 @@ static struct {
     [date release];
   }
 }
-- (id)initWithFrame:(NSRect)frameRect
-{
-  self = [super initWithFrame:frameRect];
-  if (self)
-    [self setDate:[Date today]];
-  return self;
-}
 
 - (void)dealloc
 {
+  RELEASE(_date);
   [super dealloc];
 }
 
-- (id)dataSource
-{
-  return dataSource;
-}
-- (void)setDataSource:(id)source
-{
-  dataSource = source;
-  [self reloadData];
-}
 - (id)delegate
 {
   return delegate;
@@ -251,11 +236,10 @@ static struct {
   Event *apt;
   NSSet *events;
 
-  [self setDate:[dataSource selectedDate]];
   enumerator = [[self subviews] objectEnumerator];
   while ((wdv = [enumerator nextObject])) {
     [wdv clear];
-    events = [dataSource scheduledAppointmentsForDay:[wdv day]];
+    events = [[StoreManager globalManager] scheduledAppointmentsForDay:[wdv day]];
     enm = [events objectEnumerator];
     while ((apt = [enm nextObject]))
       [wdv addAppointment:apt];
@@ -269,6 +253,13 @@ static struct {
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
+  [self reloadData];
+}
+
+- (void)setDate:(Date *)date
+{
+  ASSIGNCOPY(_date, date);
+  [self setupSelectWeek];
   [self reloadData];
 }
 @end

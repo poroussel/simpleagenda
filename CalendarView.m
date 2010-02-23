@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #import "Date.h"
 #import "CalendarView.h"
+#import "StoreManager.h"
 
 @interface DayFormatter : NSFormatter
 @end
@@ -48,7 +49,6 @@ static NSImage *_2right;
   [_dayTimer invalidate];
   RELEASE(_dayTimer);
   RELEASE(delegate);
-  RELEASE(dataSource);
   [boldFont release];
   [normalFont release];
   [title release];
@@ -74,7 +74,6 @@ static NSImage *_2right;
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
     delegate = nil;
-    dataSource = nil;
 
     title = [[NSTextField alloc] initWithFrame: NSMakeRect(32, 128, 168, 20)];
     [title setEditable:NO];
@@ -230,7 +229,7 @@ static NSImage *_2right;
 	[cell setDrawsBackground:NO];
       }
       [cell setObjectValue:AUTORELEASE([day copy])];
-      if (dataSource && [[dataSource scheduledAppointmentsForDay:day] count])
+      if ([[[StoreManager globalManager] scheduledAppointmentsForDay:day] count])
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];
@@ -325,16 +324,6 @@ static NSImage *_2right;
 - (NSString *)dateAsString
 {
   return [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]];
-}
-
-- (void)setDataSource:(NSObject <AgendaDataSource> *)source
-{
-  ASSIGN(dataSource, source);
-  [self updateView];
-}
-- (id)dataSource
-{
-  return dataSource;
 }
 
 - (void)dataChanged:(NSNotification *)not

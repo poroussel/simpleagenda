@@ -5,10 +5,10 @@
 #import "Event.h"
 #import "StoreManager.h"
 #import "AppointmentView.h"
+#import "Date.h"
 
 @interface DayView : NSView <ConfigListener>
 {
-  IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
   int _firstH;
   int _lastH;
@@ -19,6 +19,7 @@
   AppointmentView *_selected;
   NSColor *_backgroundColor;
   NSColor *_alternateBackgroundColor;
+  Date *_date;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
@@ -31,4 +32,5 @@
 - (int)firstHour;
 - (int)lastHour;
 - (int)minimumStep;
+- (void)setDate:(Date *)date;
 @end

@@ -4,16 +4,18 @@
 #import "ConfigManager.h"
 #import "StoreManager.h"
 #import "AppointmentView.h"
+#import "Date.h"
 
 @interface WeekView : NSView <ConfigListener>
 {
-  IBOutlet id <AgendaDataSource> dataSource;
   IBOutlet id delegate;
   int weekNumber;
   int year;
+  Date *_date;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
 - (void)reloadData;
 - (id)delegate;
+- (void)setDate:(Date *)date;
 @end

@@ -41,8 +41,7 @@
 	    "setDelegate:"
 	);
 	Outlets = (
-	    delegate,
-	    dataSource
+	    delegate
 	);
 	Super = NSBox;
     };
@@ -50,7 +49,6 @@
 	Actions = (
 	);
 	Outlets = (
-	    dataSource,
 	    delegate
 	);
 	Super = NSView;
@@ -95,7 +93,6 @@
 	    "deselectAll:"
 	);
 	Outlets = (
-	    dataSource,
 	    delegate
 	);
 	Super = NSView;

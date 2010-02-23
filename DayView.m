@@ -210,6 +210,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   [_backgroundColor release];
   [_alternateBackgroundColor release];
   [_textAttributes release];
+  RELEASE(_date);
   [super dealloc];
 }
 
@@ -271,7 +272,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
   if ([apt allDay])
     return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
-  range = [apt intersectionWithDay:[dataSource selectedDate]];
+  range = [apt intersectionWithDay:_date];
   start = [self minuteToPosition:range.location/60];
   size = [self minuteToSize:range.length/60];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
@@ -318,14 +319,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   }
 }
 
-- (id)dataSource
-{
-  return dataSource;
-}
-- (void)setDataSource:(id)source
-{
-  dataSource = source;
-}
 - (id)delegate
 {
   return delegate;
@@ -353,7 +346,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   NSSet *events;
   BOOL found;
 
-  events = [dataSource scheduledAppointmentsForDay:[dataSource selectedDate]];
+  events = [[StoreManager globalManager] scheduledAppointmentsForDay:_date];
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
     if (![events containsObject:[aptv appointment]] || ![[[aptv appointment] store] displayed]) {
@@ -507,5 +500,11 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 - (int)minimumStep
 {
   return _minStep;
+}
+
+- (void)setDate:(Date *)date
+{
+  ASSIGNCOPY(_date, date);
+  [self reloadData];
 }
 @end

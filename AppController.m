@@ -299,7 +299,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSEnumerator *enumerator = [[self scheduledAppointmentsForDay:_selectedDay] objectEnumerator];
+  NSEnumerator *enumerator = [[_sm scheduledAppointmentsForDay:_selectedDay] objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
@@ -541,25 +541,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   return YES;
 }
 
-/* AgendaDataSource protocol */
-/* FIXME : this should probably go in StoreManager */
-- (NSSet *)scheduledAppointmentsForDay:(Date *)date
-{
-  NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
-  NSEnumerator *enumerator = [[_sm allEvents] objectEnumerator];
-  Event *event;
-
-  NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
-  while ((event = [enumerator nextObject]))
-    if ([event isScheduledForDay:date])
-      [dayEvents addObject:event];
-  return dayEvents;
-}
-- (Date *)selectedDate
-{
-  return [calendar date];
-}
-
 - (void)dataChanged:(NSNotification *)not
 {
   /* 
@@ -686,8 +667,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSTabViewItem *taskTab = [tabs tabViewItemAtIndex:[tabs indexOfTabViewItemWithIdentifier:@"Tasks"]];
 
   ASSIGNCOPY(_selectedDay, date);
-  [dayView reloadData];
-  [weekView reloadData];
+  [dayView setDate:date];
+  [weekView setDate:date];
   /* Hack to enable translation of this tab's label */
   [taskTab setLabel:_(@"Tasks")];
   [dayTab setLabel:[[_selectedDay calendarDate] descriptionWithCalendarFormat:@"%e %b"]];
