@@ -1,8 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "Task.h"
 
-static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
-
 @implementation Task(NSCoding)
 -(void)encodeWithCoder:(NSCoder *)coder
 {
@@ -23,10 +21,18 @@ static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
 }
 @end
 
+static NSArray *stateName;
+
 @implementation Task
++ (void)initialize
+{
+  if (stateName == nil)
+    stateName = [[NSArray alloc] initWithObjects:_(@"None"), _(@"Started"), _(@"Completed"), _(@"Canceled"), nil];
+}
+
 + (NSArray *)stateNamesArray
 {
-  return [NSArray arrayWithObjects:stateName count:4];
+  return stateName;
 }
 
 - (id)init
@@ -49,7 +55,7 @@ static NSString *stateName[] = {@"None", @"Started", @"Completed", @"Canceled"};
 }
 - (NSString *)stateAsString
 {
-  return stateName[_state];
+  return [stateName objectAtIndex:_state];
 }
 - (void)setState:(enum taskState)state
 {
