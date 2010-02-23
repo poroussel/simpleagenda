@@ -28,7 +28,7 @@ static NSMutableDictionary *editors;
   self = [super init];
   if (self) {
     formatter = AUTORELEASE([[HourFormatter alloc] init]);
-    dateFormatter = AUTORELEASE([[[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO] autorelease]);
+    dateFormatter = AUTORELEASE([[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO]);
     [durationText setFormatter:formatter];
     [timeText setFormatter:formatter];
     [endDate setFormatter:dateFormatter];
