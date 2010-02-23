@@ -2,14 +2,14 @@
 #import "Task.h"
 
 @implementation Task(NSCoding)
--(void)encodeWithCoder:(NSCoder *)coder
+- (void)encodeWithCoder:(NSCoder *)coder
 {
   [super encodeWithCoder:coder];
   [coder encodeInt:_state forKey:@"state"];
   if (_completionDate != nil)
     [coder encodeObject:_completionDate forKey:@"completion"];
 }
--(id)initWithCoder:(NSCoder *)coder
+- (id)initWithCoder:(NSCoder *)coder
 {
   [super initWithCoder:coder];
   _state = [coder decodeIntForKey:@"state"];
@@ -83,7 +83,6 @@ static NSArray *stateName;
   return [self summary];
 }
 @end
-
 
 @implementation Task(iCalendar)
 - (id)initWithICalComponent:(icalcomponent *)ic
