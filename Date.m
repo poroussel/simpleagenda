@@ -81,6 +81,15 @@ static NSTimeZone *gl_nstz = nil;
   return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
 }
 
+- (BOOL)isEqual:(id)aDate
+{
+  return icaltime_as_timet(_time) == icaltime_as_timet(((Date *)aDate)->_time);
+}
+
+- (NSUInteger)hash
+{
+  return icaltime_as_timet(_time);
+}
 /*
  * This is a bit convoluted because icaltime_compare
  * creates two dates in utc timezone to do the comparison.
