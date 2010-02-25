@@ -13,6 +13,7 @@
   [coder encodeInt:_classification forKey:@"classification"];
   if (_stamp)
     [coder encodeObject:_stamp forKey:@"dtstamp"];
+  [coder encodeObject:_categories forKey:@"categories"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -31,12 +32,26 @@
     _stamp = [[coder decodeObjectForKey:@"dtstamp"] retain];
   else
     _stamp = nil;
+  if ([coder containsValueForKey:@"categories"])
+    _categories = [[coder decodeObjectForKey:@"categories"] retain];
+  else
+    _categories = [NSMutableArray new];
+  return self;
+}
+
+- (id)init
+{
+  self = [super init];
+  if (self) {
+    _alarms = [NSMutableArray new];
+    _categories = [NSMutableArray new];
+  }
   return self;
 }
 
 - (id)initWithSummary:(NSString *)summary
 {
-  self = [super init];
+  self = [self init];
   if (self)
     [self setSummary:summary];
   return self;
@@ -49,6 +64,7 @@
   RELEASE(_uid);
   RELEASE(_stamp);
   RELEASE(_alarms);
+  RELEASE(_categories);
   [super dealloc];
 }
 
@@ -147,6 +163,29 @@
   /* FIXME : do something */
 }
 
+- (NSArray *)categories
+{
+  return [NSArray arrayWithArray:_categories];
+}
+- (void)setCategories:(NSArray *)categories
+{
+  [_categories setArray:categories];
+}
+- (void)addCategory:(NSString *)category
+{
+  if (![_categories containsObject:category])
+    [_categories addObject:category];
+}
+- (void)removeCategory:(NSString *)category
+{
+  if ([_categories containsObject:category])
+    [_categories removeObject:category];
+}
+- (BOOL)inCategory:(NSString *)category
+{
+  return [_categories containsObject:category];
+}
+
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
@@ -175,6 +214,9 @@
   prop = icalcomponent_get_first_property(ic, ICAL_CLASS_PROPERTY);
   if (prop)
     [self setClassification:icalproperty_get_class(prop)];
+  prop = icalcomponent_get_first_property(ic, ICAL_CATEGORIES_PROPERTY);
+  if (prop)
+    [self setCategories:[[NSString stringWithUTF8String:icalproperty_get_categories(prop)] componentsSeparatedByString:@","]];
   return self;
  init_error:
   NSLog(@"Error creating Element from iCal component");
@@ -218,6 +260,8 @@
   icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp iCalTime]));  
   [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
+  [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
   return YES;
 }
 

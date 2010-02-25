@@ -25,6 +25,7 @@
   icalproperty_class _classification;
   Date *_stamp;
   NSMutableArray *_alarms;
+  NSMutableArray *_categories;
 }
 
 - (id)initWithSummary:(NSString *)summary;
@@ -47,6 +48,12 @@
 - (NSArray *)alarms;
 - (void)addAlarm:(SAAlarm *)alarm;
 - (void)removeAlarm:(SAAlarm *)alarm;
+
+- (NSArray *)categories;
+- (void)setCategories:(NSArray *)categories;
+- (void)addCategory:(NSString *)category;
+- (void)removeCategory:(NSString *)category;
+- (BOOL)inCategory:(NSString *)category;
 
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
