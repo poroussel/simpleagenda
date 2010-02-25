@@ -9,6 +9,7 @@ extern NSString * const SADataChanged;
 @interface StoreManager : NSObject
 {
   NSMutableDictionary *_stores;
+  NSMutableDictionary *_cache;
   id _defaultStore;
 }
 

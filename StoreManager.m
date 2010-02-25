@@ -94,6 +94,7 @@ static NSMutableDictionary *backends = nil;
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
     [self setDefaultStore:defaultStore];
+    _cache = [[NSMutableDictionary alloc] initWithCapacity:256];
   }
   return self;
 }
@@ -104,11 +105,13 @@ static NSMutableDictionary *backends = nil;
   [self synchronise];
   RELEASE(_defaultStore);
   [_stores release];
+  [_cache release];
   [super dealloc];
 }
 
 - (void)dataChanged:(NSNotification *)not
 {
+  [_cache removeAllObjects];
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChanged object:self];
 }
 
@@ -216,14 +219,21 @@ static NSMutableDictionary *backends = nil;
 
 - (NSSet *)scheduledAppointmentsForDay:(Date *)date
 {
-  NSMutableSet *dayEvents = [NSMutableSet setWithCapacity:8];
-  NSEnumerator *enumerator = [[self allEvents] objectEnumerator];
+  NSMutableSet *dayEvents;
+  NSEnumerator *enumerator;
   Event *event;
 
   NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
+  dayEvents = [_cache objectForKey:date];
+  if (dayEvents)
+    return dayEvents;
+
+  dayEvents = [NSMutableSet setWithCapacity:8];
+  enumerator = [[self allEvents] objectEnumerator];
   while ((event = [enumerator nextObject]))
     if ([event isScheduledForDay:date])
       [dayEvents addObject:event];
+  [_cache setObject:dayEvents forKey:date];
   return dayEvents;
 }
 @end
