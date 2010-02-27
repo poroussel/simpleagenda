@@ -14,8 +14,9 @@ version 0.40
 	  date and time in the appicon
 	* Full keyboard navigation in appointment and task dialogs
  	  (you can use the Tab key in the description fields, yeah !)
-	* Bug fixes thanks to Fred Kiefer and James Jordan
 	* Better navigation performances with lots of appointments
+	* Bug fixes thanks to Fred Kiefer, James Jordan, Sergey Golovin 
+	  and Sebastian Reitenbach
 
 version 0.39 (2009/09/20)
 	* Code cleanups (as always)
