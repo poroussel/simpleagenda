@@ -4,7 +4,7 @@
 #import "iCalTree.h"
 #import "WebDAVResource.h"
 
-@interface iCalStore : MemoryStore <AgendaStore, PeriodicRefresh, ConfigListener>
+@interface iCalStore : MemoryStore <SharedStore, ConfigListener>
 {
   iCalTree *_tree;
   NSURL *_url;
