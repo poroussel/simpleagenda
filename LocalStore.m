@@ -11,6 +11,7 @@
 		       [[NSColor darkGrayColor] description], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:YES], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
+		       [NSNumber numberWithBool:YES], ST_ENABLED,
 		       nil, nil];
 }
 

@@ -98,6 +98,7 @@
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       [NSNumber numberWithBool:NO], ST_REFRESH,
+		       [NSNumber numberWithBool:YES], ST_ENABLED,
 		       nil, nil];
 }
 
