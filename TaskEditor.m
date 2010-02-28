@@ -44,7 +44,7 @@ static NSMutableDictionary *editors;
     originalStore = [task store];
     [store removeAllItems];
     while ((aStore = [list nextObject])) {
-      if ([aStore writable] || aStore == originalStore)
+      if ([aStore enabled] && ([aStore writable] || aStore == originalStore))
 	[store addItemWithTitle:[aStore description]];
     }
     if ([task store])

@@ -7,7 +7,7 @@
 #import "iCalStore.h"
 #import "Event.h"
 
-NSString * const SADataChanged = @"DataDidChanged";
+NSString * const SADataChangedInStoreManager = @"SADataDidChangedInStoreManager";
 static NSString * const PERSONAL_AGENDA = @"Personal Agenda";
 
 static NSMutableDictionary *backends;
@@ -87,6 +87,10 @@ static StoreManager *singleton;
 					     selector:@selector(dataChanged:)
 					         name:SAElementUpdatedInStore
 					       object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(dataChanged:)
+					         name:SAEnabledStatusChangedForStore
+					       object:nil];
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
@@ -112,7 +116,7 @@ static StoreManager *singleton;
 - (void)dataChanged:(NSNotification *)not
 {
   [_cache removeAllObjects];
-  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChanged object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStoreManager object:self];
 }
 
 - (void)addStoreNamed:(NSString *)name
@@ -200,7 +204,7 @@ static StoreManager *singleton;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store displayed])
+    if ([store enabled] && [store displayed])
       [all addObjectsFromArray:[store events]];
   return all;
 }
@@ -212,7 +216,7 @@ static StoreManager *singleton;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store displayed])
+    if ([store enabled] && [store displayed])
       [all addObjectsFromArray:[store tasks]];
   return all;
 }

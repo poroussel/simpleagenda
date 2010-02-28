@@ -6,6 +6,7 @@
 
 NSString * const SADataChangedInStore = @"SADataDidChangedInStore";
 NSString * const SAStatusChangedForStore = @"SAStatusChangedForStore";
+NSString * const SAEnabledStatusChangedForStore = @"SAEnabledStatusChangedForStore";
 NSString * const SAElementAddedToStore = @"SAElementAddedToStore";
 NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
 NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
@@ -202,6 +203,6 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   _enabled = state;
   NSLog(@"Store %@ %@", _name, state ? @"enabled" : @"disabled");
   [_config setObject:[NSNumber numberWithBool:_enabled] forKey:ST_ENABLED];
-  [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAEnabledStatusChangedForStore object:self];
 }
 @end

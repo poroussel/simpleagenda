@@ -4,7 +4,7 @@
 #import "Element.h"
 #import "AgendaStore.h"
 
-extern NSString * const SADataChanged;
+extern NSString * const SADataChangedInStoreManager;
 
 @interface StoreManager : NSObject
 {
@@ -23,6 +23,7 @@ extern NSString * const SADataChanged;
 - (void)setDefaultStore:(NSString *)name;
 - (id <AgendaStore>)defaultStore;
 - (NSEnumerator *)storeEnumerator;
+/* FIXME : add enabledStoreEnumerator ? */
 - (void)synchronise;
 - (void)refresh;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;

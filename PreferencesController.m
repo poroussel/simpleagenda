@@ -24,9 +24,14 @@
     RETAIN(storeFactory);
     [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
+    /* FIXME : could we call setupDefaultStore directly ? */
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					  selector:@selector(storeStateChanged:) 
 					  name:SAStatusChangedForStore 
+					  object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+ 					  selector:@selector(storeStateChanged:) 
+ 					  name:SAEnabledStatusChangedForStore 
 					  object:nil];
   }
   return self;
@@ -51,14 +56,21 @@
     if ([aStore writable] && [aStore enabled])
       [defaultStorePopUp addItemWithTitle:[aStore description]];
   }
-  [defaultStorePopUp selectItemWithTitle:defaultStore];
+  if ([defaultStorePopUp numberOfItems] > 0) {
+    if ([defaultStorePopUp itemWithTitle:defaultStore])
+      [defaultStorePopUp selectItemWithTitle:defaultStore];
+    else {
+      [defaultStorePopUp selectItemAtIndex:0];
+      [self selectDefaultStore:self];
+    }
+  }
 }
 
 - (void)setupStores
 {
-  NSEnumerator *list = [_sm storeEnumerator];
+  NSEnumerator *list;
   id <AgendaStore> aStore;
-
+  NSLog(@"setupStores");
   [self setupDefaultStore];
   list = [_sm storeEnumerator];
   [storePopUp removeAllItems];
@@ -102,10 +114,8 @@
 }
 
 
-- (void)periodicSetup
+- (void)periodicSetupForStore:(id)store
 {
-  id <SharedStore> store = (id <SharedStore>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
-
   if ([store conformsToProtocol:@protocol(PeriodicRefresh)]) {
     [storeRefresh setEnabled:YES];
     [storeRefresh setState:[store periodicRefresh]];
@@ -135,7 +145,7 @@
     [removeButton setEnabled:NO];
   else
     [removeButton setEnabled:YES];
-  [self periodicSetup];
+  [self periodicSetupForStore:store];
 }
 
 - (void)changeColor:(id)sender
@@ -210,7 +220,7 @@
 {
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setPeriodicRefresh:[storeRefresh state]];
-  [self periodicSetup];
+  [self periodicSetupForStore:store];
 }
 
 - (void)toggleEnabled:(id)sender

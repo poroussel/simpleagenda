@@ -239,7 +239,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    * numerous invisible updates which would slow the startup,
    * register only when the application is ready.
    */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   /* Set the selected day : this will update all views and titles (but not the summary */

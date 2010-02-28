@@ -5,6 +5,7 @@
 
 extern NSString * const SADataChangedInStore;
 extern NSString * const SAStatusChangedForStore;
+extern NSString * const SAEnabledStatusChangedForStore;
 extern NSString * const SAElementAddedToStore;
 extern NSString * const SAElementRemovedFromStore;
 extern NSString * const SAElementUpdatedInStore;
