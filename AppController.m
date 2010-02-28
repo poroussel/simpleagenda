@@ -242,8 +242,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChanged object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  /* Set the selected day : this will update all views and titles */
+  /* Set the selected day : this will update all views and titles (but not the summary */
   [calendar setDate:[Date today]];
+  /*
+   * If stores are loaded before this is executed (it happens
+   * when the gui is super slow, with remote X for example)
+   * we miss the dataChanged notification (that's the purpose 
+   * of late registering after all) and the summary will be
+   * empty so this is needed here.
+   */
+  [self updateSummaryData];
   /* This will init the alarms for all loaded elements needing one */
   [AlarmManager globalManager];
 }
