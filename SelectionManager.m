@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
 #import "SelectionManager.h"
 
+static SelectionManager *singleton;
+
 @implementation SelectionManager(Private)
 - (id)init
 {
@@ -14,12 +16,14 @@
 @end
 
 @implementation SelectionManager
++ (void)initialize
+{
+  if ([SelectionManager class] == self)
+    singleton = [[SelectionManager alloc] init];
+}
+
 + (SelectionManager *)globalManager
 {
-  static SelectionManager *singleton;
-
-  if (singleton == nil)
-    singleton = [[SelectionManager alloc] init];
   return singleton;
 }
 

@@ -1,6 +1,8 @@
 #import <Foundation/Foundation.h>
 #import "ConfigManager.h"
 
+static ConfigManager *singleton;
+
 @implementation ConfigManager(Private)
 - (ConfigManager *)initRoot
 {
@@ -16,8 +18,13 @@
 }
 @end
 
-
 @implementation ConfigManager
++ (void)initialize
+{
+  if ([ConfigManager class] == self)
+    singleton = [[ConfigManager alloc] initRoot];
+}
+
 - (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent
 {
   NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
@@ -37,10 +44,6 @@
 
 + (ConfigManager *)globalConfig
 {
-  static ConfigManager *singleton;
-
-  if (singleton == nil)
-    singleton = [[ConfigManager alloc] initRoot];
   return singleton;
 }
 

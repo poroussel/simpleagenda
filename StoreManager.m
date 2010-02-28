@@ -10,16 +10,19 @@
 NSString * const SADataChanged = @"DataDidChanged";
 static NSString * const PERSONAL_AGENDA = @"Personal Agenda";
 
-static NSMutableDictionary *backends = nil;
+static NSMutableDictionary *backends;
+static StoreManager *singleton;
 
 @implementation StoreManager
 + (void)initialize
 {
-  NSArray *classes = GSObjCAllSubclassesOfClass([MemoryStore class]);
-  NSEnumerator *enumerator = [classes objectEnumerator];
+  NSArray *classes;
+  NSEnumerator *enumerator;
   Class backendClass;
 
-  if (backends == nil) {
+  if ([StoreManager class] == self) {
+    classes = GSObjCAllSubclassesOfClass([MemoryStore class]);
+    enumerator = [classes objectEnumerator];
     backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
     while ((backendClass = [enumerator nextObject])) {
       if ([backendClass conformsToProtocol:@protocol(AgendaStore)])
@@ -27,6 +30,7 @@ static NSMutableDictionary *backends = nil;
       else
 	NSLog(@"Can't register %@ as a store backend", [backendClass description]);
     }
+    singleton = [[StoreManager alloc] init];
   }
 }
 
@@ -42,10 +46,6 @@ static NSMutableDictionary *backends = nil;
 
 + (StoreManager *)globalManager
 {
-  static StoreManager *singleton;
-
-  if (singleton == nil)
-    singleton = [[StoreManager alloc] init];
   return singleton;
 }
 

@@ -7,6 +7,8 @@
 #import "SAAlarm.h"
 #import "defines.h"
 
+static AlarmManager *singleton;
+
 @interface AlarmManager(Private)
 - (void)removeAlarms;
 - (void)createAlarms;
@@ -186,12 +188,14 @@
 @end
 
 @implementation AlarmManager
++ (void)initialize
+{
+  if ([AlarmManager class] == self)
+    singleton = [[AlarmManager alloc] init];
+}
+
 + (AlarmManager *)globalManager
 {
-  static AlarmManager *singleton;
-
-  if (singleton == nil)
-    singleton = [[AlarmManager alloc] init];
   return singleton;
 }
 
