@@ -7,7 +7,7 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "toggleShowTime:",
+	    "toggleEnabled:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectItem:",
@@ -16,6 +16,7 @@
 	    "toggleDisplay:",
 	    "toggleRefresh:",
 	    "toggleShowDate:",
+	    "toggleShowTime:",
 	    "toggleTooltip:",
 	    "toggleWritable:"
 	);
@@ -39,7 +40,8 @@
 	    "changeInterval:",
 	    "toggleTooltip:",
 	    "toggleShowTime:",
-	    "toggleShowDate:"
+	    "toggleShowDate:",
+	    "toggleEnabled:"
 	);
 	Outlets = (
 	    panel,
@@ -70,7 +72,8 @@
 	    showTooltip,
 	    showTimeAppIcon,
 	    showDateAppIcon,
-	    uiPreferences
+	    uiPreferences,
+	    storeEnabled
 	);
 	Super = NSObject;
     };

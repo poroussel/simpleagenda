@@ -130,6 +130,7 @@
   [storeTextColor setColor:[store textColor]];
   [storeDisplay setState:[store displayed]];
   [storeWritable setState:[store writable]];
+  [storeEnabled setState:[store enabled]];
   if ([[defaultStorePopUp titleOfSelectedItem] isEqual:[store description]])
     [removeButton setEnabled:NO];
   else
@@ -210,6 +211,12 @@
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
   [store setPeriodicRefresh:[storeRefresh state]];
   [self periodicSetup];
+}
+
+- (void)toggleEnabled:(id)sender
+{
+  id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
+  [store setEnabled:[storeEnabled state]];
 }
 
 - (void)toggleTooltip:(id)sender

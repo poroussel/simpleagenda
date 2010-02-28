@@ -29,11 +29,11 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
      */
     [_config registerDefaults:[self defaults]];
     _modified = NO;
-    _enabled = YES;
     _data = [[NSMutableDictionary alloc] initWithCapacity:128];
     _tasks = [[NSMutableDictionary alloc] initWithCapacity:16];
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
+    _enabled = [[_config objectForKey:ST_ENABLED] boolValue];
   }
   return self;
 }
@@ -201,6 +201,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 {
   _enabled = state;
   NSLog(@"Store %@ %@", _name, state ? @"enabled" : @"disabled");
+  [_config setObject:[NSNumber numberWithBool:_enabled] forKey:ST_ENABLED];
   [[NSNotificationCenter defaultCenter] postNotificationName:SAStatusChangedForStore object:self];
 }
 @end
