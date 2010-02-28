@@ -95,7 +95,6 @@
   DayView *parent = (DayView *)[self superview];
   id delegate = [parent delegate];
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-  int start;
   int minutes;
   BOOL keepOn = YES;
   BOOL modified = NO;
