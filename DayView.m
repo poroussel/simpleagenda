@@ -12,6 +12,14 @@
 #define RedimRect(frame) NSMakeRect(frame.origin.x, frame.origin.y, frame.size.width, 10)
 #define TextRect(rect) NSMakeRect(rect.origin.x + 4, rect.origin.y, rect.size.width - 8, rect.size.height - 2)
 
+@interface DayView(Private)
+- (NSRect)frameForAppointment:(Event *)apt;
+- (int)minuteToPosition:(int)minutes;
+- (int)positionToMinute:(float)position;
+- (int)roundMinutes:(int)minutes;
+- (int)distanceToDuration:(int)distance;
+@end
+
 @interface AppDayView : AppointmentView
 {
 }
@@ -89,7 +97,6 @@
   NSPoint mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   int start;
   int minutes;
-  int minStep;
   BOOL keepOn = YES;
   BOOL modified = NO;
   BOOL inResize;
@@ -106,16 +113,21 @@
     return;
   inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];
   if (inResize) {
+    int startduration = [_apt duration];
+    int starty = [self convertPoint:[theEvent locationInWindow] fromView:self].y;
+    int minStep = [parent minimumStep];
+    int diffduration;
+    int newy;
+
     [[NSCursor resizeUpDownCursor] push];
-    minStep = [parent minimumStep];
-    start = [[_apt startDate] minuteOfDay];
     while (keepOn) {
       theEvent = [[self window] nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-      mouseLoc = [self convertPoint:[theEvent locationInWindow] fromView:self];
+      newy = [self convertPoint:[theEvent locationInWindow] fromView:self].y;
 
       switch ([theEvent type]) {
       case NSLeftMouseDragged:
-	minutes = [parent roundMinutes:[parent positionToMinute:mouseLoc.y] - start];
+	diffduration = [parent distanceToDuration:starty-newy];
+	minutes = [parent roundMinutes:startduration+diffduration];
 	if (minutes < minStep)
 	  minutes = minStep;
 	if (minutes != [_apt duration]) {
@@ -225,6 +237,10 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 - (int)positionToMinute:(float)position
 {
   return ((_lastH + 1) * 60) - ((_lastH - _firstH + 1) * 60) * position / [self frame].size.height;
+}
+- (int)distanceToDuration:(int)distance
+{
+  return ((_lastH - _firstH + 1) * 60) * distance / [self frame].size.height;
 }
 
 - (void)fixFrames
