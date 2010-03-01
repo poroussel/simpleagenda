@@ -70,7 +70,7 @@
 {
   NSEnumerator *list;
   id <AgendaStore> aStore;
-  NSLog(@"setupStores");
+
   [self setupDefaultStore];
   list = [_sm storeEnumerator];
   [storePopUp removeAllItems];
