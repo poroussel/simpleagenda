@@ -30,9 +30,15 @@ static NSImage *_repeatImage;
   return self;
 }
 
+- (void)viewWillMoveToSuperview:(NSView *)newSuper
+{
+  /* Called with nil when the view is removed from its superview */
+  if (nil == newSuper)
+    [[ConfigManager globalConfig] unregisterClient:self];
+}
+
 - (void)dealloc
 {
-  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_apt);
   [super dealloc];
 }

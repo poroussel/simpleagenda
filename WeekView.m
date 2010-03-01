@@ -158,9 +158,9 @@ static struct {
 {
   AppWeekView *awv;
 
-  awv = AUTORELEASE([[AppWeekView alloc] initWithFrame:[self frameForNewAppointment:apt] appointment:apt]);
+  awv = [[AppWeekView alloc] initWithFrame:[self frameForNewAppointment:apt] appointment:apt];
   [awv setAutoresizingMask:NSViewWidthSizable];
-  [self addSubview:awv];
+  [self addSubview:AUTORELEASE(awv)];
 }
 
 - (Date *)day

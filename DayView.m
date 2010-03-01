@@ -368,7 +368,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       if (aptv == _selected)
 	_selected = nil;
       [aptv removeFromSuperviewWithoutNeedingDisplay];
-      [aptv release];
     }
   }
   enumerator = [events objectEnumerator];
@@ -386,7 +385,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       /* FIXME : probably shouldn't be there */
       [config registerClient:self forKey:[[apt store] description]];
       if ([[apt store] displayed])
-	[self addSubview:[[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt]];
+	[self addSubview:AUTORELEASE([[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt])];
     }
   }
   [self setNeedsDisplay:YES];
