@@ -209,6 +209,7 @@ static NSImage *_2right;
   NSColor *clear = [NSColor clearColor];
   NSColor *white = [NSColor whiteColor];
   NSColor *black = [NSColor blackColor];
+  StoreManager *sm = [StoreManager globalManager];
 
   [self clearSelectedDay];
   today = [Date today];
@@ -229,7 +230,7 @@ static NSImage *_2right;
 	[cell setDrawsBackground:NO];
       }
       [cell setObjectValue:AUTORELEASE([day copy])];
-      if ([[[StoreManager globalManager] scheduledAppointmentsForDay:day] count])
+      if ([[sm scheduledAppointmentsForDay:day] count])
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];
