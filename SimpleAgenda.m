@@ -1,7 +1,7 @@
 /* 
    Project: SimpleAgenda
 
-   Copyright (C) 2007 Philippe Roussel
+   Copyright (C) 2007-2010 Philippe Roussel
 
    Author: Philippe Roussel <p.o.roussel@free.fr>
 
@@ -27,6 +27,7 @@
 int main(int argc, const char *argv[])
 {
   //[NSObject enableDoubleReleaseCheck:YES];
+  //NSZombieEnabled = YES;
   return NSApplicationMain (argc, argv);
 }
 
