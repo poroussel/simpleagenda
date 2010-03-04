@@ -45,6 +45,7 @@
   if (self) {
     _alarms = [NSMutableArray new];
     _categories = [NSMutableArray new];
+    _classification = ICAL_CLASS_PUBLIC;
   }
   return self;
 }
@@ -127,7 +128,7 @@
 {
   if (classification < ICAL_CLASS_X || classification > ICAL_CLASS_NONE) {
     NSLog(@"Wrong classification value %d, change it to ICAL_CLASS_PUBLIC", classification);
-    classification = ICAL_CLASS_PUBLIC;
+    _classification = ICAL_CLASS_PUBLIC;
   }
   _classification = classification;
 }
@@ -190,7 +191,7 @@
 {
   icalproperty *prop;
 
-  self = [super init];
+  self = [self init];
   if (self == nil)
     return nil;
   prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
