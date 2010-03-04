@@ -148,7 +148,7 @@
     _hreftree = [[NSMutableDictionary alloc] initWithCapacity:512];
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
-   [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
+    [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
   }
   return self;
 }
@@ -339,7 +339,8 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
   [self fetchData:nil];
-  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
+  /* FIXME : see the comment in iCalStore as for why we use waitUntilDone:NO */
+  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:NO];
   [pool release];
 }
 

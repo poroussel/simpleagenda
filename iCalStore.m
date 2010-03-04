@@ -267,8 +267,7 @@
 - (void)initTimer:(id)object
 {
   [_refreshTimer invalidate];
-  [_refreshTimer release];
-  _refreshTimer = nil;
+  DESTROY(_refreshTimer);
   if ([self periodicRefresh]) {
     _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				             interval:[self refreshInterval]
@@ -288,7 +287,13 @@
   /* Read data on this second thread */
   [self fetchData];
   /* But create the refresh timer on the main thread */
-  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:YES];
+  /*
+   * FIXME : this messes memory if waitUntilDone:YES and crashes
+   * with enableDoubleReleaseCheck:YES. I don't understand why but
+   * all this code should be redone anyway so go with the
+   * workaround for now
+   */
+  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:NO];
   [pool release];
 }
 @end
