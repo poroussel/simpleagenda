@@ -1,1 +1,2 @@
 LIBUUID=@have_libuuid@
+ADDRESSES=@have_addresses@
