@@ -1,58 +1,56 @@
 /***
 French.lproj/Localizable.strings
-updated by make_strings 2010-02-23 10:23:55 +0100
+updated by make_strings 2010-03-05 10:40:10 +0100
 add comments above this one
 ***/
 
 
 /*** Keys found in multiple places ***/
 
-/* File: DayView.m:34 */
+/* File: DayView.m:42 */
 /* File: WeekView.m:32 */
 "All day : %@" = "Toute la journ\U00E9e : %@";
 
 
-/* File: Task.m:30 */
-"None" = "Aucun";
-
-/* File: Task.m:30 */
-"Started" = "D\U00E9marr\U00E9";
-
-/* File: Task.m:30 */
-"Completed" = "Termin\U00E9";
-
-/* File: Task.m:30 */
-"Canceled" = "Annul\U00E9";
-
-
 /*** Strings from AppController.m ***/
-/* File: AppController.m:398 */
+/* File: AppController.m:406 */
 "Export as" = "Exporter sous";
-/* File: AppController.m:355 */
+/* File: AppController.m:363 */
 "New task" = "Nouvelle t\U00E2che";
 /* File: AppController.m:82 */
 "Open tasks" = "T\U00E2ches en cours";
 /* File: AppController.m:155 */
 "Open tasks (%d)" = "T\U00E2ches en cours (%d)";
-/* File: AppController.m:507 */
+/* File: AppController.m:514 */
 /* File: AppController.m:81 */
 "Search results" = "R\U00E9sultats recherche";
-/* File: AppController.m:505 */
+/* File: AppController.m:512 */
 "Search results (%d items)" = "R\U00E9sultats (%d \U00E9l\U00E9ments)";
 /* File: AppController.m:80 */
 "Soon" = "Bient\U00F4t";
-/* File: AppController.m:692 */
+/* File: AppController.m:680 */
 /* File: AppController.m:169 */
 "Tasks" = "T\U00E2ches";
 /* File: AppController.m:78 */
 "Today" = "Aujourd'hui";
 /* File: AppController.m:79 */
 "Tomorrow" = "Demain";
-/* File: AppController.m:694 */
+/* File: AppController.m:682 */
 /* File: AppController.m:167 */
 "Week %d" = "Semaine %d";
-/* File: AppController.m:331 */
+/* File: AppController.m:339 */
 "edit summary..." = "modifier le r\U00E9sum\U00E9...";
-/* File: AppController.m:727 */
-/* File: AppController.m:323 */
+/* File: AppController.m:715 */
+/* File: AppController.m:331 */
 "edit title..." = "modifier le titre...";
+
+
+/*** Strings from Task.m ***/
+/* File: Task.m:30 */
+"Canceled" = "Annul\U00E9";
+/* File: Task.m:30 */
+"Completed" = "Termin\U00E9";
+/* File: Task.m:30 */
+"None" = "Aucun";
+/* File: Task.m:30 */
+"Started" = "D\U00E9marr\U00E9";
