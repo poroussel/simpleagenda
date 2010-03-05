@@ -30,8 +30,8 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
      */
     [_config registerDefaults:[self defaults]];
     _modified = NO;
-    _data = [[NSMutableDictionary alloc] initWithCapacity:128];
-    _tasks = [[NSMutableDictionary alloc] initWithCapacity:16];
+    _data = [[NSMutableDictionary alloc] initWithCapacity:512];
+    _tasks = [[NSMutableDictionary alloc] initWithCapacity:128];
     _writable = [[_config objectForKey:ST_RW] boolValue];
     _displayed = [[_config objectForKey:ST_DISPLAY] boolValue];
     _enabled = [[_config objectForKey:ST_ENABLED] boolValue];
