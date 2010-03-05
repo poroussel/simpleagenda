@@ -26,4 +26,17 @@
   [e1 release];
   [e2 release];
 }
+
+- (void)testDefaults
+{
+  Element *el = [Element new];
+
+  [self assertTrue:([el classification] == ICAL_CLASS_PUBLIC)];
+  [self assertNotNil:[el dateStamp]];
+  [self assertNotNil:[el categories]];
+  [self assertInt:[[el categories] count] equals:0];
+  [self assertFalse:[el hasAlarms]];
+  [self assertNotNil:[el alarms]];
+  [el release];
+}
 @end
