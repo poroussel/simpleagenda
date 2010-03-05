@@ -86,7 +86,7 @@
 @interface iCalStore(Private)
 - (void)fetchData;
 - (void)parseData:(NSData *)data;
-- (void)initTimer:(id)object;
+- (void)initTimer;
 - (void)initStoreAsync:(id)object;
 @end
 
@@ -112,6 +112,7 @@
     [_config registerClient:self forKey:ST_REFRESH];
     [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
+    [self initTimer];
   }
   return self;
 }
@@ -242,7 +243,7 @@
 }
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
-  [self initTimer:nil];
+  [self initTimer];
 }
 @end
 
@@ -264,10 +265,12 @@
   } else
     NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
 }
-- (void)initTimer:(id)object
+- (void)initTimer
 {
-  [_refreshTimer invalidate];
-  DESTROY(_refreshTimer);
+  if (nil != _refreshTimer) {
+    [_refreshTimer invalidate];
+    DESTROY(_refreshTimer);
+  }
   if ([self periodicRefresh]) {
     _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				             interval:[self refreshInterval]
@@ -284,16 +287,7 @@
 - (void)initStoreAsync:(id)object
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  /* Read data on this second thread */
   [self fetchData];
-  /* But create the refresh timer on the main thread */
-  /*
-   * FIXME : this messes memory if waitUntilDone:YES and crashes
-   * with enableDoubleReleaseCheck:YES. I don't understand why but
-   * all this code should be redone anyway so go with the
-   * workaround for now
-   */
-  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:NO];
   [pool release];
 }
 @end

@@ -124,7 +124,7 @@
 
 @interface GroupDAVStore(Private)
 - (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource;
-- (void)initTimer:(id)object;
+- (void)initTimer;
 - (void)initStoreAsync:(id)object;
 - (void)fetchData:(id)object;
 @end
@@ -149,6 +149,7 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
+    [self initTimer];
   }
   return self;
 }
@@ -324,7 +325,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   return result;
 }
 
-- (void)initTimer:(id)object
+- (void)initTimer
 {
   /* TODO */
 }
@@ -339,8 +340,6 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
   [self fetchData:nil];
-  /* FIXME : see the comment in iCalStore as for why we use waitUntilDone:NO */
-  [self performSelectorOnMainThread:@selector(initTimer:) withObject:nil waitUntilDone:NO];
   [pool release];
 }
 
