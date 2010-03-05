@@ -1,4 +1,4 @@
-version 0.40
+version 0.40 (2010/03/05)
 	* Display tooltips over appointments if the user want them
 	* Use libuuid to generate unique event ids if available
 	* Fix ticket #13 : iCalendar stores can use local files

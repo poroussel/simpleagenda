@@ -2,13 +2,13 @@
     ApplicationDescription = "Simple agenda and calendar application";
     ApplicationIcon = Calendar.tiff;
     ApplicationName = SimpleAgenda;
-    ApplicationRelease = 0.39;
+    ApplicationRelease = 0.40;
     Authors = (
 	"Philippe Roussel <p.o.roussel@free.fr>"
     );
-    Copyright = "Copyright (C) 2007-2009";
+    Copyright = "Copyright (C) 2007-2010";
     CopyrightDescription = "Released under GPL Version 2 or any later version";
-    FullVersionID = 0.39;
+    FullVersionID = 0.40;
     NSExecutable = SimpleAgenda;
     NSIcon = Calendar.tiff;
     NSMainNibFile = Agenda.gorm;
