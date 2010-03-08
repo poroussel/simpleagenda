@@ -1,8 +1,16 @@
 #import <AppKit/AppKit.h>
-#import "LocalStore.h"
+#import "AgendaStore.h"
 #import "Event.h"
 #import "Task.h"
 #import "defines.h"
+
+@interface LocalStore : MemoryStore <AgendaStore>
+{
+  NSString *_globalPath;
+  NSString *_globalFile;
+  NSString *_globalTaskFile;
+}
+@end
 
 @implementation LocalStore
 - (NSDictionary *)defaults

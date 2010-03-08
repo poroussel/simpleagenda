@@ -3,8 +3,6 @@
 #import "StoreManager.h"
 #import "ConfigManager.h"
 #import "defines.h"
-#import "LocalStore.h"
-#import "iCalStore.h"
 #import "Event.h"
 
 NSString * const SADataChangedInStoreManager = @"SADataDidChangedInStoreManager";

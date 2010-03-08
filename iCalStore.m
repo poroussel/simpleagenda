@@ -1,9 +1,19 @@
 #import <AppKit/AppKit.h>
 #import "Event.h"
 #import "Task.h"
-#import "iCalStore.h"
+#import "AgendaStore.h"
 #import "WebDAVResource.h"
+#import "iCalTree.h"
 #import "defines.h"
+
+@interface iCalStore : MemoryStore <SharedStore, ConfigListener>
+{
+  iCalTree *_tree;
+  NSURL *_url;
+  NSTimer *_refreshTimer;
+  WebDAVResource *_resource;
+}
+@end
 
 @interface iCalStoreDialog : NSObject
 {
