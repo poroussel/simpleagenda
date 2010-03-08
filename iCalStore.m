@@ -117,6 +117,11 @@
   return self;
 }
 
++ (BOOL)isUserInstanciable
+{
+  return YES;
+}
+
 + (BOOL)registerWithName:(NSString *)name
 {
   ConfigManager *cm;

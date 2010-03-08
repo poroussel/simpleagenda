@@ -39,6 +39,15 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   return self;
 }
 
++ (BOOL)isUserInstanciable
+{
+  return NO;
+}
+
++ (void)registered
+{
+}
+
 + (id)storeNamed:(NSString *)name
 {
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);

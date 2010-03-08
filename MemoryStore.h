@@ -14,6 +14,7 @@ extern NSString * const SAElementUpdatedInStore;
 @class NSColor;
 
 @protocol MemoryStore <NSObject>
++ (BOOL)isUserInstanciable;
 + (id)storeNamed:(NSString *)name;
 - (id)initWithName:(NSString *)name;
 + (BOOL)registerWithName:(NSString *)name;

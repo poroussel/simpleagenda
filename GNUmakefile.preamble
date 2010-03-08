@@ -13,8 +13,11 @@ ADDITIONAL_CFLAGS +=
 
 # Additional flags to pass to the linker
 ADDITIONAL_LDFLAGS += -lical
-#ifeq(have_libuuid,yes)
+#ifeq(LIBUUID,yes)
 ADDITIONAL_LDFLAGS += -luuid
+#endif
+#ifeq(ADDRESSES,yes)
+ADDITIONAL_LDFLAGS += -lAddresses
 #endif
 
 # Additional include directories the compiler should search

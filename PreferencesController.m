@@ -107,7 +107,8 @@
   [self setupStores];
   [storeClass removeAllItems];
   while ((backend = [backends nextObject]))
-    [storeClass addItemWithTitle:[backend storeTypeName]];
+    if ([backend isUserInstanciable])
+      [storeClass addItemWithTitle:[backend storeTypeName]];
   [storeClass selectItemAtIndex:0];
   [createButton setEnabled:NO];
   [panel makeKeyAndOrderFront:self];

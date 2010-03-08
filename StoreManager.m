@@ -25,7 +25,7 @@ static StoreManager *singleton;
     enumerator = [classes objectEnumerator];
     backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
     while ((backendClass = [enumerator nextObject])) {
-      if ([backendClass conformsToProtocol:@protocol(AgendaStore)])
+      if ([backendClass conformsToProtocol:@protocol(MemoryStore)])
 	[backends setObject:backendClass forKey:[backendClass storeTypeName]];
       else
 	NSLog(@"Can't register %@ as a store backend", [backendClass description]);
@@ -174,7 +174,8 @@ static StoreManager *singleton;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    [store write];
+    if ([store conformsToProtocol:@protocol(StoreBackend)])
+      [store write];
 }
 
 - (void)refresh
