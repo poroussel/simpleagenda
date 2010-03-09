@@ -267,7 +267,10 @@
 - (void)fetchData
 {
   if ([_resource get])
-    [self parseData:[_resource data]];
+    if ([NSThread isMainThread])
+      [self parseData:[_resource data]];
+    else
+      [self performSelectorOnMainThread:@selector(parseData:) withObject:[_resource data] waitUntilDone:NO];
   else
     [self setEnabled:NO];
 }

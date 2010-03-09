@@ -16,6 +16,7 @@
   NSMutableDictionary *_hreftree;
   NSMutableDictionary *_hrefresource;
   NSMutableArray *_modifiedhref;
+  NSMutableSet *_loadedData;
 }
 @end
 
@@ -138,7 +139,7 @@
 - (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource;
 - (void)initTimer;
 - (void)initStoreAsync:(id)object;
-- (void)fetchData:(id)object;
+- (void)fetchData;
 @end
 
 @implementation GroupDAVStore
@@ -160,6 +161,7 @@
     _hreftree = [[NSMutableDictionary alloc] initWithCapacity:512];
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
+    _loadedData = [[NSMutableSet alloc] initWithCapacity:512];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
     [self initTimer];
   }
@@ -216,6 +218,7 @@
   DESTROY(_hreftree);
   DESTROY(_hrefresource);
   DESTROY(_modifiedhref);
+  DESTROY(_loadedData);
   [super dealloc];
 }
 
@@ -241,7 +244,7 @@
     if ([resource httpStatus] > 199 && [resource httpStatus] < 300)
       /* FIXME : this is extremely slow. We should only load attributes and fetch new or modified elements */
       /* Reloading all data is a way to handle href and uid modification done by the server */
-      [self fetchData:nil];
+      [self fetchData];
     else
       NSLog(@"Error %d writing event to %@", [resource httpStatus], [url absoluteString]);
   }
@@ -283,7 +286,7 @@
 {
   /* FIXME : this should call something else, same thing for iCalStore ? */
   /* This version won't work for deleted elements etc */
-  [self fetchData:nil];
+  [self fetchData];
 }
 
 - (BOOL)write
@@ -356,7 +359,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
   if ([_config objectForKey:ST_TASK_URL])
     _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
-  [self fetchData:nil];
+  [self fetchData];
   [pool release];
 }
 
@@ -367,7 +370,6 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   NSEnumerator *enumerator;
   NSString *href;
   NSSet *components;
-  NSMutableSet *global = [NSMutableSet setWithCapacity:32];
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
@@ -376,7 +378,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     if ([element get] && [tree parseData:[element data]]) {
       components = [tree components];
       if ([components count] > 0) {
-	[global unionSet:components];
+	[_loadedData unionSet:components];
 	[_hreftree setObject:tree forKey:href];
 	[_hrefresource setObject:element forKey:href];
 	[_uidhref setObject:href forKey:[[components anyObject] UID]];
@@ -385,15 +387,20 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     [tree release];
     [element release];
   }
-  if ([global count] > 0)
-    [self fillWithElements:global];      
 }
-- (void)fetchData:(id)object
+- (void)fetchData
 {
+  [_loadedData removeAllObjects];
   if (_calendar)
     [self fetchList:[self itemsUnderRessource:_calendar]];
   if (_task)
     [self fetchList:[self itemsUnderRessource:_task]];
+  if ([_loadedData count] > 0) {  
+    if ([NSThread isMainThread])
+      [self fillWithElements:_loadedData];
+    else
+      [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:_loadedData waitUntilDone:YES];
+  }      
   NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
   NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
 }

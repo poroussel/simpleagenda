@@ -1,3 +1,6 @@
+version 0.41
+	* Threads/memory pools/notifications fixes
+
 version 0.40 (2010/03/05)
 	* Display tooltips over appointments if the user want them
 	* Use libuuid to generate unique event ids if available
