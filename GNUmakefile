@@ -66,9 +66,10 @@ SAAlarm.m \
 AlarmManager.m \
 NSString+SimpleAgenda.m \
 AlarmEditor.m
-#ifeq(ADDRESSES,yes)
+
+ifeq ($(ADDRESSES),yes)
 SimpleAgenda_OBJC_FILES += ABStore.m
-#endif
+endif
 
 #
 # Other sources
