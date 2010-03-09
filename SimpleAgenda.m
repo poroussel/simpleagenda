@@ -27,7 +27,6 @@
 int main(int argc, const char *argv[])
 {
   //[NSObject enableDoubleReleaseCheck:YES];
-  //NSZombieEnabled = YES;
   return NSApplicationMain (argc, argv);
 }
 
