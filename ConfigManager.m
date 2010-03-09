@@ -2,13 +2,13 @@
 #import "ConfigManager.h"
 
 static ConfigManager *singleton;
+static NSMutableDictionary *_cpkey;
 
 @implementation ConfigManager(Private)
 - (ConfigManager *)initRoot
 {
   self = [super init];
   if (self) {
-    _cpkey = [NSMutableDictionary new];
     _dict = [NSMutableDictionary new];
     _defaults = [NSMutableDictionary new];
     [_dict setDictionary:[[NSUserDefaults standardUserDefaults] 
@@ -21,8 +21,10 @@ static ConfigManager *singleton;
 @implementation ConfigManager
 + (void)initialize
 {
-  if ([ConfigManager class] == self)
+  if ([ConfigManager class] == self) {
+    _cpkey = [NSMutableDictionary new];
     singleton = [[ConfigManager alloc] initRoot];
+  }
 }
 
 - (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent
@@ -30,7 +32,6 @@ static ConfigManager *singleton;
   NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
   self = [super init];
   if (self) {
-    _cpkey = [NSMutableDictionary new];
     _dict = [NSMutableDictionary new];
     _defaults = [NSMutableDictionary new];
     if (parent == nil)
@@ -53,28 +54,21 @@ static ConfigManager *singleton;
   RELEASE(_parent);
   [_defaults release];
   [_dict release];
-  [_cpkey release];
   [super dealloc];
 }
 
 - (void)notifyListenerForKey:(NSString *)key
 {
   NSEnumerator *enumerator;
-  NSMutableSet *set, *tmp;
   id <ConfigListener> listener;
-  if (key)
-    set = [_cpkey objectForKey:key];
-  else {
-    set = [NSMutableSet new];
-    enumerator = [_cpkey objectEnumerator];
-    while ((tmp = [enumerator nextObject]))
-      [set unionSet:tmp];
-  }
-  enumerator = [set objectEnumerator];
-  while ((listener = [enumerator nextObject]))
+  NSValue *value;
+
+  NSAssert(key != nil, @"Missing key");
+  enumerator = [[_cpkey objectForKey:key] objectEnumerator];
+  while ((value = [enumerator nextObject])) {
+    listener = [value nonretainedObjectValue];
     [listener config:self dataDidChangedForKey:key];
-  if (!key)
-    [set release];
+  }
 }
 
 - (void)registerDefaults:(NSDictionary *)defaults
@@ -159,26 +153,47 @@ static ConfigManager *singleton;
 {
   NSAssert(key != nil, @"You have to register for a specific key");
   NSMutableSet *listeners = [_cpkey objectForKey:key];
+
   if (listeners)
-    [listeners addObject:client];
+    [listeners addObject:[NSValue valueWithNonretainedObject:client]];
   else
-    listeners = [NSMutableSet setWithObject:client];
+    listeners = [NSMutableSet setWithObject:[NSValue valueWithNonretainedObject:client]];
   [_cpkey setObject:listeners forKey:key];
+ 
 }
 
 - (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString*)key
 {
   NSMutableSet *set = [_cpkey objectForKey:key];
-  if (set)
-    [set removeObject:client];
+  NSSet *copy;
+  NSEnumerator *enumerator;
+  NSValue *v;
+
+  if (set) {
+    copy = [NSSet setWithSet:set];
+    enumerator = [copy objectEnumerator];
+    while ((v = [enumerator nextObject])) {
+      if (client == [v nonretainedObjectValue])
+	[set removeObject:v];
+    }
+  }
 }
 
 - (void)unregisterClient:(id <ConfigListener>)client
 {
   NSMutableSet *set;
+  NSSet *copy;
+  NSValue *v;
   NSEnumerator *enumerator = [_cpkey objectEnumerator];
+  NSEnumerator *en;
 
-  while ((set = [enumerator nextObject]))
-    [set removeObject:client];
+  while ((set = [enumerator nextObject])) {
+    copy = [NSSet setWithSet:set];
+    en = [copy objectEnumerator];
+    while ((v = [en nextObject])) {
+      if (client == [v nonretainedObjectValue])
+	[set removeObject:v];
+    }
+  }
 }
 @end

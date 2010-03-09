@@ -13,7 +13,6 @@
   ConfigManager *_parent;
   NSMutableDictionary *_defaults;
   NSMutableDictionary *_dict;
-  NSMutableDictionary *_cpkey;
 }
 
 - (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent;

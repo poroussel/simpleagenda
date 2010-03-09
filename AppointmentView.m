@@ -26,19 +26,15 @@ static NSImage *_repeatImage;
     ASSIGN(_apt, apt);
     [self tooltipSetup];
     [[ConfigManager globalConfig] registerClient:self forKey:TOOLTIP];
+    [[ConfigManager globalConfig] registerClient:self forKey:ST_COLOR];
+    [[ConfigManager globalConfig] registerClient:self forKey:ST_TEXT_COLOR];
   }
   return self;
 }
 
-- (void)viewWillMoveToSuperview:(NSView *)newSuper
-{
-  /* Called with nil when the view is removed from its superview */
-  if (nil == newSuper)
-    [[ConfigManager globalConfig] unregisterClient:self];
-}
-
 - (void)dealloc
 {
+  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_apt);
   [super dealloc];
 }
@@ -67,5 +63,7 @@ static NSImage *_repeatImage;
 {
   if ([key isEqualToString:TOOLTIP])
     [self tooltipSetup];
+  else
+    [self setNeedsDisplay:YES];
 }
 @end

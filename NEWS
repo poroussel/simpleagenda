@@ -1,5 +1,11 @@
 version 0.41
 	* Threads/memory pools/notifications fixes
+	* Fix silly bugs in the makefile when using conditions : we 
+	  always tried to link with libuuid and Addresses even when 
+	  configure didn't detect them
+	* Big changes in ConfigManager : it doesn't retain its listeners 
+	  anymore and listeners are now global. It means that you can 
+	  register for any key with any ConfigManager instance.
 
 version 0.40 (2010/03/05)
 	* Display tooltips over appointments if the user want them

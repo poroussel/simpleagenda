@@ -354,7 +354,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (void)reloadData
 {
-  ConfigManager *config = [ConfigManager globalConfig];
   NSEnumerator *enumerator, *enm;
   AppointmentView *aptv;
   Event *apt;
@@ -382,8 +381,6 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       }
     }
     if (found == NO) {
-      /* FIXME : probably shouldn't be there */
-      [config registerClient:self forKey:[[apt store] description]];
       if ([[apt store] displayed])
 	[self addSubview:AUTORELEASE([[AppDayView alloc] initWithFrame:[self frameForAppointment:apt]  appointment:apt])];
     }
@@ -495,12 +492,15 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   return YES;
 }
 
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  _firstH = [config integerForKey:FIRST_HOUR];
-  _lastH = [config integerForKey:LAST_HOUR];
-  _minStep = [config integerForKey:MIN_STEP];  
-  [self reloadData];
+  if ([key isEqualToString:MIN_STEP])
+    _minStep = [config integerForKey:MIN_STEP];
+  else {
+    _firstH = [config integerForKey:FIRST_HOUR];
+    _lastH = [config integerForKey:LAST_HOUR];
+    [self reloadData];
+  }
 }
 
 - (int)firstHour
