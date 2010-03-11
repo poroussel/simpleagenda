@@ -21,13 +21,12 @@
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       [NSNumber numberWithBool:YES], ST_ENABLED,
-		       @"ABStore", ST_CLASS,
 		       nil, nil];
 }
 
 + (NSString *)storeName
 {
-  return _(@"birthdays");
+  return _(@"my address book");
 }
 
 + (NSString *)storeTypeName
