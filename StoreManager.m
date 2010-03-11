@@ -64,7 +64,9 @@ static StoreManager *singleton;
   NSString *defaultStore;
   NSEnumerator *enumerator;
   NSString *stname;
+  Class backendClass;
   ConfigManager *config = [ConfigManager globalConfig];
+  id store;
 
   self = [super init];
   if (self) {
@@ -89,14 +91,24 @@ static StoreManager *singleton;
 					     selector:@selector(dataChanged:)
 					         name:SAEnabledStatusChangedForStore
 					       object:nil];
+    _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
+    _cache = [[NSMutableDictionary alloc] initWithCapacity:256];
+    /* Create user defined stores */
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
-    _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     enumerator = [storeArray objectEnumerator];
     while ((stname = [enumerator nextObject]))
       [self addStoreNamed:stname];
+    /* Create automatic stores */
+    enumerator = [backends objectEnumerator];
+    while ((backendClass = [enumerator nextObject])) {
+      if (![backendClass isUserInstanciable] && [backendClass storeName]) {
+	store = [backendClass storeNamed:[backendClass storeName]];
+	[_stores setObject:store forKey:[backendClass storeName]];
+	NSLog(@"Added %@ to StoreManager", [backendClass storeName]);
+      }
+    }
     [self setDefaultStore:defaultStore];
-    _cache = [[NSMutableDictionary alloc] initWithCapacity:256];
   }
   return self;
 }

@@ -6,6 +6,8 @@ version 0.41
 	* Big changes in ConfigManager : it doesn't retain its listeners 
 	  anymore and listeners are now global. It means that you can 
 	  register for any key with any ConfigManager instance.
+	* New ABStore that creates birthday events from Addresses contacts 
+	  if the Addresses framework is available.
 
 version 0.40 (2010/03/05)
 	* Display tooltips over appointments if the user want them

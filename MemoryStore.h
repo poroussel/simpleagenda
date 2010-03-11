@@ -15,6 +15,7 @@ extern NSString * const SAElementUpdatedInStore;
 
 @protocol MemoryStore <NSObject>
 + (BOOL)isUserInstanciable;
++ (NSString *)storeName;
 + (id)storeNamed:(NSString *)name;
 - (id)initWithName:(NSString *)name;
 + (BOOL)registerWithName:(NSString *)name;

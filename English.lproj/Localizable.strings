@@ -1,70 +1,64 @@
 /***
 English.lproj/Localizable.strings
-updated by make_strings 2010-03-05 10:40:10 +0100
+updated by make_strings 2010-03-11 09:46:33 +0100
 add comments above this one
 ***/
 
 
 /*** Keys found in multiple places ***/
 
-/* File: AppController.m:81 */
-/* File: AppController.m:514 */
-"Search results" = "Search results";
-
-/* File: AppController.m:331 */
-/* File: AppController.m:715 */
-"edit title..." = "edit title...";
-
-/* File: AppController.m:167 */
-/* File: AppController.m:682 */
-"Week %d" = "Week %d";
-
-/* File: AppController.m:169 */
-/* File: AppController.m:680 */
-"Tasks" = "Tasks";
-
 /* File: DayView.m:42 */
 /* File: WeekView.m:32 */
 "All day : %@" = "All day : %@";
 
+/* File: ABStore.m:31 */
+"birthdays" = "birthdays";
 
-/*** Unmatched/untranslated keys ***/
 
-/* File: AppController.m:78 */
-"Today" = "Today";
+/*** Strings from ABStore.m ***/
+/* File: ABStore.m:60 */
+"Birthday" = "Birthday";
 
-/* File: AppController.m:79 */
-"Tomorrow" = "Tomorrow";
 
-/* File: AppController.m:80 */
-"Soon" = "Soon";
-
-/* File: AppController.m:82 */
-"Open tasks" = "Open tasks";
-
-/* File: AppController.m:155 */
-"Open tasks (%d)" = "Open tasks (%d)";
-
-/* File: AppController.m:339 */
-"edit summary..." = "edit summary...";
-
-/* File: AppController.m:363 */
-"New task" = "New task";
-
+/*** Strings from AppController.m ***/
 /* File: AppController.m:406 */
 "Export as" = "Export as";
-
+/* File: AppController.m:363 */
+"New task" = "New task";
+/* File: AppController.m:82 */
+"Open tasks" = "Open tasks";
+/* File: AppController.m:155 */
+"Open tasks (%d)" = "Open tasks (%d)";
+/* File: AppController.m:514 */
+/* File: AppController.m:81 */
+"Search results" = "Search results";
 /* File: AppController.m:512 */
 "Search results (%d items)" = "Search results (%d items)";
+/* File: AppController.m:80 */
+"Soon" = "Soon";
+/* File: AppController.m:680 */
+/* File: AppController.m:169 */
+"Tasks" = "Tasks";
+/* File: AppController.m:78 */
+"Today" = "Today";
+/* File: AppController.m:79 */
+"Tomorrow" = "Tomorrow";
+/* File: AppController.m:682 */
+/* File: AppController.m:167 */
+"Week %d" = "Week %d";
+/* File: AppController.m:339 */
+"edit summary..." = "edit summary...";
+/* File: AppController.m:715 */
+/* File: AppController.m:331 */
+"edit title..." = "edit title...";
 
-/* File: Task.m:30 */
-"None" = "None";
 
-/* File: Task.m:30 */
-"Started" = "Started";
-
-/* File: Task.m:30 */
-"Completed" = "Completed";
-
+/*** Strings from Task.m ***/
 /* File: Task.m:30 */
 "Canceled" = "Canceled";
+/* File: Task.m:30 */
+"Completed" = "Completed";
+/* File: Task.m:30 */
+"None" = "None";
+/* File: Task.m:30 */
+"Started" = "Started";

@@ -44,6 +44,11 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   return NO;
 }
 
++ (NSString *)storeName
+{
+  return nil;
+}
+
 + (id)storeNamed:(NSString *)name
 {
   return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
