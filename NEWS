@@ -1,4 +1,4 @@
-version 0.41
+version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes
 	* Fix silly bugs in the makefile when using conditions : we 
 	  always tried to link with libuuid and Addresses even when 
@@ -8,6 +8,7 @@ version 0.41
 	  register for any key with any ConfigManager instance.
 	* New ABStore that creates birthday events from Addresses contacts 
 	  if the Addresses framework is available.
+	* New application icon from OpenClipArt
 
 version 0.40 (2010/03/05)
 	* Display tooltips over appointments if the user want them
