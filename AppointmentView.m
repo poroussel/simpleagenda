@@ -8,10 +8,8 @@ static NSImage *_repeatImage;
 @implementation AppointmentView
 + (void)initialize
 {
-  if (!_repeatImage) {
-    _repeatImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForImageResource:@"repeat"]];
-    [_repeatImage setFlipped:YES];
-  }
+  _repeatImage = [NSImage imageNamed:@"repeat"];
+  [_repeatImage setFlipped:YES];
 }
 
 - (NSImage *)repeatImage
