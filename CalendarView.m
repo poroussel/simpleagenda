@@ -29,16 +29,10 @@ static NSImage *_1right;
 static NSImage *_2right;
 + (void)initialize
 {
-  NSString *path;
-
-  path = [[NSBundle mainBundle] pathForImageResource:@"1left"];
-  _1left = [[NSImage alloc] initWithContentsOfFile:path];
-  path = [[NSBundle mainBundle] pathForImageResource:@"2left"];
-  _2left = [[NSImage alloc] initWithContentsOfFile:path];
-  path = [[NSBundle mainBundle] pathForImageResource:@"1right"];
-  _1right = [[NSImage alloc] initWithContentsOfFile:path];
-  path = [[NSBundle mainBundle] pathForImageResource:@"2right"];
-  _2right = [[NSImage alloc] initWithContentsOfFile:path];
+  _1left = [NSImage imageNamed:@"1left"];
+  _2left = [NSImage imageNamed:@"2left"];
+  _1right = [NSImage imageNamed:@"1right"];
+  _2right = [NSImage imageNamed:@"2right"];
 }
 
 - (void)dealloc
