@@ -164,14 +164,10 @@ static NSMutableDictionary *editors;
   [window close];
 }
 
-- (void)controlTextDidChange:(NSNotification *)aNotification
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   id end = [endDate objectValue];
-
-  if (end == nil || ![end isKindOfClass:[NSDate class]])
-    [ok setEnabled:NO];
-  else
-    [ok setEnabled:[self canBeModified]];
+  [ok setEnabled: ([self canBeModified] && (end != nil))];
 }
 
 - (void)selectFrequency:(id)sender
