@@ -31,11 +31,7 @@
     );
     NSTypes = (
 	{
-	    NSDocumentClass = "";
-	    NSHumanReadableName = "";
 	    NSIcon = "ical-file.tiff";
-	    NSName = "";
-	    NSRole = "";
 	    NSUnixExtensions = (
 		ics
 	    );
