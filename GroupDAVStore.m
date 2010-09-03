@@ -189,7 +189,7 @@
     if ([dialog task])
       taskURL = [NSURL URLWithString:[dialog task] possiblyRelativeToURL:baseURL];
     [dialog release];
-    cm = [[ConfigManager alloc] initForKey:name withParent:nil];
+    cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[dialog url] forKey:ST_URL];
     if (calendarURL)
       [cm setObject:[calendarURL description] forKey:ST_CALENDAR_URL];

@@ -149,7 +149,7 @@
       writable = [resource writableWithData:[resource data]];
     [resource release];
     [dialog release];
-    cm = [[ConfigManager alloc] initForKey:name withParent:nil];
+    cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[storeURL description] forKey:ST_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];

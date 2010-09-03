@@ -22,7 +22,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   self = [super init];
   if (self) {
     _name = [name copy];
-    _config = [[ConfigManager alloc] initForKey:name withParent:nil];
+    _config = [[ConfigManager alloc] initForKey:name];
     /*
      * Don't remove this even if it's seems silly : it will
      * call the subclass's -defaults method which will have

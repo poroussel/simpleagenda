@@ -27,15 +27,15 @@ static NSMutableDictionary *_cpkey;
   }
 }
 
-- (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent
+- (ConfigManager *)initForKey:(NSString *)key
 {
+  ConfigManager *parent = [ConfigManager globalConfig];
+
   NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
   self = [super init];
   if (self) {
     _dict = [NSMutableDictionary new];
     _defaults = [NSMutableDictionary new];
-    if (parent == nil)
-      parent = [ConfigManager globalConfig];
     [_dict setDictionary:[parent dictionaryForKey:key]];
     ASSIGN(_parent, parent);
     ASSIGNCOPY(_key, key);

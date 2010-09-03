@@ -45,7 +45,7 @@
 {
   ConfigManager *cm;
 
-  cm = [[ConfigManager alloc] initForKey:name withParent:nil];
+  cm = [[ConfigManager alloc] initForKey:name];
   [cm setObject:[name copy] forKey:ST_FILE];
   [cm setObject:[[self class] description] forKey:ST_CLASS];
   [cm release];

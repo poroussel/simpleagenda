@@ -15,7 +15,7 @@
   NSMutableDictionary *_dict;
 }
 
-- (ConfigManager *)initForKey:(NSString *)key withParent:(ConfigManager *)parent;
+- (ConfigManager *)initForKey:(NSString *)key;
 + (ConfigManager *)globalConfig;
 - (void)registerDefaults:(NSDictionary *)defaults;
 - (void)registerClient:(id <ConfigListener>)client forKey:(NSString *)key;

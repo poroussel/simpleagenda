@@ -1,3 +1,6 @@
+version 0.42
+	* Bug fixes and code cleanups
+
 version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes
 	* Fix silly bugs in the makefile when using conditions : we 
