@@ -533,17 +533,17 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   SEL action = [menuItem action];
 
-  if (sel_eq(action, @selector(copy:)))
+  if (sel_isEqual(action, @selector(copy:)))
     return [selectionManager count] > 0;
-  if (sel_eq(action, @selector(cut:)))
+  if (sel_isEqual(action, @selector(cut:)))
     return [selectionManager count] > 0;
-  if (sel_eq(action, @selector(editAppointment:)))
+  if (sel_isEqual(action, @selector(editAppointment:)))
     return [selectionManager count] == 1;
-  if (sel_eq(action, @selector(delAppointment:)))
+  if (sel_isEqual(action, @selector(delAppointment:)))
     return [selectionManager count] > 0;
-  if (sel_eq(action, @selector(exportAppointment:)))
+  if (sel_isEqual(action, @selector(exportAppointment:)))
     return [selectionManager count] > 0;
-  if (sel_eq(action, @selector(paste:)))
+  if (sel_isEqual(action, @selector(paste:)))
     return [selectionManager copiedCount] > 0;
   return YES;
 }
