@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <string.h>
 #import "Event.h"
 #import "DateRange.h"
 
