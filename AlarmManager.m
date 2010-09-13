@@ -5,8 +5,10 @@
 #import "MemoryStore.h"
 #import "Element.h"
 #import "SAAlarm.h"
+#import "AlarmBackend.h"
 #import "defines.h"
 
+static NSMutableDictionary *backends;
 static AlarmManager *singleton;
 
 @interface AlarmManager(Private)
@@ -140,6 +142,8 @@ static AlarmManager *singleton;
 
   self = [super init];
   if (self) {
+    
+
     [cm registerDefaults:[self defaults]];
     [cm registerClient:self forKey:ALARMS];
     _active = [[cm objectForKey:ALARMS] boolValue];
@@ -190,8 +194,24 @@ static AlarmManager *singleton;
 @implementation AlarmManager
 + (void)initialize
 {
-  if ([AlarmManager class] == self)
+  NSArray *classes;
+  NSEnumerator *enumerator;
+  Class backendClass;
+  id backend;
+
+  if ([AlarmManager class] == self) {
+    classes = GSObjCAllSubclassesOfClass([AlarmBackend class]);
+    enumerator = [classes objectEnumerator];
+    backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
+    while ((backendClass = [enumerator nextObject])) {
+      backend = [backendClass new];
+      if (backend) {
+	[backends setObject:backend forKey:[backendClass backendName]];
+	NSLog(@"Alarm backend <%@> registered", [backendClass backendName]);
+      }
+    }
     singleton = [[AlarmManager alloc] init];
+  }
 }
 
 + (AlarmManager *)globalManager
@@ -206,5 +226,16 @@ static AlarmManager *singleton;
     [self createAlarms];
   else
     [self removeAlarms];
+}
+@end
+
+
+@implementation AlarmBackend
++ (NSString *)backendName
+{
+  return @"Base backend";
+}
+- (void)display:(SAAlarm *)alarm
+{
 }
 @end

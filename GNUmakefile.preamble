@@ -19,6 +19,9 @@ endif
 ifeq ($(ADDRESSES),yes)
 ADDITIONAL_TOOL_LIBS += -lAddresses
 endif
+ifeq ($(DBUSKIT),yes)
+ADDITIONAL_TOOL_LIBS += -lDBusKit
+endif
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += 

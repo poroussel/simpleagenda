@@ -71,6 +71,10 @@ ifeq ($(ADDRESSES),yes)
 SimpleAgenda_OBJC_FILES += ABStore.m
 endif
 
+ifeq ($(DBUSKIT),yes)
+SimpleAgenda_OBJC_FILES += DBusBackend.m
+endif
+
 #
 # Other sources
 #
