@@ -8,6 +8,10 @@
 #import "AlarmBackend.h"
 #import "defines.h"
 
+NSString * const ACTIVATE_ALARMS = @"activateAlarms";
+NSString * const ACTIVATE_DEFAULT_ALARM = @"activateDefaultAlarm";
+NSString * const DEFAULT_ALARM = @"defaultAlarm";
+
 static NSMutableDictionary *backends;
 static AlarmManager *singleton;
 
@@ -132,7 +136,8 @@ static AlarmManager *singleton;
 
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:ALARMS];
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil] 
+				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, ACTIVATE_DEFAULT_ALARM, nil]];
 }
 
 - (id)init
@@ -145,8 +150,8 @@ static AlarmManager *singleton;
     
 
     [cm registerDefaults:[self defaults]];
-    [cm registerClient:self forKey:ALARMS];
-    _active = [[cm objectForKey:ALARMS] boolValue];
+    [cm registerClient:self forKey:ACTIVATE_ALARMS];
+    _active = [[cm objectForKey:ACTIVATE_ALARMS] boolValue];
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
     [nc addObserver:self 
 	   selector:@selector(elementAdded:) 
@@ -221,7 +226,7 @@ static AlarmManager *singleton;
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  _active = [[config objectForKey:ALARMS] boolValue];
+  _active = [[config objectForKey:ACTIVATE_ALARMS] boolValue];
   if (_active)
     [self createAlarms];
   else
