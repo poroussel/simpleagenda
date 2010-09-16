@@ -13,6 +13,7 @@ NSString * const ACTIVATE_DEFAULT_ALARM = @"activateDefaultAlarm";
 NSString * const DEFAULT_ALARM = @"defaultAlarm";
 
 static NSMutableDictionary *backends;
+static AlarmBackend *activeBackend;
 static AlarmManager *singleton;
 
 @interface AlarmManager(Private)
@@ -23,10 +24,10 @@ static AlarmManager *singleton;
 @implementation AlarmManager(Private)
 - (void)runAlarm:(SAAlarm *)alarm
 {
-  NSLog([alarm description]);
-  if ([alarm isAbsoluteTrigger]) {
-  } else {
-  }
+  if (activeBackend)
+    [activeBackend display:alarm];
+  else
+    NSLog([alarm description]);
 }
 
 - (void)addAlarm:(SAAlarm *)alarm forUID:(NSString *)uid

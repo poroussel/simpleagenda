@@ -9,7 +9,7 @@
 - (NSString *)stringForObjectValue:(id)anObject
 {
   NSAssert([anObject isKindOfClass:[Date class]], @"Needs a Date as input");
-  return [NSString stringWithFormat:@"%2d", [anObject dayOfMonth]];
+  return [NSString stringWithFormat:@"%2d", [(Date *)anObject dayOfMonth]];
 }
 - (BOOL)getObjectValue:(id *)anObject forString:(NSString *)string errorDescription:(NSString **)error
 {
