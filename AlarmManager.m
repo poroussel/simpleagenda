@@ -91,6 +91,7 @@ static AlarmManager *singleton;
     if (added)
       [self addAlarm:alarm forUID:[element UID]];
   }
+  NSLog(@"Add alarms for %@", [element UID]);
 }
 
 - (void)setAlarmsForElements:(NSArray *)elements
@@ -108,7 +109,6 @@ static AlarmManager *singleton;
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
     
-    NSLog(@"Add alarms for %@", uid);
     [self setAlarmsForElement:[store elementWithUID:uid]];
   }
 }
