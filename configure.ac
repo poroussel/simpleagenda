@@ -10,7 +10,19 @@ AC_CONFIG_HEADER([config.h])
 AC_CHECK_HEADERS([libical/ical.h], ,[AC_CHECK_HEADERS([ical.h], ,[AC_MSG_ERROR(ical.h not found. You must have libical >= 0.27 installed.)])])
 AC_CHECK_HEADERS([uuid/uuid.h], have_libuuid=yes, have_libuuid=no)
 AC_CHECK_ADDRESSES(have_addresses=yes, have_addresses=no)
-AC_CHECK_DBUSKIT(have_dbuskit=yes, have_dbuskit=no)
+
+AC_ARG_ENABLE([dbuskit],
+	   [AC_HELP_STRING([--disable-dbuskit],
+                           [disable DBusKit based alarm notification])],
+           [],
+	   [enable_dbuskit=yes])
+if test "x$enable_dbuskit" != xno; then
+   AC_CHECK_DBUSKIT(have_dbuskit=yes, have_dbuskit=no)
+else
+   AC_MSG_NOTICE([DBusKit disabled])
+   have_dbuskit=no
+fi
+
 AC_SUBST(have_libuuid)
 AC_SUBST(have_addresses)
 AC_SUBST(have_dbuskit)
