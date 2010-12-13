@@ -22,6 +22,7 @@
     RETAIN(globalPreferences);
     RETAIN(storePreferences);
     RETAIN(storeFactory);
+    RETAIN(uiPreferences);
     [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
     /* FIXME : could we call setupDefaultStore directly ? */
@@ -42,6 +43,7 @@
   RELEASE(globalPreferences);
   RELEASE(storePreferences);
   RELEASE(storeFactory);
+  RELEASE(uiPreferences);
   [super dealloc];
 }
 
@@ -277,23 +279,33 @@
   [createButton setEnabled:NO];
 }
 
+- (void)setContent:(id)content
+{
+  id old = [slot contentView];
+
+  if (old == content)
+    return;
+  [slot setContentView: content];
+  [itemPopUp setNextKeyView:[slot contentView]];
+}
+
+
 - (void)selectItem:(id)sender
 {
   switch ([sender indexOfSelectedItem]) {
   case 0:
-    [slot setContentView:globalPreferences];
+    [self setContent:globalPreferences];
     break;
   case 1:
-    [slot setContentView:storePreferences];
+    [self setContent:storePreferences];
     break;
   case 2:
-    [slot setContentView:storeFactory];
+    [self setContent:storeFactory];
     break;
   case 3:
-    [slot setContentView:uiPreferences];
+    [self setContent:uiPreferences];
     break;
   }
-  [itemPopUp setNextKeyView:[slot contentView]];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification
