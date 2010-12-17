@@ -28,24 +28,35 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 
   self = [super init];
   if (self) {
-    c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
-    if (!c) {
-      NSLog(@"Unable to create a connection to org.freedesktop.Notifications");
-      [self release];
-      return nil;
-    }
-    remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
-    if (!remote) {
-      NSLog(@"Unable to create a proxy for /org/freedesktop/Notifications");
-      [self release];
-      return nil;
-    }
-    caps = [remote GetCapabilities];
-    if (!caps) {
-      NSLog(@"No response to GetCapabilities method");
-      [self release];
-      return nil;
-    }
+    NS_DURING
+      {
+	c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
+	if (!c) {
+	  NSLog(@"Unable to create a connection to org.freedesktop.Notifications");
+	  [self release];
+	  self = nil;
+	}
+	remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
+	if (!remote) {
+	  NSLog(@"Unable to create a proxy for /org/freedesktop/Notifications");
+	  [self release];
+	  self = nil;
+	}
+	caps = [remote GetCapabilities];
+	if (!caps) {
+	  NSLog(@"No response to GetCapabilities method");
+	  [self release];
+	  self = nil;
+	}
+      }
+    NS_HANDLER
+      {
+	NSLog([localException description]);
+	NSLog(@"Exception during DBus backend setup, backend disabled");
+	[self release];
+	self = nil;
+      }
+    NS_ENDHANDLER
   }
   return self;
 }
