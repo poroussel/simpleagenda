@@ -32,13 +32,13 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
       {
 	c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
 	if (!c) {
-	  NSLog(@"Unable to create a connection to org.freedesktop.Notifications");
+	  NSLog(@"Unable to create a connection to %@", DBUS_BUS);
 	  [self release];
 	  self = nil;
 	}
 	remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
 	if (!remote) {
-	  NSLog(@"Unable to create a proxy for /org/freedesktop/Notifications");
+	  NSLog(@"Unable to create a proxy for %@", DBUS_PATH);
 	  [self release];
 	  self = nil;
 	}
