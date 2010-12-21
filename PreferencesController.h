@@ -36,6 +36,7 @@
   IBOutlet id uiPreferences;
   IBOutlet id showDateAppIcon;
   IBOutlet id showTimeAppIcon;
+  IBOutlet id alarmPreferences;
   StoreManager *_sm;
 }
 

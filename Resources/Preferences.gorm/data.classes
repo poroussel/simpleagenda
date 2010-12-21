@@ -73,7 +73,8 @@
 	    showTimeAppIcon,
 	    showDateAppIcon,
 	    uiPreferences,
-	    storeEnabled
+	    storeEnabled,
+	    alarmPreferences
 	);
 	Super = NSObject;
     };

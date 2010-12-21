@@ -23,6 +23,7 @@
     RETAIN(storePreferences);
     RETAIN(storeFactory);
     RETAIN(uiPreferences);
+    RETAIN(alarmPreferences);
     [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
     /* FIXME : could we call setupDefaultStore directly ? */
@@ -44,6 +45,7 @@
   RELEASE(storePreferences);
   RELEASE(storeFactory);
   RELEASE(uiPreferences);
+  RELEASE(alarmPreferences);
   [super dealloc];
 }
 
@@ -304,6 +306,9 @@
     break;
   case 3:
     [self setContent:uiPreferences];
+    break;
+  case 4:
+    [self setContent:alarmPreferences];
     break;
   }
 }
