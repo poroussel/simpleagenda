@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <Foundation/Foundation.h>
+#import "config.h"
 
 extern NSString * const SAActionDisplay;
 extern NSString * const SAActionEmail;
@@ -12,6 +13,7 @@ extern NSString * const SAActionSound;
 
 @interface SAAlarm : NSObject
 {
+  NSAttributedString *_text;
   Date *_absoluteTrigger;
   NSTimeInterval _relativeTrigger;
   NSString *_action;
@@ -24,6 +26,8 @@ extern NSString * const SAActionSound;
 }
 
 + (id)alarm;
+- (NSAttributedString *)text;
+- (void)setText:(NSAttributedString *)text;
 - (BOOL)isAbsoluteTrigger;
 - (Date *)absoluteTrigger;
 - (void)setAbsoluteTrigger:(Date *)trigger;
@@ -44,4 +48,9 @@ extern NSString * const SAActionSound;
 - (Element *)element;
 - (void)setElement:(Element *)element;
 - (Date *)triggerDateRelativeTo:(Date *)date;
+
+- (id)initWithICalComponent:(icalcomponent *)ic;
+- (icalcomponent *)asICalComponent;
+- (BOOL)updateICalComponent:(icalcomponent *)ic;
+- (int)iCalComponentType;
 @end

@@ -63,7 +63,7 @@ static AlarmManager *singleton;
 
   if ([date timeIntervalSinceNow] < 0)
     return NO;
-  [self performSelector:@selector(absoluteTrigger:) 
+  [self performSelector:@selector(runAlarm:) 
 	     withObject:alarm 
 	     afterDelay:[date timeIntervalSinceNow]];
   return YES;

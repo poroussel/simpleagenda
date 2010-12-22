@@ -188,6 +188,8 @@
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   icalproperty *prop;
+  icalcomponent *subc;
+  SAAlarm *alarm;
 
   self = [self init];
   if (self == nil)
@@ -216,7 +218,17 @@
   prop = icalcomponent_get_first_property(ic, ICAL_CATEGORIES_PROPERTY);
   if (prop)
     [self setCategories:[[NSString stringWithUTF8String:icalproperty_get_categories(prop)] componentsSeparatedByString:@","]];
+
+  subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
+  for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT)) {
+    alarm = [[SAAlarm alloc] initWithICalComponent:subc];
+    if (alarm) {
+      [self addAlarm:alarm];
+      RELEASE(alarm);
+    }
+  }
   return self;
+
  init_error:
   NSLog(@"Error creating Element from iCal component");
   [self release];

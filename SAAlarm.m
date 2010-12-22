@@ -2,6 +2,7 @@
 
 #import "SAAlarm.h"
 #import "Date.h"
+#import "Element.h"
 
 NSString * const SAActionDisplay = @"DISPLAY";
 NSString * const SAActionEmail = @"EMAIL";
@@ -11,6 +12,7 @@ NSString * const SAActionSound = @"AUDIO";
 @implementation SAAlarm
 - (void)dealloc
 {
+  DESTROY(_text);
   DESTROY(_absoluteTrigger);
   DESTROY(_action);
   DESTROY(_emailaddress);
@@ -22,6 +24,7 @@ NSString * const SAActionSound = @"AUDIO";
 - (id)init
 {
   self = [super init];
+  _text = nil;
   _absoluteTrigger = nil;
   _relativeTrigger = 0;
   _emailaddress = nil;
@@ -34,6 +37,16 @@ NSString * const SAActionSound = @"AUDIO";
 + (id)alarm
 {
   return AUTORELEASE([[SAAlarm alloc] init]);
+}
+
+- (NSAttributedString *)text
+{
+  return _text;
+}
+
+- (void)setText:(NSAttributedString *)text
+{
+  ASSIGN(_text, text);
 }
 
 - (BOOL)isAbsoluteTrigger
@@ -140,6 +153,7 @@ NSString * const SAActionSound = @"AUDIO";
 - (void)setElement:(Element *)element
 {
   _element = element;
+  NSLog(@"Added %@ to element %@", [self description], [element UID]);
 }
 
 - (Date *)triggerDateRelativeTo:(Date *)date
@@ -150,7 +164,77 @@ NSString * const SAActionSound = @"AUDIO";
 - (NSString *)description
 {
   if ([self isAbsoluteTrigger])
-    return [NSString stringWithFormat:@"Absolute trigger set to %@ repeat %d interval %f", [_absoluteTrigger description], _repeatCount, _repeatInterval];
-  return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f", _relativeTrigger, _repeatCount, _repeatInterval];
+    return [NSString stringWithFormat:@"Absolute trigger set to %@ repeat %d interval %f with text <%@> action %@", [_absoluteTrigger description], _repeatCount, _repeatInterval, _text, _action];
+  return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f with text <%@> action %@", _relativeTrigger, _repeatCount, _repeatInterval, _text, _action];
+}
+
+- (id)initWithICalComponent:(icalcomponent *)ic
+{
+  icalproperty *prop;
+  struct icaltriggertype trigger;
+
+  self = [self init];
+  if (self == nil)
+    return nil;
+  prop = icalcomponent_get_first_property(ic, ICAL_ACTION_PROPERTY);
+  if (!prop) {
+    NSLog(@"No action defined, alarm disabled");
+    goto init_error;
+  }
+  switch (icalproperty_get_action(prop)) {
+  case ICAL_ACTION_X:
+  case ICAL_ACTION_DISPLAY:
+    [self setAction:SAActionDisplay];
+    break;
+  case ICAL_ACTION_AUDIO:
+    [self setAction:SAActionSound];
+    break;
+  case ICAL_ACTION_EMAIL:
+    [self setAction:SAActionEmail];
+    break;
+  case ICAL_ACTION_PROCEDURE:
+    [self setAction:SAActionProcedure];
+    break;
+  default:
+    NSLog(@"No action defined, alarm disabled");
+    goto init_error;
+  }
+  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
+  if (prop)
+    [self setText:AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]])];
+  prop = icalcomponent_get_first_property(ic, ICAL_TRIGGER_PROPERTY);
+  if (!prop) {
+    NSLog(@"No trigger defined, alarm disabled");
+    goto init_error;
+  }
+  trigger = icalproperty_get_trigger(prop);
+  if (icaltime_is_null_time(trigger.time))
+    [self setRelativeTrigger:icaldurationtype_as_int(trigger.duration)];
+  else
+    [self setAbsoluteTrigger:AUTORELEASE([[Date alloc] initWithICalTime:trigger.time])];
+  prop = icalcomponent_get_first_property(ic, ICAL_REPEAT_PROPERTY);
+  if (prop)
+    [self setRepeatCount:icalproperty_get_repeat(prop)];
+  return self;
+
+ init_error:
+  NSLog(@"Error creating Alarm from iCal component");
+  [self release];
+  return nil;
+}
+
+- (icalcomponent *)asICalComponent
+{
+  return NULL;
+}
+
+- (BOOL)updateICalComponent:(icalcomponent *)ic
+{
+  return NO;
+}
+
+- (int)iCalComponentType
+{
+  return ICAL_VALARM_COMPONENT;
 }
 @end
