@@ -9,23 +9,34 @@
 #import "defines.h"
 
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
-NSString * const ACTIVATE_DEFAULT_ALARM = @"activateDefaultAlarm";
-NSString * const DEFAULT_ALARM = @"defaultAlarm";
+NSString * const DEFAULT_ALARM_BACKEND = @"defaultAlarmBackend";
 
 static NSMutableDictionary *backends;
-static AlarmBackend *activeBackend;
 static AlarmManager *singleton;
 
 @interface AlarmManager(Private)
++ (void)addBackendClass:(Class)class;
 - (void)removeAlarms;
 - (void)createAlarms;
 @end
 
 @implementation AlarmManager(Private)
++ (void)addBackendClass:(Class)class
+{
+  id backend;
+
+  backend = [class new];
+  if (backend) {
+    [backends setObject:backend forKey:[class backendName]];
+    [backend release];
+    NSLog(@"Alarm backend <%@> registered", [class backendName]);
+  }
+}
+
 - (void)runAlarm:(SAAlarm *)alarm
 {
-  if (activeBackend)
-    [activeBackend display:alarm];
+  if (_defaultBackend)
+    [_defaultBackend display:alarm];
   else
     NSLog([alarm description]);
 }
@@ -137,10 +148,11 @@ static AlarmManager *singleton;
 
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [NSNumber numberWithBool:NO], nil] 
-				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, ACTIVATE_DEFAULT_ALARM, nil]];
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [AlarmBackend backendName], nil] 
+				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, DEFAULT_ALARM_BACKEND, nil]];
 }
 
+/* FIXME : what happens when a store is reloaded ? */
 - (id)init
 {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
@@ -149,8 +161,9 @@ static AlarmManager *singleton;
   self = [super init];
   if (self) {
     [cm registerDefaults:[self defaults]];
-    [cm registerClient:self forKey:ACTIVATE_ALARMS];
     _active = [[cm objectForKey:ACTIVATE_ALARMS] boolValue];
+    [self setDefaultBackend:[cm objectForKey:DEFAULT_ALARM_BACKEND]];
+
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
     [nc addObserver:self 
 	   selector:@selector(elementAdded:) 
@@ -164,9 +177,10 @@ static AlarmManager *singleton;
 	   selector:@selector(elementUpdated:) 
 	       name:SAElementUpdatedInStore
 	     object:nil];
+
     if (_active)
       [self createAlarms];
-    /* FIXME : what happens when a store is reloaded ? */
+    [cm registerClient:self forKey:ACTIVATE_ALARMS];
   }
   return self;
 }
@@ -201,26 +215,45 @@ static AlarmManager *singleton;
   NSArray *classes;
   NSEnumerator *enumerator;
   Class backendClass;
-  id backend;
 
   if ([AlarmManager class] == self) {
     classes = GSObjCAllSubclassesOfClass([AlarmBackend class]);
+    backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]+1];
     enumerator = [classes objectEnumerator];
-    backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
-    while ((backendClass = [enumerator nextObject])) {
-      backend = [backendClass new];
-      if (backend) {
-	[backends setObject:backend forKey:[backendClass backendName]];
-	NSLog(@"Alarm backend <%@> registered", [backendClass backendName]);
-      }
-    }
+    while ((backendClass = [enumerator nextObject]))
+      [self addBackendClass:backendClass];
+    [self addBackendClass:[AlarmBackend class]];
     singleton = [[AlarmManager alloc] init];
   }
+}
+
++ (NSArray *)backends
+{
+  return [backends allValues];
+}
+
++ (id)backendForName:(NSString *)name
+{
+  return [backends objectForKey:name];
 }
 
 + (AlarmManager *)globalManager
 {
   return singleton;
+}
+
+- (id)defaultBackend
+{
+  return _defaultBackend;
+}
+
+- (void)setDefaultBackend:(NSString *)name
+{
+  id bck = [AlarmManager backendForName:name];
+  if (bck != nil) {
+    _defaultBackend = bck;
+    NSLog(@"Default alarm backend is <%@>", name);
+  }
 }
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
@@ -237,13 +270,14 @@ static AlarmManager *singleton;
 @implementation AlarmBackend
 + (NSString *)backendName
 {
-  return @"Base backend";
+  return @"Log backend";
 }
 - (NSString *)backendType
 {
-  return nil;
+  return SAActionDisplay;
 }
 - (void)display:(SAAlarm *)alarm
 {
+  NSLog([alarm description]);
 }
 @end
