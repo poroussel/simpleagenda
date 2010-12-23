@@ -14,6 +14,7 @@
   if (_stamp)
     [coder encodeObject:_stamp forKey:@"dtstamp"];
   [coder encodeObject:_categories forKey:@"categories"];
+  [coder encodeObject:_alarms forKey:@"alarms"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -36,6 +37,7 @@
     _categories = [[coder decodeObjectForKey:@"categories"] retain];
   else
     _categories = [NSMutableArray new];
+  _alarms = [[coder decodeObjectForKey:@"alarms"] retain];
   return self;
 }
 
