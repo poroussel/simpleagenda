@@ -148,8 +148,6 @@ static AlarmManager *singleton;
 
   self = [super init];
   if (self) {
-    
-
     [cm registerDefaults:[self defaults]];
     [cm registerClient:self forKey:ACTIVATE_ALARMS];
     _active = [[cm objectForKey:ACTIVATE_ALARMS] boolValue];
@@ -240,6 +238,10 @@ static AlarmManager *singleton;
 + (NSString *)backendName
 {
   return @"Base backend";
+}
+- (NSString *)backendType
+{
+  return nil;
 }
 - (void)display:(SAAlarm *)alarm
 {

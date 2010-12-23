@@ -20,6 +20,11 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
   return @"DBus desktop notification";
 }
 
+- (NSString *)backendType
+{
+  return SAActionDisplay;
+}
+
 - (id)init
 {
   NSConnection *c;
