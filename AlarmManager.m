@@ -80,6 +80,7 @@ static AlarmManager *singleton;
   return YES;
 }
 
+/* FIXME */
 - (BOOL)addRelativeAlarm:(SAAlarm *)alarm
 {
   return NO;
@@ -102,7 +103,6 @@ static AlarmManager *singleton;
     if (added)
       [self addAlarm:alarm forUID:[element UID]];
   }
-  NSLog(@"Add alarms for %@", [element UID]);
 }
 
 - (void)setAlarmsForElements:(NSArray *)elements
@@ -114,8 +114,14 @@ static AlarmManager *singleton;
     [self setAlarmsForElement:element];
 }
 
+- (void)dataChanged:(NSNotification *)not
+{
+  [self createAlarms];
+}
+
 - (void)elementAdded:(NSNotification *)not
 {
+  NSLog([[not userInfo] objectForKey:@"UID"]);
   if (_active) {
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
@@ -126,12 +132,8 @@ static AlarmManager *singleton;
 
 - (void)elementRemoved:(NSNotification *)not
 {
-  if (_active) {
-    NSString *uid = [[not userInfo] objectForKey:@"UID"];
-
-    NSLog(@"Remove alarms for %@", uid);
-    [self removeAlarmsforUID:uid];
-  }
+  if (_active)
+    [self removeAlarmsforUID:[[not userInfo] objectForKey:@"UID"]];
 }
 
 - (void)elementUpdated:(NSNotification *)not
@@ -140,7 +142,6 @@ static AlarmManager *singleton;
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
 
-    NSLog(@"Update alarms for %@", uid);
     [self removeAlarmsforUID:uid];
     [self setAlarmsForElement:[store elementWithUID:uid]];
   }
@@ -148,7 +149,7 @@ static AlarmManager *singleton;
 
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [AlarmBackend backendName], nil] 
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:YES], [AlarmBackend backendName], nil] 
 				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, DEFAULT_ALARM_BACKEND, nil]];
 }
 
@@ -166,6 +167,10 @@ static AlarmManager *singleton;
 
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
     [nc addObserver:self 
+	   selector:@selector(dataChanged:) 
+	       name:SADataChangedInStore
+	     object:nil];
+    [nc addObserver:self 
 	   selector:@selector(elementAdded:) 
 	       name:SAElementAddedToStore
 	     object:nil];
@@ -178,8 +183,7 @@ static AlarmManager *singleton;
 	       name:SAElementUpdatedInStore
 	     object:nil];
 
-    if (_active)
-      [self createAlarms];
+    [self createAlarms];
     [cm registerClient:self forKey:ACTIVATE_ALARMS];
   }
   return self;
@@ -198,8 +202,10 @@ static AlarmManager *singleton;
   StoreManager *sm = [StoreManager globalManager];
 
   [self removeAlarms];
-  [self setAlarmsForElements:[sm allEvents]];
-  [self setAlarmsForElements:[sm allTasks]];
+  if (_active) {
+    [self setAlarmsForElements:[sm allEvents]];
+    [self setAlarmsForElements:[sm allTasks]];
+  }
 }
 
 - (void)removeAlarms
