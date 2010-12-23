@@ -488,6 +488,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     while ((el = [enumerator nextObject])) {
       /* FIXME : store property could be handled by Event:copy ? */
       store = [el store];
+
+      /* FIXME : this isn't enough : we have to find a writable store or error out */
+      if (![store writable])
+	store = [_sm defaultStore];
+	
       start = [[el startDate] minuteOfDay];
       if ([selectionManager lastOperation] == SMCopy)
 	el = [el copy];
