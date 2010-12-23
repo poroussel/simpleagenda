@@ -576,11 +576,21 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {
   SEL action = [menuItem action];
+  NSEnumerator *enumerator;
+  Element *el;
 
   if (sel_isEqual(action, @selector(copy:)))
     return [selectionManager count] > 0;
-  if (sel_isEqual(action, @selector(cut:)))
-    return [selectionManager count] > 0;
+  if (sel_isEqual(action, @selector(cut:))) {
+    if ([selectionManager count] == 0)
+      return NO;
+    enumerator = [[selectionManager selection] objectEnumerator];
+    while ((el = [enumerator nextObject])) {
+      if (![[el store] writable])
+	return NO;
+    }
+    return YES;
+  }
   if (sel_isEqual(action, @selector(editAppointment:)))
     return [selectionManager count] == 1;
   if (sel_isEqual(action, @selector(delAppointment:)))
