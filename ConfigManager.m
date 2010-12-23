@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import "NSColor+SimpleAgenda.h"
 #import "ConfigManager.h"
 
 static ConfigManager *singleton;
