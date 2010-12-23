@@ -207,7 +207,7 @@ NSString * const SAActionSound = @"AUDIO";
 - (void)setElement:(Element *)element
 {
   _element = element;
-  NSLog(@"Added %@ to element %@", [self description], [element UID]);
+  NSDebugLog(@"Added %@ to element %@", [self description], [element UID]);
 }
 
 - (Date *)triggerDateRelativeTo:(Date *)date
