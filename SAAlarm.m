@@ -190,7 +190,12 @@ NSString * const SAActionSound = @"AUDIO";
     [self setAction:SAActionSound];
     break;
   case ICAL_ACTION_EMAIL:
-    [self setAction:SAActionEmail];
+    prop = icalcomponent_get_first_property(ic, ICAL_ATTENDEE_PROPERTY);
+    if (!prop) {
+      NSLog(@"No email address, alarm disabled");
+      goto init_error;
+    }
+    [self setEmailAddress:[NSString stringWithUTF8String:icalproperty_get_attendee(prop)]];    
     break;
   case ICAL_ACTION_PROCEDURE:
     [self setAction:SAActionProcedure];
