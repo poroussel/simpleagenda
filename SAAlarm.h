@@ -11,9 +11,10 @@ extern NSString * const SAActionSound;
 @class Date;
 @class Element;
 
-@interface SAAlarm : NSObject
+@interface SAAlarm : NSObject <NSCoding>
 {
-  NSAttributedString *_text;
+  NSAttributedString *_desc;
+  NSString *_summary;
   Date *_absoluteTrigger;
   NSTimeInterval _relativeTrigger;
   NSString *_action;
@@ -26,8 +27,10 @@ extern NSString * const SAActionSound;
 }
 
 + (id)alarm;
-- (NSAttributedString *)text;
-- (void)setText:(NSAttributedString *)text;
+- (NSAttributedString *)desc;
+- (void)setDesc:(NSAttributedString *)desc;
+- (NSString *)summary;
+- (void)setSummary:(NSString *)summary;
 - (BOOL)isAbsoluteTrigger;
 - (Date *)absoluteTrigger;
 - (void)setAbsoluteTrigger:(Date *)trigger;
