@@ -38,6 +38,7 @@
   IBOutlet id showTimeAppIcon;
   IBOutlet id alarmPreferences;
   IBOutlet id alarmEnabled;
+  IBOutlet id alarmBackendPopUp;
   StoreManager *_sm;
 }
 

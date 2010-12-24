@@ -77,7 +77,8 @@
 	    uiPreferences,
 	    storeEnabled,
 	    alarmPreferences,
-	    alarmEnabled
+	    alarmEnabled,
+	    alarmBackendPopUp
 	);
 	Super = NSObject;
     };

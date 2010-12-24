@@ -10,7 +10,7 @@
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
 NSString * const DEFAULT_ALARM_BACKEND = @"defaultAlarmBackend";
 
-static NSMutableDictionary *backends;
+static NSMutableDictionary *backendsArray;
 static AlarmManager *singleton;
 
 @interface AlarmManager(Private)
@@ -26,7 +26,7 @@ static AlarmManager *singleton;
 
   backend = [class new];
   if (backend) {
-    [backends setObject:backend forKey:[class backendName]];
+    [backendsArray setObject:backend forKey:[class backendName]];
     [backend release];
     NSLog(@"Alarm backend <%@> registered", [class backendName]);
   }
@@ -221,7 +221,7 @@ static AlarmManager *singleton;
 
   if ([AlarmManager class] == self) {
     classes = GSObjCAllSubclassesOfClass([AlarmBackend class]);
-    backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]+1];
+    backendsArray = [[NSMutableDictionary alloc] initWithCapacity:[classes count]+1];
     enumerator = [classes objectEnumerator];
     while ((backendClass = [enumerator nextObject]))
       [self addBackendClass:backendClass];
@@ -232,12 +232,12 @@ static AlarmManager *singleton;
 
 + (NSArray *)backends
 {
-  return [backends allValues];
+  return [backendsArray allValues];
 }
 
 + (id)backendForName:(NSString *)name
 {
-  return [backends objectForKey:name];
+  return [backendsArray objectForKey:name];
 }
 
 + (AlarmManager *)globalManager

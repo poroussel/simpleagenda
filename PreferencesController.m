@@ -4,6 +4,7 @@
 #import "HourFormatter.h"
 #import "ConfigManager.h"
 #import "AlarmManager.h"
+#import "AlarmBackend.h"
 #import "defines.h"
 
 @implementation PreferencesController
@@ -92,8 +93,8 @@
 
 - (void)showPreferences
 {
-  NSEnumerator *backends = [[StoreManager backends] objectEnumerator];
   ConfigManager *config = [ConfigManager globalConfig];
+  NSEnumerator *backends;
   int start = [config integerForKey:FIRST_HOUR];
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
@@ -108,10 +109,16 @@
   [showTooltip setState:[config integerForKey:TOOLTIP]];
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
+
   [alarmEnabled setState:[config integerForKey:ACTIVATE_ALARMS]];
+  [alarmBackendPopUp removeAllItems];
+  backends = [[AlarmManager backends] objectEnumerator];
+  while ((backend = [backends nextObject]))
+    [alarmBackendPopUp addItemWithTitle:[[backend class] backendName]];
 
   [self setupStores];
   [storeClass removeAllItems];
+  backends = [[StoreManager backends] objectEnumerator];
   while ((backend = [backends nextObject]))
     if ([backend isUserInstanciable])
       [storeClass addItemWithTitle:[backend storeTypeName]];
