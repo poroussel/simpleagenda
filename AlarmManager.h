@@ -18,4 +18,6 @@ NSString * const DEFAULT_ALARM_BACKEND;
 + (AlarmManager *)globalManager;
 - (id)defaultBackend;
 - (void)setDefaultBackend:(NSString *)name;
+- (BOOL)alarmsEnabled;
+- (void)setAlarmsEnabled:(BOOL)value;
 @end

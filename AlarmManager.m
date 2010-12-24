@@ -255,8 +255,20 @@ static AlarmManager *singleton;
   id bck = [AlarmManager backendForName:name];
   if (bck != nil) {
     _defaultBackend = bck;
+    [[ConfigManager globalConfig] setObject:name forKey:DEFAULT_ALARM_BACKEND];
     NSLog(@"Default alarm backend is <%@>", name);
   }
+}
+
+- (BOOL)alarmsEnabled
+{
+  return _active;
+}
+
+- (void)setAlarmsEnabled:(BOOL)value
+{
+  [[ConfigManager globalConfig] setInteger:value forKey:ACTIVATE_ALARMS];
+  NSLog(@"Alarms are %@", value ? @"enabled" : @"disabled");
 }
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key

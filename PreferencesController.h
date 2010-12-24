@@ -62,4 +62,5 @@
 - (void)toggleShowDate:(id)sender;
 - (void)toggleShowTime:(id)sender;
 - (void)toggleAlarms:(id)sender;
+- (void)selectAlarmBackend:(id)sender;
 @end

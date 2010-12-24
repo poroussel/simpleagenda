@@ -265,7 +265,12 @@
 
 - (void)toggleAlarms:(id)sender
 {
-  [[ConfigManager globalConfig] setInteger:[alarmEnabled state] forKey:ACTIVATE_ALARMS];
+  [[AlarmManager globalManager] setAlarmsEnabled:[alarmEnabled state]];
+}
+
+- (void)selectAlarmBackend:(id)sender
+{
+  [[AlarmManager globalManager] setDefaultBackend:[alarmBackendPopUp titleOfSelectedItem]];
 }
 
 /* We only allow the removal of non-default stores */
