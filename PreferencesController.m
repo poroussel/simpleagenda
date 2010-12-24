@@ -99,6 +99,7 @@
   int end = [config integerForKey:LAST_HOUR];
   int step = [config integerForKey:MIN_STEP];
   Class backend;
+  NSString *name;
 
   [dayStart setIntValue:start];
   [dayEnd setIntValue:end];
@@ -115,6 +116,10 @@
   backends = [[AlarmManager backends] objectEnumerator];
   while ((backend = [backends nextObject]))
     [alarmBackendPopUp addItemWithTitle:[[backend class] backendName]];
+
+  name = [[ConfigManager globalConfig] objectForKey:DEFAULT_ALARM_BACKEND];
+  if ([alarmBackendPopUp itemWithTitle:name])
+    [alarmBackendPopUp selectItemWithTitle:name];
 
   [self setupStores];
   [storeClass removeAllItems];
