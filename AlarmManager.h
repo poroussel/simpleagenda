@@ -3,13 +3,9 @@
 #import <Foundation/NSObject.h>
 #import "ConfigManager.h"
 
-NSString * const ACTIVATE_ALARMS;
-NSString * const DEFAULT_ALARM_BACKEND;
-
-@interface AlarmManager : NSObject <ConfigListener>
+@interface AlarmManager : NSObject
 {
   NSMutableDictionary *_activeAlarms;
-  BOOL _active;
   id _defaultBackend;
 }
 
@@ -17,6 +13,7 @@ NSString * const DEFAULT_ALARM_BACKEND;
 + (id)backendForName:(NSString *)name;
 + (AlarmManager *)globalManager;
 - (id)defaultBackend;
+- (NSString *)defaultBackendName;
 - (void)setDefaultBackend:(NSString *)name;
 - (BOOL)alarmsEnabled;
 - (void)setAlarmsEnabled:(BOOL)value;

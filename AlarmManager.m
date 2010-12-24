@@ -118,7 +118,7 @@ static AlarmManager *singleton;
 
 - (void)elementAdded:(NSNotification *)not
 {
-  if (_active) {
+  if ([self alarmsEnabled]) {
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
     
@@ -128,13 +128,13 @@ static AlarmManager *singleton;
 
 - (void)elementRemoved:(NSNotification *)not
 {
-  if (_active)
+  if ([self alarmsEnabled])
     [self removeAlarmsforUID:[[not userInfo] objectForKey:@"UID"]];
 }
 
 - (void)elementUpdated:(NSNotification *)not
 {
-  if (_active) {
+  if ([self alarmsEnabled]) {
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
 
@@ -158,7 +158,6 @@ static AlarmManager *singleton;
   self = [super init];
   if (self) {
     [cm registerDefaults:[self defaults]];
-    _active = [[cm objectForKey:ACTIVATE_ALARMS] boolValue];
     [self setDefaultBackend:[cm objectForKey:DEFAULT_ALARM_BACKEND]];
 
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
@@ -180,8 +179,7 @@ static AlarmManager *singleton;
 	     object:nil];
 
     [self createAlarms];
-    NSLog(@"Alarms are %@", _active ? @"enabled" : @"disabled");
-    [cm registerClient:self forKey:ACTIVATE_ALARMS];
+    NSLog(@"Alarms are %@", [self alarmsEnabled] ? @"enabled" : @"disabled");
   }
   return self;
 }
@@ -189,7 +187,6 @@ static AlarmManager *singleton;
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [[ConfigManager globalConfig] unregisterClient:self];
   RELEASE(_activeAlarms);
   [super dealloc];
 }
@@ -199,7 +196,7 @@ static AlarmManager *singleton;
   StoreManager *sm = [StoreManager globalManager];
 
   [self removeAlarms];
-  if (_active) {
+  if ([self alarmsEnabled]) {
     [self setAlarmsForElements:[sm allEvents]];
     [self setAlarmsForElements:[sm allTasks]];
   }
@@ -250,6 +247,11 @@ static AlarmManager *singleton;
   return _defaultBackend;
 }
 
+- (NSString *)defaultBackendName
+{
+  return [[_defaultBackend class] backendName];
+}
+
 - (void)setDefaultBackend:(NSString *)name
 {
   id bck = [AlarmManager backendForName:name];
@@ -262,22 +264,17 @@ static AlarmManager *singleton;
 
 - (BOOL)alarmsEnabled
 {
-  return _active;
+  return [[[ConfigManager globalConfig] objectForKey:ACTIVATE_ALARMS] boolValue];
 }
 
 - (void)setAlarmsEnabled:(BOOL)value
 {
-  [[ConfigManager globalConfig] setInteger:value forKey:ACTIVATE_ALARMS];
-  NSLog(@"Alarms are %@", value ? @"enabled" : @"disabled");
-}
-
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
-{
-  _active = [[config objectForKey:ACTIVATE_ALARMS] boolValue];
-  if (_active)
+  if (value)
     [self createAlarms];
   else
     [self removeAlarms];
+  [[ConfigManager globalConfig] setInteger:value forKey:ACTIVATE_ALARMS];
+  NSLog(@"Alarms are %@", value ? @"enabled" : @"disabled");
 }
 @end
 

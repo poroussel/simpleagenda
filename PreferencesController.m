@@ -111,13 +111,13 @@
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
 
-  [alarmEnabled setState:[config integerForKey:ACTIVATE_ALARMS]];
+  [alarmEnabled setState:[[AlarmManager globalManager] alarmsEnabled]];
   [alarmBackendPopUp removeAllItems];
   backends = [[AlarmManager backends] objectEnumerator];
   while ((backend = [backends nextObject]))
     [alarmBackendPopUp addItemWithTitle:[[backend class] backendName]];
 
-  name = [[ConfigManager globalConfig] objectForKey:DEFAULT_ALARM_BACKEND];
+  name = [[AlarmManager globalManager] defaultBackendName];
   if ([alarmBackendPopUp itemWithTitle:name])
     [alarmBackendPopUp selectItemWithTitle:name];
 
