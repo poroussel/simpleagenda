@@ -121,6 +121,7 @@
     _resource = [[WebDAVResource alloc] initWithURL:_url];
     [_config registerClient:self forKey:ST_REFRESH];
     [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
+    [_config registerClient:self forKey:ST_ENABLED];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
     [self initTimer];
   }
@@ -258,6 +259,10 @@
 }
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
+  if ([key isEqualToString:ST_ENABLED]) {
+    if ([self enabled])
+      [self read];
+  }
   [self initTimer];
 }
 @end
@@ -276,12 +281,14 @@
 }
 - (void)parseData:(NSData *)data
 {
-  if ([_tree parseData:data]) {
-    [self fillWithElements:[_tree components]];
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
-  } else
-    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  if ([self enabled]) {
+    if ([_tree parseData:data]) {
+      [self fillWithElements:[_tree components]];
+      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
+      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
+    } else
+      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+  }
 }
 - (void)initTimer
 {
