@@ -7,7 +7,7 @@
 #import "iCalTree.h"
 #import "defines.h"
 
-@interface GroupDAVStore : MemoryStore <AgendaStore>
+@interface GroupDAVStore : MemoryStore <AgendaStore, ConfigListener>
 {
   NSURL *_url;
   WebDAVResource *_calendar;
@@ -162,6 +162,9 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     _loadedData = [[NSMutableSet alloc] initWithCapacity:512];
+    [_config registerClient:self forKey:ST_REFRESH];
+    [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
+    [_config registerClient:self forKey:ST_ENABLED];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
     [self initTimer];
   }
@@ -313,6 +316,14 @@
   [copy release];
   return YES;
 }
+
+- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+{
+  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
+    [self read];
+    [self initTimer];
+  }
+}
 @end
 
 
@@ -390,6 +401,8 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 }
 - (void)fetchData
 {
+  if (![self enabled])
+    return;
   [_loadedData removeAllObjects];
   if (_calendar)
     [self fetchList:[self itemsUnderRessource:_calendar]];
