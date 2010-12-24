@@ -6,7 +6,6 @@
 #import "Element.h"
 #import "SAAlarm.h"
 #import "AlarmBackend.h"
-#import "defines.h"
 
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
 NSString * const DEFAULT_ALARM_BACKEND = @"defaultAlarmBackend";
@@ -37,8 +36,6 @@ static AlarmManager *singleton;
 {
   if (_defaultBackend)
     [_defaultBackend display:alarm];
-  else
-    NSLog([alarm description]);
 }
 
 - (void)addAlarm:(SAAlarm *)alarm forUID:(NSString *)uid
@@ -121,7 +118,6 @@ static AlarmManager *singleton;
 
 - (void)elementAdded:(NSNotification *)not
 {
-  NSLog([[not userInfo] objectForKey:@"UID"]);
   if (_active) {
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
