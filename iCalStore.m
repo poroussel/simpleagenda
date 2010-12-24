@@ -259,10 +259,8 @@
 }
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
-  if ([key isEqualToString:ST_ENABLED]) {
-    if ([self enabled])
-      [self read];
-  }
+  if ([key isEqualToString:ST_ENABLED] && [self enabled])
+    [self read];
   [self initTimer];
 }
 @end
