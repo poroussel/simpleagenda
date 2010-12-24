@@ -7,13 +7,14 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "toggleEnabled:",
+	    "toggleAlarms:",
 	    "removeStore:",
 	    "selectDefaultStore:",
 	    "selectItem:",
 	    "selectStore:",
 	    "setColor:",
 	    "toggleDisplay:",
+	    "toggleEnabled:",
 	    "toggleRefresh:",
 	    "toggleShowDate:",
 	    "toggleShowTime:",
@@ -41,7 +42,8 @@
 	    "toggleTooltip:",
 	    "toggleShowTime:",
 	    "toggleShowDate:",
-	    "toggleEnabled:"
+	    "toggleEnabled:",
+	    "toggleAlarms:"
 	);
 	Outlets = (
 	    panel,
@@ -74,7 +76,8 @@
 	    showDateAppIcon,
 	    uiPreferences,
 	    storeEnabled,
-	    alarmPreferences
+	    alarmPreferences,
+	    alarmEnabled
 	);
 	Super = NSObject;
     };

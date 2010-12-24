@@ -184,6 +184,7 @@ static AlarmManager *singleton;
 	     object:nil];
 
     [self createAlarms];
+    NSLog(@"Alarms are %@", _active ? @"enabled" : @"disabled");
     [cm registerClient:self forKey:ACTIVATE_ALARMS];
   }
   return self;

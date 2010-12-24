@@ -3,6 +3,7 @@
 #import "PreferencesController.h"
 #import "HourFormatter.h"
 #import "ConfigManager.h"
+#import "AlarmManager.h"
 #import "defines.h"
 
 @implementation PreferencesController
@@ -107,6 +108,7 @@
   [showTooltip setState:[config integerForKey:TOOLTIP]];
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
+  [alarmEnabled setState:[config integerForKey:ACTIVATE_ALARMS]];
 
   [self setupStores];
   [storeClass removeAllItems];
@@ -247,6 +249,11 @@
 - (void)toggleShowTime:(id)sender
 {
   [[ConfigManager globalConfig] setInteger:[showTimeAppIcon state] forKey:APPICON_TIME];
+}
+
+- (void)toggleAlarms:(id)sender
+{
+  [[ConfigManager globalConfig] setInteger:[alarmEnabled state] forKey:ACTIVATE_ALARMS];
 }
 
 /* We only allow the removal of non-default stores */

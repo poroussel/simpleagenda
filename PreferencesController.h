@@ -37,6 +37,7 @@
   IBOutlet id showDateAppIcon;
   IBOutlet id showTimeAppIcon;
   IBOutlet id alarmPreferences;
+  IBOutlet id alarmEnabled;
   StoreManager *_sm;
 }
 
@@ -59,4 +60,5 @@
 - (void)toggleTooltip:(id)sender;
 - (void)toggleShowDate:(id)sender;
 - (void)toggleShowTime:(id)sender;
+- (void)toggleAlarms:(id)sender;
 @end
