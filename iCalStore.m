@@ -259,9 +259,10 @@
 }
 - (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
 {
-  if ([key isEqualToString:ST_ENABLED] && [self enabled])
+  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
-  [self initTimer];
+    [self initTimer];
+  }
 }
 @end
 
@@ -269,24 +270,24 @@
 @implementation iCalStore(Private)
 - (void)fetchData
 {
-  if ([_resource get])
-    if ([NSThread isMainThread])
-      [self parseData:[_resource data]];
+  if ([self enabled]) {
+    if ([_resource get])
+      if ([NSThread isMainThread])
+	[self parseData:[_resource data]];
+      else
+	[self performSelectorOnMainThread:@selector(parseData:) withObject:[_resource data] waitUntilDone:NO];
     else
-      [self performSelectorOnMainThread:@selector(parseData:) withObject:[_resource data] waitUntilDone:NO];
-  else
-    [self setEnabled:NO];
+      [self setEnabled:NO];
+  }
 }
 - (void)parseData:(NSData *)data
 {
-  if ([self enabled]) {
-    if ([_tree parseData:data]) {
-      [self fillWithElements:[_tree components]];
-      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
-      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
-    } else
-      NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
-  }
+  if ([_tree parseData:data]) {
+    [self fillWithElements:[_tree components]];
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
+  } else
+    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
 }
 - (void)initTimer
 {
