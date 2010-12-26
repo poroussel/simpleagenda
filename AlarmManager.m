@@ -88,7 +88,7 @@ static AlarmManager *singleton;
   if ([[Date now] compareTime:activation] == NSOrderedDescending)
     return NO;
   activation = [Date dateWithTimeInterval:[alarm relativeTrigger] sinceDate:activation];
-  delay = [activation timeIntervalSinceDate:[Date now]];
+  delay = [activation timeIntervalSinceNow];
   if (delay < 1 && delay > -600)
     delay = 1;
   if (delay < 0)
