@@ -5,7 +5,6 @@
 #import "MemoryStore.h"
 #import "Element.h"
 #import "SAAlarm.h"
-#import "DateRange.h"
 #import "AlarmBackend.h"
 
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
@@ -68,21 +67,22 @@ static AlarmManager *singleton;
 
 - (BOOL)addAbsoluteAlarm:(SAAlarm *)alarm
 {
-  NSDate *date = [[alarm absoluteTrigger] calendarDate];
+  NSTimeInterval delay;
 
-  if ([date timeIntervalSinceNow] < 0)
+  if (![[alarm absoluteTrigger] belongsToDay:[Date today]])
+    return NO;
+  delay = [[alarm absoluteTrigger] timeIntervalSinceNow];
+  if (delay < 0)
     return NO;
   [self performSelector:@selector(runAlarm:) 
 	     withObject:alarm 
-	     afterDelay:[date timeIntervalSinceNow]];
+	     afterDelay:delay];
   return YES;
 }
 
 - (BOOL)addRelativeAlarm:(SAAlarm *)alarm
 {
-  Element *el = [alarm element];
-  Date *activation = [el nextActivationDate];
-  DateRange *range;
+  Date *activation = [[alarm element] nextActivationDate];
   NSTimeInterval delay;
 
   if (!activation)
@@ -90,8 +90,7 @@ static AlarmManager *singleton;
   if ([[Date now] compareTime:activation] == NSOrderedDescending)
     return NO;
   activation = [Date dateWithTimeInterval:[alarm relativeTrigger] sinceDate:activation];
-  range = AUTORELEASE([[DateRange alloc] initWithStart:activation duration:1]);
-  if (![range intersectsWithDay:[Date today]])
+  if (![activation belongsToDay:[Date today]])
     return NO;
   delay = [activation timeIntervalSinceDate:[Date now]];
   if (delay < 1 && delay > -600)
