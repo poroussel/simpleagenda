@@ -164,6 +164,11 @@
   /* FIXME : do something */
 }
 
+- (Date *)nextActivationDate
+{
+  return nil;
+}
+
 - (NSArray *)categories
 {
   return [NSArray arrayWithArray:_categories];

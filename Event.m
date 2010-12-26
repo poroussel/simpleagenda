@@ -82,6 +82,13 @@
   return NSMakeRange(0, 0);
 }
 
+- (Date *)nextActivationDate
+{
+  if (!_rrule)
+    return _startDate;
+  return nil;
+}
+
 - (NSString *)location
 {
   return _location;

@@ -5,6 +5,7 @@
 #import "MemoryStore.h"
 #import "Element.h"
 #import "SAAlarm.h"
+#import "DateRange.h"
 #import "AlarmBackend.h"
 
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
@@ -77,10 +78,30 @@ static AlarmManager *singleton;
   return YES;
 }
 
-/* FIXME */
 - (BOOL)addRelativeAlarm:(SAAlarm *)alarm
 {
-  return NO;
+  Element *el = [alarm element];
+  Date *activation = [el nextActivationDate];
+  DateRange *range;
+  NSTimeInterval delay;
+
+  if (!activation)
+    return NO;
+  if ([[Date now] compareTime:activation] == NSOrderedDescending)
+    return NO;
+  activation = [Date dateWithTimeInterval:[alarm relativeTrigger] sinceDate:activation];
+  range = AUTORELEASE([[DateRange alloc] initWithStart:activation duration:1]);
+  if (![range intersectsWithDay:[Date today]])
+    return NO;
+  delay = [activation timeIntervalSinceDate:[Date now]];
+  if (delay < 1 && delay > -600)
+    delay = 1;
+  if (delay < 0)
+    return NO;
+  [self performSelector:@selector(runAlarm:) 
+	     withObject:alarm 
+	     afterDelay:delay];
+  return YES;
 }
 
 - (void)setAlarmsForElement:(Element *)element

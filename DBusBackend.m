@@ -2,6 +2,7 @@
 #import <DBusKit/DBusKit.h>
 #import "AlarmBackend.h"
 #import "SAAlarm.h"
+#import "Element.h"
 
 @protocol Notifications
 - (NSArray *)GetCapabilities;
@@ -71,9 +72,23 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
     NSConnection *c;
     NSNumber *dnid;
     id <NSObject,Notifications> remote;
+    Element *el = [alarm element];
+    NSString *desc;
 
     c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
     remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
-    dnid = [remote Notify:@"SimpleAgenda" :0 :@"" :@"Attention !" :@"Il va se passer quelque chose" :[NSArray array] :[NSDictionary dictionary] :-1];
+    if ([el text])
+      desc = [NSString stringWithFormat:@"%@\n\n%@ : %@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]], [el summary], [[el text] string]];
+    else
+      desc = [NSString stringWithFormat:@"%@\n\n%@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]], [el summary]];
+    dnid = [remote Notify:@"SimpleAgenda" 
+			 :0 
+			 :@"" 
+			 :_(@"SimpleAgenda Reminder !") 
+			 :desc
+			 :[NSArray array] 
+			 :[NSDictionary dictionary] 
+			 :-1];
+    [c invalidate];
 }
 @end

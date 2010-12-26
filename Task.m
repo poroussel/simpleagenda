@@ -78,6 +78,10 @@ static NSArray *stateName;
   else
     _completionDate = nil;
 }
+- (Date *)nextActivationDate
+{
+  return _completionDate;
+}
 - (NSString *)description
 {
   return [self summary];
