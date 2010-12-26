@@ -165,7 +165,7 @@ static AlarmManager *singleton;
 
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:YES], [AlarmBackend backendName], nil] 
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [AlarmBackend backendName], nil] 
 				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, DEFAULT_ALARM_BACKEND, nil]];
 }
 
