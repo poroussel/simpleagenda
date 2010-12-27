@@ -11,7 +11,7 @@
 #import "SelectionManager.h"
 #import "ConfigManager.h"
 
-@interface AppController : NSObject <ConfigListener>
+@interface AppController : NSObject
 {
   IBOutlet CalendarView *calendar;
   IBOutlet DayView *dayView;
@@ -24,7 +24,7 @@
 
   PreferencesController *_pc;
   StoreManager *_sm;
-  SelectionManager *selectionManager;
+  SelectionManager *_selm;
   Date *_selectedDay;
   DataTree *_summaryRoot;
   DataTree *_today;

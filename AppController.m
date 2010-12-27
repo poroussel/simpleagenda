@@ -13,12 +13,56 @@
 #import "AlarmManager.h"
 #import "defines.h"
 
-@interface AppIcon : NSView
+@interface AppIcon : NSView <ConfigListener>
 {
-  NSTimer *timer;
+  ConfigManager *_cm;
+  NSDictionary *_attrs;
+  NSTimer *_timer;
+  BOOL _showDate;
+  BOOL _showTime;
 }
 @end
 @implementation AppIcon
+- (void)setup
+{
+  _showDate = [[_cm objectForKey:APPICON_DATE] boolValue];
+  _showTime = [[_cm objectForKey:APPICON_TIME] boolValue];
+  if (_showTime) {
+    if (_timer == nil)
+      _timer = [NSTimer scheduledTimerWithTimeInterval:1
+						target:self
+					      selector:@selector(secondChanged:)
+					      userInfo:nil
+					       repeats:YES];
+  } else {
+    [_timer invalidate];
+    _timer = nil;
+  }
+  [self setNeedsDisplay:YES];
+}
+- (void)dealloc
+{
+  [_cm unregisterClient:self];
+  [_attrs release];
+  [_timer invalidate];
+  [super dealloc];
+}
+- (id)initWithFrame:(NSRect)frame
+{
+  self = [super initWithFrame:frame];
+  if (self) {
+    _attrs = [[NSDictionary alloc] initWithObjectsAndKeys:[NSFont systemFontOfSize:8],NSFontAttributeName,nil];
+    _cm = [ConfigManager globalConfig];
+    [_cm registerClient:self forKey:APPICON_DATE];
+    [_cm registerClient:self forKey:APPICON_TIME];
+    [self setup];
+  }
+  return self;
+}
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+{
+  [self setup];
+}
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
   return YES;
@@ -29,29 +73,17 @@
 }
 - (void)drawRect:(NSRect)rect
 {
-  ConfigManager *config = [ConfigManager globalConfig];
+  NSUserDefaults *def = [NSUserDefaults standardUserDefaults];
   NSCalendarDate *now = [[Date now] calendarDate];
-  NSDictionary *attrs;
   NSString *aString;
 
-  attrs = [NSMutableDictionary dictionaryWithObject:[NSFont systemFontOfSize: 8]  forKey:NSFontAttributeName];
-  if ([[config objectForKey:APPICON_DATE] boolValue]) {
-    aString = [now descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
-    [aString drawAtPoint:NSMakePoint(8, 3) withAttributes:attrs];
+  if (_showDate) {
+    aString = [now descriptionWithCalendarFormat:[def objectForKey:NSShortDateFormatString]];
+    [aString drawAtPoint:NSMakePoint(8, 3) withAttributes:_attrs];
   }
-  if ([[config objectForKey:APPICON_TIME] boolValue]) {
-    aString = [now descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSTimeFormatString]];
-    [aString drawAtPoint:NSMakePoint(11, 48) withAttributes:attrs];
-    if (timer == nil)
-      timer = [NSTimer scheduledTimerWithTimeInterval:1
-         			       	       target:self
-		                             selector:@selector(secondChanged:)
-				             userInfo:nil
-				              repeats:YES];
-  } else {
-    if (timer)
-      [timer invalidate];
-    timer = nil;
+  if (_showTime) {
+    aString = [now descriptionWithCalendarFormat:[def objectForKey:NSTimeFormatString]];
+    [aString drawAtPoint:NSMakePoint(11, 49) withAttributes:_attrs];
   }
 }
 - (void)mouseDown:(NSEvent *)theEvent
@@ -78,14 +110,12 @@
       case NSRightMouseUp:
       case NSOtherMouseUp:
       case NSLeftMouseUp:
-	/* any mouse up means we're done */
 	done = YES;
 	break;
       case NSPeriodic:
 	location = [_window mouseLocationOutsideOfEventStream];
 	if (NSEqualPoints(location, lastLocation) == NO) {
-	  NSPoint origin = [_window frame].origin;
-	  
+	  NSPoint origin = [_window frame].origin;	  
 	  origin.x += (location.x - lastLocation.x);
 	  origin.y += (location.y - lastLocation.y);
 	  [_window setFrameOrigin: origin];
@@ -218,11 +248,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   self = [super init];
   if (self) {
-    ConfigManager *config = [ConfigManager globalConfig];
-    [config registerDefaults:[self defaults]];
-    [config registerClient:self forKey:APPICON_DATE];
-    [config registerClient:self forKey:APPICON_TIME];
-    selectionManager = [SelectionManager globalManager];
+    [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+    _selm = [SelectionManager globalManager];
     _sm = [StoreManager globalManager];
     _pc = [PreferencesController new];
     [self initSummary];
@@ -297,10 +324,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)applicationWillTerminate:(NSNotification*)aNotification
 {
-  [[ConfigManager globalConfig] unregisterClient:self];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_summaryRoot release];
   [_pc release];
+  [_appicon release];
   /* 
    * FIXME : we shouldn't have to release the store
    * manager as we don't retain it. It's a global
@@ -410,7 +437,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)editAppointment:(id)sender
 {
-  id lastSelection = [selectionManager lastObject];
+  id lastSelection = [_selm lastObject];
 
   if (lastSelection) {
     if ([lastSelection isKindOfClass:[Event class]])
@@ -424,26 +451,26 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)delAppointment:(id)sender
 {
-  NSEnumerator *enumerator = [selectionManager enumerator];
+  NSEnumerator *enumerator = [_selm enumerator];
   Element *el;
 
   while ((el = [enumerator nextObject]))
     [[el store] remove:el];
-  [selectionManager clear];
+  [_selm clear];
 }
 
 - (void)exportAppointment:(id)sender;
 {
-  NSEnumerator *enumerator = [selectionManager enumerator];
+  NSEnumerator *enumerator = [_selm enumerator];
   NSSavePanel *panel = [NSSavePanel savePanel];
   NSString *str;
   iCalTree *tree;
   Element *el;
 
-  if ([selectionManager count] > 0) {
+  if ([_selm count] > 0) {
     [panel setRequiredFileType:@"ics"];
     [panel setTitle:_(@"Export as")];
-    if ([panel runModalForDirectory:nil file:[[selectionManager lastObject] summary]] == NSOKButton) {
+    if ([panel runModalForDirectory:nil file:[[_selm lastObject] summary]] == NSOKButton) {
       tree = [iCalTree new];
       while ((el = [enumerator nextObject]))
 	[tree add:el];
@@ -467,18 +494,18 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)copy:(id)sender
 {
-  [selectionManager copySelection];
+  [_selm copySelection];
 }
 
 - (void)cut:(id)sender
 {
-  [selectionManager cutSelection];
+  [_selm cutSelection];
 }
 
 - (void)paste:(id)sender
 {
-  if ([selectionManager copiedCount] > 0) {
-    NSEnumerator *enumerator = [[selectionManager paste] objectEnumerator];
+  if ([_selm copiedCount] > 0) {
+    NSEnumerator *enumerator = [[_selm paste] objectEnumerator];
     Date *date = [[calendar date] copy];
     Event *el;
     id <MemoryStore> store;
@@ -494,11 +521,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 	store = [_sm defaultStore];
 	
       start = [[el startDate] minuteOfDay];
-      if ([selectionManager lastOperation] == SMCopy)
+      if ([_selm lastOperation] == SMCopy)
 	el = [el copy];
       [date setMinute:start];
       [el setStartDate:date];
-      if ([selectionManager lastOperation] == SMCopy) {
+      if ([_selm lastOperation] == SMCopy) {
 	[store add:el];
 	/*
 	 * FIXME : the new event is now in store's dictionary, we 
@@ -580,11 +607,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Element *el;
 
   if (sel_isEqual(action, @selector(copy:)))
-    return [selectionManager count] > 0;
+    return [_selm count] > 0;
   if (sel_isEqual(action, @selector(cut:))) {
-    if ([selectionManager count] == 0)
+    if ([_selm count] == 0)
       return NO;
-    enumerator = [[selectionManager selection] objectEnumerator];
+    enumerator = [[_selm selection] objectEnumerator];
     while ((el = [enumerator nextObject])) {
       if (![[el store] writable])
 	return NO;
@@ -592,13 +619,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     return YES;
   }
   if (sel_isEqual(action, @selector(editAppointment:)))
-    return [selectionManager count] == 1;
+    return [_selm count] == 1;
   if (sel_isEqual(action, @selector(delAppointment:)))
-    return [selectionManager count] > 0;
+    return [_selm count] > 0;
   if (sel_isEqual(action, @selector(exportAppointment:)))
-    return [selectionManager count] > 0;
+    return [_selm count] > 0;
   if (sel_isEqual(action, @selector(paste:)))
-    return [selectionManager copiedCount] > 0;
+    return [_selm copiedCount] > 0;
   return YES;
 }
 
@@ -617,13 +644,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
-  if ([selectionManager count] && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
+  if ([_selm count] && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
     return self;
   return nil;
 }
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
-  NSEnumerator *enumerator = [selectionManager enumerator];
+  NSEnumerator *enumerator = [_selm enumerator];
   Element *el;
   NSString *ical;
   NSString *filename;
@@ -631,7 +658,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   NSFileWrapper *fw;
   BOOL written;
 
-  if ([selectionManager count] == 0)
+  if ([_selm count] == 0)
     return NO;
   NSAssert([types count] == 1, @"It seems our assumption was wrong");
   tree = AUTORELEASE([iCalTree new]);
@@ -645,7 +672,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
       NSLog(@"Unable to encode into NSFileWrapper");
       return NO;
     }
-    filename = [NSString stringWithFormat:@"%@/%@.ics", NSTemporaryDirectory(), [[selectionManager lastObject] summary]];
+    filename = [NSString stringWithFormat:@"%@/%@.ics", NSTemporaryDirectory(), [[_selm lastObject] summary]];
     written = [fw writeToFile:filename atomically:YES updateFilenames:YES];
     [fw release];
     if (!written) {
@@ -660,11 +687,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     return [pboard setString:ical forType:NSStringPboardType];
   }
   return NO;
-}
-
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
-{
-  [_appicon setNeedsDisplay:YES];
 }
 @end
 
@@ -707,13 +729,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [date release];
     if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
       [tabs selectTabViewItemWithIdentifier:@"Day"];
-    [selectionManager set:object];
+    [_selm set:object];
     return YES;
   }
   if (object && [object isKindOfClass:[Task class]]) {
     if (![tabIdentifier isEqualToString:@"Tasks"])
       [tabs selectTabViewItemWithIdentifier:@"Tasks"];
-    [selectionManager set:object];
+    [_selm set:object];
     return YES;
   }
   return NO;
@@ -816,7 +838,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   int index = [taskView selectedRow];
   if (index > -1)
-    [selectionManager set:[[_sm allTasks] objectAtIndex:index]];
+    [_selm set:[[_sm allTasks] objectAtIndex:index]];
 }
 @end
 
