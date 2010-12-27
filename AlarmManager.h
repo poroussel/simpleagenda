@@ -3,6 +3,8 @@
 #import <Foundation/NSObject.h>
 #import "ConfigManager.h"
 
+extern NSString * const SAEventReminderWillRun;
+
 @interface AlarmManager : NSObject
 {
   NSMutableDictionary *_activeAlarms;

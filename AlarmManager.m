@@ -10,6 +10,8 @@
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
 NSString * const DEFAULT_ALARM_BACKEND = @"defaultAlarmBackend";
 
+NSString * const SAEventReminderWillRun = @"SAEventReminderWillRun";
+
 static NSMutableDictionary *backendsArray;
 static AlarmManager *singleton;
 
@@ -34,6 +36,7 @@ static AlarmManager *singleton;
 
 - (void)runAlarm:(SAAlarm *)alarm
 {
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAEventReminderWillRun object:alarm];
   if (_defaultBackend)
     [_defaultBackend display:alarm];
 }
