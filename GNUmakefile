@@ -26,7 +26,8 @@ Resources/repeat.tiff \
 Resources/1left.tiff \
 Resources/1right.tiff \
 Resources/2left.tiff \
-Resources/2right.tiff 
+Resources/2right.tiff \
+Resources/bell.tiff
 
 SimpleAgenda_LANGUAGES = English French
 

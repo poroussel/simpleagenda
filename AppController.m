@@ -20,6 +20,7 @@
   NSTimer *_timer;
   BOOL _showDate;
   BOOL _showTime;
+  NSImage *_bell;
 }
 @end
 @implementation AppIcon
@@ -52,6 +53,7 @@
   self = [super initWithFrame:frame];
   if (self) {
     _attrs = [[NSDictionary alloc] initWithObjectsAndKeys:[NSFont systemFontOfSize:8],NSFontAttributeName,nil];
+    _bell = [NSImage imageNamed:@"bell"];
     _cm = [ConfigManager globalConfig];
     [_cm registerClient:self forKey:APPICON_DATE];
     [_cm registerClient:self forKey:APPICON_TIME];
@@ -85,6 +87,7 @@
     aString = [now descriptionWithCalendarFormat:[def objectForKey:NSTimeFormatString]];
     [aString drawAtPoint:NSMakePoint(11, 49) withAttributes:_attrs];
   }
+  //[_bell dissolveToPoint:NSMakePoint(35, 35) fraction:1.0];
 }
 - (void)mouseDown:(NSEvent *)theEvent
 {
