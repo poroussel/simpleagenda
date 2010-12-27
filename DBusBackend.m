@@ -39,28 +39,25 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 	c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
 	if (!c) {
 	  NSLog(@"Unable to create a connection to %@", DBUS_BUS);
-	  [self release];
-	  self = nil;
+	  DESTROY(self);
 	}
 	remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
 	if (!remote) {
 	  NSLog(@"Unable to create a proxy for %@", DBUS_PATH);
-	  [self release];
-	  self = nil;
+	  DESTROY(self);
 	}
 	caps = [remote GetCapabilities];
 	if (!caps) {
 	  NSLog(@"No response to GetCapabilities method");
-	  [self release];
-	  self = nil;
+	  DESTROY(self);
 	}
+	[c invalidate];
       }
     NS_HANDLER
       {
 	NSLog([localException description]);
 	NSLog(@"Exception during DBus backend setup, backend disabled");
-	[self release];
-	self = nil;
+	DESTROY(self);
       }
     NS_ENDHANDLER
   }
