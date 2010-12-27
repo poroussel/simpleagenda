@@ -75,9 +75,9 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
     c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
     remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
     if ([el text])
-      desc = [NSString stringWithFormat:@"%@\n\n%@ : %@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]], [el summary], [[el text] string]];
+      desc = [NSString stringWithFormat:@"%@\n\n%@ : %@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary], [[el text] string]];
     else
-      desc = [NSString stringWithFormat:@"%@\n\n%@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]], [el summary]];
+      desc = [NSString stringWithFormat:@"%@\n\n%@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary]];
     dnid = [remote Notify:@"SimpleAgenda" 
 			 :0 
 			 :@"" 
