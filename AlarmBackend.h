@@ -4,6 +4,6 @@
 
 @interface AlarmBackend : NSObject
 + (NSString *)backendName;
-- (NSString *)backendType;
+- (enum icalproperty_action)backendType;
 - (void)display:(SAAlarm *)alarm;
 @end

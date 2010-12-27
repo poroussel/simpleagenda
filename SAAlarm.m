@@ -4,77 +4,42 @@
 #import "Date.h"
 #import "Element.h"
 
-NSString * const SAActionDisplay = @"DISPLAY";
-NSString * const SAActionEmail = @"EMAIL";
-NSString * const SAActionProcedure = @"PROCEDURE";
-NSString * const SAActionSound = @"AUDIO";
-
 @implementation SAAlarm
+- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
+{
+  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
+  if (prop)
+      icalcomponent_remove_property(ic, prop);
+}
+
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-  [coder encodeObject:_action forKey:@"action"];
-  [coder encodeInt:_repeatCount forKey:@"repeatCount"];
-  [coder encodeDouble:_relativeTrigger forKey:@"relativeTrigger"];
-  [coder encodeDouble:_repeatInterval forKey:@"repeatInterval"];
-  if (_summary)
-    [coder encodeObject:_summary forKey:@"summary"];
-  if (_desc)
-    [coder encodeObject:[_desc string] forKey:@"description"];
-  if (_absoluteTrigger)
-    [coder encodeObject:_absoluteTrigger forKey:@"absoluteTrigger"];
-  if (_emailaddress)
-    [coder encodeObject:_emailaddress forKey:@"emailAddress"];
-  if (_sound)
-    [coder encodeObject:_sound forKey:@"sound"];
-  if (_url)
-    [coder encodeObject:_url forKey:@"url"];
+  [coder encodeObject:[NSString stringWithCString:icalcomponent_as_ical_string(_ic)] forKey:@"alarmComponent"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-  _action = [[coder decodeObjectForKey:@"action"] retain];
-  _repeatCount = [coder decodeIntForKey:@"repeatCount"];
-  _relativeTrigger = [coder decodeDoubleForKey:@"relativeTrigger"];
-  _repeatInterval = [coder decodeDoubleForKey:@"repeatInterval"];
-  if ([coder containsValueForKey:@"summary"])
-    _summary = [[coder decodeObjectForKey:@"summary"] retain];
-  if ([coder containsValueForKey:@"description"])
-    _desc = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"description"]];
-  if ([coder containsValueForKey:@"absoluteTrigger"])
-    _absoluteTrigger = [[coder decodeObjectForKey:@"absoluteTrigger"] retain];
-  if ([coder containsValueForKey:@"emailAddress"])
-    _emailaddress = [[coder decodeObjectForKey:@"emailAddress"] retain];
-  if ([coder containsValueForKey:@"sound"])
-    _sound = [[coder decodeObjectForKey:@"sound"] retain];
-  if ([coder containsValueForKey:@"url"])
-    _url = [[coder decodeObjectForKey:@"url"] retain];
+  _ic = icalcomponent_new_from_string([[coder decodeObjectForKey:@"alarmComponent"] cString]);
   return self;
 }
 
 - (void)dealloc
 {
-  DESTROY(_desc);
-  DESTROY(_summary);
-  DESTROY(_absoluteTrigger);
-  DESTROY(_action);
-  DESTROY(_emailaddress);
-  DESTROY(_sound);
-  DESTROY(_url);
+  icalcomponent_free(_ic);
   [super dealloc];
 }
 
 - (id)init
 {
   self = [super init];
-  _desc = nil;
-  _summary = nil;
-  _absoluteTrigger = nil;
-  _relativeTrigger = 0;
-  _repeatInterval = 0;
-  _emailaddress = nil;
-  _sound = nil;
-  _url = nil;
-  _element = nil;
+  if (self) {
+    _element = nil;
+    _ic = icalcomponent_new([self iCalComponentType]);
+    if (!_ic) {
+      NSLog(@"Error while creating an VALARM component");
+      DESTROY(self);
+    }
+  }
   return self;
 }
 
@@ -85,118 +50,183 @@ NSString * const SAActionSound = @"AUDIO";
 
 - (NSAttributedString *)desc
 {
-  return _desc;
+  icalproperty *prop =  icalcomponent_get_first_property(_ic, ICAL_DESCRIPTION_PROPERTY);
+  if (prop)
+    return AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]]);
+  return nil;
 }
 
 - (void)setDesc:(NSAttributedString *)desc
 {
-  ASSIGN(_desc, desc);
+  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:_ic];
+  if (desc)
+    icalcomponent_add_property(_ic, icalproperty_new_description([[desc string] UTF8String]));
 }
 
 - (NSString *)summary
 {
-  return _summary;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_SUMMARY_PROPERTY);
+  if (!prop) {
+    NSLog(@"Error : no summary property");
+    return nil;
+  }
+  return [NSString stringWithUTF8String:icalproperty_get_summary(prop)];    
 }
 
 - (void)setSummary:(NSString *)summary
 {
-  ASSIGN(_summary, summary);
+  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:_ic];
+  if (summary)
+    icalcomponent_add_property(_ic, icalproperty_new_summary([summary UTF8String]));
 }
 
 - (BOOL)isAbsoluteTrigger
 {
-  return _absoluteTrigger != nil;
+  struct icaltriggertype trigger;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+  if (!prop) {
+    NSLog(@"Error : no trigger property");
+    return NO;
+  }
+  trigger = icalproperty_get_trigger(prop);
+  if (icaltime_is_null_time(trigger.time))
+    return NO;
+  return YES;
 }
 
 - (Date *)absoluteTrigger
 {
-  return _absoluteTrigger;
+  struct icaltriggertype trigger;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+  if (!prop) {
+    NSLog(@"Error : no trigger property");
+    return nil;
+  }
+  trigger = icalproperty_get_trigger(prop);
+  return AUTORELEASE([[Date alloc] initWithICalTime:trigger.time]);
 }
 
-- (void)setAbsoluteTrigger:(Date *)trigger
+- (void)setAbsoluteTrigger:(Date *)date
 {
-  ASSIGNCOPY(_absoluteTrigger, trigger);
-  _relativeTrigger = 0;
+  struct icaltriggertype trigger;
+
+  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:_ic];
+  memset(&trigger, 0, sizeof(trigger));
+  trigger.time = [date iCalTime];
+  icalcomponent_add_property(_ic, icalproperty_new_trigger(trigger));
 }
 
 - (NSTimeInterval)relativeTrigger
 {
-  return _relativeTrigger;
+  struct icaltriggertype trigger;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+  if (!prop) {
+    NSLog(@"Error : no trigger property");
+    return -1;
+  }
+  trigger = icalproperty_get_trigger(prop);
+  return icaldurationtype_as_int(trigger.duration);
 }
 
-- (void)setRelativeTrigger:(NSTimeInterval)trigger
+- (void)setRelativeTrigger:(NSTimeInterval)duration
 {
-  _relativeTrigger = trigger;
-  DESTROY(_absoluteTrigger);
+  struct icaltriggertype trigger;
+
+  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:_ic];
+  memset(&trigger, 0, sizeof(trigger));
+  trigger.duration = icaldurationtype_from_int(duration);
+  icalcomponent_add_property(_ic, icalproperty_new_trigger(trigger));
 }
 
-- (NSString *)action
+- (enum icalproperty_action)action
 {
-  return _action;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ACTION_PROPERTY);
+  if (!prop) {
+    NSLog(@"Error : no ACTION property");
+    return -1;
+  }
+  return icalproperty_get_action(prop);
 }
 
-- (void)setAction:(NSString *)action
+- (void)setAction:(enum icalproperty_action)action
 {
-  ASSIGN(_action, action);
+  [self deleteProperty:ICAL_ACTION_PROPERTY fromComponent:_ic];
+  icalcomponent_add_property(_ic, icalproperty_new_action(action));
 }
 
 - (NSString *)emailAddress
 {
-  return _emailaddress;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ATTENDEE_PROPERTY);
+  if (prop)
+    return [NSString stringWithUTF8String:icalproperty_get_attendee(prop)];
+  return nil;
 }
 
 - (void)setEmailAddress:(NSString *)emailAddress
 {
-  ASSIGN(_emailaddress, emailAddress);
-  DESTROY(_sound);
-  DESTROY(_url);
-  [self setAction:SAActionEmail];
+  [self deleteProperty:ICAL_ATTENDEE_PROPERTY fromComponent:_ic];
+  if (emailAddress) {
+    icalcomponent_add_property(_ic, icalproperty_new_attendee([emailAddress UTF8String]));
+    [self setAction:ICAL_ACTION_EMAIL];
+  }
 }
 
 - (NSString *)sound
 {
-  return _sound;
+  /* FIXME */
+  return nil;
 }
 
 - (void)setSound:(NSString *)sound
 {
-  ASSIGN(_sound, sound);
-  DESTROY(_emailaddress);
-  DESTROY(_url);
-  [self setAction:SAActionSound];
+  /* FIXME */
+  if (sound) {
+    [self setAction:ICAL_ACTION_AUDIO];
+  }
 }
 
 - (NSURL *)url
 {
-  return _url;
+  /* FIXME */
+  return nil;
 }
 
 - (void)setUrl:(NSURL *)url
 {
-  ASSIGN(_url, url);
-  DESTROY(_emailaddress);
-  DESTROY(_sound);
-  [self setAction:SAActionProcedure];
+  /* FIXME */
+  if (url) {
+    [self setAction:ICAL_ACTION_PROCEDURE];
+  }
 }
 
 - (int)repeatCount
 {
-  return _repeatCount;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_REPEAT_PROPERTY);
+  if (prop)
+    return icalproperty_get_repeat(prop);
+  return 0;
 }
 
 - (void)setRepeatCount:(int)count
 {
-  _repeatCount = count;
+  [self deleteProperty:ICAL_REPEAT_PROPERTY fromComponent:_ic];
+  if (count > 0)
+    icalcomponent_add_property(_ic, icalproperty_new_repeat(count));
 }
 
 - (NSTimeInterval)repeatInterval
 {
-  return _repeatInterval;
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_DURATION_PROPERTY);
+  if (prop)
+    return icaldurationtype_as_int(icalproperty_get_duration(prop));
+  return 0;
 }
 
 - (void)setRepeatInterval:(NSTimeInterval)interval
 {
-  _repeatInterval = interval;
+  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:_ic];
+  if (interval > 0)
+    icalcomponent_add_property(_ic, icalproperty_new_duration(icaldurationtype_from_int(interval)));
 }
 
 - (Element *)element
@@ -212,154 +242,34 @@ NSString * const SAActionSound = @"AUDIO";
 
 - (Date *)triggerDateRelativeTo:(Date *)date
 {
-  return [Date dateWithTimeInterval:_relativeTrigger sinceDate:date];
+  return [Date dateWithTimeInterval:[self relativeTrigger] sinceDate:date];
 }
 
 - (NSString *)description
 {
   if ([self isAbsoluteTrigger])
-    return [NSString stringWithFormat:@"Absolute trigger set to %@ repeat %d interval %f description <%@> action %@", [_absoluteTrigger description], _repeatCount, _repeatInterval, _desc, _action];
-  return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f description <%@> action %@", _relativeTrigger, _repeatCount, _repeatInterval, _desc, _action];
+    return [NSString stringWithFormat:@"Absolute trigger set to %@ repeat %d interval %f description <%@>", [[self absoluteTrigger] description], [self repeatCount], [self repeatInterval], [self desc]];
+  return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f description <%@>", [self relativeTrigger], [self repeatCount], [self repeatInterval], [self desc]];
 }
 
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
-  icalproperty *prop;
-  struct icaltriggertype trigger;
-
-  self = [self init];
-  if (self == nil)
-    return nil;
-
-  /* ACTION */
-  prop = icalcomponent_get_first_property(ic, ICAL_ACTION_PROPERTY);
-  if (!prop) {
-    NSLog(@"No action defined, alarm disabled");
-    goto init_error;
-  }
-  switch (icalproperty_get_action(prop)) {
-  case ICAL_ACTION_X:
-  case ICAL_ACTION_DISPLAY:
-    [self setAction:SAActionDisplay];
-    break;
-  case ICAL_ACTION_AUDIO:
-    [self setAction:SAActionSound];
-    break;
-  case ICAL_ACTION_EMAIL:
-    /* ATTENDEE */
-    prop = icalcomponent_get_first_property(ic, ICAL_ATTENDEE_PROPERTY);
-    if (!prop) {
-      NSLog(@"No email address, alarm disabled");
-      goto init_error;
+  self = [super init];
+  if (self) {
+    _element = nil;
+    _ic = icalcomponent_new_clone(ic);
+    if (!_ic) {
+      NSLog(@"Error creating Alarm from iCal component");
+      NSLog(@"\n\n%s", icalcomponent_as_ical_string(ic));
+      DESTROY(self);
     }
-    [self setEmailAddress:[NSString stringWithUTF8String:icalproperty_get_attendee(prop)]];    
-    /* SUMMARY */
-    prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-    if (!prop) {
-      NSLog(@"No summary, alarm disabled");
-      goto init_error;
-    }
-    [self setSummary:[NSString stringWithUTF8String:icalproperty_get_summary(prop)]];    
-    break;
-  case ICAL_ACTION_PROCEDURE:
-    [self setAction:SAActionProcedure];
-    break;
-  default:
-    NSLog(@"No action defined, alarm disabled");
-    goto init_error;
-  }
-
-  /* TRIGGER */
-  prop = icalcomponent_get_first_property(ic, ICAL_TRIGGER_PROPERTY);
-  if (!prop) {
-    NSLog(@"No trigger defined, alarm disabled");
-    goto init_error;
-  }
-  trigger = icalproperty_get_trigger(prop);
-  if (icaltime_is_null_time(trigger.time))
-    [self setRelativeTrigger:icaldurationtype_as_int(trigger.duration)];
-  else
-    [self setAbsoluteTrigger:AUTORELEASE([[Date alloc] initWithICalTime:trigger.time])];
-
-  /* DESCRIPTION */
-  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-  if (prop)
-    [self setDesc:AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]])];
-
-  /* REPEAT */
-  prop = icalcomponent_get_first_property(ic, ICAL_REPEAT_PROPERTY);
-  if (prop) {
-    [self setRepeatCount:icalproperty_get_repeat(prop)];
-    /* If REPEAT is present, DURATION must be here too */
-    prop = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-    if (!prop) {
-      NSLog(@"REPEAT without DURATION, alarm disabled");
-      goto init_error;
-    }
-    [self setRepeatInterval:icaldurationtype_as_int(icalproperty_get_duration(prop))];
   }
   return self;
-
- init_error:
-  NSLog(@"Error creating Alarm from iCal component");
-  NSLog(@"\n\n%s", icalcomponent_as_ical_string(ic));
-  [self release];
-  return nil;
 }
 
 - (icalcomponent *)asICalComponent
 {
-  icalcomponent *ic = icalcomponent_new([self iCalComponentType]);
-  if (!ic) {
-    NSLog(@"Couldn't create iCalendar component");
-    return NULL;
-  }
-  if (![self updateICalComponent:ic]) {
-    icalcomponent_free(ic);
-    return NULL;
-  }
-  return ic;
-}
-
-- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
-{
-  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
-  if (prop)
-      icalcomponent_remove_property(ic, prop);
-}
-
-- (BOOL)updateICalComponent:(icalcomponent *)ic
-{
-  struct icaltriggertype trigger;
-
-  [self deleteProperty:ICAL_ACTION_PROPERTY fromComponent:ic];
-  if ([[self action] isEqualToString:SAActionDisplay])
-    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_DISPLAY));
-  else if ([[self action] isEqualToString:SAActionEmail])
-    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_EMAIL));
-  else if ([[self action] isEqualToString:SAActionProcedure])
-    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_PROCEDURE));
-  else if ([[self action] isEqualToString:SAActionSound])
-    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_AUDIO));
-  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_summary([[self summary] UTF8String]));
-  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:ic];
-  memset(&trigger, 0, sizeof(trigger));
-  if ([self isAbsoluteTrigger])
-    trigger.time = [[self absoluteTrigger] iCalTime];
-  else
-    trigger.duration = icaldurationtype_from_int([self relativeTrigger]);
-  icalcomponent_add_property(ic, icalproperty_new_trigger(trigger));
-  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
-  if ([self desc])
-    icalcomponent_add_property(ic, icalproperty_new_description([[[self desc] string] UTF8String]));
-  [self deleteProperty:ICAL_REPEAT_PROPERTY fromComponent:ic];
-  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
-  if ([self repeatCount] > 0) {
-    icalcomponent_add_property(ic, icalproperty_new_repeat([self repeatCount]));
-    icalcomponent_add_property(ic, icalproperty_new_duration(icaldurationtype_from_int([self repeatInterval])));
-  }
-  return YES;
+  return icalcomponent_new_clone(_ic);
 }
 
 - (int)iCalComponentType

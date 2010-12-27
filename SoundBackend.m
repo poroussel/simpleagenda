@@ -14,9 +14,9 @@
   return @"Sound notification";
 }
 
-- (NSString *)backendType
+- (enum icalproperty_action)backendType
 {
-  return SAActionSound;
+  return ICAL_ACTION_AUDIO;
 }
 
 - (id)init

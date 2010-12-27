@@ -21,9 +21,9 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
   return @"DBus desktop notification";
 }
 
-- (NSString *)backendType
+- (enum icalproperty_action)backendType
 {
-  return SAActionDisplay;
+  return ICAL_ACTION_DISPLAY;
 }
 
 - (id)init

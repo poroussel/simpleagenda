@@ -3,26 +3,12 @@
 #import <Foundation/Foundation.h>
 #import "config.h"
 
-extern NSString * const SAActionDisplay;
-extern NSString * const SAActionEmail;
-extern NSString * const SAActionProcedure;
-extern NSString * const SAActionSound;
-
 @class Date;
 @class Element;
 
 @interface SAAlarm : NSObject <NSCoding>
 {
-  NSAttributedString *_desc;
-  NSString *_summary;
-  Date *_absoluteTrigger;
-  NSTimeInterval _relativeTrigger;
-  NSString *_action;
-  NSString *_emailaddress;
-  NSString *_sound;
-  NSURL *_url;
-  int _repeatCount;
-  NSTimeInterval _repeatInterval;
+  icalcomponent *_ic;
   Element *_element;
 }
 
@@ -36,8 +22,8 @@ extern NSString * const SAActionSound;
 - (void)setAbsoluteTrigger:(Date *)trigger;
 - (NSTimeInterval)relativeTrigger;
 - (void)setRelativeTrigger:(NSTimeInterval)trigger;
-- (NSString *)action;
-- (void)setAction:(NSString *)action;
+- (enum icalproperty_action)action;
+- (void)setAction:(enum icalproperty_action)action;
 - (NSString *)emailAddress;
 - (void)setEmailAddress:(NSString *)emailAddress;
 - (NSString *)sound;
@@ -54,6 +40,5 @@ extern NSString * const SAActionSound;
 
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
-- (BOOL)updateICalComponent:(icalcomponent *)ic;
 - (int)iCalComponentType;
 @end

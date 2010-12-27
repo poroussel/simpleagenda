@@ -303,9 +303,9 @@ static AlarmManager *singleton;
 {
   return @"Log backend";
 }
-- (NSString *)backendType
+- (enum icalproperty_action)backendType
 {
-  return SAActionDisplay;
+  return ICAL_ACTION_DISPLAY;
 }
 - (void)display:(SAAlarm *)alarm
 {
