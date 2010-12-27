@@ -330,6 +330,8 @@ NSString * const SAActionSound = @"AUDIO";
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
+  struct icaltriggertype trigger;
+
   [self deleteProperty:ICAL_ACTION_PROPERTY fromComponent:ic];
   if ([[self action] isEqualToString:SAActionDisplay])
     icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_DISPLAY));
@@ -341,6 +343,13 @@ NSString * const SAActionSound = @"AUDIO";
     icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_AUDIO));
   [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_summary([[self summary] UTF8String]));
+  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:ic];
+  memset(&trigger, 0, sizeof(trigger));
+  if ([self isAbsoluteTrigger])
+    trigger.time = [[self absoluteTrigger] iCalTime];
+  else
+    trigger.duration = icaldurationtype_from_int([self relativeTrigger]);
+  icalcomponent_add_property(ic, icalproperty_new_trigger(trigger));
   [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
   if ([self desc])
     icalcomponent_add_property(ic, icalproperty_new_description([[[self desc] string] UTF8String]));
