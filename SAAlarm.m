@@ -309,12 +309,48 @@ NSString * const SAActionSound = @"AUDIO";
 
 - (icalcomponent *)asICalComponent
 {
-  return NULL;
+  icalcomponent *ic = icalcomponent_new([self iCalComponentType]);
+  if (!ic) {
+    NSLog(@"Couldn't create iCalendar component");
+    return NULL;
+  }
+  if (![self updateICalComponent:ic]) {
+    icalcomponent_free(ic);
+    return NULL;
+  }
+  return ic;
+}
+
+- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
+{
+  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
+  if (prop)
+      icalcomponent_remove_property(ic, prop);
 }
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
-  return NO;
+  [self deleteProperty:ICAL_ACTION_PROPERTY fromComponent:ic];
+  if ([[self action] isEqualToString:SAActionDisplay])
+    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_DISPLAY));
+  else if ([[self action] isEqualToString:SAActionEmail])
+    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_EMAIL));
+  else if ([[self action] isEqualToString:SAActionProcedure])
+    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_PROCEDURE));
+  else if ([[self action] isEqualToString:SAActionSound])
+    icalcomponent_add_property(ic, icalproperty_new_action(ICAL_ACTION_AUDIO));
+  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
+  icalcomponent_add_property(ic, icalproperty_new_summary([[self summary] UTF8String]));
+  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
+  if ([self desc])
+    icalcomponent_add_property(ic, icalproperty_new_description([[[self desc] string] UTF8String]));
+  [self deleteProperty:ICAL_REPEAT_PROPERTY fromComponent:ic];
+  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
+  if ([self repeatCount] > 0) {
+    icalcomponent_add_property(ic, icalproperty_new_repeat([self repeatCount]));
+    icalcomponent_add_property(ic, icalproperty_new_duration(icaldurationtype_from_int([self repeatInterval])));
+  }
+  return YES;
 }
 
 - (int)iCalComponentType

@@ -258,14 +258,17 @@
 
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
-  icalproperty *prop;
-  prop = icalcomponent_get_first_property(ic, kind);
+  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
   if (prop)
       icalcomponent_remove_property(ic, prop);
 }
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
+  NSEnumerator *enumerator;
+  SAAlarm *alarm;
+  icalcomponent *subc;
+
   [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_uid([[self UID] cString]));
   [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
@@ -280,6 +283,16 @@
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
+
+  subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
+  for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT))
+    icalcomponent_remove_component(ic, subc);
+  enumerator = [[self alarms] objectEnumerator];
+  while ((alarm = [enumerator nextObject])) {
+    subc = [alarm asICalComponent];
+    icalcomponent_add_component(ic, subc);
+    icalcomponent_free(subc);
+  }
   return YES;
 }
 

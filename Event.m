@@ -235,20 +235,6 @@
   return nil;
 }
 
-- (icalcomponent *)asICalComponent
-{
-  icalcomponent *ic = icalcomponent_new(ICAL_VEVENT_COMPONENT);
-  if (!ic) {
-    NSLog(@"Couldn't create iCalendar component");
-    return NULL;
-  }
-  if (![self updateICalComponent:ic]) {
-    icalcomponent_free(ic);
-    return NULL;
-  }
-  return ic;
-}
-
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   Date *end;

@@ -118,17 +118,6 @@ static NSArray *stateName;
   return self;
 }
 
-- (icalcomponent *)asICalComponent
-{
-  icalcomponent *ic = icalcomponent_new(ICAL_VTODO_COMPONENT);
-  if (!ic) {
-    NSLog(@"Couldn't create iCalendar component");
-    return NULL;
-  }
-  [self updateICalComponent:ic];
-  return ic;
-}
-
 static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_COMPLETED, ICAL_STATUS_CANCELLED};
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
