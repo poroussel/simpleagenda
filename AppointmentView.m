@@ -4,17 +4,23 @@
 #import "defines.h"
 
 static NSImage *_repeatImage;
+static NSImage *_alarmImage;
 
 @implementation AppointmentView
 + (void)initialize
 {
   _repeatImage = [NSImage imageNamed:@"repeat"];
-  [_repeatImage setFlipped:YES];
+  _alarmImage = [NSImage imageNamed:@"small-bell"];
 }
 
 - (NSImage *)repeatImage
 {
   return _repeatImage;
+}
+
+- (NSImage *)alarmImage
+{
+  return _alarmImage;
 }
 
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt

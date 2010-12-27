@@ -17,6 +17,7 @@
   Event *_apt;
 }
 - (NSImage *)repeatImage;
+- (NSImage *)alarmImage;
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt;
 - (Event *)appointment;
 - (void)tooltipSetup;

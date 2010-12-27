@@ -20,6 +20,7 @@
 #define RADIUS 5
 - (void)drawRect:(NSRect)rect
 {
+  NSPoint point;
   NSString *title;
   NSString *label;
   Date *start = [_apt startDate];
@@ -60,8 +61,13 @@
   PSsetlinewidth(CEC_BORDERSIZE);
   PSstroke();
   [label drawInRect:TextRect(rect) withAttributes:textAttributes];
-  if ([_apt rrule] != nil)
+  point = NSMakePoint(rect.size.width - 18, rect.size.height - 16);
+  if ([_apt rrule]) {
     [[self repeatImage] compositeToPoint:NSMakePoint(rect.size.width - 18, rect.size.height - 18) operation:NSCompositeSourceOver];
+    point = NSMakePoint(rect.size.width - 30, rect.size.height - 16);
+  }
+  if ([_apt hasAlarms])
+    [[self alarmImage] compositeToPoint:point operation:NSCompositeSourceOver];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
