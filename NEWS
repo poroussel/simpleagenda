@@ -2,6 +2,7 @@ version 0.42
 	* Bug fixes and code cleanups
 	* Handle read only stores when cut & pasting elements
 	* Simple reminders/alarms handling with multiple backends
+	* New images from OpenClipArt (bell_gold.svg)
 
 version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes
