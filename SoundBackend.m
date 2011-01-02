@@ -8,7 +8,34 @@
 }
 @end
 
+static NSMutableArray *sounds;
+
 @implementation SoundBackend
++ (void)initialize
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSString *path, *file;
+  NSArray *paths, *files;
+  NSEnumerator *enumerator, *fenum;
+
+  if ([SoundBackend class] == self) {
+    sounds = [[NSMutableArray alloc] initWithCapacity:8];
+    paths = NSStandardLibraryPaths();
+    enumerator = [paths objectEnumerator];
+    while ((path = [enumerator nextObject])) {
+      path = [path stringByAppendingPathComponent:@"/Sounds/"];
+      files = [fm directoryContentsAtPath:path];
+      if (files) {
+	fenum = [files objectEnumerator];
+	while ((file = [fenum nextObject])) {
+	  if ([NSSound soundNamed:[file stringByDeletingPathExtension]])
+	    [sounds addObject:[file stringByDeletingPathExtension]];
+	}
+      }
+    }
+  }
+}
+
 + (NSString *)backendName
 {
   return @"Sound notification";
