@@ -3,6 +3,7 @@
 #import "SAAlarm.h"
 #import "Date.h"
 #import "Element.h"
+#import "HourFormatter.h"
 
 @implementation SAAlarm
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
@@ -254,15 +255,25 @@
 
 - (NSString *)shortDescription
 {
+  NSTimeInterval trigger;
+
   if ([self isAbsoluteTrigger])
     return [NSString stringWithFormat:_(@"Trigger on %@"), [[[self absoluteTrigger] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]]];
-  return @"Relative trigger";
+  trigger = [self relativeTrigger];
+  if (trigger >= 0)
+    return [NSString stringWithFormat:_(@"Trigger %@ after the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithFloat:trigger/3600]]];
+  return [NSString stringWithFormat:_(@"Trigger %@ before the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithFloat:-trigger/3600]]];
 }
+
+- (id)copyWithZone:(NSZone *)zone
+{
+  return [[SAAlarm allocWithZone:zone] initWithICalComponent:[self asICalComponent]];
+}
+
 
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     _element = nil;
     _ic = icalcomponent_new_clone(ic);
     if (!_ic) {

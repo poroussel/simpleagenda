@@ -4,7 +4,9 @@
 	Actions = (
 	    "addAlarm:",
 	    "selectType:",
-	    "removeAlarm:"
+	    "removeAlarm:",
+	    "changeDelay:",
+	    "switchBeforeAfter:"
 	);
 	Outlets = (
 	    panel,
@@ -13,7 +15,10 @@
 	    window,
 	    table,
 	    add,
-	    remove
+	    remove,
+	    relativeSlider,
+	    relativeText,
+	    radio
 	);
 	Super = NSObject;
     };
@@ -30,8 +35,10 @@
     FirstResponder = {
 	Actions = (
 	    "addAlarm:",
-	    "selectType:",
+	    "changeDelay:",
+	    "switchBeforeAfter:",
 	    "removeAlarm:",
+	    "selectType:",
 	    "setDelegate:"
 	);
 	Super = NSObject;

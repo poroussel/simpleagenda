@@ -46,6 +46,7 @@
 
 - (BOOL)hasAlarms;
 - (NSArray *)alarms;
+- (void)setAlarms:(NSArray *)alarms;
 - (void)addAlarm:(SAAlarm *)alarm;
 - (void)removeAlarm:(SAAlarm *)alarm;
 - (Date *)nextActivationDate;

@@ -48,6 +48,7 @@ static NSMutableDictionary *editors;
   self = [self init];
   if (self) {
     ASSIGN(_event , event);
+    ASSIGNCOPY(_modifiedAlarms, [event alarms]);
     [title setStringValue:[event summary]];
     [duration setFloatValue:[event duration] / 60.0];
     [durationText setFloatValue:[event duration] / 60.0];
@@ -95,6 +96,7 @@ static NSMutableDictionary *editors;
 - (void)dealloc
 {
   RELEASE(_event);
+  RELEASE(_modifiedAlarms);
   [super dealloc];
 }
 
@@ -146,6 +148,7 @@ static NSMutableDictionary *editors;
     [_event setStartDate:date];
     [date release];
   }
+  [_event setAlarms:_modifiedAlarms];
   aStore = [sm storeForName:[store titleOfSelectedItem]];
   if (!originalStore)
     [aStore add:_event];
@@ -228,7 +231,11 @@ static NSMutableDictionary *editors;
 
 - (void)editAlarms:(id)sender
 {
-  [AlarmEditor editAlarms:[_event alarms]];
+  NSArray *alarms;
+
+  alarms = [AlarmEditor editAlarms:_modifiedAlarms];
+  if (alarms)
+    ASSIGN(_modifiedAlarms, alarms);
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector

@@ -3,4 +3,5 @@
 #import <Foundation/Foundation.h>
 
 @interface HourFormatter : NSFormatter
++ (NSString *)stringForObjectValue:(id)anObject;
 @end

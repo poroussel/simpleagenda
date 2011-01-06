@@ -4,12 +4,17 @@
 
 @implementation HourFormatter
 
-- (NSString *)stringForObjectValue:(id)anObject
++ (NSString *)stringForObjectValue:(id)anObject
 {
   if (![anObject isKindOfClass:[NSNumber class]])
     return nil;
   int m = ([anObject floatValue] - [anObject intValue]) * 100;
   return [NSString stringWithFormat:@"%dh%02d", [anObject intValue], 60 * m / 100];
+}
+
+- (NSString *)stringForObjectValue:(id)anObject
+{
+  return [HourFormatter stringForObjectValue:anObject];
 }
 
 - (BOOL)getObjectValue:(id *)anObject forString:(NSString *)string errorDescription:(NSString **)error

@@ -153,6 +153,12 @@
   return [NSArray arrayWithArray:_alarms];
 }
 
+- (void)setAlarms:(NSArray *)alarms
+{
+  DESTROY(_alarms);
+  ASSIGN(_alarms, alarms);
+}
+
 - (void)addAlarm:(SAAlarm *)alarm
 {
   [alarm setElement:self];

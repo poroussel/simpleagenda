@@ -21,6 +21,7 @@
   id timeText;
   Date *startDate;
   Event *_event;
+  NSArray *_modifiedAlarms;
 }
 
 + (AppointmentEditor *)editorForEvent:(Event *)event;

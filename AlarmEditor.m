@@ -2,14 +2,43 @@
 #import "AlarmEditor.h"
 #import "Element.h"
 #import "SAAlarm.h"
+#import "HourFormatter.h"
 
 @implementation AlarmEditor
+- (void)setupForAlarm:(SAAlarm *)alarm
+{
+  NSTimeInterval relativeTrigger;
+
+  _current = alarm;
+  if ([alarm isAbsoluteTrigger]) {
+    [type selectItemAtIndex:1];
+  } else {
+    [type selectItemAtIndex:0];
+    relativeTrigger = [alarm relativeTrigger];
+    if (relativeTrigger >= 0) {
+      [radio selectCellWithTag:1];
+      [relativeSlider setFloatValue:relativeTrigger/3600];
+    } else {
+      [radio selectCellWithTag:0];
+      [relativeSlider setFloatValue:-relativeTrigger/3600];
+    }
+    [self changeDelay:self];
+  }
+}
+
 - (id)init
 {
+  HourFormatter *formatter;
+
   if (![NSBundle loadNibNamed:@"Alarm" owner:self]) {
     DESTROY(self);
   }
   if ((self = [super init])) {
+    _current = nil;
+    _simple = RETAIN([SAAlarm alarm]);
+    [_simple setRelativeTrigger:-15*60];
+    [_simple setAction:ICAL_ACTION_DISPLAY];
+    
     [table setDelegate:self];
 
     [type removeAllItems];
@@ -19,6 +48,10 @@
 
     [table setUsesAlternatingRowBackgroundColors:YES];
     [table sizeLastColumnToFit];
+
+    formatter = [[[HourFormatter alloc] init] autorelease];
+    [[relativeText cell] setFormatter:formatter];
+
   }
   return self;
 }
@@ -27,6 +60,12 @@
 {
   if ((self = [self init])) {
     _alarms = [alarms mutableCopy];
+    if ([_alarms count] == 0) {
+      [self setupForAlarm:_simple];
+      [remove setEnabled:NO];
+    } else {
+      [remove setEnabled:YES];
+    }
     [table reloadData];
   }
   return self;
@@ -37,36 +76,48 @@
   return [NSApp runModalForWindow:window];
 }
 
+- (NSArray *)modifiedAlarms
+{
+  return [NSArray arrayWithArray:_alarms];
+}
+
 + (NSArray *)editAlarms:(NSArray *)alarms
 {
   AlarmEditor *editor;
+  NSArray *modified;
 
   if ((editor = [[AlarmEditor alloc] initWithAlarms:alarms])) {
     [editor run];
+    modified = [editor modifiedAlarms];
     [editor release];
+    return modified;
   }
-  return alarms;
+  return nil;
 }
 
 - (void)dealloc
 {
-  [_alarms release];
+  DESTROY(_simple);
+  DESTROY(_alarms);
   [super dealloc];
 }
 
 - (void)addAlarm:(id)sender
 {
-  SAAlarm *alarm = [SAAlarm alarm];
-
-  [alarm setRelativeTrigger:-15*60];
-  [alarm setAction:ICAL_ACTION_DISPLAY];
-  [_alarms addObject:alarm];
+  [_alarms addObject:AUTORELEASE([_simple copy])];
   [table reloadData];
+  [table selectRow:[_alarms count]-1 byExtendingSelection:NO];
+  [remove setEnabled:YES];
 }
 
 - (void)removeAlarm:(id)sender
 {
-  NSLog(@"removeAlarm");
+  [_alarms removeObjectAtIndex:[table selectedRow]];
+  [table reloadData];
+  if ([_alarms count] > 0)
+    [self tableViewSelectionDidChange:nil];
+  else
+    [remove setEnabled:NO];
 }
 
 - (void)selectType:(id)sender
@@ -74,23 +125,40 @@
   NSLog(@"selectType");
 }
 
+- (void)changeDelay:(id)sender
+{
+  [relativeText setFloatValue:[relativeSlider floatValue]];
+  if (_current) {
+    if ([[radio selectedCell] tag] == 0)
+      [_current setRelativeTrigger:[relativeSlider floatValue] * -3600];
+    else
+      [_current setRelativeTrigger:[relativeSlider floatValue] * 3600];
+    [table reloadData];
+  }
+}
+
+- (void)switchBeforeAfter:(id)sender
+{
+  [self changeDelay:self];
+}
+
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-  //int index = [table selectedRow];
-  NSLog(@"selection changed");
+  if ([_alarms count] > 0)
+    [self setupForAlarm:[_alarms objectAtIndex:[table selectedRow]]];
 }
 @end
 
 @implementation AlarmEditor(NSTableViewDataSource)
-- (int) numberOfRowsInTableView: (NSTableView*)aTableView
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [_alarms count];
 }
-- (BOOL) tableView: (NSTableView*)tableView acceptDrop: (id)info row: (int)row dropOperation: (NSTableViewDropOperation)operation
+- (BOOL)tableView:(NSTableView *)tableView acceptDrop:(id)info row:(int)row dropOperation:(NSTableViewDropOperation)operation
 {
   return NO;
 }
-- (id) tableView: (NSTableView*)aTableView objectValueForTableColumn: (NSTableColumn*)aTableColumn row: (int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
   return [[_alarms objectAtIndex:rowIndex] shortDescription];
 }
