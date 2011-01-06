@@ -5,9 +5,10 @@
 	);
 	Outlets = (
 	    panel,
-	    calendar,
 	    type,
-	    action
+	    action,
+	    window,
+	    table
 	);
 	Super = NSObject;
     };
@@ -23,6 +24,7 @@
     };
     FirstResponder = {
 	Actions = (
+	    "newAction:",
 	    "setDelegate:"
 	);
 	Super = NSObject;

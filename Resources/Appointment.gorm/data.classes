@@ -6,7 +6,8 @@
 	    "validate:",
 	    "selectFrequency:",
 	    "toggleUntil:",
-	    "toggleAllDay:"
+	    "toggleAllDay:",
+	    "editAlarms:"
 	);
 	Outlets = (
 	    description,
@@ -27,8 +28,9 @@
     };
     FirstResponder = {
 	Actions = (
-	    "toggleAllDay:",
+	    "editAlarms:",
 	    "selectFrequency:",
+	    "toggleAllDay:",
 	    "toggleUntil:",
 	    "validate:"
 	);

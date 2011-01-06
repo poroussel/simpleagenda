@@ -4,6 +4,7 @@
 #import "TaskEditor.h"
 #import "StoreManager.h"
 #import "Task.h"
+#import "AlarmEditor.h"
 
 static NSMutableDictionary *editors;
 
@@ -111,6 +112,11 @@ static NSMutableDictionary *editors;
 {
   [editors removeObjectForKey:[_task UID]]; 
   [window close]; 
+}
+
+- (void)editAlarms:(id)sender
+{
+  [AlarmEditor editAlarms:[_task alarms]];
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector

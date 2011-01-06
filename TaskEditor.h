@@ -18,4 +18,5 @@
 + (TaskEditor *)editorForTask:(Task *)task;
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
+- (void)editAlarms:(id)sender;
 @end

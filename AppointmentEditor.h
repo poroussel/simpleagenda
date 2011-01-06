@@ -29,4 +29,5 @@
 - (void)selectFrequency:(id)sender;
 - (void)toggleUntil:(id)sender;
 - (void)toggleAllDay:(id)sender;
+- (void)editAlarms:(id)sender;
 @end

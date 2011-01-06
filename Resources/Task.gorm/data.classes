@@ -2,6 +2,7 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     FirstResponder = {
 	Actions = (
+	    "editAlarms:",
 	    "validate:"
 	);
 	Super = NSObject;
@@ -9,7 +10,8 @@
     TaskEditor = {
 	Actions = (
 	    "validate:",
-	    "cancel:"
+	    "cancel:",
+	    "editAlarms:"
 	);
 	Outlets = (
 	    window,

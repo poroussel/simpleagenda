@@ -2,13 +2,17 @@
 
 #import <Foundation/Foundation.h>
 
+@class Element;
+
 @interface AlarmEditor : NSObject
 {
+  id window;
   id panel;
-  id calendar;
   id type;
   id action;
+  id table;
+  NSMutableArray *_alarms;
 }
 
-- (void)show;
++ (NSArray *)editAlarms:(NSArray *)alarms;
 @end

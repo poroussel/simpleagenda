@@ -50,7 +50,7 @@
 
 - (NSAttributedString *)desc
 {
-  icalproperty *prop =  icalcomponent_get_first_property(_ic, ICAL_DESCRIPTION_PROPERTY);
+  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_DESCRIPTION_PROPERTY);
   if (prop)
     return AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]]);
   return nil;

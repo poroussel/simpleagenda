@@ -5,6 +5,7 @@
 #import "HourFormatter.h"
 #import "AgendaStore.h"
 #import "ConfigManager.h"
+#import "AlarmEditor.h"
 #import "defines.h"
 
 static NSMutableDictionary *editors;
@@ -223,6 +224,11 @@ static NSMutableDictionary *editors;
     [time setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
     [timeText setFloatValue:[[ConfigManager globalConfig] integerForKey:FIRST_HOUR]];
   }
+}
+
+- (void)editAlarms:(id)sender
+{
+  [AlarmEditor editAlarms:[_event alarms]];
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
