@@ -11,8 +11,12 @@
   id type;
   id action;
   id table;
+  id add;
+  id remove;
   NSMutableArray *_alarms;
 }
 
 + (NSArray *)editAlarms:(NSArray *)alarms;
+- (void)addAlarm:(id)sender;
+- (void)removeAlarm:(id)sender;
 @end

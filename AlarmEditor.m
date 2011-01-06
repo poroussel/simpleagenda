@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #import "AlarmEditor.h"
 #import "Element.h"
+#import "SAAlarm.h"
 
 @implementation AlarmEditor
 - (id)init
@@ -9,6 +10,8 @@
     DESTROY(self);
   }
   if ((self = [super init])) {
+    [table setDelegate:self];
+
     [type removeAllItems];
     [type addItemsWithTitles:[NSArray arrayWithObjects:_(@"Relative"), _(@"Absolute"), nil]];
     [action removeAllItems];
@@ -47,9 +50,34 @@
 
 - (void)dealloc
 {
-  NSLog(@"Dealloc AlarmEditor");
   [_alarms release];
   [super dealloc];
+}
+
+- (void)addAlarm:(id)sender
+{
+  SAAlarm *alarm = [SAAlarm alarm];
+
+  [alarm setRelativeTrigger:-15*60];
+  [alarm setAction:ICAL_ACTION_DISPLAY];
+  [_alarms addObject:alarm];
+  [table reloadData];
+}
+
+- (void)removeAlarm:(id)sender
+{
+  NSLog(@"removeAlarm");
+}
+
+- (void)selectType:(id)sender
+{
+  NSLog(@"selectType");
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+  //int index = [table selectedRow];
+  NSLog(@"selection changed");
 }
 @end
 
@@ -58,33 +86,12 @@
 {
   return [_alarms count];
 }
-
 - (BOOL) tableView: (NSTableView*)tableView acceptDrop: (id)info row: (int)row dropOperation: (NSTableViewDropOperation)operation
 {
   return NO;
 }
-
 - (id) tableView: (NSTableView*)aTableView objectValueForTableColumn: (NSTableColumn*)aTableColumn row: (int)rowIndex
 {
-  return [[_alarms objectAtIndex:rowIndex] description];
-}
-
-- (void) tableView: (NSTableView*)aTableView setObjectValue: (id)anObject forTableColumn: (NSTableColumn*)aTableColumn row: (int)rowIndex
-{
-}
-
-- (NSDragOperation) tableView: (NSTableView*)tableView validateDrop: (id)info proposedRow: (int)row proposedDropOperation: (NSTableViewDropOperation)operation
-{
-  return 0;
-}
-
-- (BOOL) tableView: (NSTableView*)tableView writeRows: (NSArray*)rows toPasteboard: (NSPasteboard*)pboard
-{
-  return NO;
-}
-
-- (BOOL) tableView: (NSTableView*)tableView writeRowsWithIndexes: (NSIndexSet*)rows toPasteboard: (NSPasteboard*)pboard
-{
-  return NO;
+  return [[_alarms objectAtIndex:rowIndex] shortDescription];
 }
 @end

@@ -252,6 +252,13 @@
   return [NSString stringWithFormat:@"Relative trigger delay %f repeat %d interval %f description <%@>", [self relativeTrigger], [self repeatCount], [self repeatInterval], [self desc]];
 }
 
+- (NSString *)shortDescription
+{
+  if ([self isAbsoluteTrigger])
+    return [NSString stringWithFormat:_(@"Trigger on %@"), [[[self absoluteTrigger] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]]];
+  return @"Relative trigger";
+}
+
 - (id)initWithICalComponent:(icalcomponent *)ic
 {
   self = [super init];

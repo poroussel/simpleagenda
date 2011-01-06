@@ -2,13 +2,18 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     AlarmEditor = {
 	Actions = (
+	    "addAlarm:",
+	    "selectType:",
+	    "removeAlarm:"
 	);
 	Outlets = (
 	    panel,
 	    type,
 	    action,
 	    window,
-	    table
+	    table,
+	    add,
+	    remove
 	);
 	Super = NSObject;
     };
@@ -24,7 +29,9 @@
     };
     FirstResponder = {
 	Actions = (
-	    "newAction:",
+	    "addAlarm:",
+	    "selectType:",
+	    "removeAlarm:",
 	    "setDelegate:"
 	);
 	Super = NSObject;

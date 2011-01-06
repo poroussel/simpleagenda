@@ -37,6 +37,7 @@
 - (Element *)element;
 - (void)setElement:(Element *)element;
 - (Date *)triggerDateRelativeTo:(Date *)date;
+- (NSString *)shortDescription;
 
 - (id)initWithICalComponent:(icalcomponent *)ic;
 - (icalcomponent *)asICalComponent;
