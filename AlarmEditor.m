@@ -23,6 +23,7 @@
       [relativeSlider setFloatValue:-relativeTrigger/3600];
     }
     [self changeDelay:self];
+    [self selectType:self];
   }
 }
 
@@ -122,7 +123,13 @@
 
 - (void)selectType:(id)sender
 {
-  NSLog(@"selectType");
+  if ([type indexOfSelectedItem] == 0) {
+    [relativeSlider setEnabled:YES];
+    [radio setEnabled:YES];
+  } else {
+    [relativeSlider setEnabled:NO];
+    [radio setEnabled:NO];
+  }
 }
 
 - (void)changeDelay:(id)sender

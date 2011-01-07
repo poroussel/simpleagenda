@@ -26,5 +26,6 @@
 - (void)addAlarm:(id)sender;
 - (void)removeAlarm:(id)sender;
 - (void)changeDelay:(id)sender;
+- (void)selectType:(id)sender;
 - (void)switchBeforeAfter:(id)sender;
 @end
