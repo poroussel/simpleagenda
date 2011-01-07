@@ -19,9 +19,6 @@
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-  NSEnumerator *enumerator;
-  SAAlarm *alarm;
-
   _summary = [[coder decodeObjectForKey:@"title"] retain];
   _text = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
   if ([coder containsValueForKey:@"uid"])
@@ -40,10 +37,7 @@
     _categories = [[coder decodeObjectForKey:@"categories"] retain];
   else
     _categories = [NSMutableArray new];
-  _alarms = [[coder decodeObjectForKey:@"alarms"] retain];
-  enumerator = [_alarms objectEnumerator];
-  while ((alarm = [enumerator nextObject]))
-    [alarm setElement:self];
+  [self setAlarms:[coder decodeObjectForKey:@"alarms"]];
   return self;
 }
 
@@ -161,8 +155,14 @@
 
 - (void)setAlarms:(NSArray *)alarms
 {
+  NSEnumerator *enumerator;
+  SAAlarm *alarm;
+
   DESTROY(_alarms);
-  ASSIGN(_alarms, alarms);
+  ASSIGNCOPY(_alarms, alarms);
+  enumerator = [_alarms objectEnumerator];
+  while ((alarm = [enumerator nextObject]))
+    [alarm setElement:self];
 }
 
 - (void)addAlarm:(SAAlarm *)alarm

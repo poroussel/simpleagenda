@@ -97,6 +97,7 @@ static NSMutableDictionary *editors;
   [_task setSummary:[summary stringValue]];
   [_task setText:[[description textStorage] copy]];
   [_task setState:[state indexOfSelectedItem]];
+  [_task setAlarms:_modifiedAlarms];
   aStore = [sm storeForName:[store titleOfSelectedItem]];
   if (!originalStore)
     [aStore add:_task];

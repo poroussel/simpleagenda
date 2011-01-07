@@ -60,7 +60,7 @@
 - (id)initWithAlarms:(NSArray *)alarms
 {
   if ((self = [self init])) {
-    _alarms = [alarms mutableCopy];
+    _alarms = [[NSMutableArray alloc] initWithArray:alarms copyItems:YES];
     if ([_alarms count] == 0) {
       [self setupForAlarm:_simple];
       [remove setEnabled:NO];
