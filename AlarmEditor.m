@@ -72,9 +72,9 @@
   return self;
 }
 
-- (int)run
+- (void)run
 {
-  return [NSApp runModalForWindow:window];
+  [NSApp runModalForWindow:window];
 }
 
 - (NSArray *)modifiedAlarms
