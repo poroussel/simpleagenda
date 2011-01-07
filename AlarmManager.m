@@ -112,6 +112,7 @@ static AlarmManager *singleton;
     return;
   enumAlarm = [[element alarms] objectEnumerator];
   while ((alarm = [enumAlarm nextObject])) {
+    NSAssert([alarm element] != nil, @"Alarm is not linked with an element");
     if ([alarm isAbsoluteTrigger])
       added = [self addAbsoluteAlarm:alarm];
     else
