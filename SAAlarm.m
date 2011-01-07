@@ -85,6 +85,7 @@
 {
   struct icaltriggertype trigger;
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+
   if (!prop) {
     NSLog(@"Error : no trigger property");
     return NO;
@@ -99,6 +100,7 @@
 {
   struct icaltriggertype trigger;
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+
   if (!prop) {
     NSLog(@"Error : no trigger property");
     return nil;
@@ -121,6 +123,7 @@
 {
   struct icaltriggertype trigger;
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+
   if (!prop) {
     NSLog(@"Error : no trigger property");
     return -1;
@@ -142,6 +145,7 @@
 - (enum icalproperty_action)action
 {
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ACTION_PROPERTY);
+
   if (!prop) {
     NSLog(@"Error : no ACTION property");
     return -1;
@@ -158,6 +162,7 @@
 - (NSString *)emailAddress
 {
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ATTENDEE_PROPERTY);
+
   if (prop)
     return [NSString stringWithUTF8String:icalproperty_get_attendee(prop)];
   return nil;
@@ -203,6 +208,7 @@
 - (int)repeatCount
 {
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_REPEAT_PROPERTY);
+
   if (prop)
     return icalproperty_get_repeat(prop);
   return 0;
@@ -218,6 +224,7 @@
 - (NSTimeInterval)repeatInterval
 {
   icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_DURATION_PROPERTY);
+
   if (prop)
     return icaldurationtype_as_int(icalproperty_get_duration(prop));
   return 0;
