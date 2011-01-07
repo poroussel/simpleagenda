@@ -19,6 +19,9 @@
 
 - (id)initWithCoder:(NSCoder *)coder
 {
+  NSEnumerator *enumerator;
+  SAAlarm *alarm;
+
   _summary = [[coder decodeObjectForKey:@"title"] retain];
   _text = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
   if ([coder containsValueForKey:@"uid"])
@@ -38,6 +41,9 @@
   else
     _categories = [NSMutableArray new];
   _alarms = [[coder decodeObjectForKey:@"alarms"] retain];
+  enumerator = [_alarms objectEnumerator];
+  while ((alarm = [enumerator nextObject]))
+    [alarm setElement:self];
   return self;
 }
 
