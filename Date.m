@@ -173,6 +173,13 @@ static NSTimeZone *gl_nstz = nil;
   return AUTORELEASE(d);
 }
 
++ (id)dayWithDate:(Date *)date
+{
+  Date *d = [date copy];
+  [d setIsDate:YES];
+  return AUTORELEASE(d);
+}
+
 - (NSCalendarDate *)calendarDate
 {
   return [NSCalendarDate dateWithYear:_time.year 

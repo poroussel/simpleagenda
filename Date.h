@@ -12,6 +12,7 @@
 + (id)today;
 + (id)dateWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate;
 + (id)dateWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time;
++ (id)dayWithDate:(Date *)date;
 - (NSCalendarDate *)calendarDate;
 - (NSComparisonResult)compare:(id)aDate;
 - (NSComparisonResult)compareTime:(id)aTime;
