@@ -13,6 +13,7 @@ SimpleAgendaTests_OBJC_FILES = \
 	../Element.m \
 	../NSString+SimpleAgenda.m \
 	../SAAlarm.m \
+	../HourFormatter.m \
 	DateTest.m \
 	ElementTest.m \
 	RecurrenceRuleTest.m \
