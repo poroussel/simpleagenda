@@ -13,6 +13,7 @@
   id state;
   id ok;
   Task *_task;
+  NSArray *_modifiedAlarms;
 }
 
 + (TaskEditor *)editorForTask:(Task *)task;

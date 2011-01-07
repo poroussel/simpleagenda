@@ -35,6 +35,7 @@ static NSMutableDictionary *editors;
   self = [self init];
   if (self) {
     ASSIGN(_task, task);
+    ASSIGNCOPY(_modifiedAlarms, [task alarms]);
     [summary setStringValue:[task summary]];
 
     [[description textStorage] deleteCharactersInRange:NSMakeRange(0, [[description textStorage] length])];
@@ -64,8 +65,9 @@ static NSMutableDictionary *editors;
 
 - (void)dealloc 
 { 
-  RELEASE(_task); 
-  [super dealloc]; 
+  RELEASE(_task);
+  RELEASE(_modifiedAlarms);
+  [super dealloc];
 } 
 
 + (void)initialize
@@ -116,7 +118,12 @@ static NSMutableDictionary *editors;
 
 - (void)editAlarms:(id)sender
 {
-  [AlarmEditor editAlarms:[_task alarms]];
+  NSArray *alarms;
+
+  alarms = [AlarmEditor editAlarms:_modifiedAlarms];
+  if (alarms)
+    ASSIGN(_modifiedAlarms, alarms);
+  [window makeKeyAndOrderFront:self];
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector

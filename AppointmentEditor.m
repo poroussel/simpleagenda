@@ -236,6 +236,7 @@ static NSMutableDictionary *editors;
   alarms = [AlarmEditor editAlarms:_modifiedAlarms];
   if (alarms)
     ASSIGN(_modifiedAlarms, alarms);
+  [window makeKeyAndOrderFront:self];
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
