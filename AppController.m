@@ -11,6 +11,7 @@
 #import "iCalTree.h"
 #import "SelectionManager.h"
 #import "AlarmManager.h"
+#import "SAAlarm.h"
 #import "defines.h"
 
 @interface AppIcon : NSView <ConfigListener>
@@ -322,6 +323,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    * empty so this is needed here.
    */
   [self updateSummaryData];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
   [AlarmManager globalManager];
 }
@@ -646,6 +648,35 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self updateSummaryData];
 }
 
+- (BOOL)showElement:(Element *)element onDay:(Date *)day
+{
+  NSString *tabIdentifier = [[tabs selectedTabViewItem] identifier];
+
+  NSAssert(element != nil, @"An object must be passed");
+  NSAssert([day isDate], @"This method uses a day, not a date");
+  if ([element isKindOfClass:[Event class]]) {
+    [calendar setDate:day];
+    if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
+      [tabs selectTabViewItemWithIdentifier:@"Day"];
+    [_selm set:element];
+    return YES;
+  }
+  if ([element isKindOfClass:[Task class]]) {
+    if (![tabIdentifier isEqualToString:@"Tasks"])
+      [tabs selectTabViewItemWithIdentifier:@"Tasks"];
+    [_selm set:element];
+    return YES;
+  }
+  return NO;
+}
+
+- (void)reminderWillRun:(NSNotification *)not
+{
+  SAAlarm *alarm = [not object];
+
+  [self showElement:[alarm element] onDay:[Date today]];
+}
+
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
   if ([_selm count] && (!sendType || [sendType isEqual:NSFilenamesPboardType] || [sendType isEqual:NSStringPboardType]))
@@ -723,25 +754,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
   id object = [item valueForKey:@"object"];
-  NSString *tabIdentifier = [[tabs selectedTabViewItem] identifier];
-  Date *date;
 
-  if (object && [object isKindOfClass:[Event class]]) {
-    date = [[item valueForKey:@"date"] copy];
-    [date setIsDate:YES];
-    [calendar setDate:date];
-    [date release];
-    if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
-      [tabs selectTabViewItemWithIdentifier:@"Day"];
-    [_selm set:object];
-    return YES;
-  }
-  if (object && [object isKindOfClass:[Task class]]) {
-    if (![tabIdentifier isEqualToString:@"Tasks"])
-      [tabs selectTabViewItemWithIdentifier:@"Tasks"];
-    [_selm set:object];
-    return YES;
-  }
+  if (object && [object isKindOfClass:[Event class]])
+    return [self showElement:object onDay:[Date dayWithDate:[item valueForKey:@"date"]]];
+  if (object && [object isKindOfClass:[Task class]])
+    return [self showElement:object onDay:[calendar date]];
   return NO;
 }
 @end
