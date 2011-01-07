@@ -72,13 +72,9 @@
   return self;
 }
 
-- (void)run
+- (NSArray *)run
 {
   [NSApp runModalForWindow:window];
-}
-
-- (NSArray *)modifiedAlarms
-{
   return [NSArray arrayWithArray:_alarms];
 }
 
@@ -88,8 +84,7 @@
   NSArray *modified;
 
   if ((editor = [[AlarmEditor alloc] initWithAlarms:alarms])) {
-    [editor run];
-    modified = [editor modifiedAlarms];
+    modified = [editor run];
     [editor release];
     return modified;
   }
