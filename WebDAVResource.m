@@ -33,7 +33,12 @@
 {
   self = [super init];
   if (self) {
-    /* FIXME : this causes a bogus GET for every resource creation */
+    /* 
+     * FIXME : this causes a bogus GET for every resource creation
+     * This also means a potentialy long pause when initialising a
+     * network store so a long pause on startup, event if the stores
+     * are disabled...
+     */
     _url = [anUrl redirection];
     [self fixURLScheme];
     _handleClass = [NSURLHandle URLHandleClassForURL:_url];
