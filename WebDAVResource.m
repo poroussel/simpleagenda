@@ -1,152 +1,96 @@
+#import <Foundation/Foundation.h>
 #import <GNUstepBase/GSXML.h>
 #import <GNUstepBase/GSMime.h>
 #import "WebDAVResource.h"
 
 @implementation WebDAVResource
-- (void)debugLog:(NSString *)format,...
-{
-  va_list ap;
-  if (_debug) {
-    va_start(ap, format);
-    NSLogv(format, ap);
-    va_end(ap);
-  }
-}
 - (void)dealloc
 {
   DESTROY(_user);
   DESTROY(_password);
   DESTROY(_lock);
-  DESTROY(_url);
   DESTROY(_lastModified);
   DESTROY(_data);
+  DESTROY(_request);
   [super dealloc];
 }
 
-- (void)fixURLScheme
+- (NSURL *)fixSchemeOfURL:(NSURL *)anUrl
 {
-  if ([[_url scheme] hasPrefix:@"webcal"])
-    ASSIGN(_url, [NSURL URLWithString:[[_url absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
+  if ([[anUrl scheme] hasPrefix:@"webcal"])
+    return [NSURL URLWithString:[[anUrl absoluteString] stringByReplacingString:@"webcal" withString:@"http"]];
+  return anUrl;
 }
 
 - (id)initWithURL:(NSURL *)anUrl
 {
-  self = [super init];
-  if (self) {
-    /* 
-     * FIXME : this causes a bogus GET for every resource creation
-     * This also means a potentialy long pause when initialising a
-     * network store so a long pause on startup, event if the stores
-     * are disabled...
-     */
-    _url = [anUrl redirection];
-    [self fixURLScheme];
-    _handleClass = [NSURLHandle URLHandleClassForURL:_url];
+  if ((self = [super init])) {
+    _request = [[NSMutableURLRequest alloc] initWithURL:[self fixSchemeOfURL:anUrl]];
     _lock = [NSLock new];
-    _user = nil;
-    _password = nil;
-    _data = nil;
-    _debug = NO;
+    _user = [[[_request URL] user] retain];
+    _password = [[[_request URL] password] retain];
+    _data = [[NSMutableData alloc] initWithCapacity:8192];
   }
   return self;
 }
 
 - (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent
 {
-  self = [self initWithURL:anUrl];
-  if (self && [parent user]) {
+  if ((self = [self initWithURL:anUrl]) && [parent user]) {
       ASSIGN(_user, [parent user]);
       ASSIGN(_password, [parent password]);
   }
   return self;
 }
 
-- (void)setDebug:(BOOL)debug
-{
-  _debug = debug;
-}
-
-/* FIXME : ugly hack to work around NSURLHandle shortcomings */
-- (NSString *)basicAuth
-{
-  NSMutableString *authorisation;
-  NSString *toEncode;
-
-  authorisation = [NSMutableString stringWithCapacity: 64];
-  if ([_password length] > 0)
-    toEncode = [NSString stringWithFormat: @"%@:%@", _user, _password];
-  else
-    toEncode = [NSString stringWithFormat: @"%@", _user];
-  [authorisation appendFormat: @"Basic %@", [GSMimeDocument encodeBase64String: toEncode]];
-  return authorisation;
-}
-
 - (BOOL)requestWithMethod:(NSString *)method body:(NSData *)body attributes:(NSDictionary *)attributes
 {
-  NSEnumerator *keys;
+  NSEnumerator *enumerator;
   NSString *key;
-  NSData *data;
-  NSString *property;
-  NSURLHandle *handle;
+  NSURLConnection *connection;
+  NSRunLoop *loop;
+  NSDate *limit;
 
   [_lock lock];
-  handle = [[_handleClass alloc] initWithURL:_url cached:NO];
-  [handle writeProperty:method forKey:GSHTTPPropertyMethodKey];
+  [_request setValue:method forHTTPHeaderField:GSHTTPPropertyMethodKey];
   if (attributes) {
-    keys = [attributes keyEnumerator];
-    while ((key = [keys nextObject]))
-      [handle writeProperty:[attributes objectForKey:key] forKey:key];
+    enumerator = [attributes keyEnumerator];
+    while ((key = [enumerator nextObject]))
+      [_request setValue:[attributes objectForKey:key] forHTTPHeaderField:key];
   }
-  if (_user && ![_url user])
-    [handle writeProperty:[self basicAuth] forKey:@"Authorization"];
   if (_etag && ([method isEqual:@"PUT"] || [method isEqual:@"DELETE"]))
-    [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
+    [_request setValue:[NSString stringWithFormat:@"([%@])", _etag] forHTTPHeaderField:@"If"];
   if (body)
-    [handle writeData:body];
-  [self debugLog:@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]];
-  DESTROY(_data);
-  data = [handle resourceData];
-  /* FIXME : this is more than ugly */
-  if ([_url isFileURL])
-    _httpStatus = data ? 200 : 199;
-  else
-    _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
-  if (data)
-    [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
-  else
-    [self debugLog:@"%@ status %d", method, _httpStatus];
-  property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
-  if (property)
-    ASSIGN(_reason, property);
-  else
-    DESTROY(_reason);
-  if (_httpStatus < 200 || _httpStatus > 299) {
-    if (_reason)
-      NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
-    else
-      NSLog(@"%s %@ : %d", __PRETTY_FUNCTION__, method, _httpStatus);
-    [handle release];
+    [_request setHTTPBody:body];
+  NSDebugLog(@"%@ %@ (%@)", [[_request URL] absoluteString], method, [attributes description]);
+
+  _done = NO;
+  connection = [[NSURLConnection alloc] initWithRequest:_request delegate:self];
+  if (!connection) {
+    NSLog(@"Connection cannot be created for %@", [_request description]);
     [_lock unlock];
     return NO;
   }
-
-  if (data)
-    ASSIGN(_data, data);
-  if ([method isEqual:@"GET"]) {
-    property = [handle propertyForKeyIfAvailable:@"Last-Modified"];
-    if (!_lastModified || (property && ![property isEqual:_lastModified])) {
-      _dataChanged = YES;
-      ASSIGN(_lastModified, property);
-    }
-    property = [handle propertyForKeyIfAvailable:@"ETag"];
-    if (!_etag || (property && ![property isEqual:_etag])) {
-      _dataChanged = YES;
-      ASSIGN(_etag, property);
-    }
+  loop = [NSRunLoop currentRunLoop];
+  while (_done == NO) {
+    limit = [[NSDate alloc] initWithTimeIntervalSinceNow:1.0];
+    [loop runMode:NSDefaultRunLoopMode beforeDate:limit];
+    RELEASE(limit);
   }
-  [handle release];
+  [connection release];
+
+  if ([_data length])
+    NSDebugLog(@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding]));
+  else
+    NSDebugLog(@"%@ status %d", method, _httpStatus);
+  if (_httpStatus < 200 || _httpStatus > 299) {
+    NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
+    [_lock unlock];
+    return NO;
+  }
   [_lock unlock];
   return YES;
+
 }
 
 /*
@@ -197,7 +141,7 @@
 
 - (NSURL *)url
 {
-  return _url;
+  return [_request URL];
 }
 
 - (BOOL)get
@@ -241,6 +185,58 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
     }
   }
 }
+
+- (void)connection:(NSURLConnection *)connection didCancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+}
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+}
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+  NSURLCredential *cd;
+
+  if (_user) {
+    cd = [NSURLCredential credentialWithUser:_user password:_password persistence:NSURLCredentialPersistenceNone];
+    [[challenge sender] useCredential:cd forAuthenticationChallenge:challenge];
+  }
+}
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+  [_data appendData:data];
+}
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response
+{
+  NSString *property;
+
+  _httpStatus = [response statusCode];
+  ASSIGNCOPY(_reason, [NSHTTPURLResponse localizedStringForStatusCode:_httpStatus]);
+  [_data setLength:0];
+  if ([[_request HTTPMethod] isEqual:@"GET"]) {
+    property = [[response allHeaderFields] valueForKey:@"Last-Modified"];
+    if (!_lastModified || (property && ![property isEqual:_lastModified])) {
+      _dataChanged = YES;
+      ASSIGN(_lastModified, property);
+    }
+    property = [[response allHeaderFields] valueForKey:@"ETag"];
+    if (!_etag || (property && ![property isEqual:_etag])) {
+      _dataChanged = YES;
+      ASSIGN(_etag, property);
+    }
+  }
+}
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
+{
+  return cachedResponse;
+}
+- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)newRequest redirectResponse:(NSURLResponse *)response
+{
+  return newRequest;
+}
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+  _done = YES;
+}
 @end
 
 @implementation NSURL(SimpleAgenda)
@@ -269,17 +265,6 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   else
     url = [NSURL URLWithString:[[base absoluteString] stringByReplacingString:[base path] withString:string]];
   return url;
-}
-- (NSURL *)redirection
-{
-  NSString *location;
-
-  location = [self propertyForKey:@"Location"];
-  if (location) {
-    NSLog(@"Redirected to %@", location);
-    return [[NSURL URLWithString:location] redirection];
-  }
-  return [self copy];
 }
 @end
 
