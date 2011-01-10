@@ -52,7 +52,7 @@
   NSDate *limit;
 
   [_lock lock];
-  [_request setValue:method forHTTPHeaderField:GSHTTPPropertyMethodKey];
+  [_request setHTTPMethod:method];
   if (attributes) {
     enumerator = [attributes keyEnumerator];
     while ((key = [enumerator nextObject]))
@@ -189,15 +189,24 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 
 - (void)connection:(NSURLConnection *)connection didCancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [challenge description]);
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [error description]);
 }
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
   NSURLCredential *cd;
 
-  if (_user) {
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [challenge description]);
+  if (_user == nil) {
+    [[challenge sender] cancelAuthenticationChallenge:challenge];
+    NSLog(@"This connection needs an authentication");
+  } else if ([challenge previousFailureCount] > 0) {
+    [[challenge sender] cancelAuthenticationChallenge:challenge];
+    NSLog(@"Wrong authentication");
+  } else {
     cd = [NSURLCredential credentialWithUser:_user password:_password persistence:NSURLCredentialPersistenceNone];
     [[challenge sender] useCredential:cd forAuthenticationChallenge:challenge];
   }
@@ -210,6 +219,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 {
   NSString *property;
 
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [response description]);
   _httpStatus = [response statusCode];
   ASSIGNCOPY(_reason, [NSHTTPURLResponse localizedStringForStatusCode:_httpStatus]);
   [_data setLength:0];
@@ -228,14 +238,18 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 }
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
 {
+  NSDebugLog(@"%s", __PRETTY_FUNCTION__);
   return cachedResponse;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)newRequest redirectResponse:(NSURLResponse *)response
 {
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [newRequest description]);
   return newRequest;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+  NSDebugLog(@"%s : data length %d", __PRETTY_FUNCTION__, [_data length]);
+  NSDebugLog(AUTORELEASE([[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding]));
   _done = YES;
 }
 @end
