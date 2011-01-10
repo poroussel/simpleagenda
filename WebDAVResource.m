@@ -193,7 +193,9 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [error description]);
+  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [error localizedDescription]);
+  ASSIGNCOPY(_reason, [error localizedDescription]);
+  _done = YES;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
