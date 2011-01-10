@@ -75,7 +75,7 @@ add comments above this one
 /*** Strings from SAAlarm.m ***/
 /* File: SAAlarm.m:271 */
 "Trigger %@ after the event"
-= "Se d\U00E9clenche %@ après l'\U00E9v\U00E9nement";
+= "Se d\U00E9clenche %@ aprU00E8s l'\U00E9v\U00E9nement";
 /* File: SAAlarm.m:272 */
 "Trigger %@ before the event"
 = "Se d\U00E9clenche %@ avant l'\U00E9v\U00E9nement";
