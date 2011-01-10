@@ -26,7 +26,7 @@
 
 + (NSString *)storeName
 {
-  return _(@"my address book");
+  return _(@"My address book");
 }
 
 + (NSString *)storeTypeName

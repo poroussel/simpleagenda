@@ -1,14 +1,14 @@
 /***
 French.lproj/Localizable.strings
-updated by make_strings 2010-03-11 10:46:44 +0100
+updated by make_strings 2011-01-10 15:44:02 +0100
 add comments above this one
 ***/
 
 
 /*** Keys found in multiple places ***/
 
-/* File: DayView.m:42 */
-/* File: WeekView.m:32 */
+/* File: DayView.m:43 */
+/* File: WeekView.m:33 */
 "All day : %@" = "Toute la journ\U00E9e : %@";
 
 
@@ -16,40 +16,71 @@ add comments above this one
 /* File: ABStore.m:58 */
 "Birthday" = "Anniversaire";
 /* File: ABStore.m:29 */
-"my address book" = "mon carnet d'adresses";
+"My address book" = "Mon carnet d'adresses";
+
+
+/*** Strings from AlarmEditor.m ***/
+/* File: AlarmEditor.m:46 */
+"Absolute" = "Absolue";
+/* File: AlarmEditor.m:48 */
+"Display" = "Affichage";
+/* File: AlarmEditor.m:48 */
+"Email" = "Email";
+/* File: AlarmEditor.m:48 */
+"Procedure" = "Action";
+/* File: AlarmEditor.m:46 */
+"Relative" = "Relative";
+/* File: AlarmEditor.m:48 */
+"Sound" = "Son";
 
 
 /*** Strings from AppController.m ***/
-/* File: AppController.m:406 */
+/* File: AppController.m:478 */
 "Export as" = "Exporter sous";
-/* File: AppController.m:363 */
+/* File: AppController.m:435 */
 "New task" = "Nouvelle t\U00E2che";
-/* File: AppController.m:82 */
-"Open tasks" = "T\U00E2ches en cours";
 /* File: AppController.m:155 */
+"Open tasks" = "T\U00E2ches en cours";
+/* File: AppController.m:228 */
 "Open tasks (%d)" = "T\U00E2ches en cours (%d)";
-/* File: AppController.m:514 */
-/* File: AppController.m:81 */
+/* File: AppController.m:591 */
+/* File: AppController.m:154 */
 "Search results" = "R\U00E9sultats recherche";
-/* File: AppController.m:512 */
+/* File: AppController.m:589 */
 "Search results (%d items)" = "R\U00E9sultats (%d \U00E9l\U00E9ments)";
-/* File: AppController.m:80 */
+/* File: AppController.m:153 */
 "Soon" = "Bient\U00F4t";
-/* File: AppController.m:680 */
-/* File: AppController.m:169 */
+/* File: AppController.m:777 */
+/* File: AppController.m:242 */
 "Tasks" = "T\U00E2ches";
-/* File: AppController.m:78 */
+/* File: AppController.m:151 */
 "Today" = "Aujourd'hui";
-/* File: AppController.m:79 */
+/* File: AppController.m:152 */
 "Tomorrow" = "Demain";
-/* File: AppController.m:682 */
-/* File: AppController.m:167 */
+/* File: AppController.m:779 */
+/* File: AppController.m:240 */
 "Week %d" = "Semaine %d";
-/* File: AppController.m:339 */
+/* File: AppController.m:411 */
 "edit summary..." = "modifier le r\U00E9sum\U00E9...";
-/* File: AppController.m:715 */
-/* File: AppController.m:331 */
+/* File: AppController.m:812 */
+/* File: AppController.m:403 */
 "edit title..." = "modifier le titre...";
+
+
+/*** Strings from DBusBackend.m ***/
+/* File: DBusBackend.m:84 */
+"SimpleAgenda Reminder !" = "Rappel SimpleAgenda !";
+
+
+/*** Strings from SAAlarm.m ***/
+/* File: SAAlarm.m:271 */
+"Trigger %@ after the event"
+= "Se d\U00E9clenche %@ après l'\U00E9v\U00E9nement";
+/* File: SAAlarm.m:272 */
+"Trigger %@ before the event"
+= "Se d\U00E9clenche %@ avant l'\U00E9v\U00E9nement";
+/* File: SAAlarm.m:268 */
+"Trigger on %@" = "Se d\U00E9clenche le %@";
 
 
 /*** Strings from Task.m ***/
