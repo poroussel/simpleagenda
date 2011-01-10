@@ -317,9 +317,9 @@
   return YES;
 }
 
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
+  if (config == _config && [key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }

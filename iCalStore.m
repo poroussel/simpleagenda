@@ -257,9 +257,9 @@
 {
   [_config setInteger:interval forKey:ST_REFRESH_INTERVAL];
 }
-- (void)config:(ConfigManager*)config dataDidChangedForKey:(NSString *)key
+- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
+  if (config == _config && [key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }
