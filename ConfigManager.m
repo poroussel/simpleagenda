@@ -8,13 +8,9 @@ static NSMutableDictionary *cpkey;
 @implementation ConfigManager(Private)
 - (ConfigManager *)initRoot
 {
-  self = [super init];
-  if (self) {
-    _dict = [NSMutableDictionary new];
-    _defaults = [NSMutableDictionary new];
-    [_dict setDictionary:[[NSUserDefaults standardUserDefaults] 
-			   persistentDomainForName:[[NSProcessInfo processInfo] processName]]];
-  }
+  if ((self = [self init]))
+      [_dict setDictionary:[[NSUserDefaults standardUserDefaults] 
+			     persistentDomainForName:[[NSProcessInfo processInfo] processName]]];
   return self;
 }
 @end
@@ -28,25 +24,30 @@ static NSMutableDictionary *cpkey;
   }
 }
 
-- (ConfigManager *)initForKey:(NSString *)key
++ (ConfigManager *)globalConfig
+{
+  return singleton;
+}
+
+- (id)init
+{
+  if ((self = [super init])) {
+    _dict = [NSMutableDictionary new];
+    _defaults = [NSMutableDictionary new];
+  }
+  return self;
+}
+
+- (id)initForKey:(NSString *)key
 {
   ConfigManager *parent = [ConfigManager globalConfig];
 
-  NSAssert(key != nil, @"ConfigManager initForKey called with nil key");
-  self = [super init];
-  if (self) {
-    _dict = [NSMutableDictionary new];
-    _defaults = [NSMutableDictionary new];
+  if ((self = [self init])) {
     [_dict setDictionary:[parent dictionaryForKey:key]];
     ASSIGN(_parent, parent);
     ASSIGNCOPY(_key, key);
   }
   return self;
-}
-
-+ (ConfigManager *)globalConfig
-{
-  return singleton;
 }
 
 - (void)dealloc
