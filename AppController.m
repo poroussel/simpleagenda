@@ -206,6 +206,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [soonStart changeDayBy:2];
   [soonEnd changeDayBy:5];
   while ((event = [enumerator nextObject])) {
+    if (![[event store] displayed])
+      continue;
     if ([event isScheduledForDay:today])
       [_today addChild:[DataTree dataTreeWithAttributes:[self attributesFrom:event and:today]]];
     if ([event isScheduledForDay:tomorrow])
@@ -220,7 +222,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_tomorrow sortChildrenUsingFunction:compareDataTreeElements context:nil];
   [_soon sortChildrenUsingFunction:compareDataTreeElements context:nil];
   [_tasks removeChildren];
-  enumerator = [[_sm allTasks] objectEnumerator];
+  enumerator = [[_sm visibleTasks] objectEnumerator];
   while ((task = [enumerator nextObject])) {
     if ([task state] != TK_COMPLETED)
       [_tasks addChild:[DataTree dataTreeWithAttributes:[self attributesFromTask:task]]];
@@ -379,7 +381,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSEnumerator *enumerator = [[_sm scheduledAppointmentsForDay:_selectedDay] objectEnumerator];
+  NSEnumerator *enumerator = [[_sm visibleAppointmentsForDay:_selectedDay] objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
@@ -827,11 +829,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 @implementation AppController(NSTableDataSource)
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-  return [[_sm allTasks] count];
+  return [[_sm visibleTasks] count];
 }
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-  Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
+  Task *task = [[_sm visibleTasks] objectAtIndex:rowIndex];
 
   if ([[aTableColumn identifier] isEqualToString:@"summary"])
     return [task summary];
@@ -839,7 +841,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 }
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
-  Task *task = [[_sm allTasks] objectAtIndex:rowIndex];
+  Task *task = [[_sm visibleTasks] objectAtIndex:rowIndex];
 
   if ([[task store] writable]) {
     [task setState:[anObject intValue]];
@@ -851,7 +853,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   Task *task;
 
   if ([[aTableColumn identifier] isEqualToString:@"state"]) {
-    task = [[_sm allTasks] objectAtIndex:rowIndex];
+    task = [[_sm visibleTasks] objectAtIndex:rowIndex];
     [aCell setEnabled:[[task store] writable]];
   }
 }
@@ -859,7 +861,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   int index = [taskView selectedRow];
   if (index > -1)
-    [_selm set:[[_sm allTasks] objectAtIndex:index]];
+    [_selm set:[[_sm visibleTasks] objectAtIndex:index]];
 }
 @end
 

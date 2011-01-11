@@ -23,11 +23,12 @@ extern NSString * const SADataChangedInStoreManager;
 - (void)setDefaultStore:(NSString *)name;
 - (id <AgendaStore>)defaultStore;
 - (NSEnumerator *)storeEnumerator;
-/* FIXME : add enabledStoreEnumerator ? */
 - (void)synchronise;
 - (void)refresh;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;
 - (NSArray *)allEvents;
 - (NSArray *)allTasks;
 - (NSSet *)scheduledAppointmentsForDay:(Date *)date;
+- (NSSet *)visibleAppointmentsForDay:(Date *)date;
+- (NSArray *)visibleTasks;
 @end

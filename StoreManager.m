@@ -91,10 +91,6 @@ static StoreManager *singleton;
 					     selector:@selector(dataChanged:)
 					         name:SAEnabledStatusChangedForStore
 					       object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(statusChanged:)
-					         name:SAStatusChangedForStore
-					       object:nil];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
     _cache = [[NSMutableDictionary alloc] initWithCapacity:256];
     /* Create user defined stores */
@@ -131,19 +127,6 @@ static StoreManager *singleton;
 {
   [_cache removeAllObjects];
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStoreManager object:self];
-}
-
-/*
- * FIXME : cela corrige le probleme de non raffraichissement
- * du calendrier lors du changement du statut visible/cache
- * d'un agenda mais tres mal : si SAStatusChangedForStore
- * est recu par le calendrier en premier ma suppression
- * du cache n'aura pas d'effet...
- * Il faut revoir toutes les notifications.
- */
-- (void)statusChanged:(NSNotification *)not
-{
-  [_cache removeAllObjects];
 }
 
 - (void)addStoreNamed:(NSString *)name
@@ -227,19 +210,31 @@ static StoreManager *singleton;
 
 - (NSArray *)allEvents
 {
-  NSMutableArray *all = [NSMutableArray arrayWithCapacity:128];
+  NSMutableArray *all = [NSMutableArray arrayWithCapacity:256];
   NSEnumerator *enumerator = [_stores objectEnumerator];
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    if ([store enabled] && [store displayed])
+    if ([store enabled])
       [all addObjectsFromArray:[store events]];
   return all;
 }
 
-- (NSArray *)allTasks;
+- (NSArray *)allTasks
 {
-  NSMutableArray *all = [NSMutableArray arrayWithCapacity:128];
+  NSMutableArray *all = [NSMutableArray arrayWithCapacity:32];
+  NSEnumerator *enumerator = [_stores objectEnumerator];
+  id <AgendaStore> store;
+
+  while ((store = [enumerator nextObject]))
+    if ([store enabled])
+      [all addObjectsFromArray:[store tasks]];
+  return all;
+}
+
+- (NSArray *)visibleTasks
+{
+  NSMutableArray *all = [NSMutableArray arrayWithCapacity:32];
   NSEnumerator *enumerator = [_stores objectEnumerator];
   id <AgendaStore> store;
 
@@ -267,5 +262,19 @@ static StoreManager *singleton;
       [dayEvents addObject:event];
   [_cache setObject:dayEvents forKey:date];
   return dayEvents;
+}
+
+- (NSSet *)visibleAppointmentsForDay:(Date *)date
+{
+  NSMutableSet *visible = [NSMutableSet setWithCapacity:4];
+  NSEnumerator *enumerator;
+  Event *event;
+
+  enumerator = [[self scheduledAppointmentsForDay:date] objectEnumerator];
+  while ((event = [enumerator nextObject])) {
+    if ([[event store] displayed])
+      [visible addObject:event];
+  }
+  return visible;
 }
 @end

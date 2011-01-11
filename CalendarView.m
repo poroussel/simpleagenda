@@ -224,7 +224,7 @@ static NSImage *_2right;
 	[cell setDrawsBackground:NO];
       }
       [cell setObjectValue:AUTORELEASE([day copy])];
-      if ([[sm scheduledAppointmentsForDay:day] count])
+      if ([[sm visibleAppointmentsForDay:day] count])
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];

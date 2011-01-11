@@ -245,7 +245,7 @@ static struct {
   enumerator = [[self subviews] objectEnumerator];
   while ((wdv = [enumerator nextObject])) {
     [wdv clear];
-    events = [[StoreManager globalManager] scheduledAppointmentsForDay:[wdv day]];
+    events = [[StoreManager globalManager] visibleAppointmentsForDay:[wdv day]];
     enm = [events objectEnumerator];
     while ((apt = [enm nextObject]))
       [wdv addAppointment:apt];
