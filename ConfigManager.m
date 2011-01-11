@@ -3,7 +3,7 @@
 #import "ConfigManager.h"
 
 static ConfigManager *singleton;
-static NSMutableDictionary *_cpkey;
+static NSMutableDictionary *cpkey;
 
 @implementation ConfigManager(Private)
 - (ConfigManager *)initRoot
@@ -23,7 +23,7 @@ static NSMutableDictionary *_cpkey;
 + (void)initialize
 {
   if ([ConfigManager class] == self) {
-    _cpkey = [NSMutableDictionary new];
+    cpkey = [NSMutableDictionary new];
     singleton = [[ConfigManager alloc] initRoot];
   }
 }
@@ -51,24 +51,24 @@ static NSMutableDictionary *_cpkey;
 
 - (void)dealloc
 {
-  RELEASE(_key);
-  RELEASE(_parent);
-  [_defaults release];
-  [_dict release];
+  DESTROY(_key);
+  DESTROY(_parent);
+  DESTROY(_defaults);
+  DESTROY(_dict);
   [super dealloc];
 }
 
 - (void)notifyListenerForKey:(NSString *)key
 {
-  NSEnumerator *enumerator;
   id <ConfigListener> listener;
-  NSValue *value;
+  NSPointerArray *array;
+  NSUInteger index;
 
-  NSAssert(key != nil, @"Missing key");
-  enumerator = [[_cpkey objectForKey:key] objectEnumerator];
-  while ((value = [enumerator nextObject])) {
-    listener = [value nonretainedObjectValue];
-    [listener config:self dataDidChangedForKey:key];
+  array = [cpkey objectForKey:key];
+  for (index = 0; index < [array count]; index++) {
+    listener = [array pointerAtIndex:index];
+    if (listener)
+      [listener config:self dataDidChangedForKey:key];
   }
 }
 
@@ -108,9 +108,8 @@ static NSMutableDictionary *_cpkey;
 
 - (int)integerForKey:(NSString *)key
 {
-  id object;
+  id object = [self objectForKey:key];
 
-  object = [self objectForKey:key];
   if (object != nil)
     return [object intValue];
   return 0;
@@ -123,9 +122,8 @@ static NSMutableDictionary *_cpkey;
 
 - (NSDictionary *)dictionaryForKey:(NSString *)key
 {
-  id object;
+  id object = [self objectForKey:key];
 
-  object = [self objectForKey:key];
   if (object != nil && [object isKindOfClass:[NSDictionary class]])
     return object;
   return nil;
@@ -150,51 +148,43 @@ static NSMutableDictionary *_cpkey;
   [self setObject:[value description] forKey:key];
 }
 
-- (void)registerClient:(id <ConfigListener>)client forKey:(NSString*)key
+- (void)registerClient:(id <ConfigListener>)client forKey:(NSString *)key
 {
-  NSAssert(key != nil, @"You have to register for a specific key");
-  NSMutableSet *listeners = [_cpkey objectForKey:key];
+  NSPointerArray *listeners = [cpkey objectForKey:key];
 
-  if (listeners)
-    [listeners addObject:[NSValue valueWithNonretainedObject:client]];
-  else
-    listeners = [NSMutableSet setWithObject:[NSValue valueWithNonretainedObject:client]];
-  [_cpkey setObject:listeners forKey:key];
- 
+  if (!listeners) {
+    listeners = [NSPointerArray pointerArrayWithWeakObjects];
+    [cpkey setObject:listeners forKey:key];
+  }
+  [listeners addPointer:client];
 }
 
-- (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString*)key
+- (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString *)key
 {
-  NSMutableSet *set = [_cpkey objectForKey:key];
-  NSSet *copy;
-  NSEnumerator *enumerator;
-  NSValue *v;
+  NSPointerArray *array = [cpkey objectForKey:key];
+  NSUInteger index;
 
-  if (set) {
-    copy = [NSSet setWithSet:set];
-    enumerator = [copy objectEnumerator];
-    while ((v = [enumerator nextObject])) {
-      if (client == [v nonretainedObjectValue])
-	[set removeObject:v];
+  if (array) {
+    for (index = 0; index < [array count]; index++) {
+      if ([array pointerAtIndex:index] == client)
+	[array replacePointerAtIndex:index withPointer:NULL];
     }
+    [array compact];
   }
 }
 
 - (void)unregisterClient:(id <ConfigListener>)client
 {
-  NSMutableSet *set;
-  NSSet *copy;
-  NSValue *v;
-  NSEnumerator *enumerator = [_cpkey objectEnumerator];
-  NSEnumerator *en;
+  NSEnumerator *enumerator = [cpkey objectEnumerator];
+  NSPointerArray *array;
+  NSUInteger index;
 
-  while ((set = [enumerator nextObject])) {
-    copy = [NSSet setWithSet:set];
-    en = [copy objectEnumerator];
-    while ((v = [en nextObject])) {
-      if (client == [v nonretainedObjectValue])
-	[set removeObject:v];
+  while ((array = [enumerator nextObject])) {
+    for (index = 0; index < [array count]; index++) {
+      if ([array pointerAtIndex:index] == client)
+	[array replacePointerAtIndex:index withPointer:NULL];
     }
+    [array compact];
   }
 }
 @end
