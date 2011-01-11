@@ -46,5 +46,6 @@
 
 @interface Date(iCalendar)
 - (id)initWithICalTime:(struct icaltimetype)time;
-- (struct icaltimetype)iCalTime;
+- (struct icaltimetype)UTCICalTime;
+- (struct icaltimetype)localICalTime;
 @end

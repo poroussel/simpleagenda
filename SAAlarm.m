@@ -115,7 +115,7 @@
 
   [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:_ic];
   memset(&trigger, 0, sizeof(trigger));
-  trigger.time = [date iCalTime];
+  trigger.time = [date UTCICalTime];
   icalcomponent_add_property(_ic, icalproperty_new_trigger(trigger));
 }
 

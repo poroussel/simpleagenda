@@ -248,16 +248,16 @@
     icalcomponent_add_property(ic, icalproperty_new_location([[self location] UTF8String]));
 
   [self deleteProperty:ICAL_DTSTART_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstart([_startDate iCalTime]));
+  icalcomponent_add_property(ic, icalproperty_new_dtstart([_startDate UTCICalTime]));
 
   [self deleteProperty:ICAL_DTEND_PROPERTY fromComponent:ic];
   [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
   if (![self allDay])
-    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate iCalTime], icaldurationtype_from_int(_duration * 60))));
+    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate UTCICalTime], icaldurationtype_from_int(_duration * 60))));
   else {
     end = [_startDate copy];
     [end incrementDay];
-    icalcomponent_add_property(ic, icalproperty_new_dtend([end iCalTime]));
+    icalcomponent_add_property(ic, icalproperty_new_dtend([end UTCICalTime]));
     [end release];
     /* OGo workaround ? */
     prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);

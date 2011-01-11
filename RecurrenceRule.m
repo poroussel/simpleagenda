@@ -10,13 +10,8 @@
 @implementation DateRecurrenceEnumerator
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start;
 {
-  self = [super init];
-  /*
-   * It's OK to use Date iCaltime: here as timezone modifications
-   * only affect datetimes, not dates
-   */
-  if (self)
-    _iterator = icalrecur_iterator_new([rule iCalRRule],  [start iCalTime]);
+  if ((self = [super init]))
+    _iterator = icalrecur_iterator_new([rule iCalRRule],  [start localICalTime]);
   return self;
 }
 - (id)nextObject
@@ -45,9 +40,8 @@
 @implementation DateRangeRecurrenceEnumerator
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start length:(NSTimeInterval)length;
 {
-  self = [super init];
-  if (self) {
-    _iterator = icalrecur_iterator_new([rule iCalRRule],  [start iCalTime]);
+  if ((self = [super init])) {
+    _iterator = icalrecur_iterator_new([rule iCalRRule],  [start localICalTime]);
     _length = length;
   }
   return self;
@@ -81,8 +75,7 @@
 - (id)initWithFrequency:(recurrenceFrequency)frequency
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
-  self = [self init];
-  if (self)
+  if ((self = [self init]))
     recur.freq = frequency;
   return self;
 }
@@ -90,13 +83,12 @@
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
   NSAssert([endDate isDate], @"Works on dates");
-  self = [self init];
-  if (self) {
+  if ((self = [self init])) {
     /*
      * It's OK to use Date iCaltime: here as timezone modifications
      * only affect datetimes, not dates
      */
-    recur.until = [endDate iCalTime];
+    recur.until = [endDate UTCICalTime];
     recur.freq = frequency;
   }
   return self;
@@ -104,8 +96,7 @@
 - (id)initWithFrequency:(recurrenceFrequency)frequency count:(int)count
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
-  self = [self init];
-  if (self) {
+  if ((self = [self init])) {
     recur.count = count;
     recur.freq = frequency;
   }
@@ -145,15 +136,13 @@
 @implementation RecurrenceRule(iCalendar)
 - (id)initWithICalRRule:(struct icalrecurrencetype)rrule
 {
-  self = [super init];
-  if (self)
+  if ((self = [super init]))
     recur = rrule;
   return self;
 }
 - (id)initWithICalString:(NSString *)rrule
 {
-  self = [super init];
-  if (self)
+  if ((self = [super init]))
     recur = icalrecurrencetype_from_string([rrule cString]);
   return self;
 }

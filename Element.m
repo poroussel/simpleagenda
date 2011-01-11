@@ -290,7 +290,7 @@
   if ([self text])
     icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
   [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp iCalTime]));  
+  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp UTCICalTime]));  
   [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];

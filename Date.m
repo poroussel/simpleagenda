@@ -353,8 +353,12 @@ static NSTimeZone *gl_nstz = nil;
     _time = icaltime_convert_to_zone(time, gl_tz);
   return self;
 }
-- (struct icaltimetype)iCalTime
+- (struct icaltimetype)UTCICalTime
 {
   return icaltime_convert_to_zone(_time, gl_utc);
+}
+- (struct icaltimetype)localICalTime
+{
+  return _time;
 }
 @end
