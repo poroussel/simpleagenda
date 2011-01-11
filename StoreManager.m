@@ -68,8 +68,7 @@ static StoreManager *singleton;
   ConfigManager *config = [ConfigManager globalConfig];
   id store;
 
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     [config registerDefaults:[self defaults]];
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					     selector:@selector(dataChanged:)
@@ -92,7 +91,8 @@ static StoreManager *singleton;
 					         name:SAEnabledStatusChangedForStore
 					       object:nil];
     _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
-    _cache = [[NSMutableDictionary alloc] initWithCapacity:256];
+    _dayEventsCache = [[NSMutableDictionary alloc] initWithCapacity:256];
+    _eventCache = [[NSMutableArray alloc] initWithCapacity:512];
     /* Create user defined stores */
     storeArray = [config objectForKey:STORES];
     defaultStore = [config objectForKey:ST_DEFAULT];
@@ -118,14 +118,16 @@ static StoreManager *singleton;
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self synchronise];
   RELEASE(_defaultStore);
-  [_stores release];
-  [_cache release];
+  RELEASE(_stores);
+  RELEASE(_dayEventsCache);
+  RELEASE(_eventCache);
   [super dealloc];
 }
 
 - (void)dataChanged:(NSNotification *)not
 {
-  [_cache removeAllObjects];
+  [_dayEventsCache removeAllObjects];
+  [_eventCache removeAllObjects];
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStoreManager object:self];
 }
 
@@ -142,8 +144,9 @@ static StoreManager *singleton;
     if (store) {
       [_stores setObject:store forKey:name];
       NSLog(@"Added %@ to StoreManager", name);
-    } else
+    } else {
       NSLog(@"Unable to initialize store %@", name);
+    }
   }
 }
 
@@ -210,14 +213,16 @@ static StoreManager *singleton;
 
 - (NSArray *)allEvents
 {
-  NSMutableArray *all = [NSMutableArray arrayWithCapacity:256];
-  NSEnumerator *enumerator = [_stores objectEnumerator];
+  NSEnumerator *enumerator;
   id <AgendaStore> store;
 
+  if ([_eventCache count])
+    return _eventCache;
+  enumerator = [_stores objectEnumerator];
   while ((store = [enumerator nextObject]))
     if ([store enabled])
-      [all addObjectsFromArray:[store events]];
-  return all;
+      [_eventCache addObjectsFromArray:[store events]];
+  return _eventCache;
 }
 
 - (NSArray *)allTasks
@@ -251,7 +256,7 @@ static StoreManager *singleton;
   Event *event;
 
   NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
-  dayEvents = [_cache objectForKey:date];
+  dayEvents = [_dayEventsCache objectForKey:date];
   if (dayEvents)
     return dayEvents;
 
@@ -260,7 +265,7 @@ static StoreManager *singleton;
   while ((event = [enumerator nextObject]))
     if ([event isScheduledForDay:date])
       [dayEvents addObject:event];
-  [_cache setObject:dayEvents forKey:date];
+  [_dayEventsCache setObject:dayEvents forKey:date];
   return dayEvents;
 }
 

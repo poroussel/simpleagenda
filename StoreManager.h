@@ -9,7 +9,8 @@ extern NSString * const SADataChangedInStoreManager;
 @interface StoreManager : NSObject
 {
   NSMutableDictionary *_stores;
-  NSMutableDictionary *_cache;
+  NSMutableDictionary *_dayEventsCache;
+  NSMutableArray *_eventCache;
   id _defaultStore;
 }
 
