@@ -187,14 +187,10 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   }
 }
 
-- (void)connection:(NSURLConnection *)connection didCancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
-{
-  NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [challenge description]);
-}
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
   NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [error localizedDescription]);
-  ASSIGNCOPY(_reason, [error localizedDescription]);
+  ASSIGN(_reason, [error localizedDescription]);
   _done = YES;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
@@ -223,7 +219,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 
   NSDebugLog(@"%s : %@", __PRETTY_FUNCTION__, [response description]);
   _httpStatus = [response statusCode];
-  ASSIGNCOPY(_reason, [NSHTTPURLResponse localizedStringForStatusCode:_httpStatus]);
+  ASSIGN(_reason, [NSHTTPURLResponse localizedStringForStatusCode:_httpStatus]);
   [_data setLength:0];
   if ([[_request HTTPMethod] isEqual:@"GET"]) {
     property = [[response allHeaderFields] valueForKey:@"Last-Modified"];
@@ -237,11 +233,6 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
       ASSIGN(_etag, property);
     }
   }
-}
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
-{
-  NSDebugLog(@"%s", __PRETTY_FUNCTION__);
-  return cachedResponse;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)newRequest redirectResponse:(NSURLResponse *)response
 {
