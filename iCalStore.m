@@ -53,21 +53,19 @@
 - (void)okClicked:(id)sender
 {
   BOOL readable;
-  NSURL *tmp;
   WebDAVResource *resource;
 
-  tmp = [NSURL URLWithString:[url stringValue]];
-  resource = AUTORELEASE([[WebDAVResource alloc] initWithURL:tmp]);
+  resource = AUTORELEASE([[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]]);
   readable = [resource readable];
   /* Read will fail if there's no resource yet, try to create an empty one */
-  if (!readable) {
+  if (!readable && [resource httpStatus] != 401) {
     [resource writableWithData:[NSData data]];
     readable = [resource readable];
   }
   if (readable)
     [NSApp stopModalWithCode:1];
   else {
-    [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [tmp propertyForKey:NSHTTPPropertyStatusReasonKey]]];
+    [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [resource reason]]];
     [warning setHidden:NO];
   }
 }
