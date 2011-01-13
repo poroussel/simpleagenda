@@ -24,6 +24,7 @@
 /* WARNING Destructive */
 - (BOOL)writableWithData:(NSData *)data;
 - (int)httpStatus;
+- (NSString *)reason;
 - (NSData *)data;
 - (NSURL *)url;
 - (BOOL)get;
