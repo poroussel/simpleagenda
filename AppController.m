@@ -315,7 +315,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  /* Set the selected day : this will update all views and titles (but not the summary */
+  /* Set the selected day : this will update all views and titles (but not the summary) */
+  [calendar setDateSource:self];
   [calendar setDate:[Date today]];
   /*
    * If stores are loaded before this is executed (it happens
@@ -330,19 +331,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [AlarmManager globalManager];
 }
 
-- (void)applicationWillTerminate:(NSNotification*)aNotification
+- (void)applicationWillTerminate:(NSNotification *)aNotification
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [_summaryRoot release];
-  [_pc release];
-  [_appicon release];
-  /* 
-   * FIXME : we shouldn't have to release the store
-   * manager as we don't retain it. It's a global
-   * instance that should synchronise itself when
-   * it's freed
-   */
-  [_sm release];
+  [_sm synchronise];
+  RELEASE(_summaryRoot);
+  RELEASE(_pc);
+  RELEASE(_appicon);
   RELEASE(_selectedDay);
 }
 
@@ -643,6 +638,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    * FIXME : if a selected event was deleted by another application, 
    * the selection will reference a non existing object
    */
+  [calendar reloadData];
   [dayView reloadData];
   [weekView reloadData];
   [taskView reloadData];
@@ -762,6 +758,15 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   if (object && [object isKindOfClass:[Task class]])
     return [self showElement:object onDay:[calendar date]];
   return NO;
+}
+@end
+
+@implementation AppController(CalendarViewDataSource)
+- (CVCellStatus)calendarView:(CalendarView *)view cellStatusForDate:(Date *)date
+{
+  if ([[_sm visibleAppointmentsForDay:date] count] > 0)
+    return CVHasDataCell;
+  return CVEmptyCell;
 }
 @end
 

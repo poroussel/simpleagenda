@@ -1,7 +1,6 @@
 #import <AppKit/AppKit.h>
 #import "Date.h"
 #import "CalendarView.h"
-#import "StoreManager.h"
 
 @interface DayFormatter : NSFormatter
 @end
@@ -37,20 +36,20 @@ static NSImage *_2right;
 
 - (void)dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [_dayTimer invalidate];
   RELEASE(date);
   RELEASE(monthDisplayed);
-  [_dayTimer invalidate];
   RELEASE(_dayTimer);
   RELEASE(delegate);
-  [boldFont release];
-  [normalFont release];
-  [title release];
-  [matrix release];
-  [obl release];
-  [tbl release];
-  [obr release];
-  [tbr release];
+  RELEASE(_dataSource);
+  RELEASE(boldFont);
+  RELEASE(normalFont);
+  RELEASE(title);
+  RELEASE(matrix);
+  RELEASE(obl);
+  RELEASE(tbl);
+  RELEASE(obr);
+  RELEASE(tbr);
   [super dealloc];
 }
 
@@ -67,7 +66,6 @@ static NSImage *_2right;
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
-    delegate = nil;
 
     title = [[NSTextField alloc] initWithFrame: NSMakeRect(32, 128, 168, 20)];
     [title setEditable:NO];
@@ -159,8 +157,6 @@ static NSImage *_2right;
 				         userInfo:nil
 				          repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_dayTimer forMode:NSDefaultRunLoopMode];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   }
   return self;
 }
@@ -203,7 +199,6 @@ static NSImage *_2right;
   NSColor *clear = [NSColor clearColor];
   NSColor *white = [NSColor whiteColor];
   NSColor *black = [NSColor blackColor];
-  StoreManager *sm = [StoreManager globalManager];
 
   [self clearSelectedDay];
   today = [Date today];
@@ -224,7 +219,9 @@ static NSImage *_2right;
 	[cell setDrawsBackground:NO];
       }
       [cell setObjectValue:AUTORELEASE([day copy])];
-      if ([[sm visibleAppointmentsForDay:day] count])
+      if (_dataSource &&
+	  [_dataSource respondsToSelector:@selector(calendarView:cellStatusForDate:)] &&
+	  [_dataSource calendarView:self cellStatusForDate:day] & CVHasDataCell)
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];
@@ -302,6 +299,21 @@ static NSImage *_2right;
   return delegate;
 }
 
+- (id)dataSource
+{
+  return _dataSource;
+}
+- (void)setDateSource:(id)dataSource
+{
+  ASSIGN(_dataSource, dataSource);
+  [self updateView];
+}
+
+- (void)reloadData
+{
+  [self updateView];
+}
+
 - (void)setDate:(Date *)nDate
 {
   NSAssert([nDate isDate], @"Calender expects a date");
@@ -319,10 +331,5 @@ static NSImage *_2right;
 - (NSString *)dateAsString
 {
   return [[date calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSDateFormatString]];
-}
-
-- (void)dataChanged:(NSNotification *)not
-{
-  [self updateView];
 }
 @end

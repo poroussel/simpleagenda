@@ -2,6 +2,11 @@
 
 #import <AppKit/AppKit.h>
 
+typedef enum {
+  CVEmptyCell = 0,
+  CVHasDataCell
+} CVCellStatus;
+
 @interface CalendarView : NSView
 {
   NSTextField *title;
@@ -17,18 +22,26 @@
   IBOutlet id delegate;
   NSTimer *_dayTimer;
   int bezeledCell;
+  id _dataSource;
 }
 
 - (id)initWithFrame:(NSRect)frame;
 - (Date *)date;
+- (void)setDate:(Date *)date;
 - (NSString *)dateAsString;
 - (id)delegate;
-- (void)setDate:(Date *)date;
 - (void)setDelegate:(id)delegate;
+- (id)dataSource;
+- (void)setDateSource:(id)dataSource;
+- (void)reloadData;
 @end
 
 @interface NSObject(CalendarViewDelegate)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date;
+@end
+
+@interface NSObject(CalendarViewDataSource)
+- (CVCellStatus)calendarView:(CalendarView *)view cellStatusForDate:(Date *)date;
 @end
