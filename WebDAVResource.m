@@ -53,6 +53,7 @@
 
   [_lock lock];
   [_request setHTTPMethod:method];
+  [_request setHTTPBody:body];
   if (attributes) {
     enumerator = [attributes keyEnumerator];
     while ((key = [enumerator nextObject]))
@@ -60,8 +61,6 @@
   }
   if (_etag && ([method isEqual:@"PUT"] || [method isEqual:@"DELETE"]))
     [_request setValue:[NSString stringWithFormat:@"([%@])", _etag] forHTTPHeaderField:@"If"];
-  if (body)
-    [_request setHTTPBody:body];
   NSDebugLog(@"%@ %@ (%@)", [[_request URL] absoluteString], method, [attributes description]);
 
   _done = NO;
