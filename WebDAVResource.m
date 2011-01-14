@@ -78,10 +78,7 @@
   }
   [connection release];
 
-  if ([_data length])
-    NSDebugLog(@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:_data encoding:NSUTF8StringEncoding]));
-  else
-    NSDebugLog(@"%@ status %d", method, _httpStatus);
+  NSDebugLog(@"%@ status %d", method, _httpStatus);
   if (_httpStatus < 200 || _httpStatus > 299) {
     NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
     [_lock unlock];
