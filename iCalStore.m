@@ -65,7 +65,7 @@
   if (readable)
     [NSApp stopModalWithCode:1];
   else {
-    [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [resource reason]]];
+    [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [[resource url] propertyForKey:NSHTTPPropertyStatusReasonKey]]];
     [warning setHidden:NO];
   }
 }
