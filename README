@@ -16,9 +16,11 @@ GNUstep frameworks. Its major features are:
 Dependencies
 ============
 
-GNUstep Startup 0.19.0
-libical 0.27
+GNUstep Startup 0.19.0 or later
+libical 0.27 or later
 libuuid (optional)
+Addresses framework (optional)
+DBusKit from svn trunk (optional)
 
 
 Website
