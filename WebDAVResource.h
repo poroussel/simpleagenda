@@ -38,7 +38,6 @@
 @interface NSURL(SimpleAgenda)
 + (BOOL)stringIsValidURL:(NSString *)string;
 + (NSURL *)URLWithString:(NSString *)string possiblyRelativeToURL:(NSURL *)base;
-- (NSURL *)redirection;
 @end
 
 @interface GSXMLDocument(SimpleAgenda)

@@ -39,12 +39,12 @@
      * network store so a long pause on startup, event if the stores
      * are disabled...
      */
-    _url = [anUrl redirection];
+    ASSIGN(_url, anUrl);
     [self fixURLScheme];
     _handleClass = [NSURLHandle URLHandleClassForURL:_url];
     _lock = [NSLock new];
-    _user = nil;
-    _password = nil;
+    ASSIGN(_user, [_url user]);
+    ASSIGN(_password, [_url password]);
     _data = nil;
     _debug = NO;
   }
@@ -90,6 +90,7 @@
   NSURLHandle *handle;
 
   [_lock lock];
+ restart:
   handle = [[_handleClass alloc] initWithURL:_url cached:NO];
   [handle writeProperty:method forKey:GSHTTPPropertyMethodKey];
   if (attributes) {
@@ -111,6 +112,15 @@
     _httpStatus = data ? 200 : 199;
   else
     _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
+
+  /* FIXME : why do we have to check for httpStatus == 0 */
+  if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
+    [self debugLog:@"Redirection to %@", [handle propertyForKey:@"Location"]];
+    ASSIGN(_url, [NSURL URLWithString:[handle propertyForKey:@"Location"]]);
+    [self fixURLScheme];
+    goto restart;
+  }
+
   if (data)
     [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
   else
@@ -269,17 +279,6 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   else
     url = [NSURL URLWithString:[[base absoluteString] stringByReplacingString:[base path] withString:string]];
   return url;
-}
-- (NSURL *)redirection
-{
-  NSString *location;
-
-  location = [self propertyForKey:@"Location"];
-  if (location) {
-    NSLog(@"Redirected to %@", location);
-    return [[NSURL URLWithString:location] redirection];
-  }
-  return [self copy];
 }
 @end
 
