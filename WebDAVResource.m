@@ -23,30 +23,27 @@
   [super dealloc];
 }
 
-- (void)fixURLScheme
+- (void)setURL:(NSURL *)anURL
 {
-  if ([[_url scheme] hasPrefix:@"webcal"])
-    ASSIGN(_url, [NSURL URLWithString:[[_url absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
+  if ([[anURL scheme] hasPrefix:@"webcal"])
+    ASSIGN(_url, [NSURL URLWithString:[[anURL absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
+  else
+    ASSIGN(_url, anURL);
+  _handleClass = [NSURLHandle URLHandleClassForURL:_url];
+  if ([_url user])
+    ASSIGN(_user, [_url user]);
+  if ([_url password])
+    ASSIGN(_password, [_url password]);
 }
 
 - (id)initWithURL:(NSURL *)anUrl
 {
   self = [super init];
   if (self) {
-    /* 
-     * FIXME : this causes a bogus GET for every resource creation
-     * This also means a potentialy long pause when initialising a
-     * network store so a long pause on startup, event if the stores
-     * are disabled...
-     */
-    ASSIGN(_url, anUrl);
-    [self fixURLScheme];
-    _handleClass = [NSURLHandle URLHandleClassForURL:_url];
     _lock = [NSLock new];
-    ASSIGN(_user, [_url user]);
-    ASSIGN(_password, [_url password]);
     _data = nil;
     _debug = NO;
+    [self setURL:anUrl];
   }
   return self;
 }
@@ -116,8 +113,7 @@
   /* FIXME : why do we have to check for httpStatus == 0 */
   if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
     [self debugLog:@"Redirection to %@", [handle propertyForKey:@"Location"]];
-    ASSIGN(_url, [NSURL URLWithString:[handle propertyForKey:@"Location"]]);
-    [self fixURLScheme];
+    [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
     goto restart;
   }
 
