@@ -16,12 +16,10 @@
   NSString *_user;
   NSString *_password;
   NSData *_data;
-  BOOL _debug;
 }
 
 - (id)initWithURL:(NSURL *)url;
 - (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent;
-- (void)setDebug:(BOOL)debug;
 - (BOOL)readable;
 /* WARNING Destructive */
 - (BOOL)writableWithData:(NSData *)data;

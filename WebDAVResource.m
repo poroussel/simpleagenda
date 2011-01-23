@@ -3,15 +3,6 @@
 #import "WebDAVResource.h"
 
 @implementation WebDAVResource
-- (void)debugLog:(NSString *)format,...
-{
-  va_list ap;
-  if (_debug) {
-    va_start(ap, format);
-    NSLogv(format, ap);
-    va_end(ap);
-  }
-}
 - (void)dealloc
 {
   DESTROY(_user);
@@ -42,7 +33,6 @@
   if (self) {
     _lock = [NSLock new];
     _data = nil;
-    _debug = NO;
     [self setURL:anUrl];
   }
   return self;
@@ -56,11 +46,6 @@
       ASSIGN(_password, [parent password]);
   }
   return self;
-}
-
-- (void)setDebug:(BOOL)debug
-{
-  _debug = debug;
 }
 
 /* FIXME : ugly hack to work around NSURLHandle shortcomings */
@@ -101,7 +86,7 @@
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
   if (body)
     [handle writeData:body];
-  [self debugLog:@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]];
+  NSDebugLog(@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]);
   DESTROY(_data);
   data = [handle resourceData];
   /* FIXME : this is more than ugly */
@@ -112,15 +97,12 @@
 
   /* FIXME : why do we have to check for httpStatus == 0 */
   if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
-    [self debugLog:@"Redirection to %@", [handle propertyForKey:@"Location"]];
+    NSDebugLog(@"Redirection to %@", [handle propertyForKey:@"Location"]);
     [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
     goto restart;
   }
 
-  if (data)
-    [self debugLog:@"%@ =>\n%@", method, AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
-  else
-    [self debugLog:@"%@ status %d", method, _httpStatus];
+  NSDebugLog(@"%@ status %d", method, _httpStatus);
   property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
   if (property)
     ASSIGN(_reason, property);
