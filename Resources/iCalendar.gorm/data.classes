@@ -11,7 +11,7 @@
 	Actions = (
 	);
 	Outlets = (
-	    _delegate
+	    "_delegate"
 	);
 	Super = NSObject;
     };

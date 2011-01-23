@@ -161,7 +161,7 @@
 
 + (NSString *)storeTypeName
 {
-  return @"iCalendar store";
+  return @"iCalendar";
 }
 
 - (void)dealloc

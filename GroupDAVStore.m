@@ -208,7 +208,7 @@
 
 + (NSString *)storeTypeName
 {
-  return @"GroupDAV store";
+  return @"GroupDAV";
 }
 
 - (void)dealloc

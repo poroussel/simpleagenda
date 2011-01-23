@@ -54,7 +54,7 @@
 
 + (NSString *)storeTypeName
 {
-  return @"Simple file store";
+  return @"Local file";
 }
 
 - (void)dealloc
