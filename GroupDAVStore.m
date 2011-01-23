@@ -111,6 +111,10 @@
 	for (i = 0; i < [set count]; i++)
 	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
 	[xpc release];
+	if ([calendar numberOfItems] > 0)
+	  [calendar selectItemAtIndex:1];
+	if ([task numberOfItems] > 0)
+	  [task selectItemAtIndex:1];
       }
     }
     [resource release];
