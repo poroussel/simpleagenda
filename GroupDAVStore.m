@@ -149,8 +149,8 @@
 @implementation GroupDAVStore
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjectsAndKeys:[[NSColor blueColor] description], ST_COLOR,
-		       [[NSColor darkGrayColor] description], ST_TEXT_COLOR,
+  return [NSDictionary dictionaryWithObjectsAndKeys:[[NSColor redColor] description], ST_COLOR,
+		       [[NSColor whiteColor] description], ST_TEXT_COLOR,
 		       [NSNumber numberWithBool:NO], ST_RW,
 		       [NSNumber numberWithBool:YES], ST_DISPLAY,
 		       [NSNumber numberWithBool:YES], ST_ENABLED,
