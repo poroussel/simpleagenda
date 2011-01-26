@@ -5,10 +5,11 @@
 
 enum taskState
 {
-  TK_NONE = 0, 
-  TK_INPROCESS, 
-  TK_COMPLETED, 
-  TK_CANCELED 
+  TK_NONE = 0,
+  TK_INPROCESS,
+  TK_COMPLETED,
+  TK_CANCELED,
+  TK_NEEDSACTION
 };
 
 @interface Task : Element

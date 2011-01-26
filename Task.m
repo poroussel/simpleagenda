@@ -27,7 +27,7 @@ static NSArray *stateName;
 + (void)initialize
 {
   if (stateName == nil)
-    stateName = [[NSArray alloc] initWithObjects:_(@"None"), _(@"Started"), _(@"Completed"), _(@"Canceled"), nil];
+    stateName = [[NSArray alloc] initWithObjects:_(@"None"), _(@"Started"), _(@"Completed"), _(@"Canceled"), _(@"Needs action"), nil];
 }
 
 + (NSArray *)stateNamesArray
@@ -109,6 +109,9 @@ static NSArray *stateName;
       case ICAL_STATUS_INPROCESS:
 	[self setState:TK_INPROCESS];
 	break;
+      case ICAL_STATUS_NEEDSACTION:
+	[self setState:TK_NEEDSACTION];
+	break;
       default:
 	[self setState:TK_NONE];
       }
@@ -118,7 +121,7 @@ static NSArray *stateName;
   return self;
 }
 
-static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_COMPLETED, ICAL_STATUS_CANCELLED};
+static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_COMPLETED, ICAL_STATUS_CANCELLED, ICAL_STATUS_NEEDSACTION};
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
