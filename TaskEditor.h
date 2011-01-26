@@ -12,6 +12,9 @@
   id store;
   id state;
   id ok;
+  id toggleDueDate;
+  id dueDate;
+  id dueTime;
   Task *_task;
   NSArray *_modifiedAlarms;
 }
@@ -20,4 +23,5 @@
 - (void)validate:(id)sender;
 - (void)cancel:(id)sender;
 - (void)editAlarms:(id)sender;
+- (void)toggleDueDate:(id)sender;
 @end

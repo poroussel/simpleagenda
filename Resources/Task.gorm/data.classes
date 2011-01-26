@@ -3,6 +3,7 @@
     FirstResponder = {
 	Actions = (
 	    "editAlarms:",
+	    "toggleDueDate:",
 	    "validate:"
 	);
 	Super = NSObject;
@@ -11,7 +12,8 @@
 	Actions = (
 	    "validate:",
 	    "cancel:",
-	    "editAlarms:"
+	    "editAlarms:",
+	    "toggleDueDate:"
 	);
 	Outlets = (
 	    window,
@@ -19,7 +21,10 @@
 	    summary,
 	    store,
 	    state,
-	    ok
+	    ok,
+	    dueDate,
+	    dueTime,
+	    toggleDueDate
 	);
 	Super = NSObject;
     };

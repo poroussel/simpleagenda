@@ -15,15 +15,15 @@ enum taskState
 @interface Task : Element
 {
   enum taskState _state;
-  Date *_completionDate;
+  Date *_dueDate;
 }
 
 + (NSArray *)stateNamesArray;
 - (enum taskState)state;
 - (NSString *)stateAsString;
 - (void)setState:(enum taskState)state;
-- (Date *)completionDate;
-- (void)setCompletionDate:(Date *)cd;
+- (Date *)dueDate;
+- (void)setDueDate:(Date *)cd;
 @end
 
 @interface Task(iCalendar)

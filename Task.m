@@ -6,17 +6,17 @@
 {
   [super encodeWithCoder:coder];
   [coder encodeInt:_state forKey:@"state"];
-  if (_completionDate != nil)
-    [coder encodeObject:_completionDate forKey:@"completion"];
+  if (_dueDate != nil)
+    [coder encodeObject:_dueDate forKey:@"dueDate"];
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
   [super initWithCoder:coder];
   _state = [coder decodeIntForKey:@"state"];
-  if ([coder containsValueForKey:@"completion"])
-    _completionDate = [[coder decodeObjectForKey:@"completion"] retain];
+  if ([coder containsValueForKey:@"dueDate"])
+    _dueDate = [[coder decodeObjectForKey:@"dueDate"] retain];
   else
-    _completionDate = nil;
+    _dueDate = nil;
   return self;
 }
 @end
@@ -40,13 +40,13 @@ static NSArray *stateName;
   self = [super init];
   if (self) {
     _state = TK_NONE;
-    _completionDate = nil;
+    _dueDate = nil;
   }
   return self;
 }
 - (void)dealloc
 {
-  RELEASE(_completionDate);
+  RELEASE(_dueDate);
   [super dealloc];
 }
 - (enum taskState)state
@@ -60,27 +60,21 @@ static NSArray *stateName;
 - (void)setState:(enum taskState)state
 {
   _state = state;
-  if (state == TK_COMPLETED)
-    [self setCompletionDate:[Date today]];
-  else
-    [self setCompletionDate:nil];
 }
-- (Date *)completionDate
+- (Date *)dueDate
 {
-  return _completionDate;
+  return _dueDate;
 }
-- (void)setCompletionDate:(Date *)cd
+- (void)setDueDate:(Date *)cd
 {
-  if (_completionDate != nil)
-    RELEASE(_completionDate);
+  DESTROY(_dueDate);
   if (cd != nil)
-    ASSIGNCOPY(_completionDate, cd);
-  else
-    _completionDate = nil;
+    ASSIGNCOPY(_dueDate, cd);
 }
 - (Date *)nextActivationDate
 {
-  return _completionDate;
+  /* FIXME */
+  return _dueDate;
 }
 - (NSString *)description
 {

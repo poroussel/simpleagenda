@@ -5,6 +5,8 @@
 #import "StoreManager.h"
 #import "Task.h"
 #import "AlarmEditor.h"
+#import "HourFormatter.h"
+#import "Date.h"
 
 static NSMutableDictionary *editors;
 
@@ -17,10 +19,16 @@ static NSMutableDictionary *editors;
 
 - (id)init
 {
-  self = [super init];
-  if (self) {
-    if (![NSBundle loadNibNamed:@"Task" owner:self])
-      return nil;
+  HourFormatter *formatter;
+  NSDateFormatter *dateFormatter;
+
+  if (![NSBundle loadNibNamed:@"Task" owner:self])
+    return nil;
+  if ((self = [super init])) {
+    formatter = AUTORELEASE([[HourFormatter alloc] init]);
+    dateFormatter = AUTORELEASE([[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO]);
+    [dueTime setFormatter:formatter];
+    [dueDate setFormatter:dateFormatter];
   }
   return self;
 }
@@ -58,6 +66,13 @@ static NSMutableDictionary *editors;
     [state addItemsWithTitles:[Task stateNamesArray]];
     [state selectItemWithTitle:[task stateAsString]];
     [ok setEnabled:[self canBeModified]];
+    if ([task dueDate]) {
+      [dueDate setObjectValue:[[task dueDate] calendarDate]];
+      [dueTime setFloatValue:([[task dueDate] hourOfDay]*60 + [[task dueDate] minuteOfHour]) / 60.0];
+      [toggleDueDate setState:YES];
+    }
+    [dueDate setEnabled:[toggleDueDate state]];
+    [dueTime setEnabled:[toggleDueDate state]];
     [window makeKeyAndOrderFront:self];
   }
   return self;
@@ -98,6 +113,11 @@ static NSMutableDictionary *editors;
   [_task setText:[[description textStorage] copy]];
   [_task setState:[state indexOfSelectedItem]];
   [_task setAlarms:_modifiedAlarms];
+  if ([toggleDueDate state]) {
+    [_task setDueDate:[Date dateWithCalendarDate:[dueDate objectValue] withTime:NO]];
+  } else {
+    [_task setDueDate:nil];
+  }
   aStore = [sm storeForName:[store titleOfSelectedItem]];
   if (!originalStore)
     [aStore add:_task];
@@ -125,6 +145,23 @@ static NSMutableDictionary *editors;
   if (alarms)
     ASSIGN(_modifiedAlarms, alarms);
   [window makeKeyAndOrderFront:self];
+}
+
+- (void)toggleDueDate:(id)sender
+{
+  Date *date;
+
+  [dueDate setEnabled:[toggleDueDate state]];
+  [dueTime setEnabled:[toggleDueDate state]];
+  if ([toggleDueDate state]) {
+    date = [Date now];
+    [date changeDayBy:7];
+    [dueDate setObjectValue:[date calendarDate]];
+    [dueTime setFloatValue:([date hourOfDay]*60 + [date minuteOfHour]) / 60.0];
+  } else {
+    [dueDate setObjectValue:nil];
+    [dueTime setObjectValue:nil];
+  }
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
