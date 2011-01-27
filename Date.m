@@ -145,11 +145,10 @@ static NSTimeZone *gl_nstz = nil;
   /* To be able to add hours and minutes, it has to be a datetime */
   d-> _time.is_date = 0;
   d->_time = icaltime_add(d->_time, icaldurationtype_from_int(seconds));
-  /*
-   * FIXME : this is wrong is refDate is a date but seconds
-   * not a multiple of 86400
-   */
-  d->_time.is_date = refDate->_time.is_date;
+  if (!d->_time.hour && !d->_time.minute && !d->_time.second)
+    d->_time.is_date = 1;
+  else
+    d->_time.is_date = 0;
   return AUTORELEASE(d);
 }
 
