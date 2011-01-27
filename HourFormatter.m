@@ -19,12 +19,48 @@
 
 - (BOOL)getObjectValue:(id *)anObject forString:(NSString *)string errorDescription:(NSString **)error
 {
-  return NO;
+  NSNumberFormatter *nf;
+  NSNumber *hours;
+  NSNumber *minutes;
+  NSArray *components = [string componentsSeparatedByString:@"h"];
+
+  if (!components || [components count] != 2) {
+    if (error)
+      *error = [[NSError alloc] initWithDomain:@"Bad time formatting : cannot find hours and minutes separated by h" code:1 userInfo:nil];
+    else
+      NSLog(@"Bad time formatting : cannot find hours and minutes separated by h");
+    return NO;
+  }
+  nf = AUTORELEASE([[NSNumberFormatter alloc] init]);
+  hours = [nf numberFromString:[components objectAtIndex:0]];
+  minutes = [nf numberFromString:[components objectAtIndex:1]];
+  if (!hours || !minutes) {
+    if (error)
+      *error = [[NSError alloc] initWithDomain:@"Bad time formatting" code:2 userInfo:nil];
+    else
+      NSLog(@"Bad time formatting");
+    return NO;
+  }
+  if ([hours intValue] < 0 || [hours intValue] > 23) {
+    if (error)
+      *error = [[NSError alloc] initWithDomain:@"Hours must be between 0 and 23" code:3 userInfo:nil];
+    else
+      NSLog(@"Hours must be between 0 and 23");
+    return NO;
+  }
+  if ([minutes intValue] < 0 || [minutes intValue] > 59) {
+    if (error)
+      *error = [[NSError alloc] initWithDomain:@"Minutes must be between 0 and 59" code:4 userInfo:nil];
+    else
+      NSLog(@"Minutes must be between 0 and 59");
+    return NO;
+  }
+  *anObject = [[NSNumber alloc] initWithFloat:[hours floatValue] + [minutes floatValue] / 60.0];
+  return YES;
 }
 
 - (NSAttributedString *)attributedStringForObjectValue:(id)anObject withDefaultAttributes:(NSDictionary *)attributes
 {
   return nil;
 }
-
 @end
