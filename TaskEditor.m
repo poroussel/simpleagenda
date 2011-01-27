@@ -73,6 +73,7 @@ static NSMutableDictionary *editors;
     }
     [dueDate setEnabled:[toggleDueDate state]];
     [dueTime setEnabled:[toggleDueDate state]];
+    [alarms setEnabled:[toggleDueDate state]];
     [window makeKeyAndOrderFront:self];
   }
   return self;
@@ -139,11 +140,11 @@ static NSMutableDictionary *editors;
 
 - (void)editAlarms:(id)sender
 {
-  NSArray *alarms;
+  NSArray *alarmArray;
 
-  alarms = [AlarmEditor editAlarms:_modifiedAlarms];
-  if (alarms)
-    ASSIGN(_modifiedAlarms, alarms);
+  alarmArray = [AlarmEditor editAlarms:_modifiedAlarms];
+  if (alarmArray)
+    ASSIGN(_modifiedAlarms, alarmArray);
   [window makeKeyAndOrderFront:self];
 }
 
@@ -153,6 +154,7 @@ static NSMutableDictionary *editors;
 
   [dueDate setEnabled:[toggleDueDate state]];
   [dueTime setEnabled:[toggleDueDate state]];
+  [alarms setEnabled:[toggleDueDate state]];
   if ([toggleDueDate state]) {
     date = [Date now];
     [date changeDayBy:7];

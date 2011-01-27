@@ -15,6 +15,7 @@
   id toggleDueDate;
   id dueDate;
   id dueTime;
+  id alarms;
   Task *_task;
   NSArray *_modifiedAlarms;
 }

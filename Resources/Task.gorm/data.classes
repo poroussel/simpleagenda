@@ -24,7 +24,8 @@
 	    ok,
 	    dueDate,
 	    dueTime,
-	    toggleDueDate
+	    toggleDueDate,
+	    alarms
 	);
 	Super = NSObject;
     };
