@@ -168,14 +168,16 @@
     [self setupForAlarm:[_alarms objectAtIndex:[table selectedRow]]];
 }
 
-- (void)textDidEndEditing:(NSNotification *)aNotification
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
-  NSLog(@"textDidEndEditing");
-}
+  Date *d;
 
-- (void)textDidChange:(NSNotification *)aNotification
-{
-  NSLog(@"textDidChange");
+  if (_current && [date objectValue] && [time objectValue]) {
+    d = [Date dateWithCalendarDate:[date objectValue] withTime:NO];
+    d = [Date dateWithTimeInterval:[time floatValue] * 3600 sinceDate:d];
+    [_current setAbsoluteTrigger:d];
+    [table reloadData];
+  }
 }
 @end
 

@@ -38,10 +38,10 @@
 	Actions = (
 	    "addAlarm:",
 	    "changeDelay:",
-	    "switchBeforeAfter:",
 	    "removeAlarm:",
 	    "selectType:",
-	    "setDelegate:"
+	    "setDelegate:",
+	    "switchBeforeAfter:"
 	);
 	Super = NSObject;
     };
