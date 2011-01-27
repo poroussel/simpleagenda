@@ -64,7 +64,7 @@ SelectionManager.m \
 RecurrenceRule.m \
 NSColor+SimpleAgenda.m \
 DateRange.m \
-SAAlarm.m \
+Alarm.m \
 AlarmManager.m \
 NSString+SimpleAgenda.m \
 AlarmEditor.m \

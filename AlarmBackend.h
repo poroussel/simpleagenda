@@ -1,9 +1,9 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "SAAlarm.h"
+#import "Alarm.h"
 
 @interface AlarmBackend : NSObject
 + (NSString *)backendName;
 - (enum icalproperty_action)backendType;
-- (void)display:(SAAlarm *)alarm;
+- (void)display:(Alarm *)alarm;
 @end

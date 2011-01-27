@@ -6,7 +6,7 @@
 @class Date;
 @class Element;
 
-@interface SAAlarm : NSObject <NSCoding>
+@interface Alarm : NSObject <NSCoding>
 {
   icalcomponent *_ic;
   Element *_element;

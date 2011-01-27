@@ -3,7 +3,7 @@
 #import <Foundation/Foundation.h>
 
 @class Element;
-@class SAAlarm;
+@class Alarm;
 
 @interface AlarmEditor : NSObject
 {
@@ -18,8 +18,8 @@
   id relativeText;
   id radio;
   NSMutableArray *_alarms;
-  SAAlarm *_current;
-  SAAlarm *_simple;
+  Alarm *_current;
+  Alarm *_simple;
 }
 
 + (NSArray *)editAlarms:(NSArray *)alarms;

@@ -1,11 +1,11 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "Date.h"
 #import "Element.h"
 #import "HourFormatter.h"
 
-@implementation SAAlarm
+@implementation Alarm
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
   icalproperty *prop = icalcomponent_get_first_property(ic, kind);
@@ -46,7 +46,7 @@
 
 + (id)alarm
 {
-  return AUTORELEASE([[SAAlarm alloc] init]);
+  return AUTORELEASE([[Alarm alloc] init]);
 }
 
 - (NSAttributedString *)desc
@@ -274,7 +274,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  return [[SAAlarm allocWithZone:zone] initWithICalComponent:[self asICalComponent]];
+  return [[Alarm allocWithZone:zone] initWithICalComponent:[self asICalComponent]];
 }
 
 

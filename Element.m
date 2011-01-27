@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "Date.h"
 #import "Element.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "NSString+SimpleAgenda.h"
 
 @implementation Element
@@ -156,7 +156,7 @@
 - (void)setAlarms:(NSArray *)alarms
 {
   NSEnumerator *enumerator;
-  SAAlarm *alarm;
+  Alarm *alarm;
 
   DESTROY(_alarms);
   ASSIGNCOPY(_alarms, alarms);
@@ -165,13 +165,13 @@
     [alarm setElement:self];
 }
 
-- (void)addAlarm:(SAAlarm *)alarm
+- (void)addAlarm:(Alarm *)alarm
 {
   [alarm setElement:self];
   [_alarms addObject:alarm];
 }
 
-- (void)removeAlarm:(SAAlarm *)alarm
+- (void)removeAlarm:(Alarm *)alarm
 {
   /* FIXME : do something */
 }
@@ -208,7 +208,7 @@
 {
   icalproperty *prop;
   icalcomponent *subc;
-  SAAlarm *alarm;
+  Alarm *alarm;
 
   self = [self init];
   if (self == nil)
@@ -240,7 +240,7 @@
 
   subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
   for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT)) {
-    alarm = [[SAAlarm alloc] initWithICalComponent:subc];
+    alarm = [[Alarm alloc] initWithICalComponent:subc];
     if (alarm) {
       [self addAlarm:alarm];
       RELEASE(alarm);
@@ -278,7 +278,7 @@
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   NSEnumerator *enumerator;
-  SAAlarm *alarm;
+  Alarm *alarm;
   icalcomponent *subc;
 
   [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];

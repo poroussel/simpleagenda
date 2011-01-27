@@ -11,7 +11,7 @@
 #import "iCalTree.h"
 #import "SelectionManager.h"
 #import "AlarmManager.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "defines.h"
 
 @interface AppIcon : NSView <ConfigListener>
@@ -670,7 +670,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (void)reminderWillRun:(NSNotification *)not
 {
-  SAAlarm *alarm = [not object];
+  Alarm *alarm = [not object];
 
   [self showElement:[alarm element] onDay:[Date today]];
 }

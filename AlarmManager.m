@@ -4,7 +4,7 @@
 #import "ConfigManager.h"
 #import "MemoryStore.h"
 #import "Element.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "AlarmBackend.h"
 
 NSString * const ACTIVATE_ALARMS = @"activateAlarms";
@@ -34,14 +34,14 @@ static AlarmManager *singleton;
   }
 }
 
-- (void)runAlarm:(SAAlarm *)alarm
+- (void)runAlarm:(Alarm *)alarm
 {
   [[NSNotificationCenter defaultCenter] postNotificationName:SAEventReminderWillRun object:alarm];
   if (_defaultBackend)
     [_defaultBackend display:alarm];
 }
 
-- (void)addAlarm:(SAAlarm *)alarm forUID:(NSString *)uid
+- (void)addAlarm:(Alarm *)alarm forUID:(NSString *)uid
 {
   NSMutableArray *alarms = [_activeAlarms objectForKey:uid];
 
@@ -56,7 +56,7 @@ static AlarmManager *singleton;
 {
   NSMutableArray *alarms = [_activeAlarms objectForKey:uid];
   NSEnumerator *enumerator;
-  SAAlarm *alarm;
+  Alarm *alarm;
   
   if (alarms) {
     enumerator = [alarms objectEnumerator];
@@ -68,7 +68,7 @@ static AlarmManager *singleton;
   }
 }
 
-- (BOOL)addAbsoluteAlarm:(SAAlarm *)alarm
+- (BOOL)addAbsoluteAlarm:(Alarm *)alarm
 {
   NSTimeInterval delay;
 
@@ -81,7 +81,7 @@ static AlarmManager *singleton;
   return YES;
 }
 
-- (BOOL)addRelativeAlarm:(SAAlarm *)alarm
+- (BOOL)addRelativeAlarm:(Alarm *)alarm
 {
   Date *activation = [[alarm element] nextActivationDate];
   NSTimeInterval delay;
@@ -105,7 +105,7 @@ static AlarmManager *singleton;
 - (void)setAlarmsForElement:(Element *)element
 {
   NSEnumerator *enumAlarm;
-  SAAlarm *alarm;
+  Alarm *alarm;
   BOOL added;
 
   if (![[element store] displayed] || ![element hasAlarms])
@@ -308,7 +308,7 @@ static AlarmManager *singleton;
 {
   return ICAL_ACTION_DISPLAY;
 }
-- (void)display:(SAAlarm *)alarm
+- (void)display:(Alarm *)alarm
 {
   NSLog([alarm description]);
 }

@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <DBusKit/DBusKit.h>
 #import "AlarmBackend.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "Element.h"
 
 @protocol Notifications
@@ -64,7 +64,7 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
   return self;
 }
 
-- (void)display:(SAAlarm *)alarm
+- (void)display:(Alarm *)alarm
 {
     NSConnection *c;
     NSNumber *dnid;

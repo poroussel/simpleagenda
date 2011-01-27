@@ -1,11 +1,11 @@
 #import <AppKit/AppKit.h>
 #import "AlarmEditor.h"
 #import "Element.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 #import "HourFormatter.h"
 
 @implementation AlarmEditor
-- (void)setupForAlarm:(SAAlarm *)alarm
+- (void)setupForAlarm:(Alarm *)alarm
 {
   NSTimeInterval relativeTrigger;
 
@@ -36,7 +36,7 @@
   }
   if ((self = [super init])) {
     _current = nil;
-    _simple = RETAIN([SAAlarm alarm]);
+    _simple = RETAIN([Alarm alarm]);
     [_simple setRelativeTrigger:-15*60];
     [_simple setAction:ICAL_ACTION_DISPLAY];
     

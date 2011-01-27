@@ -1,6 +1,6 @@
 #import <AppKit/NSSound.h>
 #import "AlarmBackend.h"
-#import "SAAlarm.h"
+#import "Alarm.h"
 
 @interface SoundBackend : AlarmBackend
 {
@@ -59,7 +59,7 @@ static NSMutableArray *sounds;
   return self;
 }
 
-- (void)display:(SAAlarm *)alarm
+- (void)display:(Alarm *)alarm
 {
   [sound play];
 }

@@ -14,7 +14,7 @@
   ICAL_CLASS_NONE = 10010
 */
 
-@class SAAlarm;
+@class Alarm;
 
 @interface Element : NSObject <NSCoding>
 {
@@ -47,8 +47,8 @@
 - (BOOL)hasAlarms;
 - (NSArray *)alarms;
 - (void)setAlarms:(NSArray *)alarms;
-- (void)addAlarm:(SAAlarm *)alarm;
-- (void)removeAlarm:(SAAlarm *)alarm;
+- (void)addAlarm:(Alarm *)alarm;
+- (void)removeAlarm:(Alarm *)alarm;
 - (Date *)nextActivationDate;
 
 - (NSArray *)categories;
