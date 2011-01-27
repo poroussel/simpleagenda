@@ -18,7 +18,9 @@
 	    remove,
 	    relativeSlider,
 	    relativeText,
-	    radio
+	    radio,
+	    date,
+	    time
 	);
 	Super = NSObject;
     };

@@ -30,10 +30,10 @@
 - (id)init
 {
   HourFormatter *formatter;
+  NSDateFormatter *dateFormatter;
 
-  if (![NSBundle loadNibNamed:@"Alarm" owner:self]) {
-    DESTROY(self);
-  }
+  if (![NSBundle loadNibNamed:@"Alarm" owner:self])
+    return nil;
   if ((self = [super init])) {
     _current = nil;
     _simple = RETAIN([Alarm alarm]);
@@ -50,9 +50,11 @@
     [table setUsesAlternatingRowBackgroundColors:YES];
     [table sizeLastColumnToFit];
 
-    formatter = [[[HourFormatter alloc] init] autorelease];
+    formatter = AUTORELEASE([[HourFormatter alloc] init]);
+    dateFormatter = AUTORELEASE([[NSDateFormatter alloc] initWithDateFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString] allowNaturalLanguage:NO]);
     [[relativeText cell] setFormatter:formatter];
-
+    [time setFormatter:formatter];
+    [date setFormatter:dateFormatter];
   }
   return self;
 }
@@ -118,13 +120,29 @@
 
 - (void)selectType:(id)sender
 {
+  Date *d;
+
   if ([type indexOfSelectedItem] == 0) {
     [relativeSlider setEnabled:YES];
     [radio setEnabled:YES];
+    [date setEnabled:NO];
+    [time setEnabled:NO];
+    [date setObjectValue:nil];
+    [date setObjectValue:nil];
+    [self changeDelay:self];
   } else {
     [relativeSlider setEnabled:NO];
     [radio setEnabled:NO];
+    [date setEnabled:YES];
+    [time setEnabled:YES];
+    d = [Date now];
+    [d changeDayBy:7];
+    [date setObjectValue:[d calendarDate]];
+    [time setFloatValue:([d hourOfDay]*60 + [d minuteOfHour]) / 60.0];
+    if (_current)
+      [_current setAbsoluteTrigger:d];
   }
+  [table reloadData];
 }
 
 - (void)changeDelay:(id)sender
@@ -148,6 +166,16 @@
 {
   if ([_alarms count] > 0)
     [self setupForAlarm:[_alarms objectAtIndex:[table selectedRow]]];
+}
+
+- (void)textDidEndEditing:(NSNotification *)aNotification
+{
+  NSLog(@"textDidEndEditing");
+}
+
+- (void)textDidChange:(NSNotification *)aNotification
+{
+  NSLog(@"textDidChange");
 }
 @end
 

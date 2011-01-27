@@ -17,6 +17,8 @@
   id relativeSlider;
   id relativeText;
   id radio;
+  id date;
+  id time;
   NSMutableArray *_alarms;
   Alarm *_current;
   Alarm *_simple;
