@@ -109,13 +109,16 @@ static NSMutableDictionary *editors;
   StoreManager *sm = [StoreManager globalManager];
   id <MemoryStore> originalStore = [_task store];
   id <MemoryStore> aStore;
+  Date *date;
 
   [_task setSummary:[summary stringValue]];
   [_task setText:[[description textStorage] copy]];
   [_task setState:[state indexOfSelectedItem]];
   [_task setAlarms:_modifiedAlarms];
   if ([toggleDueDate state]) {
-    [_task setDueDate:[Date dateWithCalendarDate:[dueDate objectValue] withTime:NO]];
+    date = [Date dateWithCalendarDate:[dueDate objectValue] withTime:NO];
+    date = [Date dateWithTimeInterval:[dueTime floatValue] * 3600 sinceDate:date];
+    [_task setDueDate:date];
   } else {
     [_task setDueDate:nil];
   }
