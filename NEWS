@@ -6,6 +6,7 @@ version 0.42
 	* New images from OpenClipArt (bell_gold.svg)
 	* Fix ticket #12 : timezone problems with recurrent events
 	* Use calendar instead of store and agenda in the ui
+	* Handle due date in tasks
 
 version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes

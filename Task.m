@@ -87,31 +87,33 @@ static NSArray *stateName;
 {
   icalproperty *prop;
 
-  self = [super initWithICalComponent:ic];
-  if (self == nil)
-    return nil;
-  prop = icalcomponent_get_first_property(ic, ICAL_STATUS_PROPERTY);
-  if (prop) {
-    switch (icalproperty_get_status(prop))
-      {
-      case ICAL_STATUS_COMPLETED:
-	[self setState:TK_COMPLETED];
-	break;
-      case ICAL_STATUS_CANCELLED:
-	[self setState:TK_CANCELED];
-	break;
-      case ICAL_STATUS_INPROCESS:
-	[self setState:TK_INPROCESS];
-	break;
-      case ICAL_STATUS_NEEDSACTION:
-	[self setState:TK_NEEDSACTION];
-	break;
-      default:
-	[self setState:TK_NONE];
-      }
+  if ((self = [super initWithICalComponent:ic])) {
+    prop = icalcomponent_get_first_property(ic, ICAL_STATUS_PROPERTY);
+    if (prop) {
+      switch (icalproperty_get_status(prop))
+	{
+	case ICAL_STATUS_COMPLETED:
+	  [self setState:TK_COMPLETED];
+	  break;
+	case ICAL_STATUS_CANCELLED:
+	  [self setState:TK_CANCELED];
+	  break;
+	case ICAL_STATUS_INPROCESS:
+	  [self setState:TK_INPROCESS];
+	  break;
+	case ICAL_STATUS_NEEDSACTION:
+	  [self setState:TK_NEEDSACTION];
+	  break;
+	default:
+	  [self setState:TK_NONE];
+	}
+    }
+    else
+      [self setState:TK_NONE];
+    prop = icalcomponent_get_first_property(ic, ICAL_DUE_PROPERTY);
+    if (prop) 
+      [self setDueDate:AUTORELEASE([[Date alloc] initWithICalTime:icalproperty_get_due(prop)])];
   }
-  else
-    [self setState:TK_NONE];
   return self;
 }
 
@@ -123,6 +125,9 @@ static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_
     return NO;
   [self deleteProperty:ICAL_STATUS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_status(statusCorr[[self state]]));
+  [self deleteProperty:ICAL_DUE_PROPERTY fromComponent:ic];
+  if (_dueDate)
+    icalcomponent_add_property(ic, icalproperty_new_due([_dueDate UTCICalTime]));      
   return YES;
 }
 
