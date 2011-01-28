@@ -50,12 +50,12 @@ static NSMutableDictionary *editors;
     ASSIGN(_event , event);
     ASSIGNCOPY(_modifiedAlarms, [event alarms]);
     [title setStringValue:[event summary]];
-    [duration setFloatValue:[event duration] / 60.0];
-    [durationText setFloatValue:[event duration] / 60.0];
+    [duration setIntValue:[event duration] * 60];
+    [durationText setIntValue:[event duration] * 60];
     [location setStringValue:[event location]];
     [allDay setState:[event allDay]];
-    [time setFloatValue:([[event startDate] hourOfDay]*60 + [[event startDate] minuteOfHour]) / 60.0];
-    [timeText setFloatValue:([[event startDate] hourOfDay]*60 + [[event startDate] minuteOfHour]) / 60.0];
+    [time setIntValue:[[event startDate] minuteOfDay] * 60];
+    [timeText setIntValue:[[event startDate] minuteOfDay] * 60];
     if (![event rrule])
       [repeat selectItemAtIndex:0];
     else
@@ -126,7 +126,7 @@ static NSMutableDictionary *editors;
   Date *date;
 
   [_event setSummary:[title stringValue]];
-  [_event setDuration:[duration floatValue] * 60.0];
+  [_event setDuration:[duration intValue] / 60];
 
   if (![repeat indexOfSelectedItem]) {
     [_event setRRule:nil];
@@ -144,7 +144,7 @@ static NSMutableDictionary *editors;
   if (![_event allDay]) {
     date = [[_event startDate] copy];
     [date setIsDate:NO];
-    [date setMinute:[time floatValue] * 60.0];
+    [date setMinute:[time intValue] / 60];
     [_event setStartDate:date];
     [date release];
   }

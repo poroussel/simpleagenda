@@ -34,7 +34,7 @@
     [time setEnabled:YES];
     d = [_current absoluteTrigger];
     [date setObjectValue:[d calendarDate]];
-    [time setFloatValue:([d hourOfDay]*60 + [d minuteOfHour]) / 60.0];
+    [time setIntValue:[d hourOfDay] * 3600 + [d minuteOfHour] * 60];
     [type selectItemAtIndex:1];
   } else {
     [relativeSlider setEnabled:YES];
@@ -47,10 +47,10 @@
     relativeTrigger = [_current relativeTrigger];
     if (relativeTrigger >= 0) {
       [radio selectCellWithTag:1];
-      [relativeSlider setFloatValue:relativeTrigger/3600];
+      [relativeSlider setFloatValue:relativeTrigger];
     } else {
       [radio selectCellWithTag:0];
-      [relativeSlider setFloatValue:-relativeTrigger/3600];
+      [relativeSlider setFloatValue:-relativeTrigger];
     }
     [relativeText setFloatValue:[relativeSlider floatValue]];
   }
@@ -157,11 +157,11 @@
 
 - (void)changeDelay:(id)sender
 {
-  [relativeText setFloatValue:[relativeSlider floatValue]];
+  [relativeText setIntValue:[relativeSlider intValue]];
   if ([[radio selectedCell] tag] == 0)
-    [_current setRelativeTrigger:[relativeSlider floatValue] * -3600];
+    [_current setRelativeTrigger:-[relativeSlider intValue]];
   else
-    [_current setRelativeTrigger:[relativeSlider floatValue] * 3600];
+    [_current setRelativeTrigger:[relativeSlider intValue]];
   [table reloadData];
 }
 
@@ -181,7 +181,7 @@
 
   if (_current && [date objectValue] && [time objectValue]) {
     d = [Date dateWithCalendarDate:[date objectValue] withTime:NO];
-    d = [Date dateWithTimeInterval:[time floatValue] * 3600 sinceDate:d];
+    d = [Date dateWithTimeInterval:[time intValue] sinceDate:d];
     [_current setAbsoluteTrigger:d];
     [table reloadData];
   }

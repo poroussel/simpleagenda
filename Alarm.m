@@ -268,8 +268,8 @@
     return [NSString stringWithFormat:_(@"Trigger on %@"), [[[self absoluteTrigger] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]]];
   trigger = [self relativeTrigger];
   if (trigger >= 0)
-    return [NSString stringWithFormat:_(@"Trigger %@ after the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithFloat:trigger/3600]]];
-  return [NSString stringWithFormat:_(@"Trigger %@ before the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithFloat:-trigger/3600]]];
+    return [NSString stringWithFormat:_(@"Trigger %@ after the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithInt:trigger]]];
+  return [NSString stringWithFormat:_(@"Trigger %@ before the event"), [HourFormatter stringForObjectValue:[NSNumber numberWithInt:-trigger]]];
 }
 
 - (id)copyWithZone:(NSZone *)zone

@@ -101,12 +101,12 @@
   Class backend;
   NSString *name;
 
-  [dayStart setIntValue:start];
-  [dayEnd setIntValue:end];
-  [dayStartText setIntValue:start];
-  [dayEndText setIntValue:end];
-  [minStep setDoubleValue:step/60.0];
-  [minStepText setDoubleValue:step/60.0];
+  [dayStart setIntValue:start*3600];
+  [dayEnd setIntValue:end*3600];
+  [dayStartText setIntValue:start*3600];
+  [dayEndText setIntValue:end*3600];
+  [minStep setIntValue:step * 60];
+  [minStepText setIntValue:step * 60];
   [showTooltip setState:[config integerForKey:TOOLTIP]];
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
@@ -140,15 +140,15 @@
     [storeRefresh setState:[store periodicRefresh]];
     [refreshInterval setEnabled:[store periodicRefresh]];
     [refreshIntervalText setEnabled:[store periodicRefresh]];
-    [refreshIntervalText setDoubleValue:[store refreshInterval]/3600.0];
-    [refreshInterval setDoubleValue:[store refreshInterval]/3600.0];
+    [refreshIntervalText setIntValue:[store refreshInterval]];
+    [refreshInterval setIntValue:[store refreshInterval]];
   } else {
     [storeRefresh setEnabled:NO];
     [storeRefresh setState:NO];
     [refreshInterval setEnabled:NO];
     [refreshIntervalText setEnabled:NO];
-    [refreshIntervalText setDoubleValue:0];
-    [refreshInterval setDoubleValue:0];
+    [refreshIntervalText setIntValue:0];
+    [refreshInterval setIntValue:0];
   }
 }
 
@@ -183,38 +183,38 @@
 
 - (void)changeStart:(id)sender
 {
-  int value = [dayStart intValue];
+  int value = [dayStart intValue] / 3600;
   if (value != [[ConfigManager globalConfig] integerForKey:FIRST_HOUR]) {
-    [dayStartText setIntValue:value];
+    [dayStartText setIntValue:value * 3600];
     [[ConfigManager globalConfig] setInteger:value forKey:FIRST_HOUR];
   }
 }
 
 - (void)changeEnd:(id)sender
 {
-  int value = [dayEnd intValue];
+  int value = [dayEnd intValue] / 3600;
   if (value != [[ConfigManager globalConfig] integerForKey:LAST_HOUR]) {
-    [dayEndText setIntValue:value];
+    [dayEndText setIntValue:value * 3600];
     [[ConfigManager globalConfig] setInteger:value forKey:LAST_HOUR];
   }
 }
 
 - (void)changeStep:(id)sender
 {
-  double value = [minStep doubleValue];
-  if (value * 60 != [[ConfigManager globalConfig] integerForKey:MIN_STEP]) {
-    [minStepText setDoubleValue:value];
-    [[ConfigManager globalConfig] setInteger:value * 60 forKey:MIN_STEP];
+  int value = [minStep intValue] / 60;
+  if (value != [[ConfigManager globalConfig] integerForKey:MIN_STEP]) {
+    [minStepText setIntValue:value * 60];
+    [[ConfigManager globalConfig] setInteger:value forKey:MIN_STEP];
   }
 }
 
 - (void)changeInterval:(id)sender
 {
-  double value = [refreshInterval doubleValue];
+  int value = [refreshInterval intValue];
   id <PeriodicRefresh> store = (id <PeriodicRefresh>)[_sm storeForName:[storePopUp titleOfSelectedItem]];
-  [store setRefreshInterval:value * 3600];
-  [refreshIntervalText setDoubleValue:value];
-  [refreshInterval setDoubleValue:value];
+  [store setRefreshInterval:value];
+  [refreshIntervalText setIntValue:value];
+  [refreshInterval setIntValue:value];
 }
 
 - (void)selectDefaultStore:(id)sender

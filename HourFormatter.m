@@ -3,13 +3,16 @@
 #import "HourFormatter.h"
 
 @implementation HourFormatter
-
 + (NSString *)stringForObjectValue:(id)anObject
 {
+  int hours;
+  int minutes;
+
   if (![anObject isKindOfClass:[NSNumber class]])
     return nil;
-  int m = ([anObject floatValue] - [anObject intValue]) * 100;
-  return [NSString stringWithFormat:@"%dh%02d", [anObject intValue], 60 * m / 100];
+  hours = [anObject intValue] / 3600;
+  minutes = [anObject intValue] / 60 - hours * 60;
+  return [NSString stringWithFormat:@"%dh%02d", hours, minutes];
 }
 
 - (NSString *)stringForObjectValue:(id)anObject
@@ -55,7 +58,7 @@
       NSLog(@"Minutes must be between 0 and 59");
     return NO;
   }
-  *anObject = [[NSNumber alloc] initWithFloat:[hours floatValue] + [minutes floatValue] / 60.0];
+  *anObject = [[NSNumber alloc] initWithInt:[hours intValue] * 3600 + [minutes intValue] * 60.0];
   return YES;
 }
 
