@@ -5,16 +5,46 @@
 #import "HourFormatter.h"
 
 @implementation AlarmEditor
-- (void)setupForAlarm:(Alarm *)alarm
+- (void)setupForSelection
 {
   NSTimeInterval relativeTrigger;
+  Date *d;
 
-  _current = alarm;
-  if ([alarm isAbsoluteTrigger]) {
+  if ([_alarms count] == 0) {
+    [action setEnabled:NO];
+    [type setEnabled:NO];
+    [relativeSlider setEnabled:NO];
+    [radio setEnabled:NO];
+    [date setEnabled:NO];
+    [time setEnabled:NO];
+    [date setObjectValue:nil];
+    [date setObjectValue:nil];
+    [remove setEnabled:NO];
+    _current = nil;
+    return;
+  }
+  [action setEnabled:YES];
+  [type setEnabled:YES];
+  [remove setEnabled:YES];
+  _current = [_alarms objectAtIndex:[table selectedRow]];
+  if ([_current isAbsoluteTrigger]) {
+    [relativeSlider setEnabled:NO];
+    [radio setEnabled:NO];
+    [date setEnabled:YES];
+    [time setEnabled:YES];
+    d = [_current absoluteTrigger];
+    [date setObjectValue:[d calendarDate]];
+    [time setFloatValue:([d hourOfDay]*60 + [d minuteOfHour]) / 60.0];
     [type selectItemAtIndex:1];
   } else {
+    [relativeSlider setEnabled:YES];
+    [radio setEnabled:YES];
+    [date setEnabled:NO];
+    [time setEnabled:NO];
+    [date setObjectValue:nil];
+    [date setObjectValue:nil];
     [type selectItemAtIndex:0];
-    relativeTrigger = [alarm relativeTrigger];
+    relativeTrigger = [_current relativeTrigger];
     if (relativeTrigger >= 0) {
       [radio selectCellWithTag:1];
       [relativeSlider setFloatValue:relativeTrigger/3600];
@@ -22,8 +52,7 @@
       [radio selectCellWithTag:0];
       [relativeSlider setFloatValue:-relativeTrigger/3600];
     }
-    [self changeDelay:self];
-    [self selectType:self];
+    [relativeText setFloatValue:[relativeSlider floatValue]];
   }
 }
 
@@ -63,13 +92,8 @@
 {
   if ((self = [self init])) {
     _alarms = [[NSMutableArray alloc] initWithArray:alarms copyItems:YES];
-    if ([_alarms count] == 0) {
-      [self setupForAlarm:_simple];
-      [remove setEnabled:NO];
-    } else {
-      [remove setEnabled:YES];
-    }
     [table reloadData];
+    [self setupForSelection];
   }
   return self;
 }
@@ -105,56 +129,40 @@
   [_alarms addObject:AUTORELEASE([_simple copy])];
   [table reloadData];
   [table selectRow:[_alarms count]-1 byExtendingSelection:NO];
-  [remove setEnabled:YES];
 }
 
 - (void)removeAlarm:(id)sender
 {
   [_alarms removeObjectAtIndex:[table selectedRow]];
   [table reloadData];
-  if ([_alarms count] > 0)
-    [self tableViewSelectionDidChange:nil];
-  else
-    [remove setEnabled:NO];
+  [self tableViewSelectionDidChange:nil];
 }
 
 - (void)selectType:(id)sender
 {
   Date *d;
 
-  if ([type indexOfSelectedItem] == 0) {
-    [relativeSlider setEnabled:YES];
-    [radio setEnabled:YES];
-    [date setEnabled:NO];
-    [time setEnabled:NO];
-    [date setObjectValue:nil];
-    [date setObjectValue:nil];
-    [self changeDelay:self];
-  } else {
-    [relativeSlider setEnabled:NO];
-    [radio setEnabled:NO];
-    [date setEnabled:YES];
-    [time setEnabled:YES];
+  if ([type indexOfSelectedItem] == 1) {
     d = [Date now];
     [d changeDayBy:7];
     [date setObjectValue:[d calendarDate]];
     [time setFloatValue:([d hourOfDay]*60 + [d minuteOfHour]) / 60.0];
-    if (_current)
-      [_current setAbsoluteTrigger:d];
+    [_current setAbsoluteTrigger:d];
+    [table reloadData];
+  } else {
+    [self changeDelay:nil];
   }
-  [table reloadData];
+  [self setupForSelection];
 }
 
 - (void)changeDelay:(id)sender
 {
   [relativeText setFloatValue:[relativeSlider floatValue]];
-  if (_current) {
-    if ([[radio selectedCell] tag] == 0)
-      [_current setRelativeTrigger:[relativeSlider floatValue] * -3600];
-    else
-      [_current setRelativeTrigger:[relativeSlider floatValue] * 3600];
-    [table reloadData];
-  }
+  if ([[radio selectedCell] tag] == 0)
+    [_current setRelativeTrigger:[relativeSlider floatValue] * -3600];
+  else
+    [_current setRelativeTrigger:[relativeSlider floatValue] * 3600];
+  [table reloadData];
 }
 
 - (void)switchBeforeAfter:(id)sender
@@ -164,8 +172,7 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-  if ([_alarms count] > 0)
-    [self setupForAlarm:[_alarms objectAtIndex:[table selectedRow]]];
+  [self setupForSelection];
 }
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
