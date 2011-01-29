@@ -68,7 +68,7 @@ static NSMutableDictionary *editors;
     [ok setEnabled:[self canBeModified]];
     if ([task dueDate]) {
       [dueDate setObjectValue:[[task dueDate] calendarDate]];
-      [dueTime setFloatValue:([[task dueDate] hourOfDay]*60 + [[task dueDate] minuteOfHour]) / 60.0];
+      [dueTime setIntValue:[[task dueDate] hourOfDay] * 3600 + [[task dueDate] minuteOfHour] * 60];
       [toggleDueDate setState:YES];
     }
     [dueDate setEnabled:[toggleDueDate state]];
@@ -117,7 +117,7 @@ static NSMutableDictionary *editors;
   [_task setAlarms:_modifiedAlarms];
   if ([toggleDueDate state]) {
     date = [Date dateWithCalendarDate:[dueDate objectValue] withTime:NO];
-    date = [Date dateWithTimeInterval:[dueTime floatValue] * 3600 sinceDate:date];
+    date = [Date dateWithTimeInterval:[dueTime intValue] sinceDate:date];
     [_task setDueDate:date];
   } else {
     [_task setDueDate:nil];
@@ -162,7 +162,7 @@ static NSMutableDictionary *editors;
     date = [Date now];
     [date changeDayBy:7];
     [dueDate setObjectValue:[date calendarDate]];
-    [dueTime setFloatValue:([date hourOfDay]*60 + [date minuteOfHour]) / 60.0];
+    [dueTime setIntValue:[date hourOfDay] * 3600 + [date minuteOfHour] * 60];
   } else {
     [dueDate setObjectValue:nil];
     [dueTime setObjectValue:nil];
