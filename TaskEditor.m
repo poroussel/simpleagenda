@@ -73,7 +73,6 @@ static NSMutableDictionary *editors;
     }
     [dueDate setEnabled:[toggleDueDate state]];
     [dueTime setEnabled:[toggleDueDate state]];
-    [alarms setEnabled:[toggleDueDate state]];
     [window makeKeyAndOrderFront:self];
   }
   return self;
@@ -157,7 +156,6 @@ static NSMutableDictionary *editors;
 
   [dueDate setEnabled:[toggleDueDate state]];
   [dueTime setEnabled:[toggleDueDate state]];
-  [alarms setEnabled:[toggleDueDate state]];
   if ([toggleDueDate state]) {
     date = [Date now];
     [date changeDayBy:7];
