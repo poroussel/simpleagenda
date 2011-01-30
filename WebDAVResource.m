@@ -239,8 +239,9 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 
   NS_DURING
     {
-      url = [NSURL URLWithString:string];
-      valid = url ? YES : NO;
+      /* We want an absolute URL */
+      if ((url = [NSURL URLWithString:string]) && [url scheme])
+	  valid = YES;
     }
   NS_HANDLER
     {
@@ -255,7 +256,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   if ([NSURL stringIsValidURL:string])
     url = [NSURL URLWithString:string];
   else
-    url = [NSURL URLWithString:[[base absoluteString] stringByReplacingString:[base path] withString:string]];
+    url = [NSURL URLWithString:string relativeToURL:base];
   return url;
 }
 @end

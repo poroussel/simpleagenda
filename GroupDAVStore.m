@@ -199,9 +199,9 @@
     cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[dialog url] forKey:ST_URL];
     if (calendarURL)
-      [cm setObject:[calendarURL description] forKey:ST_CALENDAR_URL];
+      [cm setObject:[calendarURL absoluteString] forKey:ST_CALENDAR_URL];
     if (taskURL)
-      [cm setObject:[taskURL description] forKey:ST_TASK_URL];
+      [cm setObject:[taskURL absoluteString] forKey:ST_TASK_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:YES] forKey:ST_RW];
     return YES;
