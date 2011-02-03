@@ -158,14 +158,15 @@ static NSMutableDictionary *editors;
     [originalStore remove:_event];
     [aStore add:_event];
   }
-  [editors removeObjectForKey:[_event UID]];
   [window close];
+  [editors removeObjectForKey:[_event UID]];
+  /* After this point the panel instance is released */
 }
 
 - (void)cancel:(id)sender
 {
-  [editors removeObjectForKey:[_event UID]];
   [window close];
+  [editors removeObjectForKey:[_event UID]];
 }
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification

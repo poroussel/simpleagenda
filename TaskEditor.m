@@ -130,14 +130,14 @@ static NSMutableDictionary *editors;
     [originalStore remove:_task];
     [aStore add:_task];
   }
-  [editors removeObjectForKey:[_task UID]];
   [window close];
+  [editors removeObjectForKey:[_task UID]];
 }
 
 - (void)cancel:(id)sender
 {
-  [editors removeObjectForKey:[_task UID]]; 
   [window close]; 
+  [editors removeObjectForKey:[_task UID]]; 
 }
 
 - (void)editAlarms:(id)sender
