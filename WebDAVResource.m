@@ -11,6 +11,8 @@
   DESTROY(_url);
   DESTROY(_lastModified);
   DESTROY(_data);
+  DESTROY(_reason);
+  DESTROY(_etag);
   [super dealloc];
 }
 
