@@ -110,7 +110,7 @@
 	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
 	for (i = 0; i < [set count]; i++)
 	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
-	[xpc release];
+	RELEASE(xpc);
 	if ([calendar numberOfItems] > 0)
 	  [calendar selectItemAtIndex:1];
 	if ([task numberOfItems] > 0)
@@ -355,7 +355,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
       if (elementURL)
 	[result addObject:[elementURL absoluteString]];
     }
-    [xpc release];
+    RELEASE(xpc);
   }
   return result;
 }

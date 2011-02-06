@@ -228,6 +228,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
       result = (GSXPathString *)[xpc evaluateExpression:GETLASTMODIFIED];
       if (result)
 	ASSIGN(_lastModified, [result stringValue]);
+      RELEASE(xpc);
     }
   }
 }
