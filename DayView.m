@@ -352,7 +352,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
   _selected = aptv;
-  [[SelectionManager globalManager] set:[aptv appointment]];
+  [[SelectionManager globalManager] select:[aptv appointment]];
   if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
     [delegate viewSelectEvent:[aptv appointment]];
   [self setNeedsDisplay:YES];

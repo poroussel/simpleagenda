@@ -9,6 +9,7 @@ version 0.42
 	* Handle due date in tasks
 	* Fix URL handling for GroupDAV calendars, tested against
 	  Citadel and OGO
+	* Enable copy/paste on multiple elements (select with control key)
 
 version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes

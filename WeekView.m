@@ -229,7 +229,7 @@ static struct {
 {
   if ([delegate respondsToSelector:@selector(viewSelectDate:)])
     [delegate viewSelectDate:[(WeekDayView *)[aptv superview] day]];
-  [[SelectionManager globalManager] set:[aptv appointment]];
+  [[SelectionManager globalManager] select:[aptv appointment]];
   if ([delegate respondsToSelector:@selector(viewSelectEvent:)])
     [delegate viewSelectEvent:[aptv appointment]];
   [self setNeedsDisplay:YES];

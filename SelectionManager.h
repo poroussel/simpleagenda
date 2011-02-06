@@ -17,8 +17,7 @@ typedef enum {
 + (SelectionManager *)globalManager;
 - (int)count;
 - (int)copiedCount;
-- (void)add:(id)object;
-- (void)set:(id)object;
+- (void)select:(id)object;
 - (void)clear;
 - (id)lastObject;
 - (void)copySelection;

@@ -656,13 +656,13 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     [calendar setDate:day];
     if (![tabIdentifier isEqualToString:@"Day"] && ![tabIdentifier isEqualToString:@"Week"])
       [tabs selectTabViewItemWithIdentifier:@"Day"];
-    [_selm set:element];
+    [_selm select:element];
     return YES;
   }
   if ([element isKindOfClass:[Task class]]) {
     if (![tabIdentifier isEqualToString:@"Tasks"])
       [tabs selectTabViewItemWithIdentifier:@"Tasks"];
-    [_selm set:element];
+    [_selm select:element];
     return YES;
   }
   return NO;
@@ -866,7 +866,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   int index = [taskView selectedRow];
   if (index > -1)
-    [_selm set:[[_sm visibleTasks] objectAtIndex:index]];
+    [_selm select:[[_sm visibleTasks] objectAtIndex:index]];
 }
 @end
 

@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #import "SelectionManager.h"
 
 static SelectionManager *singleton;
@@ -44,15 +45,12 @@ static SelectionManager *singleton;
   return [_copyarea count];
 }
 
-- (void)add:(id)object
+- (void)select:(id)object
 {
-  [_objects addObject:object];
-}
-
-- (void)set:(id)object
-{
-  [_objects removeAllObjects];
-  [_objects addObject:object];
+  if (!([[NSApp currentEvent] modifierFlags] & NSControlKeyMask))
+    [_objects removeAllObjects];
+  if (![_objects containsObject:object])
+    [_objects addObject:object];
 }
 
 - (void)clear
