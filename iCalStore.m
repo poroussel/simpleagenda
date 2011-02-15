@@ -221,14 +221,14 @@
     if ([_resource put:data attributes:nil]) {
       [_resource updateAttributes];
       [self setModified:NO];
-      NSLog(@"iCalStore written to %@", [_url absoluteString]);
+      NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
       return YES;
     }
     if ([_resource httpStatus] == 412) {
       NSRunAlertPanel(@"Error : data source modified", @"To prevent losing modifications, this agenda\nwill be updated and marked as read-only. ", @"Ok", nil, nil);
       [self read];
     }
-    NSLog(@"Unable to write to %@, make this store read only", [_url absoluteString]);
+    NSLog(@"Unable to write to %@, make this store read only", [_url anonymousAbsoluteString]);
     [self setWritable:NO];
     return NO;
   }
@@ -282,10 +282,10 @@
 {
   if ([_tree parseData:data]) {
     [self fillWithElements:[_tree components]];
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
+    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
   } else
-    NSLog(@"Couldn't parse data from %@", [_url absoluteString]);
+    NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
 }
 - (void)initTimer
 {

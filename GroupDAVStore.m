@@ -253,7 +253,7 @@
       /* Reloading all data is a way to handle href and uid modification done by the server */
       [self fetchData];
     else
-      NSLog(@"Error %d writing event to %@", [resource httpStatus], [url absoluteString]);
+      NSLog(@"Error %d writing event to %@", [resource httpStatus], [url anonymousAbsoluteString]);
   }
   [tree release];
   [resource release];
@@ -418,7 +418,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     else
       [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:_loadedData waitUntilDone:YES];
   }      
-  NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url absoluteString], [[self events] count]);
-  NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url absoluteString], [[self tasks] count]);
+  NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+  NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
 }
 @end

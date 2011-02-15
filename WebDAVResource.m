@@ -88,7 +88,7 @@
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
   if (body)
     [handle writeData:body];
-  NSDebugLog(@"%@ %@ (%@)", [_url absoluteString], method, [attributes description]);
+  NSDebugLog(@"%@ %@ (%@)", [_url anonymousAbsoluteString], method, [attributes description]);
   DESTROY(_data);
   data = [handle resourceData];
   /* FIXME : this is more than ugly */
@@ -261,6 +261,15 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   else
     url = [NSURL URLWithString:string relativeToURL:base];
   return url;
+}
+- (NSString *)anonymousAbsoluteString
+{
+  NSString *as = [self absoluteString];
+
+  if (![self user] && ![self password])
+    return as;
+  return [as stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@:%@@", [self user], [self password]]
+				       withString:@""];
 }
 @end
 
