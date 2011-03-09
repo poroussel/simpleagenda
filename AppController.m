@@ -270,7 +270,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[taskView tableColumnWithIdentifier:@"state"] setDataCell:cell];
   [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:128];
   [taskView setAutoresizesAllColumnsToFit:YES];
-  [[weekView superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [taskView setUsesAlternatingRowBackgroundColors:YES];
   [taskView setTarget:self];
   [taskView setDoubleAction:@selector(editAppointment:)];
