@@ -270,18 +270,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[taskView tableColumnWithIdentifier:@"state"] setDataCell:cell];
   [[taskView tableColumnWithIdentifier:@"state"] setMaxWidth:128];
   [taskView setAutoresizesAllColumnsToFit:YES];
-  /* 
-   * FIXME : this shouldn't be needed but I can't make it
-   * work by editing the interface with Gorm...
-   * [[taskView superview] superview] is the ScrollView
-   * 
-   * Edit : I don't know if the bug comes from Gorm or
-   * NSTabView but here's an explanation : there is a NSView
-   * between NSTabView and each tab view (NSTabView -> NSView -> DayView,
-   * NSTabView -> NSView -> WeekView etc) and, except for the first tab,
-   * the intermediate view's autoresizingMask is 0
-   */
-  [[[[taskView superview] superview] superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [[weekView superview] setAutoresizingMask:NSViewWidthSizable|NSViewHeightSizable];
   [taskView setUsesAlternatingRowBackgroundColors:YES];
   [taskView setTarget:self];
