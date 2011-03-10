@@ -26,7 +26,7 @@ static NSArray *stateName;
 @implementation Task
 + (void)initialize
 {
-  if (stateName == nil)
+  if ([Task class] == self)
     stateName = [[NSArray alloc] initWithObjects:_(@"None"), _(@"Started"), _(@"Completed"), _(@"Canceled"), _(@"Needs action"), nil];
 }
 
@@ -37,45 +37,52 @@ static NSArray *stateName;
 
 - (id)init
 {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     _state = TK_NONE;
     _dueDate = nil;
   }
   return self;
 }
+
 - (void)dealloc
 {
   RELEASE(_dueDate);
   [super dealloc];
 }
+
 - (enum taskState)state
 {
   return _state;
 }
+
 - (NSString *)stateAsString
 {
   return [stateName objectAtIndex:_state];
 }
+
 - (void)setState:(enum taskState)state
 {
   _state = state;
 }
+
 - (Date *)dueDate
 {
   return _dueDate;
 }
+
 - (void)setDueDate:(Date *)cd
 {
   DESTROY(_dueDate);
   if (cd != nil)
     ASSIGNCOPY(_dueDate, cd);
 }
+
 - (Date *)nextActivationDate
 {
   /* FIXME */
   return _dueDate;
 }
+
 - (NSString *)description
 {
   return [self summary];
