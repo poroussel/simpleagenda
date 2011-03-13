@@ -594,6 +594,8 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+additional_lib_dir
+additional_include_dir
 have_dbuskit
 have_addresses
 have_libuuid
@@ -648,6 +650,8 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_ical_include
+with_ical_library
 enable_dbuskit
 '
       ac_precious_vars='build_alias
@@ -1268,6 +1272,12 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dbuskit       disable DBusKit based alarm notification
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-ical-include=DIR  include path for ical headers
+  --with-ical-library=DIR  library path for ical libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -1994,6 +2004,26 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 ac_config_headers="$ac_config_headers config.h"
 
 
+old_cppflags=$CPPFLAGS
+old_ldflags=$LDFLAGS
+
+additional_include_dir=
+additional_lib_dir=
+
+
+# Check whether --with-ical-include was given.
+if test "${with_ical_include+set}" = set; then :
+  withval=$with_ical_include; additional_include_dir+=-I"$withval"
+fi
+
+
+# Check whether --with-ical-library was given.
+if test "${with_ical_library+set}" = set; then :
+  withval=$with_ical_library; additional_lib_dir=-L"$withval"
+fi
+
+CPPFLAGS="$CPPFLAGS $additional_include_dir"
+LDFLAGS="$LDFLAGS $additional_lib_dir"
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3211,6 +3241,9 @@ fi
 
 done
 
+CPPFLAGS=$old_cppflags
+LDFLAGS=$old_ldflags
+
 for ac_header in uuid/uuid.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "uuid/uuid.h" "ac_cv_header_uuid_uuid_h" "$ac_includes_default"
@@ -3375,6 +3408,9 @@ else
 $as_echo "$as_me: DBusKit disabled" >&6;}
    have_dbuskit=no
 fi
+
+
+
 
 
 
