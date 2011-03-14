@@ -360,10 +360,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [_pc showPreferences];
 }
 
+NSComparisonResult compareEventTime(id a, id b, void *context)
+{
+  return [[a startDate] compareTime:[b startDate]];
+}
+
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSEnumerator *enumerator = [[_sm visibleAppointmentsForDay:_selectedDay] objectEnumerator];
+  NSEnumerator *enumerator = [[[[_sm visibleAppointmentsForDay:_selectedDay] allObjects] 
+				sortedArrayUsingFunction:compareEventTime context:nil] objectEnumerator];
   Event *apt;
 
   while ((apt = [enumerator nextObject])) {
