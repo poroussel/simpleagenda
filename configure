@@ -3267,19 +3267,13 @@ done
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
   CFLAGS+=`gnustep-config --objc-flags`
-  PREFIX="-I"
-  OLD_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $PREFIX$GNUSTEP_SYSTEM_HEADERS $PREFIX$GNUSTEP_LOCAL_HEADERS"
 
   OLD_LDFLAGS="$LD_FLAGS"
-  PREFIX="-L"
-  LDFLAGS="$LDFLAGS $PREFIX$GNUSTEP_SYSTEM_LIBRARIES $PREFIX$GNUSTEP_LOCAL_LIBRARIES"
+  LDFLAGS=`gnustep-config --objc-libs`
   OLD_LIBS="$LIBS"
-  LIBS="-lgnustep-base"
+  LIBS="-lgnustep-base -lAddresses"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Addresses framework" >&5
 $as_echo_n "checking for Addresses framework... " >&6; }
-
-  LIBS="$LIBS -lAddresses"
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -3304,7 +3298,6 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
   LIBS="$OLD_LIBS"
-  CPPFLAGS="$OLD_CPPFLAGS"
   LDFLAGS="$OLD_LDFLAGS"
   CFLAGS="$OLD_CFLAGS"
 
@@ -3329,19 +3322,13 @@ if test "x$enable_dbuskit" != xno; then
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
   CFLAGS+=`gnustep-config --objc-flags`
-  PREFIX="-I"
-  OLD_CPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="$CPPFLAGS $PREFIX$GNUSTEP_SYSTEM_HEADERS $PREFIX$GNUSTEP_LOCAL_HEADERS"
 
   OLD_LDFLAGS="$LD_FLAGS"
-  PREFIX="-L"
-  LDFLAGS="$LDFLAGS $PREFIX$GNUSTEP_SYSTEM_LIBRARIES $PREFIX$GNUSTEP_LOCAL_LIBRARIES"
+  LDFLAGS=`gnustep-config --objc-libs`
   OLD_LIBS="$LIBS"
-  LIBS="-lgnustep-base"
+  LIBS="-lgnustep-base -lDBusKit"
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for DBusKit framework" >&5
 $as_echo_n "checking for DBusKit framework... " >&6; }
-
-  LIBS="$LIBS -lDBusKit"
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -3366,7 +3353,6 @@ rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 
   LIBS="$OLD_LIBS"
-  CPPFLAGS="$OLD_CPPFLAGS"
   LDFLAGS="$OLD_LDFLAGS"
   CFLAGS="$OLD_CFLAGS"
 
