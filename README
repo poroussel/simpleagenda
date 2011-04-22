@@ -11,7 +11,8 @@ GNUstep frameworks. Its major features are:
     * create, resize and move appointments easily
     * export individual elements as files and to pasteboard
     * import .ics files
-    * simple text search 
+    * simple text search
+    * alarms with multiples backends
 
 Dependencies
 ============
@@ -21,7 +22,7 @@ GNUstep stable version released on 2011/04/14
 libical 0.27 or later
 libuuid (optional)
 Addresses framework (optional)
-DBusKit from svn trunk (optional)
+DBusKit 0.1 (optional)
 
 
 Website
