@@ -4,22 +4,6 @@ AC_DEFUN(AC_CHECK_ADDRESSES,[
   GNUSTEP_SH_EXPORT_ALL_VARIABLES=yes
   . "$GNUSTEP_MAKEFILES/GNUstep.sh"
   unset GNUSTEP_SH_EXPORT_ALL_VARIABLES
-
-  # For backwards compatibility, define GNUSTEP_SYSTEM_HEADERS from
-  # GNUSTEP_SYSTEM_ROOT if not set yet.
-  if test x"$GNUSTEP_SYSTEM_HEADERS" = x""; then
-    GNUSTEP_SYSTEM_HEADERS="$GNUSTEP_SYSTEM_ROOT/Library/Headers"
-  fi
-  if test x"$GNUSTEP_LOCAL_HEADERS" = x""; then
-    GNUSTEP_LOCAL_HEADERS="$GNUSTEP_LOCAL_ROOT/Library/Headers"
-  fi
-
-  if test x"$GNUSTEP_SYSTEM_LIBRARIES" = x""; then
-    GNUSTEP_SYSTEM_LIBRARIES="$GNUSTEP_SYSTEM_ROOT/Library/Libraries"
-  fi
-  if test x"$GNUSTEP_LOCAL_LIBRARIES" = x""; then
-    GNUSTEP_LOCAL_LIBRARIES="$GNUSTEP_LOCAL_ROOT/Library/Libraries"
-  fi
   
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
@@ -60,22 +44,6 @@ AC_DEFUN(AC_CHECK_DBUSKIT,[
   GNUSTEP_SH_EXPORT_ALL_VARIABLES=yes
   . "$GNUSTEP_MAKEFILES/GNUstep.sh"
   unset GNUSTEP_SH_EXPORT_ALL_VARIABLES
-
-  # For backwards compatibility, define GNUSTEP_SYSTEM_HEADERS from
-  # GNUSTEP_SYSTEM_ROOT if not set yet.
-  if test x"$GNUSTEP_SYSTEM_HEADERS" = x""; then
-    GNUSTEP_SYSTEM_HEADERS="$GNUSTEP_SYSTEM_ROOT/Library/Headers"
-  fi
-  if test x"$GNUSTEP_LOCAL_HEADERS" = x""; then
-    GNUSTEP_LOCAL_HEADERS="$GNUSTEP_LOCAL_ROOT/Library/Headers"
-  fi
-
-  if test x"$GNUSTEP_SYSTEM_LIBRARIES" = x""; then
-    GNUSTEP_SYSTEM_LIBRARIES="$GNUSTEP_SYSTEM_ROOT/Library/Libraries"
-  fi
-  if test x"$GNUSTEP_LOCAL_LIBRARIES" = x""; then
-    GNUSTEP_LOCAL_LIBRARIES="$GNUSTEP_LOCAL_ROOT/Library/Libraries"
-  fi
   
   OLD_CFLAGS=$CFLAGS  
   CFLAGS="-xobjective-c "
