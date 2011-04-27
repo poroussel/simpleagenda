@@ -4,7 +4,7 @@ include local.make
 #
 # Application
 #
-VERSION = 0.41
+VERSION = 0.42
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff

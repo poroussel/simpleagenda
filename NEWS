@@ -1,4 +1,4 @@
-version 0.42
+version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups
 	* Handle read only stores when cut & pasting elements
 	* Simple reminders/alarms handling with multiple backends
