@@ -303,7 +303,7 @@ static NSImage *_2right;
 {
   return _dataSource;
 }
-- (void)setDateSource:(id)dataSource
+- (void)setDataSource:(id)dataSource
 {
   ASSIGN(_dataSource, dataSource);
   [self updateView];

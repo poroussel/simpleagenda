@@ -32,7 +32,7 @@ typedef enum {
 - (id)delegate;
 - (void)setDelegate:(id)delegate;
 - (id)dataSource;
-- (void)setDateSource:(id)dataSource;
+- (void)setDataSource:(id)dataSource;
 - (void)reloadData;
 @end
 

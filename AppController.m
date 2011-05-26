@@ -303,7 +303,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   /* Set the selected day : this will update all views and titles (but not the summary) */
-  [calendar setDateSource:self];
+  [calendar setDataSource:self];
   [calendar setDate:[Date today]];
   /*
    * If stores are loaded before this is executed (it happens
