@@ -3266,7 +3266,7 @@ done
 
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
-  CFLAGS+=`gnustep-config --objc-flags`
+  CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
   OLD_LDFLAGS="$LD_FLAGS"
   LDFLAGS=`gnustep-config --objc-libs`
@@ -3321,7 +3321,7 @@ if test "x$enable_dbuskit" != xno; then
 
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
-  CFLAGS+=`gnustep-config --objc-flags`
+  CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
   OLD_LDFLAGS="$LD_FLAGS"
   LDFLAGS=`gnustep-config --objc-libs`

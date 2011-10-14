@@ -7,7 +7,7 @@ AC_DEFUN(AC_CHECK_ADDRESSES,[
   
   OLD_CFLAGS=$CFLAGS
   CFLAGS="-xobjective-c "
-  CFLAGS+=`gnustep-config --objc-flags`
+  CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
   OLD_LDFLAGS="$LD_FLAGS"
   LDFLAGS=`gnustep-config --objc-libs`
@@ -40,7 +40,7 @@ AC_DEFUN(AC_CHECK_DBUSKIT,[
   
   OLD_CFLAGS=$CFLAGS  
   CFLAGS="-xobjective-c "
-  CFLAGS+=`gnustep-config --objc-flags`
+  CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
   OLD_LDFLAGS="$LD_FLAGS"
   LDFLAGS=`gnustep-config --objc-libs`
