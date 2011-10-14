@@ -66,5 +66,5 @@
  * it seems MIN and MAX macros are not always defined
  */
 #ifndef MAX
-#import <GNUstepBase/preface.h>
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif
