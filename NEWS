@@ -3,6 +3,7 @@ version 0.43
 	  so stop including it just for the MAX macro
 	* Fix ticket #18 with a patch from Sebastian
 	  (note to self : learn shell syntax)
+	* Fix ticket #20 with a patch from Sebastian
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups

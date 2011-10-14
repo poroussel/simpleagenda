@@ -23,7 +23,11 @@ SimpleAgendaTests_OBJC_FILES = \
 
 SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical -lgnustep-gui
 #ifeq(have_libuuid,yes)
+ifeq ($(findstring openbsd, $(GNUSTEP_TARGET_OS)), openbsd)
+SimpleAgendaTests_TOOL_LIBS += -le2fs-uuid
+else
 SimpleAgendaTests_TOOL_LIBS += -luuid
+endif
 #endif
 
 ADDITIONAL_OBJCFLAGS = -Wno-import -Wall

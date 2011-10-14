@@ -14,7 +14,11 @@ ADDITIONAL_CFLAGS +=
 # Additional flags to pass to the linker
 ADDITIONAL_TOOL_LIBS += -lical
 ifeq ($(LIBUUID),yes)
+ifeq ($(findstring openbsd, $(GNUSTEP_TARGET_OS)), openbsd)
+ADDITIONAL_TOOL_LIBS += -le2fs-uuid
+else
 ADDITIONAL_TOOL_LIBS += -luuid
+endif
 endif
 ifeq ($(ADDRESSES),yes)
 ADDITIONAL_TOOL_LIBS += -lAddresses
