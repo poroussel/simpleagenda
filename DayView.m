@@ -1,5 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "DayView.h"
 #import "ConfigManager.h"

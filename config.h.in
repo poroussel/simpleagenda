@@ -60,11 +60,3 @@
 #else
 #import <ical.h>
 #endif
-
-/*
- * Workaround a build failure found by Sergey Golovin :
- * it seems MIN and MAX macros are not always defined
- */
-#ifndef MAX
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-#endif
