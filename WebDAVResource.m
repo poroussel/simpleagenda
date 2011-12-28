@@ -1,5 +1,6 @@
 #import <GNUstepBase/GSXML.h>
 #import <GNUstepBase/GSMime.h>
+#import "NSString+SimpleAgenda.h"
 #import "WebDAVResource.h"
 
 @implementation WebDAVResource
@@ -235,28 +236,11 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 @end
 
 @implementation NSURL(SimpleAgenda)
-+ (BOOL)stringIsValidURL:(NSString *)string
-{
-  BOOL valid = NO;
-  NSURL *url;
-
-  NS_DURING
-    {
-      /* We want an absolute URL */
-      if ((url = [NSURL URLWithString:string]) && [url scheme])
-	  valid = YES;
-    }
-  NS_HANDLER
-    {
-    }
-  NS_ENDHANDLER
-    return valid;
-}
 + (NSURL *)URLWithString:(NSString *)string possiblyRelativeToURL:(NSURL *)base
 {
   NSURL *url;
 
-  if ([NSURL stringIsValidURL:string])
+  if ([string isValidURL])
     url = [NSURL URLWithString:string];
   else
     url = [NSURL URLWithString:string relativeToURL:base];

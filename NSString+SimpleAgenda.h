@@ -4,4 +4,5 @@
 
 @interface NSString(SimpleAgenda)
 + (NSString *)uuid;
+- (BOOL)isValidURL;
 @end

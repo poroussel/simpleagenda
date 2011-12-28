@@ -35,4 +35,23 @@
   return [NSString stringWithFormat:@"%@-%d-%@", [now description], counter, [[NSHost currentHost] address]];
 #endif
 }
+
+- (BOOL)isValidURL
+{
+  BOOL valid = NO;
+  NSURL *url;
+
+  NS_DURING
+    {
+      /* We want an absolute URL */
+      if ((url = [NSURL URLWithString:self]) && [url scheme])
+	  valid = YES;
+    }
+  NS_HANDLER
+    {
+      NSDebugLog(@"<%@> isn't a valid URL", self);
+    }
+  NS_ENDHANDLER
+    return valid;
+}
 @end

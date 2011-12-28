@@ -4,6 +4,7 @@
 #import "AgendaStore.h"
 #import "WebDAVResource.h"
 #import "iCalTree.h"
+#import "NSString+SimpleAgenda.h"
 #import "defines.h"
 
 @interface iCalStore : MemoryStore <SharedStore, ConfigListener>
@@ -77,7 +78,7 @@
 {
   NS_DURING
     {
-      [ok setEnabled:[NSURL stringIsValidURL:[url stringValue]]];
+      [ok setEnabled:[[url stringValue] isValidURL]];
     }
   NS_HANDLER
     {

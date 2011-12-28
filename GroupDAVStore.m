@@ -5,6 +5,7 @@
 #import "AgendaStore.h"
 #import "WebDAVResource.h"
 #import "iCalTree.h"
+#import "NSString+SimpleAgenda.h"
 #import "defines.h"
 
 @interface GroupDAVStore : MemoryStore <AgendaStore, ConfigListener>
@@ -98,7 +99,7 @@
   GSXPathNodeSet *set;
 
   [self clearPopUps];
-  if ([NSURL stringIsValidURL:[url stringValue]]) {
+  if ([[url stringValue] isValidURL]) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
       parser = [GSXMLParser parserWithData:[resource data]];
