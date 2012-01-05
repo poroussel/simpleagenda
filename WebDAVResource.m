@@ -89,7 +89,7 @@
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
   if (body)
     [handle writeData:body];
-  NSDebugLog(@"%@ %@ (%@)", [_url anonymousAbsoluteString], method, [attributes description]);
+  NSDebugLLog(@"SimpleAgenda", @"%@ %@ (%@)", [_url anonymousAbsoluteString], method, [attributes description]);
   DESTROY(_data);
   data = [handle resourceData];
   /* FIXME : this is more than ugly */
@@ -100,12 +100,12 @@
 
   /* FIXME : why do we have to check for httpStatus == 0 */
   if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
-    NSDebugLog(@"Redirection to %@", [handle propertyForKey:@"Location"]);
+    NSDebugLLog(@"SimpleAgenda", @"Redirection to %@", [handle propertyForKey:@"Location"]);
     [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
     goto restart;
   }
 
-  NSDebugLog(@"%@ status %d", method, _httpStatus);
+  NSDebugLLog(@"SimpleAgenda", @"%@ status %d", method, _httpStatus);
   property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
   if (property)
     ASSIGN(_reason, property);

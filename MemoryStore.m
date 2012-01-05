@@ -65,6 +65,7 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 - (void)dealloc
 {
+  NSDebugLLog(@"SimpleAgenda", @"Releasing store %@", _name);
   [_data release];
   [_tasks release];
   [_name release];

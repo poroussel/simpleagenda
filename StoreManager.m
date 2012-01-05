@@ -115,6 +115,7 @@ static StoreManager *singleton;
 
 - (void)dealloc
 {
+  NSDebugLLog(@"SimpleAgenda", @"Releasing StoreManager");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self synchronise];
   RELEASE(_defaultStore);

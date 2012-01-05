@@ -49,7 +49,7 @@
     }
   NS_HANDLER
     {
-      NSDebugLog(@"<%@> isn't a valid URL", self);
+      NSDebugLLog(@"SimpleAgenda", @"<%@> isn't a valid URL", self);
     }
   NS_ENDHANDLER
     return valid;

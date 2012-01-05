@@ -245,7 +245,7 @@
 - (void)setElement:(Element *)element
 {
   _element = element;
-  NSDebugLog(@"Added %@ to element %@", [self description], [element UID]);
+  NSDebugLLog(@"SimpleAgenda", @"Added %@ to element %@", [self description], [element UID]);
 }
 
 - (Date *)triggerDateRelativeTo:(Date *)date
