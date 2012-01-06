@@ -30,7 +30,7 @@ static AlarmManager *singleton;
   if (backend) {
     [backendsArray setObject:backend forKey:[class backendName]];
     [backend release];
-    NSLog(@"Alarm backend <%@> registered", [class backendName]);
+    NSLog(@"Alarm backend %@ registered", [class backendName]);
   }
 }
 
@@ -206,9 +206,11 @@ static AlarmManager *singleton;
 
 - (void)dealloc
 {
+  NSDebugLLog(@"SimpleAgenda", @"Releasing AlarmManager");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_activeAlarms);
-  [super dealloc];
+  RELEASE(backendsArray); 
+ [super dealloc];
 }
 
 - (void)createAlarms
@@ -278,7 +280,7 @@ static AlarmManager *singleton;
   if (bck != nil) {
     _defaultBackend = bck;
     [[ConfigManager globalConfig] setObject:name forKey:DEFAULT_ALARM_BACKEND];
-    NSLog(@"Default alarm backend is <%@>", name);
+    NSLog(@"Default alarm backend is %@", name);
   }
 }
 
@@ -303,6 +305,11 @@ static AlarmManager *singleton;
 + (NSString *)backendName
 {
   return @"Log backend";
+}
+- (void)dealloc
+{
+  NSDebugLLog(@"SimpleAgenda", @"Alarm backend %@ released", [[self class] backendName]);
+  [super dealloc];
 }
 - (enum icalproperty_action)backendType
 {

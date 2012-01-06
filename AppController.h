@@ -10,6 +10,7 @@
 #import "DataTree.h"
 #import "SelectionManager.h"
 #import "ConfigManager.h"
+#import "AlarmManager.h"
 
 @interface AppController : NSObject
 {
@@ -25,6 +26,7 @@
   PreferencesController *_pc;
   StoreManager *_sm;
   SelectionManager *_selm;
+  AlarmManager *_am;
   Date *_selectedDay;
   DataTree *_summaryRoot;
   DataTree *_today;

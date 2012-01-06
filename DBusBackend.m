@@ -36,7 +36,7 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
   if (self) {
     NS_DURING
       {
-	c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
+	c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:AUTORELEASE([[DKPort alloc] initWithRemote:DBUS_BUS])];
 	if (!c) {
 	  NSLog(@"Unable to create a connection to %@", DBUS_BUS);
 	  DESTROY(self);

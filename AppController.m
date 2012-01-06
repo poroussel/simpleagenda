@@ -252,14 +252,14 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 - (id)init
 {
-  self = [super init];
-  if (self) {
-    [[ConfigManager globalConfig] registerDefaults:[self defaults]];
-    _selm = [SelectionManager globalManager];
-    _sm = [StoreManager globalManager];
-    _pc = [PreferencesController new];
-    [self initSummary];
-  }
+  if (!(self = [super init]))
+    return self;
+  
+  [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+  _selm = [SelectionManager globalManager];
+  _sm = [StoreManager globalManager];
+  _pc = [PreferencesController new];
+  [self initSummary];
   return self;
 }
 
@@ -315,13 +315,14 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self updateSummaryData];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
-  [AlarmManager globalManager];
+  _am = [AlarmManager globalManager];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [_sm synchronise];
+  RELEASE(_am);
+  RELEASE(_sm);
   RELEASE(_summaryRoot);
   RELEASE(_pc);
   RELEASE(_appicon);
