@@ -278,7 +278,7 @@
 {
   id <AgendaStore> store = [_sm storeForName:[storePopUp titleOfSelectedItem]];
   ConfigManager *config = [ConfigManager globalConfig];
-  NSMutableArray *storeArray = [config objectForKey:STORES];
+  NSMutableArray *storeArray = [NSMutableArray arrayWithArray:[config objectForKey:STORES]];
 
   [storeArray removeObject:[store description]];
   [config setObject:storeArray forKey:STORES];
