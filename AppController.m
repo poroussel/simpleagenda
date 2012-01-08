@@ -90,48 +90,6 @@
   }
   //[_bell dissolveToPoint:NSMakePoint(35, 35) fraction:1.0];
 }
-- (void)mouseDown:(NSEvent *)theEvent
-{
-  if ([theEvent clickCount] > 1) {
-    [NSApp unhide:self];
-  } else {
-    /* Code copied from Switcher in GAP */
-    NSPoint lastLocation;
-    NSPoint location;
-    unsigned eventMask = NSLeftMouseDownMask | NSLeftMouseUpMask | NSPeriodicMask | NSOtherMouseUpMask | NSRightMouseUpMask;
-    NSDate *theDistantFuture = [NSDate distantFuture];
-    BOOL done = NO;
-
-    lastLocation = [theEvent locationInWindow];
-    [NSEvent startPeriodicEventsAfterDelay: 0.02 withPeriod: 0.02];
-
-    while (!done) {
-      theEvent = [NSApp nextEventMatchingMask: eventMask
-				    untilDate: theDistantFuture
-				       inMode: NSEventTrackingRunLoopMode
-				      dequeue: YES];
-      switch ([theEvent type]) {
-      case NSRightMouseUp:
-      case NSOtherMouseUp:
-      case NSLeftMouseUp:
-	done = YES;
-	break;
-      case NSPeriodic:
-	location = [_window mouseLocationOutsideOfEventStream];
-	if (NSEqualPoints(location, lastLocation) == NO) {
-	  NSPoint origin = [_window frame].origin;	  
-	  origin.x += (location.x - lastLocation.x);
-	  origin.y += (location.y - lastLocation.y);
-	  [_window setFrameOrigin: origin];
-	}
-	break;
-      default:
-	break;
-      }
-    }
-    [NSEvent stopPeriodicEvents];
-  }
-}
 @end
 
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
