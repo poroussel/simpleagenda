@@ -246,8 +246,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   win = [NSApp iconWindow];
   width = [[win contentView] bounds].size.width;
   height = [[win contentView] bounds].size.height;  
-  _appicon = [[AppIcon alloc] initWithFrame: NSMakeRect(1, 1, width - 2, height - 2)];
-  [[win contentView] addSubview:_appicon];
+  [[win contentView] addSubview:AUTORELEASE([[AppIcon alloc] initWithFrame: NSMakeRect(1, 1, width - 2, height - 2)])];
 
   [self registerForServices];
   [NSApp setServicesProvider: self];
@@ -283,7 +282,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   RELEASE(_sm);
   RELEASE(_summaryRoot);
   RELEASE(_pc);
-  RELEASE(_appicon);
   RELEASE(_selectedDay);
 }
 
@@ -744,7 +742,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date
 {
   [self updateSummaryData];
-  [_appicon setNeedsDisplay:YES];
+  [[[NSApp iconWindow] contentView] setNeedsDisplay:YES];
 }
 - (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date
 {
