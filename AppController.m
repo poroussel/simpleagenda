@@ -212,12 +212,8 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
   if (!(self = [super init]))
     return self;
-  
-  [[ConfigManager globalConfig] registerDefaults:[self defaults]];
-  _selm = [SelectionManager globalManager];
-  _sm = [StoreManager globalManager];
-  _pc = [PreferencesController new];
   [self initSummary];
+  [[ConfigManager globalConfig] registerDefaults:[self defaults]];
   return self;
 }
 
@@ -250,15 +246,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   [self registerForServices];
   [NSApp setServicesProvider: self];
-  /*
-   * We should register these notifications before allocating
-   * the StoreManager to get all data updates. To avoid
-   * numerous invisible updates which would slow the startup,
-   * register only when the application is ready.
-   */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
-  /* FIXME : this is overkill, we should only refresh the views for visual changes */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+
+  _selm = [SelectionManager globalManager];
+  _sm = [StoreManager globalManager];
+  _pc = [PreferencesController new];
   /* Set the selected day : this will update all views and titles (but not the summary) */
   [calendar setDataSource:self];
   [calendar setDate:[Date today]];
@@ -270,6 +261,15 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    * empty so this is needed here.
    */
   [self updateSummaryData];
+  /*
+   * We should register these notifications before allocating
+   * the StoreManager to get all data updates. To avoid
+   * numerous invisible updates which would slow the startup,
+   * register only when the application is ready.
+   */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  /* FIXME : this is overkill, we should only refresh the views for visual changes */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
   _am = [AlarmManager globalManager];
