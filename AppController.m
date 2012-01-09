@@ -54,7 +54,7 @@
   self = [super initWithFrame:frame];
   if (self) {
     _attrs = [[NSDictionary alloc] initWithObjectsAndKeys:[NSFont systemFontOfSize:8],NSFontAttributeName,nil];
-    _bell = [NSImage imageNamed:@"bell"];
+    _bell = [NSImage imageNamed:@"bell.tiff"];
     _cm = [ConfigManager globalConfig];
     [_cm registerClient:self forKey:APPICON_DATE];
     [_cm registerClient:self forKey:APPICON_TIME];
