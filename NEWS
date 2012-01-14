@@ -4,6 +4,7 @@ version 0.43
 	* Fix ticket #18 with a patch from Sebastian
 	  (note to self : learn shell syntax)
 	* Fix ticket #20 with a patch from Sebastian
+	* Add Italian translation from Bertalan Ivan
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups

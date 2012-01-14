@@ -30,7 +30,7 @@ Resources/2right.tiff \
 Resources/bell.tiff \
 Resources/small-bell.tiff
 
-SimpleAgenda_LANGUAGES = English French
+SimpleAgenda_LANGUAGES = English French Italian
 
 SimpleAgenda_LOCALIZED_RESOURCE_FILES = Localizable.strings
 

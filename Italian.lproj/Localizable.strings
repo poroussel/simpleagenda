@@ -1,0 +1,64 @@
+/***
+English.lproj/Localizable.strings
+updated by make_strings 2010-03-11 10:46:44 +0100
+add comments above this one
+Localization by Bertalan Ivan bertalan.ivan@gmailc.om
+***/
+
+
+/*** Keys found in multiple places ***/
+
+/* File: DayView.m:42 */
+/* File: WeekView.m:32 */
+"All day : %@" = "Tutto il giorno : %@";
+
+
+/*** Strings from ABStore.m ***/
+/* File: ABStore.m:58 */
+"Birthday" = "Compleanno";
+/* File: ABStore.m:29 */
+"my address book" = "mia rubrica";
+
+
+/*** Strings from AppController.m ***/
+/* File: AppController.m:406 */
+"Export as" = "Esporta come";
+/* File: AppController.m:363 */
+"New task" = "Nuovo evento";
+/* File: AppController.m:82 */
+"Open tasks" = "Apri evento";
+/* File: AppController.m:155 */
+"Open tasks (%d)" = "Apri evento (%d)";
+/* File: AppController.m:514 */
+/* File: AppController.m:81 */
+"Search results" = "Cerca risultati";
+/* File: AppController.m:512 */
+"Search results (%d items)" = "Cerca risultati (%d elementi)";
+/* File: AppController.m:80 */
+"Soon" = "Tra poco";
+/* File: AppController.m:680 */
+/* File: AppController.m:169 */
+"Tasks" = "Eventi";
+/* File: AppController.m:78 */
+"Today" = "Oggi";
+/* File: AppController.m:79 */
+"Tomorrow" = "Domani";
+/* File: AppController.m:682 */
+/* File: AppController.m:167 */
+"Week %d" = "Settimana %d";
+/* File: AppController.m:339 */
+"edit summary..." = "modifica sommario...";
+/* File: AppController.m:715 */
+/* File: AppController.m:331 */
+"edit title..." = "modifica titolo...";
+
+
+/*** Strings from Task.m ***/
+/* File: Task.m:30 */
+"Canceled" = "Cancellato";
+/* File: Task.m:30 */
+"Completed" = "Completato";
+/* File: Task.m:30 */
+"None" = "No";
+/* File: Task.m:30 */
+"Started" = "Iniziato";
