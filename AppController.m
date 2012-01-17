@@ -247,32 +247,20 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self registerForServices];
   [NSApp setServicesProvider: self];
 
-  _selm = [SelectionManager globalManager];
-  _sm = [StoreManager globalManager];
-  _pc = [PreferencesController new];
-  /* Set the selected day : this will update all views and titles (but not the summary) */
-  [calendar setDataSource:self];
-  [calendar setDate:[Date today]];
-  /*
-   * If stores are loaded before this is executed (it happens
-   * when the gui is super slow, with remote X for example)
-   * we miss the dataChanged notification (that's the purpose 
-   * of late registering after all) and the summary will be
-   * empty so this is needed here.
-   */
-  [self updateSummaryData];
-  /*
-   * We should register these notifications before allocating
-   * the StoreManager to get all data updates. To avoid
-   * numerous invisible updates which would slow the startup,
-   * register only when the application is ready.
-   */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+  _sm = [StoreManager globalManager];
+
+  /* Set the selected day : this will update all views and titles (but not the summary) */
+  [calendar setDataSource:self];
+  [calendar setDate:[Date today]];
+
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
   _am = [AlarmManager globalManager];
+  _selm = [SelectionManager globalManager];
+  _pc = [PreferencesController new];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
