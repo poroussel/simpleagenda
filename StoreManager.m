@@ -12,13 +12,42 @@ static NSMutableDictionary *backends;
 static StoreManager *singleton;
 
 @implementation StoreManager
+- (void)initStores
+{
+  NSArray *storeArray;
+  NSString *defaultStore;
+  NSEnumerator *enumerator;
+  NSString *stname;
+  Class backendClass;
+  ConfigManager *config = [ConfigManager globalConfig];
+  id store;
+
+  /* Create user defined stores */
+  storeArray = [config objectForKey:STORES];
+  defaultStore = [config objectForKey:ST_DEFAULT];
+  enumerator = [storeArray objectEnumerator];
+  while ((stname = [enumerator nextObject]))
+    [self addStoreNamed:stname];
+
+  /* Create automatic stores */
+  enumerator = [backends objectEnumerator];
+  while ((backendClass = [enumerator nextObject])) {
+    if (![backendClass isUserInstanciable] && [backendClass storeName]) {
+      store = [backendClass storeNamed:[backendClass storeName]];
+      [_stores setObject:store forKey:[backendClass storeName]];
+      NSLog(@"Added %@ to StoreManager", [backendClass storeName]);
+    }
+  }
+  [self setDefaultStore:defaultStore];
+}
+
 + (void)initialize
 {
   NSArray *classes;
   NSEnumerator *enumerator;
   Class backendClass;
 
-  if ([StoreManager class] == self) {
+  if (self == [StoreManager class]) {
     classes = GSObjCAllSubclassesOfClass([MemoryStore class]);
     enumerator = [classes objectEnumerator];
     backends = [[NSMutableDictionary alloc] initWithCapacity:[classes count]];
@@ -28,7 +57,13 @@ static StoreManager *singleton;
       else
 	NSLog(@"Can't register %@ as a store backend", [backendClass description]);
     }
-    singleton = [[StoreManager alloc] init];
+    singleton = [StoreManager new];
+    /*
+     * Stores have to be loaded after the singleton is fully initialized 
+     * as they might call methods depending on the singleton like
+     * [StoreManager globalManager]
+     */
+    [singleton initStores];
   }
 }
 
@@ -60,56 +95,34 @@ static StoreManager *singleton;
 
 - (id)init
 {
-  NSArray *storeArray;
-  NSString *defaultStore;
-  NSEnumerator *enumerator;
-  NSString *stname;
-  Class backendClass;
-  ConfigManager *config = [ConfigManager globalConfig];
-  id store;
-
-  if ((self = [super init])) {
-    [config registerDefaults:[self defaults]];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:)
-					         name:SADataChangedInStore
-					       object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:)
-					         name:SAElementAddedToStore
-					       object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:)
-					         name:SAElementRemovedFromStore
-					       object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:)
-					         name:SAElementUpdatedInStore
-					       object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(dataChanged:)
-					         name:SAEnabledStatusChangedForStore
-					       object:nil];
-    _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
-    _dayEventsCache = [[NSMutableDictionary alloc] initWithCapacity:256];
-    _eventCache = [[NSMutableArray alloc] initWithCapacity:512];
-    /* Create user defined stores */
-    storeArray = [config objectForKey:STORES];
-    defaultStore = [config objectForKey:ST_DEFAULT];
-    enumerator = [storeArray objectEnumerator];
-    while ((stname = [enumerator nextObject]))
-      [self addStoreNamed:stname];
-    /* Create automatic stores */
-    enumerator = [backends objectEnumerator];
-    while ((backendClass = [enumerator nextObject])) {
-      if (![backendClass isUserInstanciable] && [backendClass storeName]) {
-	store = [backendClass storeNamed:[backendClass storeName]];
-	[_stores setObject:store forKey:[backendClass storeName]];
-	NSLog(@"Added %@ to StoreManager", [backendClass storeName]);
-      }
-    }
-    [self setDefaultStore:defaultStore];
-  }
+  if (!(self = [super init]))
+    return nil;
+  
+  [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(dataChanged:)
+					       name:SADataChangedInStore
+					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(dataChanged:)
+					       name:SAElementAddedToStore
+					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(dataChanged:)
+					       name:SAElementRemovedFromStore
+					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(dataChanged:)
+					       name:SAElementUpdatedInStore
+					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(dataChanged:)
+					       name:SAEnabledStatusChangedForStore
+					     object:nil];
+  _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
+  _dayEventsCache = [[NSMutableDictionary alloc] initWithCapacity:256];
+  _eventCache = [[NSMutableArray alloc] initWithCapacity:512];
+  _opqueue = [NSOperationQueue new];
   return self;
 }
 
@@ -122,7 +135,13 @@ static StoreManager *singleton;
   RELEASE(_stores);
   RELEASE(_dayEventsCache);
   RELEASE(_eventCache);
+  RELEASE(_opqueue);
   [super dealloc];
+}
+
+- (NSOperationQueue *)operationQueue
+{
+  return _opqueue;
 }
 
 - (void)dataChanged:(NSNotification *)not

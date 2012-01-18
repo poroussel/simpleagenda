@@ -12,12 +12,14 @@ extern NSString * const SADataChangedInStoreManager;
   NSMutableDictionary *_dayEventsCache;
   NSMutableArray *_eventCache;
   id _defaultStore;
+  NSOperationQueue *_opqueue;
 }
 
 + (NSArray *)backends;
 + (Class)backendForName:(NSString *)name;
 + (StoreManager *)globalManager;
 
+- (NSOperationQueue *)operationQueue;
 - (void)addStoreNamed:(NSString *)name;
 - (void)removeStoreNamed:(NSString *)name;
 - (id <AgendaStore>)storeForName:(NSString *)name;
