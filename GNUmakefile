@@ -68,7 +68,8 @@ Alarm.m \
 AlarmManager.m \
 NSString+SimpleAgenda.m \
 AlarmEditor.m \
-SoundBackend.m
+SoundBackend.m \
+InvocationOperation.m
 
 ifeq ($(ADDRESSES),yes)
 SimpleAgenda_OBJC_FILES += ABStore.m
