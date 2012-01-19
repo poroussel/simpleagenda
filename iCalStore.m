@@ -5,16 +5,9 @@
 #import "WebDAVResource.h"
 #import "iCalTree.h"
 #import "NSString+SimpleAgenda.h"
+#import "InvocationOperation.h"
+#import "StoreManager.h"
 #import "defines.h"
-
-@interface iCalStore : MemoryStore <SharedStore, ConfigListener>
-{
-  iCalTree *_tree;
-  NSURL *_url;
-  NSTimer *_refreshTimer;
-  WebDAVResource *_resource;
-}
-@end
 
 @interface iCalStoreDialog : NSObject
 {
@@ -92,13 +85,17 @@
 }
 @end
 
-@interface iCalStore(Private)
-- (void)fetchData;
-- (void)parseData:(NSData *)data;
-- (void)initTimer;
-- (void)initStoreAsync:(id)object;
-@end
 
+@interface iCalStore : MemoryStore <SharedStore, ConfigListener>
+{
+  iCalTree *_tree;
+  NSURL *_url;
+  NSTimer *_refreshTimer;
+  WebDAVResource *_resource;
+}
+- (void)initTimer;
+- (void)doRead;
+@end
 @implementation iCalStore
 - (NSDictionary *)defaults
 {
@@ -121,7 +118,7 @@
     [_config registerClient:self forKey:ST_REFRESH];
     [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
     [_config registerClient:self forKey:ST_ENABLED];
-    [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
+    [self read];
     [self initTimer];
   }
   return self;
@@ -208,7 +205,8 @@
 
 - (void)read
 {
-  [self fetchData];
+  if ([self enabled])
+    [[[StoreManager globalManager] operationQueue] addOperation:AUTORELEASE([[InvocationOperation alloc] initWithTarget:self selector:@selector(doRead) object:nil])];
 }
 
 - (BOOL)write
@@ -263,25 +261,10 @@
     [self initTimer];
   }
 }
-@end
 
-
-@implementation iCalStore(Private)
-- (void)fetchData
+- (void)parseData
 {
-  if ([self enabled]) {
-    if ([_resource get])
-      if ([NSThread isMainThread])
-	[self parseData:[_resource data]];
-      else
-	[self performSelectorOnMainThread:@selector(parseData:) withObject:[_resource data] waitUntilDone:NO];
-    else
-      [self setEnabled:NO];
-  }
-}
-- (void)parseData:(NSData *)data
-{
-  if ([_tree parseData:data]) {
+  if ([_tree parseData:[_resource data]]) {
     [self fillWithElements:[_tree components]];
     NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
     NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
@@ -307,10 +290,11 @@
     NSLog(@"Store %@ automatic refresh disabled", [self description]);
   }
 }
-- (void)initStoreAsync:(id)object
+- (void)doRead
 {
-  NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  [self fetchData];
-  [pool release];
+  if ([_resource get])
+    [self parseData];
+  else
+    [self setEnabled:NO];
 }
 @end
