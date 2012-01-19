@@ -12,8 +12,31 @@ NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
 NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
 
 @implementation MemoryStore
++ (BOOL)registerWithName:(NSString *)name
+{
+  return NO;
+}
++ (id)storeNamed:(NSString *)name
+{
+  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
+}
++ (BOOL)isUserInstanciable
+{
+  return NO;
+}
++ (NSString *)storeName
+{
+  [self subclassResponsibility:_cmd];
+  return nil;
+}
++ (NSString *)storeTypeName
+{
+  [self subclassResponsibility:_cmd];
+  return nil;
+}
 - (NSDictionary *)defaults
 {
+  [self subclassResponsibility:_cmd];
   return nil;
 }
 
@@ -39,30 +62,6 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   return self;
 }
 
-+ (BOOL)isUserInstanciable
-{
-  return NO;
-}
-
-+ (NSString *)storeName
-{
-  return nil;
-}
-
-+ (id)storeNamed:(NSString *)name
-{
-  return AUTORELEASE([[self allocWithZone: NSDefaultMallocZone()] initWithName:name]);
-}
-
-+ (BOOL)registerWithName:(NSString *)name
-{
-  return NO;
-}
-+ (NSString *)storeTypeName
-{
-  return nil;
-}
-
 - (void)dealloc
 {
   NSDebugLLog(@"SimpleAgenda", @"Releasing store %@", _name);
@@ -71,6 +70,11 @@ NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
   [_name release];
   [_config release];
   [super dealloc];
+}
+
+- (ConfigManager *)config
+{
+  return _config;
 }
 
 - (NSArray *)events

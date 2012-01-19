@@ -14,12 +14,13 @@ extern NSString * const SAElementUpdatedInStore;
 @class NSColor;
 
 @protocol MemoryStore <NSObject>
++ (BOOL)registerWithName:(NSString *)name;
++ (id)storeNamed:(NSString *)name;
 + (BOOL)isUserInstanciable;
 + (NSString *)storeName;
-+ (id)storeNamed:(NSString *)name;
-- (id)initWithName:(NSString *)name;
-+ (BOOL)registerWithName:(NSString *)name;
 + (NSString *)storeTypeName;
+- (id)initWithName:(NSString *)name;
+- (ConfigManager *)config;
 - (NSArray *)events;
 - (NSArray *)tasks;
 - (Element *)elementWithUID:(NSString *)uid;

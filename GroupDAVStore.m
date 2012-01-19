@@ -167,9 +167,9 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     _loadedData = [[NSMutableSet alloc] initWithCapacity:512];
-    [_config registerClient:self forKey:ST_REFRESH];
-    [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
-    [_config registerClient:self forKey:ST_ENABLED];
+    [[self config] registerClient:self forKey:ST_REFRESH];
+    [[self config] registerClient:self forKey:ST_REFRESH_INTERVAL];
+    [[self config] registerClient:self forKey:ST_ENABLED];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
     [self initTimer];
   }
@@ -324,7 +324,7 @@
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  if (config == _config && [key isEqualToString:ST_ENABLED] && [self enabled]) {
+  if (config == [self config] && [key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }
@@ -368,13 +368,13 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 - (void)initStoreAsync:(id)object
 {
   NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
+  _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
   _calendar = nil;
   _task = nil;
-  if ([_config objectForKey:ST_CALENDAR_URL])
-    _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
-  if ([_config objectForKey:ST_TASK_URL])
-    _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[_config objectForKey:ST_TASK_URL]] authFromURL:_url];
+  if ([[self config] objectForKey:ST_CALENDAR_URL])
+    _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
+  if ([[self config] objectForKey:ST_TASK_URL])
+    _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] authFromURL:_url];
   [self fetchData];
   [pool release];
 }

@@ -113,11 +113,11 @@
   self = [super initWithName:name];
   if (self) {
     _tree = [iCalTree new];
-    _url = [[NSURL alloc] initWithString:[_config objectForKey:ST_URL]];
+    _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
-    [_config registerClient:self forKey:ST_REFRESH];
-    [_config registerClient:self forKey:ST_REFRESH_INTERVAL];
-    [_config registerClient:self forKey:ST_ENABLED];
+    [[self config] registerClient:self forKey:ST_REFRESH];
+    [[self config] registerClient:self forKey:ST_REFRESH_INTERVAL];
+    [[self config] registerClient:self forKey:ST_ENABLED];
     [self read];
     [self initTimer];
   }
@@ -164,7 +164,8 @@
 
 - (void)dealloc
 {
-  [_config unregisterClient:self];
+  /* FIXME : this sould be handled by the super class */
+  [[self config] unregisterClient:self];
   [_refreshTimer invalidate];
   [_refreshTimer release];
   [self write];
@@ -236,27 +237,27 @@
 
 - (BOOL)periodicRefresh
 {
-  if ([_config objectForKey:ST_REFRESH])
-    return [[_config objectForKey:ST_REFRESH] boolValue];
+  if ([[self config] objectForKey:ST_REFRESH])
+    return [[[self config] objectForKey:ST_REFRESH] boolValue];
   return NO;
 }
 - (void)setPeriodicRefresh:(BOOL)periodic
 {
-  [_config setObject:[NSNumber numberWithBool:periodic] forKey:ST_REFRESH];
+  [[self config] setObject:[NSNumber numberWithBool:periodic] forKey:ST_REFRESH];
 }
 - (NSTimeInterval)refreshInterval
 {
-  if ([_config objectForKey:ST_REFRESH_INTERVAL])
-    return [_config integerForKey:ST_REFRESH_INTERVAL];
+  if ([[self config] objectForKey:ST_REFRESH_INTERVAL])
+    return [[self config] integerForKey:ST_REFRESH_INTERVAL];
   return 60 * 30;
 }
 - (void)setRefreshInterval:(NSTimeInterval)interval
 {
-  [_config setInteger:interval forKey:ST_REFRESH_INTERVAL];
+  [[self config] setInteger:interval forKey:ST_REFRESH_INTERVAL];
 }
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
 {
-  if (config == _config && [key isEqualToString:ST_ENABLED] && [self enabled]) {
+  if (config == [self config] && [key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }
