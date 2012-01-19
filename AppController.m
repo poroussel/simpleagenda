@@ -250,11 +250,23 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  _sm = [StoreManager globalManager];
 
   /* Set the selected day : this will update all views and titles (but not the summary) */
   [calendar setDataSource:self];
+  /*
+   * FIXME : this has to be called before the StoreManager is setup
+   * so that the calendar date is setup when -dataChanged is called
+   * and the view redrawn by calling -reloadData
+   */
+  /*
+   * FIXME : setting the calendar date ends up calling -calendarView:selectedDateChanged
+   * then [DayView -setDate:] which calls [DayView -reloadData] where we find
+   * [StoreManager globalManager] => the StoreManager is hiddenly initialized
+   * 
+   * This is all too complex and should be redone maybe based on notifications
+   */
   [calendar setDate:[Date today]];
+  _sm = [StoreManager globalManager];
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
