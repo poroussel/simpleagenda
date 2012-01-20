@@ -3,10 +3,21 @@
 #import "../Event.h"
 #import "../Date.h"
 
+@interface SimpleStore : MemoryStore
+{
+}
+@end
+@implementation SimpleStore
+- (NSDictionary *)defaults
+{
+  return nil;
+}
+@end
+
 @implementation MemoryStoreTest
 - (void)setUp
 {
-  testStore = [[MemoryStore alloc] initWithName:@"testStore"];
+  testStore = [[SimpleStore alloc] initWithName:@"testStore"];
 }
 
 - (void)tearDown
@@ -16,8 +27,7 @@
 
 - (void)testStoreCreation
 {
-  MemoryStore *ms = [[MemoryStore alloc] initWithName:@"elementCount"];
-
+  MemoryStore *ms = [[SimpleStore alloc] initWithName:@"elementCount"];
 
   [self assertTrue:(ms != nil) message:@"MemoryStore created."];
   [self assertTrue:[ms events] && [ms tasks] message:@"Events and tasks dictionaries exist."];
@@ -41,7 +51,7 @@
 
 - (void)testStoreElementCount
 {
-  MemoryStore *ms = [[MemoryStore alloc] initWithName:@"elementCount"];
+  MemoryStore *ms = [[SimpleStore alloc] initWithName:@"elementCount"];
   Event *ev = [[Event alloc] initWithStartDate:[Date now] duration:60 title:@"Title"];
 
   [ms add:ev];
