@@ -8,7 +8,8 @@
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:_summary forKey:@"title"];
-  [coder encodeObject:[_text string] forKey:@"descriptionText"];
+  if (_text)
+    [coder encodeObject:[_text string] forKey:@"descriptionText"];
   [coder encodeObject:_uid forKey:@"uid"];
   [coder encodeInt:_classification forKey:@"classification"];
   if (_stamp)
@@ -20,7 +21,10 @@
 - (id)initWithCoder:(NSCoder *)coder
 {
   _summary = [[coder decodeObjectForKey:@"title"] retain];
-  _text = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
+  if ([coder containsValueForKey:@"descriptionText"])
+    _text = [[NSAttributedString alloc] initWithString:[coder decodeObjectForKey:@"descriptionText"]];
+  else
+    _text = nil;
   if ([coder containsValueForKey:@"uid"])
     _uid = [[coder decodeObjectForKey:@"uid"] retain];
   else
@@ -43,13 +47,13 @@
 
 - (id)init
 {
-  self = [super init];
-  if (self) {
-    _alarms = [NSMutableArray new];
-    _categories = [NSMutableArray new];
-    _classification = ICAL_CLASS_PUBLIC;
-    ASSIGNCOPY(_stamp, [Date now]);
-  }
+  if (!(self = [super init]))
+    return nil;
+  _alarms = [NSMutableArray new];
+  _categories = [NSMutableArray new];
+  _classification = ICAL_CLASS_PUBLIC;
+  _text = nil;
+  ASSIGNCOPY(_stamp, [Date now]);
   return self;
 }
 
