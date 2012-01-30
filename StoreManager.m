@@ -217,7 +217,8 @@ static StoreManager *singleton;
   id <AgendaStore> store;
 
   while ((store = [enumerator nextObject]))
-    [store read];
+    if ([store conformsToProtocol:@protocol(StoreBackend)])
+      [store read];
 }
 
 - (id <AgendaStore>)storeContainingElement:(Element *)elt
