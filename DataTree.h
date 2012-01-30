@@ -4,14 +4,11 @@
 
 @interface DataTree : NSObject
 {
-  id _parent;
   NSMutableArray *_children;
   NSMutableDictionary *_attributes;
 }
 
 + (id)dataTreeWithAttributes:(NSDictionary *)attributes;
-- (void)setParent:(id)parent;
-- (id)parent;
 - (void)setChildren:(NSArray *)children;
 - (void)addChild:(id)child;
 - (void)removeChildren;

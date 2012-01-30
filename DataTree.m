@@ -3,18 +3,15 @@
 @implementation DataTree
 - (id)init
 {
-  self = [super init];
-  if (self) {
-    _parent = nil;
-    _children = [[NSMutableArray alloc] init];
-    _attributes = [[NSMutableDictionary alloc] init];
+  if ((self = [super init])) {
+    _children = [NSMutableArray new];
+    _attributes = [NSMutableDictionary new];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  RELEASE(_parent);
   [_attributes release];
   [_children release];
   [super dealloc];
@@ -22,25 +19,14 @@
 
 - (id)initWithAttributes:(NSDictionary *)attributes
 {
-  self = [self init];
-  if (self)
+  if ((self = [self init]))
     [self setAttributes:attributes];
   return self;
 }
 
 + (id)dataTreeWithAttributes:(NSDictionary *)attributes
 {
-  return AUTORELEASE([[DataTree alloc] initWithAttributes:attributes]);
-}
-
-- (void)setParent:(id)parent
-{
-  ASSIGN(_parent, parent);
-}
-
-- (id)parent
-{
-  return _parent;
+  return [[[DataTree alloc] initWithAttributes:attributes] autorelease];
 }
 
 - (void)setChildren:(NSArray *)children
