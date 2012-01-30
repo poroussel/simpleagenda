@@ -266,7 +266,7 @@
 - (void)parseData
 {
   if ([_tree parseData:[_resource data]]) {
-    [self fillWithElements:[_tree components]];
+    [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:[_tree components] waitUntilDone:NO];
     NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
     NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
   } else
