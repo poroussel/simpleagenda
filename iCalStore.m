@@ -261,15 +261,6 @@
   }
 }
 
-- (void)parseData
-{
-  if ([_tree parseData:[_resource data]]) {
-    [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:[_tree components] waitUntilDone:NO];
-    NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-    NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
-  } else
-    NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
-}
 - (void)initTimer
 {
   if (nil != _refreshTimer) {
@@ -291,9 +282,18 @@
 }
 - (void)doRead
 {
-  if ([_resource get])
-    [self parseData];
-  else
+  if ([_resource get]) {
+    if ([_tree parseData:[_resource data]]) {
+      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+      [self performSelectorOnMainThread:@selector(fillWithElements:) 
+			     withObject:[_tree components] 
+			  waitUntilDone:YES];
+    } else{
+      NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
+    }
+  } else {
     [self setEnabled:NO];
+  }
 }
 @end
