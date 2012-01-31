@@ -28,7 +28,6 @@
 }
 - (void)main
 {
-  /* FIXME : do we need NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init]; ? */
   NSDebugLLog(@"SimpleAgenda", [_invocation description]);
   [_invocation invoke];
 }
