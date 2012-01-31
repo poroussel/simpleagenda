@@ -95,23 +95,17 @@
   }
 }
 
-- (BOOL)write
+- (void)write
 {
-  NSSet *set;
-  NSSet *tasks;
-
   if (![self modified])
-    return YES;
-  set = [NSSet setWithArray:[self events]];
-  tasks = [NSSet setWithArray:[self tasks]];
-  if ([NSKeyedArchiver archiveRootObject:set toFile:_globalFile] && 
-      [NSKeyedArchiver archiveRootObject:tasks toFile:_globalTaskFile]) {
+    return;
+  if ([NSKeyedArchiver archiveRootObject:[NSSet setWithArray:[self events]] toFile:_globalFile] && 
+      [NSKeyedArchiver archiveRootObject:[NSSet setWithArray:[self tasks]] toFile:_globalTaskFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
     [self setModified:NO];
-    return YES;
+  } else {
+    NSLog(@"Unable to write to %@, make this store read only", _globalFile);
+    [self setWritable:NO];
   }
-  NSLog(@"Unable to write to %@, make this store read only", _globalFile);
-  [self setWritable:NO];
-  return NO;
 }
 @end

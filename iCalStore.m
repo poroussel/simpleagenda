@@ -210,29 +210,27 @@
     [[[StoreManager globalManager] operationQueue] addOperation:AUTORELEASE([[InvocationOperation alloc] initWithTarget:self selector:@selector(doRead) object:nil])];
 }
 
-- (BOOL)write
+- (void)write
 {
   NSData *data;
 
   if (![self modified] || ![self writable])
-    return YES;
+    return;
   data = [_tree iCalTreeAsData];
   if (data) {
     if ([_resource put:data attributes:nil]) {
       [_resource updateAttributes];
       [self setModified:NO];
       NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
-      return YES;
+      return;
     }
     if ([_resource httpStatus] == 412) {
       NSRunAlertPanel(@"Error : data source modified", @"To prevent losing modifications, this agenda\nwill be updated and marked as read-only. ", @"Ok", nil, nil);
-      [self read];
+      [self doRead];
     }
     NSLog(@"Unable to write to %@, make this store read only", [_url anonymousAbsoluteString]);
     [self setWritable:NO];
-    return NO;
   }
-  return YES;
 }
 
 - (BOOL)periodicRefresh

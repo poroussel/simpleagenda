@@ -4,7 +4,7 @@
 
 @protocol StoreBackend
 - (void)read;
-- (BOOL)write;
+- (void)write;
 @end
 
 @protocol PeriodicRefresh

@@ -297,7 +297,7 @@
   [self fetchData];
 }
 
-- (BOOL)write
+- (void)write
 {
   NSEnumerator *enumerator;
   WebDAVResource *element;
@@ -319,7 +319,6 @@
     }
   }
   [copy release];
-  return YES;
 }
 
 - (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
