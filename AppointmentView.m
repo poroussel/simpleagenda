@@ -25,20 +25,20 @@ static NSImage *_alarmImage;
 
 - (id)initWithFrame:(NSRect)frameRect appointment:(Event *)apt
 {
-  self = [super initWithFrame:frameRect];
-  if (self) {
+  if ((self = [super initWithFrame:frameRect])) {
     ASSIGN(_apt, apt);
     [self tooltipSetup];
-    [[ConfigManager globalConfig] registerClient:self forKey:TOOLTIP];
-    [[ConfigManager globalConfig] registerClient:self forKey:ST_COLOR];
-    [[ConfigManager globalConfig] registerClient:self forKey:ST_TEXT_COLOR];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(configChanged:) 
+						 name:SAConfigManagerValueChanged 
+					       object:nil];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  [[ConfigManager globalConfig] unregisterClient:self];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_apt);
   [super dealloc];
 }
@@ -63,11 +63,12 @@ static NSImage *_alarmImage;
     [self setToolTip:nil];
 }
 
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+- (void)configChanged:(NSNotification *)not
 {
+  NSString *key = [[not userInfo] objectForKey:@"key"];
   if ([key isEqualToString:TOOLTIP])
     [self tooltipSetup];
-  else
+  else if ([key isEqualToString:ST_COLOR] || [key isEqualToString:ST_TEXT_COLOR])
     [self setNeedsDisplay:YES];
 }
 @end

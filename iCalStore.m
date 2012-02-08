@@ -86,7 +86,7 @@
 @end
 
 
-@interface iCalStore : MemoryStore <SharedStore, ConfigListener>
+@interface iCalStore : MemoryStore <SharedStore>
 {
   iCalTree *_tree;
   NSURL *_url;
@@ -115,11 +115,12 @@
     _tree = [iCalTree new];
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
-    [[self config] registerClient:self forKey:ST_REFRESH];
-    [[self config] registerClient:self forKey:ST_REFRESH_INTERVAL];
-    [[self config] registerClient:self forKey:ST_ENABLED];
     [self read];
     [self initTimer];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(configChanged:) 
+						 name:SAConfigManagerValueChanged 
+					       object:[self config]];
   }
   return self;
 }
@@ -164,8 +165,7 @@
 
 - (void)dealloc
 {
-  /* FIXME : this sould be handled by the super class */
-  [[self config] unregisterClient:self];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_refreshTimer invalidate];
   [_refreshTimer release];
   [self write];
@@ -253,9 +253,10 @@
 {
   [[self config] setInteger:interval forKey:ST_REFRESH_INTERVAL];
 }
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+- (void)configChanged:(NSNotification *)not
 {
-  if (config == [self config] && [key isEqualToString:ST_ENABLED] && [self enabled]) {
+  NSString *key = [[not userInfo] objectForKey:@"key"];
+  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }
@@ -284,11 +285,11 @@
 {
   if ([_resource get]) {
     if ([_tree parseData:[_resource data]]) {
-      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
       [self performSelectorOnMainThread:@selector(fillWithElements:) 
 			     withObject:[_tree components] 
 			  waitUntilDone:YES];
+      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
     } else{
       NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
     }

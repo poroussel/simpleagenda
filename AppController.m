@@ -14,7 +14,7 @@
 #import "Alarm.h"
 #import "defines.h"
 
-@interface AppIcon : NSView <ConfigListener>
+@interface AppIcon : NSView
 {
   ConfigManager *_cm;
   NSDictionary *_attrs;
@@ -44,27 +44,29 @@
 }
 - (void)dealloc
 {
-  [_cm unregisterClient:self];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_attrs release];
   [_timer invalidate];
   [super dealloc];
 }
 - (id)initWithFrame:(NSRect)frame
 {
-  self = [super initWithFrame:frame];
-  if (self) {
+  if ((self = [super initWithFrame:frame])) {
     _attrs = [[NSDictionary alloc] initWithObjectsAndKeys:[NSFont systemFontOfSize:8],NSFontAttributeName,nil];
     _bell = [NSImage imageNamed:@"bell.tiff"];
     _cm = [ConfigManager globalConfig];
-    [_cm registerClient:self forKey:APPICON_DATE];
-    [_cm registerClient:self forKey:APPICON_TIME];
     [self setup];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(configChanged:) 
+						 name:SAConfigManagerValueChanged object:_cm];
   }
   return self;
 }
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+- (void)configChanged:(NSNotification *)not
 {
-  [self setup];
+  NSString *key = [[not userInfo] objectForKey:@"key"];
+  if ([key isEqualToString:APPICON_DATE] || [key isEqualToString:APPICON_TIME])
+    [self setup];
 }
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {

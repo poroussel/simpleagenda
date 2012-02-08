@@ -7,7 +7,7 @@
 #import "AppointmentView.h"
 #import "Date.h"
 
-@interface DayView : NSView <ConfigListener>
+@interface DayView : NSView
 {
   IBOutlet id delegate;
   int _firstH;

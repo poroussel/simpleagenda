@@ -204,27 +204,26 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
 - (id)initWithFrame:(NSRect)frameRect
 {
-  self = [super initWithFrame:frameRect];
-  if (self) {
+  if ((self = [super initWithFrame:frameRect])) {
     ConfigManager *config = [ConfigManager globalConfig];
     [config registerDefaults:[self defaults]];
-    [config registerClient:self forKey:FIRST_HOUR];
-    [config registerClient:self forKey:LAST_HOUR];
-    [config registerClient:self forKey:MIN_STEP];
-
     _firstH = [config integerForKey:FIRST_HOUR];
     _lastH = [config integerForKey:LAST_HOUR];
     _minStep = [config integerForKey:MIN_STEP];
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName] retain];
     _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
     _alternateBackgroundColor = [[_backgroundColor colorModifiedWithDeltaRed:0.05 green:0.05 blue:0.05 alpha:0] retain];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(configChanged:) 
+						 name:SAConfigManagerValueChanged 
+					       object:config];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  [[ConfigManager globalConfig] unregisterClient:self];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_backgroundColor release];
   [_alternateBackgroundColor release];
   [_textAttributes release];
@@ -499,13 +498,17 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   return YES;
 }
 
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+- (void)configChanged:(NSNotification *)not
 {
+  NSString *key = [[not userInfo] objectForKey:@"key"];
+  ConfigManager *config = [ConfigManager globalConfig];
+
   if ([key isEqualToString:MIN_STEP])
     _minStep = [config integerForKey:MIN_STEP];
-  else {
+  else if ([key isEqualToString:FIRST_HOUR] || [key isEqualToString:LAST_HOUR]) {
     _firstH = [config integerForKey:FIRST_HOUR];
     _lastH = [config integerForKey:LAST_HOUR];
+    /* FIXME : this should use a -refreshView method instead */
     [self reloadData];
   }
 }

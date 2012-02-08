@@ -12,7 +12,7 @@
 - (void)viewSelectDate:(Date *)date;
 @end
 
-@interface AppointmentView : NSView <ConfigListener>
+@interface AppointmentView : NSView
 {
   Event *_apt;
 }

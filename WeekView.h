@@ -6,7 +6,7 @@
 #import "AppointmentView.h"
 #import "Date.h"
 
-@interface WeekView : NSView <ConfigListener>
+@interface WeekView : NSView
 {
   IBOutlet id delegate;
   int weekNumber;

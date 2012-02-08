@@ -5,6 +5,8 @@ version 0.43
 	  (note to self : learn shell syntax)
 	* Fix ticket #20 with a patch from Sebastian
 	* Add Italian translation from Bertalan Ivan
+	* Start conversion from badly written threaded code to NSOperation
+	* New implementation of ConfigManager (again...)
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups

@@ -2,25 +2,17 @@
 #import "NSColor+SimpleAgenda.h"
 #import "ConfigManager.h"
 
-static ConfigManager *singleton;
-static NSMutableDictionary *cpkey;
+NSString * const SAConfigManagerValueChanged = @"SAConfigManagerValueChanged";
 
-@implementation ConfigManager(Private)
-- (ConfigManager *)initRoot
-{
-  if ((self = [self init]))
-      [_dict setDictionary:[[NSUserDefaults standardUserDefaults] 
-			     persistentDomainForName:[[NSProcessInfo processInfo] processName]]];
-  return self;
-}
-@end
+static ConfigManager *singleton;
+static NSUserDefaults *appDefaults;
 
 @implementation ConfigManager
 + (void)initialize
 {
   if ([ConfigManager class] == self) {
-    cpkey = [NSMutableDictionary new];
-    singleton = [[ConfigManager alloc] initRoot];
+    singleton = [ConfigManager new];
+    appDefaults = [NSUserDefaults standardUserDefaults];
   }
 }
 
@@ -31,46 +23,23 @@ static NSMutableDictionary *cpkey;
 
 - (id)init
 {
-  if ((self = [super init])) {
-    _dict = [NSMutableDictionary new];
+  if ((self = [super init]))
     _defaults = [NSMutableDictionary new];
-  }
   return self;
 }
 
 - (id)initForKey:(NSString *)key
 {
-  ConfigManager *parent = [ConfigManager globalConfig];
-
-  if ((self = [self init])) {
-    [_dict setDictionary:[parent dictionaryForKey:key]];
-    ASSIGN(_parent, parent);
+  if ((self = [self init]))
     ASSIGNCOPY(_key, key);
-  }
   return self;
 }
 
 - (void)dealloc
 {
-  DESTROY(_key);
-  DESTROY(_parent);
   DESTROY(_defaults);
-  DESTROY(_dict);
+  DESTROY(_key);
   [super dealloc];
-}
-
-- (void)notifyListenerForKey:(NSString *)key
-{
-  id <ConfigListener> listener;
-  NSPointerArray *array;
-  NSUInteger index;
-
-  array = [cpkey objectForKey:key];
-  for (index = 0; index < [array count]; index++) {
-    listener = [array pointerAtIndex:index];
-    if (listener)
-      [listener config:self dataDidChangedForKey:key];
-  }
 }
 
 - (void)registerDefaults:(NSDictionary *)defaults
@@ -80,31 +49,40 @@ static NSMutableDictionary *cpkey;
 
 - (id)objectForKey:(NSString *)key
 {
-  id obj = [_dict objectForKey:key];
-
-  if (obj)
-    return obj;
-  return [_defaults objectForKey:key];
+  id value = _key ? [[appDefaults dictionaryForKey:_key] objectForKey:key] : [appDefaults objectForKey:key];
+  return value ? value : [_defaults objectForKey:key];
 }
 
 - (void)removeObjectForKey:(NSString *)key
 {
-  [_dict removeObjectForKey:key];
-  [self notifyListenerForKey:key];
-  if (_parent)
-    [_parent setObject:_dict forKey:_key];
-  else
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+  NSMutableDictionary *mdict;
+
+  if (_key) {
+    mdict = [NSMutableDictionary dictionaryWithDictionary:[appDefaults objectForKey:_key]];
+    [mdict removeObjectForKey:key];
+    [appDefaults setObject:mdict forKey:_key];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAConfigManagerValueChanged
+							object:self
+						      userInfo:[NSDictionary dictionaryWithObject:_key forKey:@"key"]];
+  } else
+    [appDefaults removeObjectForKey:key];
+  [appDefaults synchronize];
 }
 
 - (void)setObject:(id)value forKey:(NSString *)key
 {
-  [_dict setObject:value forKey:key];
-  [self notifyListenerForKey:key];
-  if (_parent)
-    [_parent setObject:_dict forKey:_key];
-  else
-    [[NSUserDefaults standardUserDefaults] setObject:value forKey:key];
+  NSMutableDictionary *mdict;
+
+  if (_key) {
+    mdict = [NSMutableDictionary dictionaryWithDictionary:[appDefaults objectForKey:_key]];
+    [mdict setObject:value forKey:key];
+    [appDefaults setObject:mdict forKey:_key];
+  } else
+    [appDefaults setObject:value forKey:key];
+  [[NSNotificationCenter defaultCenter] postNotificationName:SAConfigManagerValueChanged
+						      object:self
+						    userInfo:[NSDictionary dictionaryWithObject:key forKey:@"key"]];
+  [appDefaults synchronize];
 }
 
 - (int)integerForKey:(NSString *)key
@@ -121,20 +99,6 @@ static NSMutableDictionary *cpkey;
   [self setObject:[NSNumber numberWithInt:value] forKey:key];
 }
 
-- (NSDictionary *)dictionaryForKey:(NSString *)key
-{
-  id object = [self objectForKey:key];
-
-  if (object != nil && [object isKindOfClass:[NSDictionary class]])
-    return object;
-  return nil;
-}
-
-- (void)setDictionary:(NSDictionary *)dict forKey:(NSString *)key
-{
-  [self setObject:dict forKey:key];
-}
-
 - (NSColor *)colorForKey:(NSString *)key
 {
   id obj = [self objectForKey:key];
@@ -147,45 +111,5 @@ static NSMutableDictionary *cpkey;
 - (void)setColor:(NSColor *)value forKey:(NSString *)key
 {
   [self setObject:[value description] forKey:key];
-}
-
-- (void)registerClient:(id <ConfigListener>)client forKey:(NSString *)key
-{
-  NSPointerArray *listeners = [cpkey objectForKey:key];
-
-  if (!listeners) {
-    listeners = [NSPointerArray pointerArrayWithWeakObjects];
-    [cpkey setObject:listeners forKey:key];
-  }
-  [listeners addPointer:client];
-}
-
-- (void)unregisterClient:(id <ConfigListener>)client forKey:(NSString *)key
-{
-  NSPointerArray *array = [cpkey objectForKey:key];
-  NSUInteger index;
-
-  if (array) {
-    for (index = 0; index < [array count]; index++) {
-      if ([array pointerAtIndex:index] == client)
-	[array replacePointerAtIndex:index withPointer:NULL];
-    }
-    [array compact];
-  }
-}
-
-- (void)unregisterClient:(id <ConfigListener>)client
-{
-  NSEnumerator *enumerator = [cpkey objectEnumerator];
-  NSPointerArray *array;
-  NSUInteger index;
-
-  while ((array = [enumerator nextObject])) {
-    for (index = 0; index < [array count]; index++) {
-      if ([array pointerAtIndex:index] == client)
-	[array replacePointerAtIndex:index withPointer:NULL];
-    }
-    [array compact];
-  }
 }
 @end

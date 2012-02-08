@@ -8,7 +8,7 @@
 #import "NSString+SimpleAgenda.h"
 #import "defines.h"
 
-@interface GroupDAVStore : MemoryStore <AgendaStore, ConfigListener>
+@interface GroupDAVStore : MemoryStore <AgendaStore>
 {
   NSURL *_url;
   WebDAVResource *_calendar;
@@ -167,11 +167,12 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     _loadedData = [[NSMutableSet alloc] initWithCapacity:512];
-    [[self config] registerClient:self forKey:ST_REFRESH];
-    [[self config] registerClient:self forKey:ST_REFRESH_INTERVAL];
-    [[self config] registerClient:self forKey:ST_ENABLED];
     [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
     [self initTimer];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+					     selector:@selector(configChanged:) 
+						 name:SAConfigManagerValueChanged 
+					       object:[self config]];
   }
   return self;
 }
@@ -218,6 +219,7 @@
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self write];
   DESTROY(_url);
   DESTROY(_calendar);
@@ -321,9 +323,10 @@
   [copy release];
 }
 
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
+- (void)configChanged:(NSNotification *)not
 {
-  if (config == [self config] && [key isEqualToString:ST_ENABLED] && [self enabled]) {
+  NSString *key = [[not userInfo] objectForKey:@"key"];
+  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
     [self read];
     [self initTimer];
   }
