@@ -24,6 +24,7 @@
 {
   icalcomponent *icomp;
 
+  NSDebugMLLog(@"iCalTree", string);
   icomp = icalparser_parse_string([string UTF8String]);
   if (icomp) {
     icalcomponent_free(root);
