@@ -3,17 +3,13 @@
 #import "Task.h"
 
 @implementation iCalTree
-
 - (id)init
 {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("1.0"),
 			       icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
-    if (!root) {
-      [self release];
-      return nil;
-    }
+    if (!root)
+      DESTROY(self);
   }
   return self;
 }
@@ -39,7 +35,7 @@
 
 - (BOOL)parseData:(NSData *)data
 {
-  return [self parseString:AUTORELEASE([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding])];
+  return [self parseString:[[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]];
 }
 
 - (NSString *)iCalTreeAsString
@@ -85,18 +81,16 @@
 
 - (icalcomponent *)componentForEvent:(Element *)elt
 {
-  NSString *uid = [elt UID];
   icalcomponent *ic;
   icalproperty *prop;
+  NSString *uid = [elt UID];
   int type = [elt iCalComponentType];
 
   for (ic = icalcomponent_get_first_component(root, type); 
        ic != NULL; ic = icalcomponent_get_next_component(root, type)) {
     prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-    if (prop) {
-      if ([uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
+    if (prop && [uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
 	return ic;
-    }
   }
   NSLog(@"iCalendar component not found for %@", [elt description]);
   return NULL;
@@ -123,10 +117,8 @@
 - (BOOL)update:(Element *)elt
 {
   icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic) {
-    NSLog(@"No iCal component found for %@", [elt description]);
+  if (!ic)
     return NO;
-  }
   return [elt updateICalComponent:ic];
 }
 @end
