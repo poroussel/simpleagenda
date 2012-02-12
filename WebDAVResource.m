@@ -6,14 +6,14 @@
 @implementation WebDAVResource
 - (void)dealloc
 {
-  DESTROY(_user);
-  DESTROY(_password);
-  DESTROY(_lock);
-  DESTROY(_url);
-  DESTROY(_lastModified);
-  DESTROY(_data);
-  DESTROY(_reason);
-  DESTROY(_etag);
+  [_user release];
+  [_password release];
+  [_lock release];
+  [_url release];
+  [_lastModified release];
+  [_data release];
+  [_reason release];
+  [_etag release];
   [super dealloc];
 }
 
@@ -32,10 +32,8 @@
 
 - (id)initWithURL:(NSURL *)anUrl
 {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     _lock = [NSLock new];
-    _data = nil;
     [self setURL:anUrl];
   }
   return self;
@@ -89,7 +87,10 @@
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
   if (body)
     [handle writeData:body];
-  NSDebugMLLog(@"WebDAVResource", @"%@ %@ (%@)", [_url anonymousAbsoluteString], method, [attributes description]);
+  if (attributes)
+    NSDebugMLLog(@"WebDAVResource", @"%@ %@ (%@)", method, [_url anonymousAbsoluteString], [attributes description]);
+  else
+    NSDebugMLLog(@"WebDAVResource", @"%@ %@", method, [_url anonymousAbsoluteString]);
   DESTROY(_data);
   data = [handle resourceData];
   /* FIXME : this is more than ugly */
@@ -229,7 +230,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
       result = (GSXPathString *)[xpc evaluateExpression:GETLASTMODIFIED];
       if (result)
 	ASSIGN(_lastModified, [result stringValue]);
-      RELEASE(xpc);
+      [xpc release];
     }
   }
 }
@@ -238,13 +239,9 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 @implementation NSURL(SimpleAgenda)
 + (NSURL *)URLWithString:(NSString *)string possiblyRelativeToURL:(NSURL *)base
 {
-  NSURL *url;
-
   if ([string isValidURL])
-    url = [NSURL URLWithString:string];
-  else
-    url = [NSURL URLWithString:string relativeToURL:base];
-  return url;
+    return [NSURL URLWithString:string];
+  return [NSURL URLWithString:string relativeToURL:base];
 }
 - (NSString *)anonymousAbsoluteString
 {
@@ -287,7 +284,7 @@ static const NSString *removeString = @"<?xml version='1.0' encoding='UTF-8'?> \
       NSLog(@"Error parsing xslt document");
       return nil;
     }
-    removeXSLT = RETAIN([parser document]);
+    removeXSLT = [[parser document] retain];
   }
   return [self xsltTransform:removeXSLT];
 }
