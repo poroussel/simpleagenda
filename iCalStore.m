@@ -24,8 +24,7 @@
 @implementation iCalStoreDialog
 - (id)initWithName:(NSString *)storeName
 {
-  self = [super init];
-  if (self) {
+  if ((self = [super init])) {
     if (![NSBundle loadNibNamed:@"iCalendar" owner:self])
       return nil;
     [warning setHidden:YES];
@@ -110,9 +109,9 @@
 
 - (id)initWithName:(NSString *)name
 {
-  self = [super initWithName:name];
-  if (self) {
+  if ((self = [super initWithName:name])) {
     _tree = [iCalTree new];
+    assert(_tree != nil);
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
     [self read];
@@ -169,9 +168,9 @@
   [_refreshTimer invalidate];
   [_refreshTimer release];
   [self write];
-  DESTROY(_resource);
-  DESTROY(_url);
-  DESTROY(_tree);
+  [_resource release];
+  [_url release];
+  [_tree release];
   [super dealloc];
 }
 
@@ -207,7 +206,9 @@
 - (void)read
 {
   if ([self enabled])
-    [[[StoreManager globalManager] operationQueue] addOperation:AUTORELEASE([[InvocationOperation alloc] initWithTarget:self selector:@selector(doRead) object:nil])];
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+												    selector:@selector(doRead) 
+												      object:nil] autorelease]];
 }
 
 - (void)write
@@ -217,21 +218,12 @@
   if (![self modified] || ![self writable])
     return;
   data = [_tree iCalTreeAsData];
-  if (data) {
-    if ([_resource put:data attributes:nil]) {
-      [_resource updateAttributes];
-      [self setModified:NO];
-      NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
-      return;
-    }
-    if ([_resource httpStatus] == 412) {
-      NSRunAlertPanel(@"Error : data source modified", @"To prevent losing modifications, this agenda\nwill be updated and marked as read-only. ", @"Ok", nil, nil);
-      [self doRead];
-    }
-    NSLog(@"Unable to write to %@, make this store read only", [_url anonymousAbsoluteString]);
-    [self setWritable:NO];
-  }
+  if (data)
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+												    selector:@selector(doWrite:)
+												      object:[data retain]] autorelease]];
 }
+
 
 - (BOOL)periodicRefresh
 {
@@ -253,13 +245,17 @@
 {
   [[self config] setInteger:interval forKey:ST_REFRESH_INTERVAL];
 }
+
 - (void)configChanged:(NSNotification *)not
 {
   NSString *key = [[not userInfo] objectForKey:@"key"];
-  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
-    [self read];
+  if ([key isEqualToString:ST_ENABLED]) {
+    if ([self enabled])
+      [self read];
     [self initTimer];
   }
+  if ([key isEqualToString:ST_REFRESH] || [key isEqualToString:ST_REFRESH_INTERVAL]) 
+    [self initTimer];
 }
 
 - (void)initTimer
@@ -268,6 +264,8 @@
     [_refreshTimer invalidate];
     DESTROY(_refreshTimer);
   }
+  if (![self enabled])
+    return;
   if ([self periodicRefresh]) {
     _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				             interval:[self refreshInterval]
@@ -294,7 +292,24 @@
       NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
     }
   } else {
-    [self setEnabled:NO];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore 
+							object:self
+						      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:[_resource httpStatus]] forKey:@"errorCode"]];
+  }
+}
+- (void)doWrite:(NSData *)data
+{
+  BOOL ret = [_resource put:data attributes:nil];
+  
+  [data release];
+  if (ret) {
+    [_resource updateAttributes];
+    [self setModified:NO];
+    NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
+  } else {
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore 
+							object:self
+						      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:[_resource httpStatus]] forKey:@"errorCode"]];
   }
 }
 @end

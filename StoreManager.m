@@ -1,3 +1,4 @@
+#import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
 #import "AgendaStore.h"
 #import "StoreManager.h"
@@ -119,6 +120,14 @@ static StoreManager *singleton;
 					   selector:@selector(dataChanged:)
 					       name:SAEnabledStatusChangedForStore
 					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(handleError:)
+					       name:SAErrorReadingStore
+					     object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self 
+					   selector:@selector(handleError:)
+					       name:SAErrorWritingStore
+					     object:nil];
   _stores = [[NSMutableDictionary alloc] initWithCapacity:1];
   _dayEventsCache = [[NSMutableDictionary alloc] initWithCapacity:256];
   _eventCache = [[NSMutableArray alloc] initWithCapacity:512];
@@ -151,6 +160,25 @@ static StoreManager *singleton;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStoreManager object:self];
 }
 
+- (void)handleError:(NSNotification *)not
+{
+  id <AgendaStore> store = [not object];
+  NSNumber *errorCode = [[not userInfo] objectForKey:@"errorCode"];
+
+  if ([[not name] isEqualToString:SAErrorReadingStore]) {
+    [store setEnabled:NO];
+  }
+  if ([[not name] isEqualToString:SAErrorWritingStore]) {
+    if ([errorCode intValue] == 412) {
+      NSRunAlertPanel(@"Error : data source modified", @"To prevent losing other modifications, this agenda will be updated.", @"Ok", nil, nil);
+      [store read];
+    } else {
+      NSLog(@"Unable to write to %@, make this store read only", [store description]);
+      [store setWritable:NO];
+    }
+  }
+}
+
 - (void)addStoreNamed:(NSString *)name
 {
   Class storeClass;
@@ -163,8 +191,7 @@ static StoreManager *singleton;
     store = [storeClass storeNamed:name];
     if (store) {
       [_stores setObject:store forKey:name];
-      NSLog(@"Added %@ to StoreManager", name);
-    } else {
+      NSLog(@"Added %@ to StoreManager", name);    } else {
       NSLog(@"Unable to initialize store %@", name);
     }
   }

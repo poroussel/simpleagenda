@@ -6,6 +6,8 @@
 #import "WebDAVResource.h"
 #import "iCalTree.h"
 #import "NSString+SimpleAgenda.h"
+#import "InvocationOperation.h"
+#import "StoreManager.h"
 #import "defines.h"
 
 @interface GroupDAVStore : MemoryStore <AgendaStore>
@@ -17,7 +19,6 @@
   NSMutableDictionary *_hreftree;
   NSMutableDictionary *_hrefresource;
   NSMutableArray *_modifiedhref;
-  NSMutableSet *_loadedData;
 }
 @end
 
@@ -141,10 +142,7 @@
 @end
 
 @interface GroupDAVStore(Private)
-- (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource;
-- (void)initTimer;
-- (void)initStoreAsync:(id)object;
-- (void)fetchData;
+- (void)doRead;
 @end
 
 @implementation GroupDAVStore
@@ -166,9 +164,14 @@
     _hreftree = [[NSMutableDictionary alloc] initWithCapacity:512];
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
-    _loadedData = [[NSMutableSet alloc] initWithCapacity:512];
-    [NSThread detachNewThreadSelector:@selector(initStoreAsync:) toTarget:self withObject:nil];
-    [self initTimer];
+    _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
+    _calendar = nil;
+    _task = nil;
+    if ([[self config] objectForKey:ST_CALENDAR_URL])
+      _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
+    if ([[self config] objectForKey:ST_TASK_URL])
+      _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] authFromURL:_url];
+    [self read];
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					     selector:@selector(configChanged:) 
 						 name:SAConfigManagerValueChanged 
@@ -221,14 +224,13 @@
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self write];
-  DESTROY(_url);
-  DESTROY(_calendar);
-  DESTROY(_task);
-  DESTROY(_uidhref);
-  DESTROY(_hreftree);
-  DESTROY(_hrefresource);
-  DESTROY(_modifiedhref);
-  DESTROY(_loadedData);
+  [_url release];
+  [_calendar release];
+  [_task release];
+  [_uidhref release];
+  [_hreftree release];
+  [_hrefresource release];
+  [_modifiedhref release];
   [super dealloc];
 }
 
@@ -254,7 +256,7 @@
     if ([resource httpStatus] > 199 && [resource httpStatus] < 300)
       /* FIXME : this is extremely slow. We should only load attributes and fetch new or modified elements */
       /* Reloading all data is a way to handle href and uid modification done by the server */
-      [self fetchData];
+      [self doRead];
     else
       NSLog(@"Error %d writing event to %@", [resource httpStatus], [url anonymousAbsoluteString]);
   }
@@ -264,7 +266,7 @@
 
 - (void)remove:(Element *)elt
 {
-  NSString *href = [_uidhref objectForKey:[elt UID]];
+  NSURL *href = [_uidhref objectForKey:[elt UID]];
   WebDAVResource *resource = [_hrefresource objectForKey:href];
 
   [resource delete];
@@ -294,17 +296,19 @@
 
 - (void)read
 {
-  /* FIXME : this should call something else, same thing for iCalStore ? */
-  /* This version won't work for deleted elements etc */
-  [self fetchData];
+  if ([self enabled])
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+												    selector:@selector(doRead) 
+												      object:nil] autorelease]];
 }
 
 - (void)write
 {
+  NSDictionary *attr = [NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"];
   NSEnumerator *enumerator;
   WebDAVResource *element;
   iCalTree *tree;
-  NSString *href;
+  NSURL *href;
   NSArray *copy;
 
   copy = [_modifiedhref copy];
@@ -312,12 +316,12 @@
   while ((href = [enumerator nextObject])) {
     element = [_hrefresource objectForKey:href];
     tree = [_hreftree objectForKey:href];
-    if ([element put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"]]) {
+    if ([element put:[tree iCalTreeAsData] attributes:attr]) {
       /* Read it back to update the attributes */ 
       /* FIXME : RFC says we should update the list instead */
       [element updateAttributes];
       [_modifiedhref removeObject:href];
-      NSLog(@"Written %@", href);
+      NSLog(@"Written %@", [href anonymousAbsoluteString]);
     }
   }
   [copy release];
@@ -326,9 +330,9 @@
 - (void)configChanged:(NSNotification *)not
 {
   NSString *key = [[not userInfo] objectForKey:@"key"];
-  if ([key isEqualToString:ST_ENABLED] && [self enabled]) {
-    [self read];
-    [self initTimer];
+  if ([key isEqualToString:ST_ENABLED]) {
+    if ([self enabled])
+      [self read];
   }
 }
 @end
@@ -356,47 +360,29 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     for (i = 0; i < [set count]; i++) {
       elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[ressource url]];
       if (elementURL)
-	[result addObject:[elementURL absoluteString]];
+	[result addObject:elementURL];
     }
     RELEASE(xpc);
   }
   return result;
 }
 
-- (void)initTimer
-{
-  /* TODO */
-}
-- (void)initStoreAsync:(id)object
-{
-  NSAutoreleasePool *pool = [NSAutoreleasePool new];
-  _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
-  _calendar = nil;
-  _task = nil;
-  if ([[self config] objectForKey:ST_CALENDAR_URL])
-    _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
-  if ([[self config] objectForKey:ST_TASK_URL])
-    _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] authFromURL:_url];
-  [self fetchData];
-  [pool release];
-}
-
-- (void)fetchList:(NSArray *)items
+- (void)addList:(NSArray *)items toSet:(NSMutableSet *)loadedData
 {
   WebDAVResource *element;
   iCalTree *tree;
   NSEnumerator *enumerator;
-  NSString *href;
+  NSURL *href;
   NSSet *components;
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
-    element = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:href] authFromURL:_url];
+    element = [[WebDAVResource alloc] initWithURL:href authFromURL:_url];
     tree = [iCalTree new];
     if ([element get] && [tree parseData:[element data]]) {
       components = [tree components];
       if ([components count] > 0) {
-	[_loadedData unionSet:components];
+	[loadedData unionSet:components];
 	[_hreftree setObject:tree forKey:href];
 	[_hrefresource setObject:element forKey:href];
 	[_uidhref setObject:href forKey:[[components anyObject] UID]];
@@ -406,21 +392,16 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     [element release];
   }
 }
-- (void)fetchData
+- (void)doRead
 {
-  if (![self enabled])
-    return;
-  [_loadedData removeAllObjects];
+  NSMutableSet *loadedData = [[NSMutableSet alloc] initWithCapacity:512];
   if (_calendar)
-    [self fetchList:[self itemsUnderRessource:_calendar]];
+    [self addList:[self itemsUnderRessource:_calendar] toSet:loadedData];
   if (_task)
-    [self fetchList:[self itemsUnderRessource:_task]];
-  if ([_loadedData count] > 0) {  
-    if ([NSThread isMainThread])
-      [self fillWithElements:_loadedData];
-    else
-      [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:_loadedData waitUntilDone:YES];
-  }      
+    [self addList:[self itemsUnderRessource:_task] toSet:loadedData];
+  if ([loadedData count] > 0)
+    [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:loadedData waitUntilDone:YES];
+  [loadedData release];
   NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
   NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
 }

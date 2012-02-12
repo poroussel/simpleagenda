@@ -10,6 +10,8 @@ NSString * const SAEnabledStatusChangedForStore = @"SAEnabledStatusChangedForSto
 NSString * const SAElementAddedToStore = @"SAElementAddedToStore";
 NSString * const SAElementRemovedFromStore = @"SAElementRemoveFromStore";
 NSString * const SAElementUpdatedInStore = @"SAElementUpdatedInStore";
+NSString * const SAErrorReadingStore = @"SAErrorReadingStore";
+NSString * const SAErrorWritingStore = @"SAErrorWritingStore";
 
 @implementation MemoryStore
 + (BOOL)registerWithName:(NSString *)name

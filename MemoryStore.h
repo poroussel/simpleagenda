@@ -9,6 +9,8 @@ extern NSString * const SAEnabledStatusChangedForStore;
 extern NSString * const SAElementAddedToStore;
 extern NSString * const SAElementRemovedFromStore;
 extern NSString * const SAElementUpdatedInStore;
+extern NSString * const SAErrorReadingStore;
+extern NSString * const SAErrorWritingStore;
 
 @class Element;
 @class NSColor;
