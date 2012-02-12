@@ -7,7 +7,6 @@
 {
   NSURL *_url;
   Class _handleClass;
-  NSLock *_lock;
   BOOL _dataChanged;
   int _httpStatus;
   NSString *_reason;

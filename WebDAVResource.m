@@ -8,7 +8,6 @@
 {
   [_user release];
   [_password release];
-  [_lock release];
   [_url release];
   [_lastModified release];
   [_data release];
@@ -32,10 +31,8 @@
 
 - (id)initWithURL:(NSURL *)anUrl
 {
-  if ((self = [super init])) {
-    _lock = [NSLock new];
+  if ((self = [super init]))
     [self setURL:anUrl];
-  }
   return self;
 }
 
@@ -72,7 +69,6 @@
   NSString *property;
   NSURLHandle *handle;
 
-  [_lock lock];
  restart:
   handle = [[_handleClass alloc] initWithURL:_url cached:NO];
   [handle writeProperty:method forKey:GSHTTPPropertyMethodKey];
@@ -118,7 +114,6 @@
     else
       NSLog(@"%s %@ : %d", __PRETTY_FUNCTION__, method, _httpStatus);
     [handle release];
-    [_lock unlock];
     return NO;
   }
 
@@ -137,7 +132,6 @@
     }
   }
   [handle release];
-  [_lock unlock];
   return YES;
 }
 
