@@ -9,10 +9,9 @@ AC_DEFUN(AC_CHECK_ADDRESSES,[
   CFLAGS="-xobjective-c "
   CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
-  OLD_LDFLAGS="$LD_FLAGS"
-  LDFLAGS=`gnustep-config --objc-libs`
   OLD_LIBS="$LIBS"
-  LIBS="-lgnustep-base -lAddresses"
+  LIBS=`gnustep-config --base-libs`
+  LIBS="-lAddresses $LIBS"
   AC_MSG_CHECKING([for Addresses framework])
 
   AC_LINK_IFELSE(
@@ -26,7 +25,6 @@ AC_DEFUN(AC_CHECK_ADDRESSES,[
 	  have_addresses=no)
 
   LIBS="$OLD_LIBS"
-  LDFLAGS="$OLD_LDFLAGS"
   CFLAGS="$OLD_CFLAGS"
 
   AC_MSG_RESULT($have_addresses)
@@ -42,10 +40,9 @@ AC_DEFUN(AC_CHECK_DBUSKIT,[
   CFLAGS="-xobjective-c "
   CFLAGS="$CFLAGS `gnustep-config --objc-flags`"
 
-  OLD_LDFLAGS="$LD_FLAGS"
-  LDFLAGS=`gnustep-config --objc-libs`
   OLD_LIBS="$LIBS"
-  LIBS="-lgnustep-base -lDBusKit"
+  LIBS=`gnustep-config --base-libs`
+  LIBS="-lDBusKit $LIBS"
   AC_MSG_CHECKING([for DBusKit framework])
 
   AC_LINK_IFELSE(
@@ -59,7 +56,6 @@ AC_DEFUN(AC_CHECK_DBUSKIT,[
 	  have_dbuskit=no)
 
   LIBS="$OLD_LIBS"
-  LDFLAGS="$OLD_LDFLAGS"
   CFLAGS="$OLD_CFLAGS"
 
   AC_MSG_RESULT($have_dbuskit)
