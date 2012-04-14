@@ -3,6 +3,10 @@
     ApplicationIcon = Calendar.tiff;
     ApplicationName = SimpleAgenda;
     ApplicationRelease = 0.42;
+    FreeDesktopCategories = (
+	"Office",
+	"Calendar"
+    );    			  
     Authors = (
 	"Philippe Roussel <p.o.roussel@free.fr>"
     );
