@@ -7,6 +7,7 @@ version 0.43
 	* Add Italian translation from Bertalan Ivan
 	* Start conversion from badly written threaded code to NSOperation
 	* New implementation of ConfigManager (again...)
+	* Make the main window closable
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups

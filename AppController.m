@@ -287,6 +287,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   RELEASE(_selectedDay);
 }
 
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)app
+{
+  return YES;
+}
 
 /* Called when user opens an .ics file in GWorkspace */
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
