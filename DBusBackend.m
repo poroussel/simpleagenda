@@ -67,7 +67,6 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 - (void)display:(Alarm *)alarm
 {
     NSConnection *c;
-    NSNumber *dnid;
     id <NSObject,Notifications> remote;
     Element *el = [alarm element];
     NSString *desc;
@@ -78,14 +77,14 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
       desc = [NSString stringWithFormat:@"%@\n\n%@ : %@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary], [[el text] string]];
     else
       desc = [NSString stringWithFormat:@"%@\n\n%@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary]];
-    dnid = [remote Notify:@"SimpleAgenda" 
-			 :0 
-			 :@"" 
-			 :_(@"SimpleAgenda Reminder !") 
-			 :desc
-			 :[NSArray array] 
-			 :[NSDictionary dictionary] 
-			 :-1];
+    [remote Notify:@"SimpleAgenda" 
+		  :0 
+		  :@"" 
+		  :_(@"SimpleAgenda Reminder !") 
+		  :desc
+		  :[NSArray array] 
+		  :[NSDictionary dictionary] 
+		  :-1];
     [c invalidate];
 }
 @end
