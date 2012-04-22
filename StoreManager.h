@@ -29,6 +29,7 @@ extern NSString * const SADataChangedInStoreManager;
 - (void)synchronise;
 - (void)refresh;
 - (id <AgendaStore>)storeContainingElement:(Element *)elt;
+- (BOOL)moveElement:(Element *)elt toStore:(id <MemoryStore>)store;
 - (NSArray *)allEvents;
 - (NSArray *)allTasks;
 - (NSSet *)scheduledAppointmentsForDay:(Date *)date;

@@ -259,6 +259,27 @@ static StoreManager *singleton;
   return nil;
 }
 
+- (BOOL)moveElement:(Element *)elt toStore:(id <MemoryStore>)store
+{
+  id <MemoryStore> origin = [elt store];
+
+  if (origin && ![origin writable])
+    return NO;
+  if (![store writable])
+    return NO;
+  if (!origin)
+    [store add:elt];
+  else if (origin == store)
+    [store update:elt];
+  else {
+    [elt retain];
+    [origin remove:elt];
+    [store add:elt];
+    [elt release];
+  }
+  return YES;
+}
+
 - (NSArray *)allEvents
 {
   NSEnumerator *enumerator;

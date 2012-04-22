@@ -1,16 +1,19 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import "AppointmentView.h"
+#import "StoreManager.h"
 #import "defines.h"
 
 static NSImage *_repeatImage;
 static NSImage *_alarmImage;
+static NSImage *_checkMark;
 
 @implementation AppointmentView
 + (void)initialize
 {
   _repeatImage = [NSImage imageNamed:@"repeat.tiff"];
   _alarmImage = [NSImage imageNamed:@"small-bell.tiff"];
+  _checkMark = [NSImage imageNamed:@"NSMenuCheckmark"];
 }
 
 - (NSImage *)repeatImage
@@ -55,19 +58,48 @@ static NSImage *_alarmImage;
 
 - (NSMenu *)menuForEvent:(NSEvent *)event
 {
-  NSMenu *menu;
-  <NSMenuItem> item;
+  NSEnumerator *enm;
+  MemoryStore *store;
+  NSMenu *menu, *calendars;
+  id <NSMenuItem> item;
+  int index = 0;
 
   if ([event type] != NSRightMouseDown)
     return nil;
 
+  calendars = [[NSMenu alloc] initWithTitle:_(@"Calendars")];
+  [calendars setAutoenablesItems:NO];
+  enm = [[StoreManager globalManager] storeEnumerator];
+  while ((store = [enm nextObject])) {
+    if ([store enabled] && [store writable]) {
+      item = [calendars insertItemWithTitle:[store description] action:@selector(setStore:) keyEquivalent:nil atIndex:index++];
+      [item setTarget:self];
+      [item setRepresentedObject:store];
+      if (store == [_apt store]) {
+	[item setImage:_checkMark];
+	[item setEnabled:NO];
+      }
+    }
+  }
   menu = [[NSMenu alloc] initWithTitle:_(@"Appointment")];
-  if ([_apt sticky])
-    item = [menu insertItemWithTitle:_(@"Unset sticky") action:@selector(changeSticky:) keyEquivalent:nil atIndex:0];
-  else
-    item = [menu insertItemWithTitle:_(@"Set sticky") action:@selector(changeSticky:) keyEquivalent:nil atIndex:0];
+  item = [menu insertItemWithTitle:_(@"Calendars")
+			    action:NULL
+		     keyEquivalent:nil
+			   atIndex:0];
+  [menu setSubmenu:calendars forItem:item];
+  item = [menu insertItemWithTitle:[_apt sticky] ? _(@"Unset sticky") : _(@"Set sticky")
+			    action:@selector(changeSticky:)
+		     keyEquivalent:nil
+			   atIndex:1];
   [item setTarget:self];
+  [calendars autorelease];
   return [menu autorelease];
+}
+
+- (void)setStore:(id)sender
+{
+  [[StoreManager globalManager] moveElement:_apt 
+				    toStore:[sender representedObject]];
 }
 
 - (void)changeSticky:(id)sender
@@ -90,6 +122,7 @@ static NSImage *_alarmImage;
 - (void)configChanged:(NSNotification *)not
 {
   NSString *key = [[not userInfo] objectForKey:@"key"];
+
   if ([key isEqualToString:TOOLTIP])
     [self tooltipSetup];
   else if ([key isEqualToString:ST_COLOR] || [key isEqualToString:ST_TEXT_COLOR])
