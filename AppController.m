@@ -249,9 +249,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self registerForServices];
   [NSApp setServicesProvider: self];
 
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
-  /* FIXME : this is overkill, we should only refresh the views for visual changes */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStoreAddedToStoreManager object:nil];
 
   /* Set the selected day : this will update all views and titles (but not the summary) */
   [calendar setDataSource:self];
@@ -269,6 +267,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
    */
   [calendar setDate:[Date today]];
   _sm = [StoreManager globalManager];
+
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  /* FIXME : this is overkill, we should only refresh the views for visual changes */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:SAStoreAddedToStoreManager object:nil];
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */

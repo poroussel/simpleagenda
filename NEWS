@@ -8,6 +8,7 @@ version 0.43
 	* Start conversion from badly written threaded code to NSOperation
 	* New implementation of ConfigManager (again...)
 	* Make the main window closable
+	* Fix race between store loading and window first display
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups
