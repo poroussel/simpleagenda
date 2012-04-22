@@ -53,6 +53,30 @@ static NSImage *_alarmImage;
   return YES;
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)event
+{
+  NSMenu *menu;
+  <NSMenuItem> item;
+
+  if ([event type] != NSRightMouseDown)
+    return nil;
+
+  menu = [[NSMenu alloc] initWithTitle:_(@"Appointment")];
+  if ([_apt sticky])
+    item = [menu insertItemWithTitle:_(@"Unset sticky") action:@selector(changeSticky:) keyEquivalent:nil atIndex:0];
+  else
+    item = [menu insertItemWithTitle:_(@"Set sticky") action:@selector(changeSticky:) keyEquivalent:nil atIndex:0];
+  [item setTarget:self];
+  return [menu autorelease];
+}
+
+- (void)changeSticky:(id)sender
+{
+  [_apt setSticky:![_apt sticky]];
+  [[_apt store] update:_apt];
+  [self setNeedsDisplay:YES];
+}
+
 - (void)tooltipSetup
 {
   NSAttributedString *as = [_apt text];

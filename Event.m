@@ -12,6 +12,7 @@
   [coder encodeObject:_location forKey:@"location"];
   [coder encodeBool:_allDay forKey:@"allDay"];
   [coder encodeObject:_rrule forKey:@"rrule"];
+  [coder encodeBool:_sticky forKey:@"sticky"];
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
@@ -25,6 +26,10 @@
     _allDay = NO;
   if ([coder containsValueForKey:@"rrule"])
     _rrule = [[coder decodeObjectForKey:@"rrule"] retain];
+  if ([coder containsValueForKey:@"sticky"])
+    _sticky = [coder decodeBoolForKey:@"sticky"];
+  else
+    _sticky = NO;
   return self;
 }
 @end
@@ -43,6 +48,7 @@
   if (self) {
     [self setStartDate:start];
     [self setDuration:minutes];
+    [self setSticky:NO];
   }
   return self;
 }
@@ -156,6 +162,11 @@
   return _rrule;
 }
 
+- (BOOL)sticky
+{
+  return _sticky;
+}
+
 - (void)setDuration:(int)newDuration
 {
   _duration = newDuration;
@@ -169,6 +180,11 @@
 - (void)setRRule:(RecurrenceRule *)arule
 {
   ASSIGN(_rrule, arule);
+}
+
+- (void)setSticky:(BOOL)sticky
+{
+  _sticky = sticky;
 }
 
 - (NSEnumerator *)dateEnumerator
@@ -227,6 +243,13 @@
   location = icalcomponent_get_location(ic);
   if (location)
     [self setLocation:[NSString stringWithUTF8String:location]];
+  prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
+  while (prop) {
+    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY")) {
+      [self setSticky:strcmp("YES", icalproperty_get_value_as_string(prop))];
+    }
+    prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+  }
   return self;
 
  init_error:
@@ -267,6 +290,17 @@
       prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
     }
     prop = icalproperty_new_from_string("X-MICROSOFT-CDO-ALLDAYEVENT:TRUE");
+    icalcomponent_add_property(ic, prop);
+  }
+
+  prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
+  while (prop) {
+    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY"))
+      icalcomponent_remove_property(ic, prop); 
+    prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+  }
+  if ([self sticky]) {
+    prop = icalproperty_new_from_string("X-SIMPLEAGENDA-STICKY:TRUE");
     icalcomponent_add_property(ic, prop);
   }
 

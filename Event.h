@@ -10,6 +10,7 @@
   BOOL _allDay;
   Date *_startDate;
   int _duration;
+  BOOL _sticky;
   RecurrenceRule *_rrule;
 }
 
@@ -24,12 +25,14 @@
 - (int)duration;
 - (Date *)startDate;
 - (RecurrenceRule *)rrule;
+- (BOOL)sticky;
 
 - (void)setLocation:(NSString *)aLocation;
 - (void)setAllDay:(BOOL)allDay;
 - (void)setDuration:(int)duration;
 - (void)setStartDate:(Date *)startDate;
 - (void)setRRule:(RecurrenceRule *)rrule;
+- (void)setSticky:(BOOL)sticky;
 
 - (NSEnumerator *)dateEnumerator;
 - (NSEnumerator *)dateRangeEnumerator;

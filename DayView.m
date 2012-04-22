@@ -71,7 +71,7 @@
   PSsetalpha(0.7);
   PSsetlinewidth(CEC_BORDERSIZE);
   PSstroke();
-  if (![_apt allDay]) {
+  if (![_apt allDay] && ![_apt sticky]) {
     NSRect rd = RedimRect(rect);
     PSnewpath();
     PSmoveto(RADIUS + CEC_BORDERSIZE, rd.origin.y);
@@ -115,7 +115,7 @@
   [self becomeFirstResponder];
   [parent selectAppointmentView:self];
 
-  if (![[_apt store] writable] || [_apt allDay])
+  if (![[_apt store] writable] || [_apt allDay] || [_apt sticky])
     return;
   inResize = [self mouse:mouseLoc inRect:RedimRect([self bounds])];
   if (inResize) {

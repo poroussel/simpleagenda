@@ -9,6 +9,9 @@ version 0.43
 	* New implementation of ConfigManager (again...)
 	* Make the main window closable
 	* Fix race between store loading and window first display
+	* Implement an old feature request from Dennis Leeuw : in the day view 
+	  you can right click on an appointment and make it sticky. You won't be
+	  able to mistakenly move it or resize it.
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups
