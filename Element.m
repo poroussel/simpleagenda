@@ -4,7 +4,36 @@
 #import "Alarm.h"
 #import "NSString+SimpleAgenda.h"
 
+static NSArray *availableCategories;
+
 @implementation Element
++ (void)initialize
+{
+  if (self == [Element class]) {
+    availableCategories = [[NSArray alloc] initWithObjects:_(@"None"),
+					   _(@"Anniversary"),
+					   _(@"Appointment"),
+					   _(@"Business"),
+					   _(@"Congress"),
+					   _(@"Education"),
+					   _(@"Holiday"),
+					   _(@"Idea"),
+					   _(@"Meeting"),
+					   _(@"Miscellaneous"),
+					   _(@"Personal"),
+					   _(@"Phone call"),
+					   _(@"Sick day"),
+					   _(@"Travel"),
+					   _(@"Vacation"),
+					   nil];
+  }
+}
+
++ (NSArray *)availableCategories
+{
+  return availableCategories;
+}
+
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:_summary forKey:@"title"];
@@ -59,8 +88,7 @@
 
 - (id)initWithSummary:(NSString *)summary
 {
-  self = [self init];
-  if (self)
+  if ((self = [self init]))
     [self setSummary:summary];
   return self;
 }

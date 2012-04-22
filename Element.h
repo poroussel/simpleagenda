@@ -28,6 +28,8 @@
   NSMutableArray *_categories;
 }
 
++ (NSArray *)availableCategories;
+
 - (id)initWithSummary:(NSString *)summary;
 - (void)generateUID;
 - (id <MemoryStore>)store;
