@@ -7,8 +7,6 @@
 #import "Event.h"
 
 NSString * const SADataChangedInStoreManager = @"SADataDidChangedInStoreManager";
-NSString * const SAStoreAddedToStoreManager = @"SAStoreAddedToStoreManager";
-NSString * const SAStoreRemovedFromStoreManager = @"SAStoreRemovedFromStoreManager";
 static NSString * const PERSONAL_AGENDA = @"Personal Agenda";
 
 static NSMutableDictionary *backends;

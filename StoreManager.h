@@ -5,8 +5,6 @@
 #import "AgendaStore.h"
 
 extern NSString * const SADataChangedInStoreManager;
-extern NSString * const SAStoreAddedToStoreManager;
-extern NSString * const SAStoreRemovedFromStoreManager;
 
 @interface StoreManager : NSObject
 {
