@@ -82,16 +82,11 @@ static NSImage *_checkMark;
     }
   }
   menu = [[NSMenu alloc] initWithTitle:_(@"Appointment")];
-  item = [menu insertItemWithTitle:_(@"Calendars")
+  item = [menu insertItemWithTitle:_(@"Calendars") 
 			    action:NULL
 		     keyEquivalent:nil
 			   atIndex:0];
   [menu setSubmenu:calendars forItem:item];
-  item = [menu insertItemWithTitle:[_apt sticky] ? _(@"Unset sticky") : _(@"Set sticky")
-			    action:@selector(changeSticky:)
-		     keyEquivalent:nil
-			   atIndex:1];
-  [item setTarget:self];
   [calendars autorelease];
   return [menu autorelease];
 }

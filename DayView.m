@@ -188,6 +188,21 @@
   DayView *parent = (DayView *)[self superview];
   [self setFrame:[parent frameForAppointment:_apt]];
 }
+
+- (NSMenu *)menuForEvent:(NSEvent *)event
+{
+  NSMenu *menu;
+  id <NSMenuItem> item;
+
+  if ((menu = [super menuForEvent:event])) {
+    item = [menu insertItemWithTitle:[_apt sticky] ? _(@"Unset sticky") : _(@"Set sticky")
+			      action:@selector(changeSticky:)
+		       keyEquivalent:nil
+			     atIndex:1];
+    [item setTarget:self];
+  }
+  return menu;
+}
 @end
 
 NSComparisonResult compareAppointmentViews(id a, id b, void *data)
