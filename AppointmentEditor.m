@@ -121,7 +121,6 @@ static NSMutableDictionary *editors;
 - (void)validate:(id)sender
 {
   StoreManager *sm = [StoreManager globalManager];
-  id <MemoryStore> originalStore = [_event store];
   id <MemoryStore> aStore;
   Date *date;
 
@@ -150,14 +149,7 @@ static NSMutableDictionary *editors;
   }
   [_event setAlarms:_modifiedAlarms];
   aStore = [sm storeForName:[store titleOfSelectedItem]];
-  if (!originalStore)
-    [aStore add:_event];
-  else if (originalStore == aStore)
-    [aStore update:_event];
-  else {
-    [originalStore remove:_event];
-    [aStore add:_event];
-  }
+  [sm moveElement:_event toStore:aStore];
   [window close];
   [editors removeObjectForKey:[_event UID]];
   /* After this point the panel instance is released */
