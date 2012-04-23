@@ -466,7 +466,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     break;
   case NSTabCharacter:
     if (_selected != nil) {
-      unsigned int index = [[self subviews] indexOfObject:_selected];
+      NSUInteger index = [[self subviews] indexOfObject:_selected];
       if (index != NSNotFound) {
 	if ([theEvent modifierFlags] & NSShiftKeyMask) {
 	  index--;
