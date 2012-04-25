@@ -65,4 +65,29 @@
   RELEASE(last);
 }
 
+/*
+ * I'm not sure these tests are meaningful but they should
+ * prevent some bugs...
+ */
+- (void)testTimeZone
+{
+  Date *d1, *d2, *d3;
+  struct icaltimetype id;
+  
+  d1 = [Date now];
+
+  id = [d1 localICalTime];
+  d2 = [[Date alloc] initWithICalTime:id];
+  [self assertTrue:[d1 compareTime:d2] == NSOrderedSame];
+  [self assertTrue:[[d1 calendarDate] compare:[d2 calendarDate]] == NSOrderedSame];
+  [self assertTrue:[[d1 calendarDate] isEqualToDate:[d2 calendarDate]]];
+  [d2 release];
+
+  id = [d1 UTCICalTime];
+  d3 = [[Date alloc] initWithICalTime:id];
+  [self assertTrue:[d1 compareTime:d3] == NSOrderedSame];
+  [self assertTrue:[[d1 calendarDate] compare:[d3 calendarDate]] == NSOrderedSame];
+  [self assertTrue:[[d1 calendarDate] isEqualToDate:[d3 calendarDate]]];
+  [d3 release];
+}
 @end
