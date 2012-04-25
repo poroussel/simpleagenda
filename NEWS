@@ -13,6 +13,7 @@ version 0.43
 	  you can right click on an appointment and make it sticky. You won't be
 	  able to mistakenly move it or resize it.
 	* Add a contextual menu to move an appointment from a calendar to another
+	* Type 'make tests=yes' to build and run the 'testsuite'
 
 version 0.42 (2011/04/27)
 	* Bug fixes and code cleanups

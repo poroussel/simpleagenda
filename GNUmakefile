@@ -85,9 +85,14 @@ endif
 SimpleAgenda_OBJC_FILES += \
 SimpleAgenda.m 
 
+ifeq ($(tests),yes)
+SUBPROJECTS = tests
+endif
+
 #
 # Makefiles
 #
 -include GNUmakefile.preamble
 include $(GNUSTEP_MAKEFILES)/application.make
+include $(GNUSTEP_MAKEFILES)/aggregate.make
 -include GNUmakefile.postamble
