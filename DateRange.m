@@ -46,7 +46,7 @@
 
 - (BOOL)contains:(Date *)date
 {
-  if ([_start compareTime:date] > 0)
+  if ([_start compare:date withTime:YES] > 0)
     return NO;
   if ([date timeIntervalSinceDate:_start] > _length)
     return NO;

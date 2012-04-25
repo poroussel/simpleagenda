@@ -93,7 +93,7 @@
 
 NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 {
-  return [[[a valueForKey:@"object"] startDate] compareTime:[[b valueForKey:@"object"] startDate]];
+  return [[[a valueForKey:@"object"] startDate] compare:[[b valueForKey:@"object"] startDate] withTime:YES];
 }
 
 @implementation AppController
@@ -322,7 +322,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
 NSComparisonResult compareEventTime(id a, id b, void *context)
 {
-  return [[a startDate] compareTime:[b startDate]];
+  return [[a startDate] compare:[b startDate] withTime:YES];
 }
 
 - (int)_sensibleStartForDuration:(int)duration

@@ -181,7 +181,7 @@ static NSImage *_2right;
     for (j = 1; j < 7; j++) {
       cell = [matrix cellAtRow:j column:i];
       object = [cell objectValue];
-      if (object != nil && ![date compare:object]) {
+      if (object != nil && ![date compare:object withTime:NO]) {
 	bezeledCell = [cell tag];
 	[cell setBezeled:YES];
 	[self updateTitle];
@@ -211,7 +211,7 @@ static NSImage *_2right;
     [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
     for (column = 1; column < 8; column++, [day incrementDay]) {
       cell = [matrix cellAtRow: row column: column];
-      if ([day compare:today] == 0) {
+      if ([day compare:today withTime:NO] == 0) {
 	[cell setBackgroundColor:[NSColor yellowColor]];
 	[cell setDrawsBackground:YES];
       } else {

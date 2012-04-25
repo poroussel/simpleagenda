@@ -82,7 +82,7 @@
   while ((range = [enumerator nextObject])) {
     if ([range intersectsWithDay:day])
       return [range intersectionWithDay:day];
-    if ([[range start] compare:day] > 0)
+    if ([[range start] compare:day withTime:NO] > 0)
       break;
   }
   return NSMakeRange(0, 0);

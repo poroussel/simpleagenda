@@ -76,9 +76,14 @@ static NSTimeZone *gl_nstz = nil;
   return new;
 }
 
+/*
+ * This method shouldn't be used as it's not
+ * clear if it should compare Dates or DateTimes
+ */
 - (NSComparisonResult)compare:(id)aDate
 {
-  return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
+  [self subclassResponsibility:_cmd];
+  return NSOrderedSame;
 }
 
 - (BOOL)isEqual:(id)aDate
@@ -97,8 +102,11 @@ static NSTimeZone *gl_nstz = nil;
  * (up or down, depending on the local time zone) and a
  * date won't.
  */
-- (NSComparisonResult)compareTime:(id)aDate
+- (NSComparisonResult)compare:(id)aDate withTime:(BOOL)time
 {
+  if (!time)
+    return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
+
   NSComparisonResult res;
   int a_isdate = _time.is_date;
   int b_isdate = ((Date *)aDate)->_time.is_date;

@@ -25,7 +25,7 @@
   if (!lastDate)
     ASSIGNCOPY(lastDate, now);
   else {
-    if (![lastDate compareTime:now])
+    if (![lastDate compare:now withTime:YES])
       counter++;
     else {
       ASSIGNCOPY(lastDate, now);

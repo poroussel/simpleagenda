@@ -26,12 +26,12 @@
   [self assertInt:[now minuteOfHour] equals:0 message:@"a date minuteOfHour is 0"];
   [self assertInt:[now secondOfMinute] equals:0 message:@"a date secondOfMinute is 0"];
 
-  [self assertInt:[now compare:copy] equals:0 message:@"comparing with date only we have equality"];
-  [self assertInt:[now compareTime:copy] equals:-1];
+  [self assertInt:[now compare:copy withTime:NO] equals:0 message:@"comparing with date only we have equality"];
+  [self assertInt:[now compare:copy withTime:YES] equals:-1];
   [copy release];
 
   Date *distantDate = [Date dateWithTimeInterval:60 sinceDate:today];
-  [self assertInt:[today compareTime:distantDate] equals:-1 message:@"today must be inferior as distantDay is 1 hour later. bug if distantDate is a date as today, not a datetime"];
+  [self assertInt:[today compare:distantDate withTime:YES] equals:-1 message:@"today must be inferior as distantDay is 1 hour later. bug if distantDate is a date as today, not a datetime"];
 }
 
 - (void)testDateManipulations
@@ -78,14 +78,14 @@
 
   id = [d1 localICalTime];
   d2 = [[Date alloc] initWithICalTime:id];
-  [self assertTrue:[d1 compareTime:d2] == NSOrderedSame];
+  [self assertTrue:[d1 compare:d2 withTime:YES] == NSOrderedSame];
   [self assertTrue:[[d1 calendarDate] compare:[d2 calendarDate]] == NSOrderedSame];
   [self assertTrue:[[d1 calendarDate] isEqualToDate:[d2 calendarDate]]];
   [d2 release];
 
   id = [d1 UTCICalTime];
   d3 = [[Date alloc] initWithICalTime:id];
-  [self assertTrue:[d1 compareTime:d3] == NSOrderedSame];
+  [self assertTrue:[d1 compare:d3 withTime:YES] == NSOrderedSame];
   [self assertTrue:[[d1 calendarDate] compare:[d3 calendarDate]] == NSOrderedSame];
   [self assertTrue:[[d1 calendarDate] isEqualToDate:[d3 calendarDate]]];
   [d3 release];

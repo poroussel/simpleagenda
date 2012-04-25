@@ -207,7 +207,7 @@
 
 NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 {
-  return [[[a appointment] startDate] compareTime:[[b appointment] startDate]];
+  return [[[a appointment] startDate] compare:[[b appointment] startDate] withTime:YES];
 }
 
 @implementation DayView
