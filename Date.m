@@ -82,7 +82,7 @@ static NSTimeZone *gl_nstz = nil;
  */
 - (NSComparisonResult)compare:(id)aDate
 {
-  [self subclassResponsibility:_cmd];
+  [self notImplemented:_cmd];
   return NSOrderedSame;
 }
 
