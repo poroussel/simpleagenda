@@ -160,6 +160,11 @@ static StoreManager *singleton;
   [[NSNotificationCenter defaultCenter] postNotificationName:SADataChangedInStoreManager object:self];
 }
 
+- (void)displayPanelFromDictionary:(NSDictionary *)dict
+{
+  NSRunAlertPanel([dict objectForKey:@"title"], [dict objectForKey:@"message"], _(@"Ok"), nil, nil);
+}
+
 - (void)handleError:(NSNotification *)not
 {
   id <AgendaStore> store = [not object];
@@ -169,13 +174,17 @@ static StoreManager *singleton;
     [store setEnabled:NO];
   }
   if ([[not name] isEqualToString:SAErrorWritingStore]) {
-    if ([errorCode intValue] == 412) {
-      NSRunAlertPanel(@"Error : data source modified", @"To prevent losing other modifications, this agenda will be updated.", @"Ok", nil, nil);
-      [store read];
+    if ([errorCode intValue] == 412) {      
+      [self performSelectorOnMainThread:@selector(displayPanelFromDictionary:) 
+			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : calendar modified"), @"title", _(@"To prevent losing other modifications, this agenda will be updated."), @"title", nil]
+			  waitUntilDone:YES];
     } else {
-      NSLog(@"Unable to write to %@, make this store read only", [store description]);
       [store setWritable:NO];
+      [self performSelectorOnMainThread:@selector(displayPanelFromDictionary:) 
+			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : unable to save modifications"), @"title", _(@"This agenda will be marked as read only and reread."), @"title", nil]
+			  waitUntilDone:YES];
     }
+    [store read];
   }
 }
 

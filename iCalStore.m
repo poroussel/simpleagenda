@@ -306,6 +306,7 @@
     [self setModified:NO];
     NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
   } else {
+    NSLog(@"Unable to write to calendar %@, make it read only and reread the data", [self description]);
     [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore 
 							object:self
 						      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:[_resource httpStatus]] forKey:@"errorCode"]];
