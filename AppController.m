@@ -230,7 +230,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
-  [window makeKeyAndOrderFront:self];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
