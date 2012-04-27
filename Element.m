@@ -326,7 +326,8 @@ static NSArray *availableCategories;
   [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
+  if ([[self categories] count] > 0)
+    icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
 
   subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
   for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT))
