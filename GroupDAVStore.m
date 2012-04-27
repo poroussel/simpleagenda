@@ -223,7 +223,6 @@
 - (void)dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [self write];
   [_url release];
   [_calendar release];
   [_task release];

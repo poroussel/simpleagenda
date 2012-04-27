@@ -167,7 +167,6 @@
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_refreshTimer invalidate];
   [_refreshTimer release];
-  [self write];
   [_resource release];
   [_url release];
   [_tree release];

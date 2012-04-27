@@ -59,7 +59,6 @@
 
 - (void)dealloc
 {
-  [self write];
   [_globalFile release];
   [_globalTaskFile release];
   [_globalPath release];
