@@ -217,6 +217,16 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 		       forKeys:[NSArray arrayWithObjects:FIRST_HOUR, LAST_HOUR, MIN_STEP, nil]];
 }
 
+
+- (void)colorsDidChanged:(NSNotification *)not
+{
+  DESTROY(_backgroundColor);
+  DESTROY(_alternateBackgroundColor);
+  _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
+  _alternateBackgroundColor = [[_backgroundColor colorModifiedWithDeltaRed:0.05 green:0.05 blue:0.05 alpha:0] retain];
+  [self setNeedsDisplay:YES];
+}
+
 - (id)initWithFrame:(NSRect)frameRect
 {
   if ((self = [super initWithFrame:frameRect])) {
@@ -232,6 +242,10 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 					     selector:@selector(configChanged:) 
 						 name:SAConfigManagerValueChanged 
 					       object:config];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(colorsDidChanged:)
+						 name:NSSystemColorsDidChangeNotification
+					       object:nil];
   }
   return self;
 }
