@@ -143,6 +143,7 @@
 
 @interface GroupDAVStore(Private)
 - (void)doRead;
+- (void)doWrite;
 @end
 
 @implementation GroupDAVStore
@@ -303,27 +304,11 @@
 
 - (void)write
 {
-  NSDictionary *attr = [NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"];
-  NSEnumerator *enumerator;
-  WebDAVResource *element;
-  iCalTree *tree;
-  NSURL *href;
-  NSArray *copy;
-
-  copy = [_modifiedhref copy];
-  enumerator = [copy objectEnumerator];
-  while ((href = [enumerator nextObject])) {
-    element = [_hrefresource objectForKey:href];
-    tree = [_hreftree objectForKey:href];
-    if ([element put:[tree iCalTreeAsData] attributes:attr]) {
-      /* Read it back to update the attributes */ 
-      /* FIXME : RFC says we should update the list instead */
-      [element updateAttributes];
-      [_modifiedhref removeObject:href];
-      NSLog(@"Written %@", [href anonymousAbsoluteString]);
-    }
-  }
-  [copy release];
+  if (![self enabled] || ![self writable])
+    return;
+  [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+												  selector:@selector(doWrite)
+												    object:nil] autorelease]];
 }
 
 - (void)configChanged:(NSNotification *)not
@@ -403,5 +388,40 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   [loadedData release];
   NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
   NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+}
+
+- (void)doWrite
+{
+  NSDictionary *attr = [NSDictionary dictionaryWithObject:@"text/calendar; charset=utf-8" forKey:@"Content-Type"];
+  NSEnumerator *enumerator;
+  WebDAVResource *element;
+  iCalTree *tree;
+  NSURL *href;
+  NSArray *copy;
+  BOOL error = NO;
+
+  copy = [_modifiedhref copy];
+  enumerator = [copy objectEnumerator];
+  while ((href = [enumerator nextObject])) {
+    element = [_hrefresource objectForKey:href];
+    tree = [_hreftree objectForKey:href];
+    if ([element put:[tree iCalTreeAsData] attributes:attr]) {
+      /* Read it back to update the attributes */ 
+      /* FIXME : RFC says we should update the list instead */
+      [element updateAttributes];
+      [_modifiedhref removeObject:href];
+      NSLog(@"Written %@", [href anonymousAbsoluteString]);
+    } else {
+      NSLog(@"Unable to write to %@", [href anonymousAbsoluteString]);
+      error = YES;
+    }
+  }
+  if (error) {
+    NSLog(@"Calendar %@ will be made read only and data reread", [self description]);
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore 
+							object:self
+						      userInfo:[NSDictionary dictionary]];
+  }
+  [copy release];
 }
 @end
