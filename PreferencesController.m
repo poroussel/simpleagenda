@@ -89,6 +89,7 @@
 - (void)storeStateChanged:(NSNotification *)notification
 {
   [self setupDefaultStore];
+  [self selectStore:nil];
 }
 
 - (void)showPreferences
