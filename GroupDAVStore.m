@@ -334,9 +334,10 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   GSXPathNodeSet *set;
   NSURL *elementURL;
 
+  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] 
+		attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
+    return nil;
   result = [NSMutableArray arrayWithCapacity:256];
-  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
-    return result;
   parser = [GSXMLParser parserWithData:[ressource data]];
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
@@ -351,7 +352,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   return result;
 }
 
-- (void)addList:(NSArray *)items toSet:(NSMutableSet *)loadedData
+- (void)add:(NSArray *)items toSet:(NSMutableSet *)loadedData
 {
   WebDAVResource *element;
   iCalTree *tree;
@@ -379,15 +380,34 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 - (void)doRead
 {
   NSMutableSet *loadedData = [[NSMutableSet alloc] initWithCapacity:512];
-  if (_calendar)
-    [self addList:[self itemsUnderRessource:_calendar] toSet:loadedData];
-  if (_task)
-    [self addList:[self itemsUnderRessource:_task] toSet:loadedData];
-  if ([loadedData count] > 0)
+  BOOL error = NO;
+  NSArray *items;
+
+  if (_calendar) {
+    items = [self itemsUnderRessource:_calendar];
+    if (items)
+      [self add:items toSet:loadedData];
+    else
+      error = YES;
+  }
+  if (_task && !error) {
+    items = [self itemsUnderRessource:_task];
+    if (items)
+      [self add:items toSet:loadedData];
+    else
+      error = YES;
+  }
+  if (error) {
+    NSLog(@"Error while reading %@", [self description]);
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore 
+							object:self
+						      userInfo:[NSDictionary dictionary]];
+  } else {
     [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:loadedData waitUntilDone:YES];
+    NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+    NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+  }
   [loadedData release];
-  NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-  NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
 }
 
 - (void)doWrite
