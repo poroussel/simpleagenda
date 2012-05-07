@@ -173,18 +173,18 @@ static StoreManager *singleton;
   if ([[not name] isEqualToString:SAErrorReadingStore]) {
     [store setEnabled:NO];
     [self performSelectorOnMainThread:@selector(displayPanelFromDictionary:) 
-			   withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : unable to read calendar data"), @"title", _(@"This calendar be disabled."), @"title", nil]
+			   withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : unable to read calendar data"), @"title", _(@"This calendar will be disabled."), @"message", nil]
 			waitUntilDone:YES];
   }
   if ([[not name] isEqualToString:SAErrorWritingStore]) {
     if ([errorCode intValue] == 412) {      
       [self performSelectorOnMainThread:@selector(displayPanelFromDictionary:) 
-			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : calendar modified"), @"title", _(@"To prevent losing other modifications, this calendar will be updated."), @"title", nil]
+			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : calendar modified"), @"title", _(@"To prevent losing other modifications, this calendar will be updated."), @"message", nil]
 			  waitUntilDone:YES];
     } else {
       [store setWritable:NO];
       [self performSelectorOnMainThread:@selector(displayPanelFromDictionary:) 
-			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : unable to save modifications"), @"title", _(@"This calendar will be marked as read only and reread."), @"title", nil]
+			     withObject:[NSDictionary dictionaryWithObjectsAndKeys:_(@"Error : unable to save modifications"), @"title", _(@"This calendar will be marked as read only and reread."), @"message", nil]
 			  waitUntilDone:YES];
     }
     [store read];
