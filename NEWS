@@ -1,4 +1,4 @@
-version 0.43
+version 0.43 (2012/09/15)
 	* Fix ticket #19 : preface.h doesn't exist anymore in GNUstep
 	  so stop including it just for the MAX macro
 	* Fix ticket #18 with a patch from Sebastian
