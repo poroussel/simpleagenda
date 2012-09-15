@@ -67,7 +67,7 @@ static NSImage *_2right;
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
 
-    title = [[NSTextField alloc] initWithFrame: NSMakeRect(32, 128, 168, 20)];
+    title = [[NSTextField alloc] initWithFrame: NSMakeRect(32, 125, 168, 20)];
     [title setEditable:NO];
     [title setDrawsBackground:NO];
     [title setBezeled:NO];
