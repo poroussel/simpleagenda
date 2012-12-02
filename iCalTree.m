@@ -28,7 +28,6 @@
     NSLog(@"No string to parse");
     return NO;
   }
-  assert(string != nil);
   NSDebugMLLog(@"iCalTree", string);
   icomp = icalparser_parse_string([string UTF8String]);
   if (icomp) {
