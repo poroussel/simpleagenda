@@ -238,9 +238,9 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     _textAttributes = [[NSDictionary dictionaryWithObject:[NSColor textColor] forKey:NSForegroundColorAttributeName] retain];
     _backgroundColor = [[[NSColor controlBackgroundColor] colorUsingColorSpaceName:NSCalibratedRGBColorSpace] retain];
     _alternateBackgroundColor = [[_backgroundColor colorModifiedWithDeltaRed:0.05 green:0.05 blue:0.05 alpha:0] retain];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(configChanged:) 
-						 name:SAConfigManagerValueChanged 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(configChanged:)
+						 name:SAConfigManagerValueChanged
 					       object:config];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					     selector:@selector(colorsDidChanged:)
@@ -463,10 +463,10 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
 
   if ([characters length] > 0)
     character = [characters characterAtIndex: 0];
-  
+
   switch (character) {
   case '\r':
-  case NSEnterCharacter: 
+  case NSEnterCharacter:
     if (_selected != nil) {
       if ([delegate respondsToSelector:@selector(viewEditEvent:)])
 	[delegate viewEditEvent:[_selected appointment]];
@@ -483,16 +483,17 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
       NSUInteger index = [[self subviews] indexOfObject:_selected];
       if (index != NSNotFound) {
 	if ([theEvent modifierFlags] & NSShiftKeyMask) {
-	  index--;
-	  if (index < 0)
+	  if (index == 0)
 	    index = [[self subviews] count] - 1;
+	  else
+	    index--;
 	} else {
 	  index++;
 	  if (index >= [[self subviews] count])
 	    index = 0;
 	}
 	[self selectAppointmentView:[[self subviews] objectAtIndex:index]];
-      } 
+      }
     } else {
       [self selectAppointmentView:[[self subviews] lastObject]];
     }
