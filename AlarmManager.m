@@ -57,13 +57,13 @@ static AlarmManager *singleton;
   NSMutableArray *alarms = [_activeAlarms objectForKey:uid];
   NSEnumerator *enumerator;
   Alarm *alarm;
-  
+
   if (alarms) {
     enumerator = [alarms objectEnumerator];
     while ((alarm = [enumerator nextObject]))
-      [NSObject cancelPreviousPerformRequestsWithTarget:self 
-	                                       selector:@selector(runAlarm:) 
-	                                         object:alarm]; 
+      [NSObject cancelPreviousPerformRequestsWithTarget:self
+	                                       selector:@selector(runAlarm:)
+	                                         object:alarm];
     [_activeAlarms removeObjectForKey:uid];
   }
 }
@@ -75,8 +75,8 @@ static AlarmManager *singleton;
   delay = [[alarm absoluteTrigger] timeIntervalSinceNow];
   if (delay < 0)
     return NO;
-  [self performSelector:@selector(runAlarm:) 
-	     withObject:alarm 
+  [self performSelector:@selector(runAlarm:)
+	     withObject:alarm
 	     afterDelay:delay];
   return YES;
 }
@@ -96,8 +96,8 @@ static AlarmManager *singleton;
     delay = 1;
   if (delay < 0)
     return NO;
-  [self performSelector:@selector(runAlarm:) 
-	     withObject:alarm 
+  [self performSelector:@selector(runAlarm:)
+	     withObject:alarm
 	     afterDelay:delay];
   return YES;
 }
@@ -141,7 +141,7 @@ static AlarmManager *singleton;
   if ([self alarmsEnabled]) {
     MemoryStore *store = [not object];
     NSString *uid = [[not userInfo] objectForKey:@"UID"];
-    
+
     [self setAlarmsForElement:[store elementWithUID:uid]];
   }
 }
@@ -165,7 +165,7 @@ static AlarmManager *singleton;
 
 - (NSDictionary *)defaults
 {
-  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [AlarmBackend backendName], nil] 
+  return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects: [NSNumber numberWithBool:NO], [AlarmBackend backendName], nil]
 				     forKeys:[NSArray arrayWithObjects: ACTIVATE_ALARMS, DEFAULT_ALARM_BACKEND, nil]];
 }
 
@@ -181,20 +181,20 @@ static AlarmManager *singleton;
     [self setDefaultBackend:[cm objectForKey:DEFAULT_ALARM_BACKEND]];
 
     _activeAlarms = [[NSMutableDictionary alloc] initWithCapacity:32];
-    [nc addObserver:self 
-	   selector:@selector(dataChanged:) 
+    [nc addObserver:self
+	   selector:@selector(dataChanged:)
 	       name:SADataChangedInStore
 	     object:nil];
-    [nc addObserver:self 
-	   selector:@selector(elementAdded:) 
+    [nc addObserver:self
+	   selector:@selector(elementAdded:)
 	       name:SAElementAddedToStore
 	     object:nil];
-    [nc addObserver:self 
-	   selector:@selector(elementRemoved:) 
+    [nc addObserver:self
+	   selector:@selector(elementRemoved:)
 	       name:SAElementRemovedFromStore
 	     object:nil];
-    [nc addObserver:self 
-	   selector:@selector(elementUpdated:) 
+    [nc addObserver:self
+	   selector:@selector(elementUpdated:)
 	       name:SAElementUpdatedInStore
 	     object:nil];
 
@@ -209,7 +209,7 @@ static AlarmManager *singleton;
   NSDebugLLog(@"SimpleAgenda", @"Releasing AlarmManager");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_activeAlarms);
-  RELEASE(backendsArray); 
+  RELEASE(backendsArray);
  [super dealloc];
 }
 
@@ -317,6 +317,6 @@ static AlarmManager *singleton;
 }
 - (void)display:(Alarm *)alarm
 {
-  NSLog([alarm description]);
+  NSLog(@"%@", [alarm description]);
 }
 @end

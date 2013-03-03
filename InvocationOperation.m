@@ -28,7 +28,7 @@
 }
 - (void)main
 {
-  NSDebugLLog(@"SimpleAgenda", [_invocation description]);
+  NSDebugLLog(@"SimpleAgenda", @"%@", [_invocation description]);
   [_invocation invoke];
 }
 @end
