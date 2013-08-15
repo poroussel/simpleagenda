@@ -118,7 +118,7 @@ static NSImage *_2right;
     [matrix setDelegate:self];
     [matrix setAction: @selector(selectDay:)];
     [matrix setDoubleAction: @selector(doubleClick:)];
-    
+
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
     for (i = 0; i < 8; i++) {
@@ -251,14 +251,14 @@ static NSImage *_2right;
 }
 - (void)previousMonth:(id)sender
 {
-  Date *cdate = AUTORELEASE([date copy]);
+  Date *cdate = AUTORELEASE([monthDisplayed copy]);
 
   [cdate setMonth:[cdate monthOfYear]-1];
   [self setDate:cdate];
 }
 - (void)nextMonth:(id)sender
 {
-  Date *cdate = AUTORELEASE([date copy]);
+  Date *cdate = AUTORELEASE([monthDisplayed copy]);
 
   [cdate setMonth:[cdate monthOfYear]+1];
   [self setDate:cdate];
