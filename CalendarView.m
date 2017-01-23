@@ -112,8 +112,8 @@ static NSImage *_2right;
     matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
 			       mode: NSListModeMatrix
 			       prototype: cell
-			       numberOfRows: 7
-			       numberOfColumns: 8];
+			       numberOfRows: 8
+			       numberOfColumns: 7];
     [matrix setIntercellSpacing: NSZeroSize];
     [matrix setDelegate:self];
     [matrix setAction: @selector(selectDay:)];
@@ -122,7 +122,7 @@ static NSImage *_2right;
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
     for (i = 0; i < 8; i++) {
-      cell = [matrix cellAtRow: 0 column: i];
+      cell = [matrix cellAtRow: i column: 0];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -132,7 +132,7 @@ static NSImage *_2right;
 	[cell setStringValue: [[days objectAtIndex: 0] substringToIndex:1]];
     }
     for (i = 0; i < 7; i++) {
-      cell = [matrix cellAtRow: i column: 0];
+      cell = [matrix cellAtRow: 0 column: i];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -140,8 +140,8 @@ static NSImage *_2right;
     formatter = [DayFormatter new];
     for (i = 1, tag = 1; i < 8; i++) {
       for (j = 1; j < 7; j++) {
-	[[matrix cellAtRow: j column: i] setFormatter:formatter];
-	[[matrix cellAtRow: j column: i] setTag:tag++];
+	[[matrix cellAtRow: i column: j] setFormatter:formatter];
+	[[matrix cellAtRow: i column: j] setTag:tag++];
       }
     }
     [formatter release];
@@ -179,7 +179,7 @@ static NSImage *_2right;
 
   for (i = 1; i < 8; i++) {
     for (j = 1; j < 7; j++) {
-      cell = [matrix cellAtRow:j column:i];
+      cell = [matrix cellAtRow:i column:j];
       object = [cell objectValue];
       if (object != nil && ![date compare:object withTime:NO]) {
 	bezeledCell = [cell tag];
@@ -197,8 +197,9 @@ static NSImage *_2right;
   Date *day, *today;
   NSTextFieldCell *cell;
   NSColor *clear = [NSColor clearColor];
-  NSColor *white = [NSColor whiteColor];
+  NSColor *gray = [NSColor grayColor];
   NSColor *black = [NSColor blackColor];
+  NSColor *red = [NSColor redColor];
 
   [self clearSelectedDay];
   today = [Date today];
@@ -206,10 +207,10 @@ static NSImage *_2right;
   [day setDay: 1];
   column = [day weekday];
   [day changeDayBy:1-column];
-  for (row = 1; row < 7; row++) {
+  for (column = 1; column < 7; column++) {
     week = [day weekOfYear];
-    [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
-    for (column = 1; column < 8; column++, [day incrementDay]) {
+    [[matrix cellAtRow:0 column:column] setStringValue:[NSString stringWithFormat:@"%d ", week]];
+    for (row = 1; row < 8; row++, [day incrementDay]) {
       cell = [matrix cellAtRow: row column: column];
       if ([day compare:today withTime:NO] == 0) {
 	[cell setBackgroundColor:[NSColor yellowColor]];
@@ -225,10 +226,12 @@ static NSImage *_2right;
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];
-      if ([day monthOfYear] == [monthDisplayed monthOfYear])
-	[cell setTextColor:black];
+      if ([day monthOfYear] == [monthDisplayed monthOfYear]) {
+         [cell setTextColor:black];
+         if (row == 6 || row == 7) [cell setTextColor:red];
+      }
       else
-	[cell setTextColor:white];
+	[cell setTextColor:gray];
     }
   }
   [self setSelectedDay];
