@@ -64,7 +64,7 @@
   return [_attributes valueForKey:key];
 }
 
-- (void)sortChildrenUsingFunction:(int (*)(id, id, void *))compare context:(void *)context
+- (void)sortChildrenUsingFunction:(NSComparisonResult (*)(id, id, void *))compare context:(void *)context
 {
   [_children sortUsingFunction:compare context:context];
 }
