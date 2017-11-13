@@ -15,10 +15,10 @@ AC_DEFUN(AC_CHECK_ADDRESSES,[
   AC_MSG_CHECKING([for Addresses framework])
 
   AC_LINK_IFELSE(
-          AC_LANG_PROGRAM(
+          [AC_LANG_PROGRAM(
                   [[#include <Foundation/Foundation.h>
                     #include <Addresses/Addresses.h>]],
-                  [[[[ADAddressBook sharedAddressBook]];]]),
+                  [[[ADAddressBook sharedAddressBook];]])],
 	  $1;
 	  have_addresses=yes,
 	  $2;
@@ -46,10 +46,10 @@ AC_DEFUN(AC_CHECK_DBUSKIT,[
   AC_MSG_CHECKING([for DBusKit framework])
 
   AC_LINK_IFELSE(
-          AC_LANG_PROGRAM(
+          [AC_LANG_PROGRAM(
                   [[#import <Foundation/Foundation.h>
                     #import <DBusKit/DBusKit.h>]],
-                  [[[[DKPort sessionBusPort]];]]),
+                  [[[DKPort sessionBusPort];]])],
 	  $1;
 	  have_dbuskit=yes,
 	  $2;
