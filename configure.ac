@@ -43,10 +43,6 @@ AC_SUBST(additional_include_dir)
 AC_SUBST(additional_lib_dir)
 
 AH_BOTTOM([
-/*
- * FIXME : this is ugly (but better than repeating
- * this ugly code in every file that needs ical.h
- */
 #ifdef HAVE_LIBICAL_ICAL_H
 #include <libical/ical.h>
 #else
