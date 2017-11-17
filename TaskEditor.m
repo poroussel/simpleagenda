@@ -33,6 +33,12 @@ static NSMutableDictionary *editors;
   return self;
 }
 
+- (id)document
+{
+   return nil;
+}
+
+
 - (id)initWithTask:(Task *)task
 {
   StoreManager *sm = [StoreManager globalManager];
