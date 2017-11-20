@@ -9,6 +9,9 @@
 /* Define to 1 if you have the <libical/ical.h> header file. */
 #undef HAVE_LIBICAL_ICAL_H
 
+/* Define to 1 if you have the required UUID library implementation */
+#undef HAVE_LIBUUID
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
