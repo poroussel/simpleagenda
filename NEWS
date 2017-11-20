@@ -1,3 +1,9 @@
+version 0.44 (2017/11/20)
+	* Fix missing -document methods in appointment and tasks editor
+	* Compilation warnings fixes from Yavor Doganov
+	* autoconf & co fixes also from Yavor Doganov
+	* Change main window geometry (make all views visible)
+
 version 0.43 (2012/09/15)
 	* Fix ticket #19 : preface.h doesn't exist anymore in GNUstep
 	  so stop including it just for the MAX macro
@@ -9,7 +15,7 @@ version 0.43 (2012/09/15)
 	* New implementation of ConfigManager (again...)
 	* Make the main window closable
 	* Fix race between store loading and window first display
-	* Implement an old feature request from Dennis Leeuw : in the day view 
+	* Implement an old feature request from Dennis Leeuw : in the day view
 	  you can right click on an appointment and make it sticky. You won't be
 	  able to mistakenly move it or resize it.
 	* Add a contextual menu to move an appointment from a calendar to another
@@ -31,13 +37,13 @@ version 0.42 (2011/04/27)
 
 version 0.41 (2010/03/15)
 	* Threads/memory pools/notifications fixes
-	* Fix silly bugs in the makefile when using conditions : we 
-	  always tried to link with libuuid and Addresses even when 
+	* Fix silly bugs in the makefile when using conditions : we
+	  always tried to link with libuuid and Addresses even when
 	  configure didn't detect them
-	* Big changes in ConfigManager : it doesn't retain its listeners 
-	  anymore and listeners are now global. It means that you can 
+	* Big changes in ConfigManager : it doesn't retain its listeners
+	  anymore and listeners are now global. It means that you can
 	  register for any key with any ConfigManager instance.
-	* New ABStore that creates birthday events from Addresses contacts 
+	* New ABStore that creates birthday events from Addresses contacts
 	  if the Addresses framework is available.
 	* New application icon from OpenClipArt
 
@@ -53,12 +59,12 @@ version 0.40 (2010/03/05)
 	* Show today's date in the appicon
 	* Use a human readable description for colors in defaults
 	* Show time in the appicon
-	* Add a new UI Preferences panel and use it for tooltips and 
+	* Add a new UI Preferences panel and use it for tooltips and
 	  date and time in the appicon
 	* Full keyboard navigation in appointment and task dialogs
  	  (you can use the Tab key in the description fields, yeah !)
 	* Better navigation performances with lots of appointments
-	* Bug fixes thanks to Fred Kiefer, James Jordan, Sergey Golovin 
+	* Bug fixes thanks to Fred Kiefer, James Jordan, Sergey Golovin
 	  and Sebastian Reitenbach
 
 version 0.39 (2009/09/20)
@@ -98,13 +104,13 @@ version 0.37 (2008/11/02)
 
 version 0.36 (2008/01/20)
 	* Calendar UI changes : to reduce calendar size, use different
-	  visual hints. Today has a yellow background (unchanged), the 
-	  selected day cell is bezeled/pushed (was a bold font) and busy 
-	  days use a bold font (instead of a tick mark). Always show six 
-	  weeks with black text for the chosen month and white text for 
-	  the previous and next ones. Use a defined font size so that it 
+	  visual hints. Today has a yellow background (unchanged), the
+	  selected day cell is bezeled/pushed (was a bold font) and busy
+	  days use a bold font (instead of a tick mark). Always show six
+	  weeks with black text for the chosen month and white text for
+	  the previous and next ones. Use a defined font size so that it
 	  all fits whatever the user choose as a default size.
-	* Day view : circle through appointments with TAB and edit the 
+	* Day view : circle through appointments with TAB and edit the
 	  selected one with enter
 	* Day view : no more appointments overlapping. The algorithm is
 	  not 100% correct, we might want to change that in the future
@@ -113,7 +119,7 @@ version 0.36 (2008/01/20)
 	* Use ETags to prevent overwriting distant modifications
 	* Add a menu item to force agendas to reload their data
 	* Bug fixes and various improvements
-	* Experimental GroupDAV support : some things work but use with 
+	* Experimental GroupDAV support : some things work but use with
 	  care. Feedback appreciated
 
 version 0.35 (2007/12/31)
@@ -123,7 +129,7 @@ version 0.35 (2007/12/31)
 version 0.34 (2007/12/13)
 	* Fix loading and saving logic : when loading an iCalendar,
 	  we used to refresh the view for each appointment and task.
-	  Should be quite faster when loading a big calendar. Also, 
+	  Should be quite faster when loading a big calendar. Also,
 	  stop saving unmodified local calendars on exit.
 	* Fix position for appointments going outside the day view
 	* Show abbreviated date in day view tab
@@ -137,7 +143,7 @@ version 0.33 (2007/12/08)
 	* Add a visual hint for recurrent events
 	* Fix iCalendar date and duration encoding
 	* Fix pasteboard interaction
-	* Draw appointments with transparency (code from old 
+	* Draw appointments with transparency (code from old
 	  http://www.linuks.mine.nu/agenda/agenda-0.1.tar.gz)
 
 version 0.32 (2007/12/07)
@@ -145,12 +151,12 @@ version 0.32 (2007/12/07)
 	* Internal modifications and refactoring
 	* Add Open tasks category to summary view
 	* Enable 24 hours DayView
-	* Change iCalStore creation to set store writable flag if 
-	  possible without erasing existing data 
+	* Change iCalStore creation to set store writable flag if
+	  possible without erasing existing data
 	* Show days with appointments in MonthView.
-	* Real asynchronous startup for remote stores. Thanks to 
+	* Real asynchronous startup for remote stores. Thanks to
  	  Dennis Leeuw for this bug report (and many others)
-	* Fix end date processing for recurrent events : events can 
+	* Fix end date processing for recurrent events : events can
 	  repeat for ever or until a specified date
 
 version 0.31 (2007/11/21)
@@ -163,7 +169,7 @@ version 0.30 (2007/11/12)
 	* Refactor code to handle multiple kinds of events
 	* Add simple task (iCalendar VTODO) support
 	* Add a task view
-	* Coherent ui : in summary, day view and task view, 
+	* Coherent ui : in summary, day view and task view,
 	  simple click to select and double click to edit
 	* Make calendar view smaller
 	* Fix appointment resize bug in day view
@@ -172,7 +178,7 @@ version 0.29 (2007/11/02)
 	* Preferences dialog uses a popup to select categories (r276)
 	* Events text color selectable in store preferences
 	* Fix time zone bugs
-	* Fix iCal authenticated loading 
+	* Fix iCal authenticated loading
 
 version 0.28
 	* Simple text search
@@ -186,7 +192,7 @@ version 0.27 (2007/09/18)
 version 0.26 (2007/08/16)
 	* Save main window geometry
 	* Add a 'Save all' item menu to fsync data
-	* Register SimpleAgenda as an application handling 
+	* Register SimpleAgenda as an application handling
 	  .ics files and import events when user open one
 	* Add a NEWS file
 	* Fix compilation with gcc 3.3
