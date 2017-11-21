@@ -109,7 +109,15 @@ static NSImage *_2right;
     [cell setAlignment: NSRightTextAlignment];
     [cell setFont:normalFont];
 
-    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
+    int WEEKDAYSTOP = 1;
+    if (WEEKDAYSTOP)
+      matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
+			       mode: NSListModeMatrix
+			       prototype: cell
+			       numberOfRows: 7
+			       numberOfColumns: 8];
+    else
+      matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
 			       mode: NSListModeMatrix
 			       prototype: cell
 			       numberOfRows: 8
@@ -122,7 +130,10 @@ static NSImage *_2right;
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
     for (i = 0; i < 8; i++) {
-      cell = [matrix cellAtRow: i column: 0];
+      if (WEEKDAYSTOP)
+        cell = [matrix cellAtRow: 0 column: i];
+      else
+        cell = [matrix cellAtRow: i column: 0];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -132,7 +143,10 @@ static NSImage *_2right;
 	[cell setStringValue: [[days objectAtIndex: 0] substringToIndex:1]];
     }
     for (i = 0; i < 7; i++) {
-      cell = [matrix cellAtRow: 0 column: i];
+      if (WEEKDAYSTOP)
+        cell = [matrix cellAtRow: i column: 0];
+      else
+        cell = [matrix cellAtRow: 0 column: i];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -140,8 +154,13 @@ static NSImage *_2right;
     formatter = [DayFormatter new];
     for (i = 1, tag = 1; i < 8; i++) {
       for (j = 1; j < 7; j++) {
-	[[matrix cellAtRow: i column: j] setFormatter:formatter];
-	[[matrix cellAtRow: i column: j] setTag:tag++];
+        if (WEEKDAYSTOP) {
+          [[matrix cellAtRow: j column: i] setFormatter:formatter];
+          [[matrix cellAtRow: j column: i] setTag:tag++];
+        } else {
+          [[matrix cellAtRow: i column: j] setFormatter:formatter];
+          [[matrix cellAtRow: i column: j] setTag:tag++];
+        }
       }
     }
     [formatter release];
@@ -177,9 +196,13 @@ static NSImage *_2right;
   int i, j;
   id object;
 
+  int WEEKDAYSTOP = 1;
   for (i = 1; i < 8; i++) {
     for (j = 1; j < 7; j++) {
-      cell = [matrix cellAtRow:i column:j];
+      if (WEEKDAYSTOP)
+        cell = [matrix cellAtRow:j column:i];
+      else
+        cell = [matrix cellAtRow:i column:j];
       object = [cell objectValue];
       if (object != nil && ![date compare:object withTime:NO]) {
 	bezeledCell = [cell tag];
@@ -207,33 +230,69 @@ static NSImage *_2right;
   [day setDay: 1];
   column = [day weekday];
   [day changeDayBy:1-column];
-  for (column = 1; column < 7; column++) {
-    week = [day weekOfYear];
-    [[matrix cellAtRow:0 column:column] setStringValue:[NSString stringWithFormat:@"%d ", week]];
-    for (row = 1; row < 8; row++, [day incrementDay]) {
-      cell = [matrix cellAtRow: row column: column];
-      if ([day compare:today withTime:NO] == 0) {
-	[cell setBackgroundColor:[NSColor yellowColor]];
-	[cell setDrawsBackground:YES];
-      } else {
-	[cell setBackgroundColor:clear];
-	[cell setDrawsBackground:NO];
+  int WEEKDAYSTOP = 1;
+  if (WEEKDAYSTOP)
+    for (row = 1; row < 7; row++) {
+      week = [day weekOfYear];
+      [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
+      for (column = 1; column < 8; column++, [day incrementDay])
+      {
+        cell = [matrix cellAtRow: row column: column];
+        if ([day compare:today withTime:NO] == 0) {
+          [cell setBackgroundColor:[NSColor yellowColor]];
+          [cell setDrawsBackground:YES];
+        } else {
+          [cell setBackgroundColor:clear];
+          [cell setDrawsBackground:NO];
+        }
+        [cell setObjectValue:AUTORELEASE([day copy])];
+        if (_dataSource &&
+            [_dataSource respondsToSelector:@selector(calendarView:cellStatusForDate:)] &&
+            [_dataSource calendarView:self cellStatusForDate:day] & CVHasDataCell)
+          [cell setFont:boldFont];
+        else
+          [cell setFont: normalFont];
+        if ([day monthOfYear] == [monthDisplayed monthOfYear]) {
+           [cell setTextColor:black];
+           if (WEEKDAYSTOP) {
+             if (column == 6 || column == 7) [cell setTextColor:red];
+           } else {
+             if (row == 6 || row == 7) [cell setTextColor:red];
+           }
+        }
+        else
+          [cell setTextColor:gray];
       }
-      [cell setObjectValue:AUTORELEASE([day copy])];
-      if (_dataSource &&
-	  [_dataSource respondsToSelector:@selector(calendarView:cellStatusForDate:)] &&
-	  [_dataSource calendarView:self cellStatusForDate:day] & CVHasDataCell)
-	[cell setFont:boldFont];
-      else
-	[cell setFont: normalFont];
-      if ([day monthOfYear] == [monthDisplayed monthOfYear]) {
-         [cell setTextColor:black];
-         if (row == 6 || row == 7) [cell setTextColor:red];
-      }
-      else
-	[cell setTextColor:gray];
     }
-  }
+  else
+    for (column = 1; column < 7; column++) {
+      week = [day weekOfYear];
+      [[matrix cellAtRow:0 column:column] setStringValue:[NSString stringWithFormat:@"%d ", week]];
+      for (row = 1; row < 8; row++, [day incrementDay])
+      {
+        cell = [matrix cellAtRow: row column: column];
+        if ([day compare:today withTime:NO] == 0) {
+          [cell setBackgroundColor:[NSColor yellowColor]];
+          [cell setDrawsBackground:YES];
+        } else {
+          [cell setBackgroundColor:clear];
+          [cell setDrawsBackground:NO];
+        }
+        [cell setObjectValue:AUTORELEASE([day copy])];
+        if (_dataSource &&
+            [_dataSource respondsToSelector:@selector(calendarView:cellStatusForDate:)] &&
+            [_dataSource calendarView:self cellStatusForDate:day] & CVHasDataCell)
+          [cell setFont:boldFont];
+        else
+          [cell setFont: normalFont];
+        if ([day monthOfYear] == [monthDisplayed monthOfYear]) {
+           [cell setTextColor:black];
+           if (row == 6 || row == 7) [cell setTextColor:red];
+        }
+        else
+          [cell setTextColor:gray];
+      }
+    }
   [self setSelectedDay];
   [day release];
 }
