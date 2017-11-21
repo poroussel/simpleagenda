@@ -12,7 +12,7 @@
   id store;
   id state;
   id ok;
-  id toggleDueDate;
+  NSButton *toggleDueDate;
   id dueDate;
   id dueTime;
   id alarms;

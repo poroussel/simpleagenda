@@ -2,7 +2,7 @@
 #import "NSString+SimpleAgenda.h"
 #import "config.h"
 #ifdef HAVE_UUID_UUID_H
-#import <uuid/uuid.h>
+#include <uuid/uuid.h>
 #else
 #import "Date.h"
 #endif
@@ -10,7 +10,7 @@
 @implementation NSString(SimpleAgenda)
 + (NSString *)uuid
 {
-#ifdef HAVE_UUID_UUID_H
+#ifdef HAVE_LIBUUID
   uuid_t uuid;
   char uuid_str[37];
 

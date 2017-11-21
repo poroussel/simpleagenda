@@ -1,13 +1,16 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the <ical.h> header file. */
+#undef HAVE_ICAL_H
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
 /* Define to 1 if you have the <libical/ical.h> header file. */
 #undef HAVE_LIBICAL_ICAL_H
 
-/* Define to 1 if you have the <uuid/uuid.h> header file. */
-#undef HAVE_UUID_UUID_H
+/* Define to 1 if you have the required UUID library implementation */
+#undef HAVE_LIBUUID
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -33,6 +36,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the <uuid/uuid.h> header file. */
+#undef HAVE_UUID_UUID_H
+
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 
@@ -45,18 +51,19 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* 
- * FIXME : this is ugly (but better than repeating
- * this ugly code in every file that needs ical.h
- */ 
+
 #ifdef HAVE_LIBICAL_ICAL_H
-#import <libical/ical.h>
+#include <libical/ical.h>
 #else
-#import <ical.h>
+#include <ical.h>
 #endif
+

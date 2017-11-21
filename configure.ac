@@ -21,7 +21,10 @@ AC_CHECK_HEADERS([libical/ical.h], ,[AC_CHECK_HEADERS([ical.h], ,[AC_MSG_ERROR(i
 CPPFLAGS=$old_cppflags
 LDFLAGS=$old_ldflags
 
-AC_CHECK_HEADERS([uuid/uuid.h], have_libuuid=yes, have_libuuid=no)
+AC_CHECK_HEADERS([uuid/uuid.h])
+AC_SEARCH_LIBS([uuid_generate], [uuid e2fs-uuid],
+  [AC_DEFINE([HAVE_LIBUUID], [1],
+    [Define to 1 if you have the required UUID library implementation])])
 AC_CHECK_ADDRESSES(have_addresses=yes, have_addresses=no)
 
 AC_ARG_ENABLE([dbuskit],
@@ -36,12 +39,18 @@ else
    have_dbuskit=no
 fi
 
-AC_SUBST(have_libuuid)
 AC_SUBST(have_addresses)
 AC_SUBST(have_dbuskit)
 AC_SUBST(additional_include_dir)
 AC_SUBST(additional_lib_dir)
 
+AH_BOTTOM([
+#ifdef HAVE_LIBICAL_ICAL_H
+#include <libical/ical.h>
+#else
+#include <ical.h>
+#endif
+])
 
 AC_CONFIG_FILES([local.make])
 AC_OUTPUT

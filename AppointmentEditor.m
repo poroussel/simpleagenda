@@ -38,6 +38,11 @@ static NSMutableDictionary *editors;
   return self;
 }
 
+- (id)document
+{
+   return nil;
+}
+
 - (id)initWithEvent:(Event *)event
 {
   StoreManager *sm = [StoreManager globalManager];

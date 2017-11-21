@@ -1,4 +1,4 @@
-LIBUUID=@have_libuuid@
+ADDITIONAL_OBJC_LIBS=@LIBS@
 ADDRESSES=@have_addresses@
 DBUSKIT=@have_dbuskit@
 ADDITIONAL_INCLUDE_DIRS=@additional_include_dir@

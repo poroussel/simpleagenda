@@ -30,4 +30,5 @@
 - (void)changeDelay:(id)sender;
 - (void)selectType:(id)sender;
 - (void)switchBeforeAfter:(id)sender;
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification;
 @end

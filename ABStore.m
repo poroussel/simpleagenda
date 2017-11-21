@@ -50,8 +50,8 @@
     if (value && [value isMemberOfClass:[NSCalendarDate class]]) {
       date = [Date today];
       [date setYear:[value yearOfCommonEra]];
-      [date setMonth:[value monthOfYear]];
-      [date setDay:[value dayOfMonth]];
+      [date setMonth:[(NSCalendarDate *)value monthOfYear]];
+      [date setDay:[(NSCalendarDate *)value dayOfMonth]];
       event = [[Event alloc] initWithStartDate:date duration:0 title:[person screenName]];
       [event setAllDay:YES];
       [event setRRule:rrule];

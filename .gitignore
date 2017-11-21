@@ -1,0 +1,7 @@
+SimpleAgenda.app/*
+obj/*
+
+config.h
+config.log
+config.status
+local.make
