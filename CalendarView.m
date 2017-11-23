@@ -1,6 +1,8 @@
 #import <AppKit/AppKit.h>
+#import "defines.h"
 #import "Date.h"
 #import "CalendarView.h"
+#import "ConfigManager.h"
 
 @interface DayFormatter : NSFormatter
 @end
@@ -20,6 +22,7 @@
 }
 @end
 
+static int WEEKDAYSTOP = 1;
 
 @implementation CalendarView
 static NSImage *_1left;
@@ -53,6 +56,7 @@ static NSImage *_2right;
   [super dealloc];
 }
 
+
 - (id)initWithFrame:(NSRect)frame
 {
   int i;
@@ -63,6 +67,9 @@ static NSImage *_2right;
 
   self = [super initWithFrame:frame];
   if (self) {
+    NSString *direction = [[ConfigManager globalConfig] objectForKey:CAL_DIRECTION];
+    WEEKDAYSTOP = ![direction isEqualToString:CAL_VERTICAL];
+
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
@@ -109,7 +116,6 @@ static NSImage *_2right;
     [cell setAlignment: NSRightTextAlignment];
     [cell setFont:normalFont];
 
-    int WEEKDAYSTOP = 1;
     if (WEEKDAYSTOP)
       matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
 			       mode: NSListModeMatrix
@@ -196,7 +202,6 @@ static NSImage *_2right;
   int i, j;
   id object;
 
-  int WEEKDAYSTOP = 1;
   for (i = 1; i < 8; i++) {
     for (j = 1; j < 7; j++) {
       if (WEEKDAYSTOP)
@@ -230,7 +235,7 @@ static NSImage *_2right;
   [day setDay: 1];
   column = [day weekday];
   [day changeDayBy:1-column];
-  int WEEKDAYSTOP = 1;
+
   if (WEEKDAYSTOP)
     for (row = 1; row < 7; row++) {
       week = [day weekOfYear];

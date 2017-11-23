@@ -5,6 +5,9 @@
 #define MIN_STEP @"minimumStep"
 #define TOOLTIP @"showTooltip"
 
+#define CAL_DIRECTION @"calendarDirection"
+#define CAL_VERTICAL @"Vertical"
+
 #define STORE_CLASSES @"storeClasses"
 
 #define STORES @"stores"
