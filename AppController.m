@@ -676,7 +676,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 @end
 
 @implementation AppController(NSOutlineViewDataSource)
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
   if (item == nil)
     return [[_summaryRoot children] count];
@@ -688,7 +688,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
     return YES;
   return [[item children] count] > 0;
 }
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
   if (item == nil)
     return [[_summaryRoot children] objectAtIndex:index];
@@ -784,11 +784,11 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 @end
 
 @implementation AppController(NSTableDataSource)
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [[_sm visibleTasks] count];
 }
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   Task *task = [[_sm visibleTasks] objectAtIndex:rowIndex];
 
@@ -796,7 +796,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
     return [task summary];
   return [NSNumber numberWithInt:[task state]];
 }
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   Task *task = [[_sm visibleTasks] objectAtIndex:rowIndex];
 
@@ -805,7 +805,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
     [[task store] update:task];
   }
 }
-- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   Task *task;
 
