@@ -282,16 +282,16 @@
 {
   if ([_resource get]) {
     if ([_tree parseData:[_resource data]]) {
-      [self performSelectorOnMainThread:@selector(fillWithElements:) 
-			     withObject:[_tree components] 
+      [self performSelectorOnMainThread:@selector(fillWithElements:)
+			     withObject:[_tree components]
 			  waitUntilDone:YES];
-      NSLog(@"iCalStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-      NSLog(@"iCalStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+      NSLog(@"iCalStore from %@ : loaded %lu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+      NSLog(@"iCalStore from %@ : loaded %lu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
     } else{
       NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
     }
   } else {
-    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore 
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore
 							object:self
 						      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:[_resource httpStatus]] forKey:@"errorCode"]];
   }
@@ -299,7 +299,7 @@
 - (void)doWrite:(NSData *)data
 {
   BOOL ret = [_resource put:data attributes:nil];
-  
+
   [data release];
   if (ret) {
     [_resource updateAttributes];
@@ -307,7 +307,7 @@
     NSLog(@"iCalStore written to %@", [_url anonymousAbsoluteString]);
   } else {
     NSLog(@"Unable to write to calendar %@, make it read only and reread the data", [self description]);
-    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore 
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore
 							object:self
 						      userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:[_resource httpStatus]] forKey:@"errorCode"]];
   }

@@ -17,7 +17,7 @@
 - (id)nextObject
 {
   struct icaltimetype next;
-  
+
   next = icalrecur_iterator_next(_iterator);
   if (icaltime_is_null_time(next))
     return nil;
@@ -50,7 +50,7 @@
 {
   Date *date;
   struct icaltimetype next;
-  
+
   next = icalrecur_iterator_next(_iterator);
   if (icaltime_is_null_time(next))
     return nil;
@@ -76,7 +76,7 @@
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
   if ((self = [self init]))
-    recur.freq = frequency;
+    recur.freq = (icalrecurrencetype_frequency)frequency;
   return self;
 }
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate
@@ -89,7 +89,7 @@
      * only affect datetimes, not dates
      */
     recur.until = [endDate UTCICalTime];
-    recur.freq = frequency;
+    recur.freq = (icalrecurrencetype_frequency)frequency;
   }
   return self;
 }
@@ -98,7 +98,7 @@
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
   if ((self = [self init])) {
     recur.count = count;
-    recur.freq = frequency;
+    recur.freq = (icalrecurrencetype_frequency)frequency;
   }
   return self;
 }
@@ -119,7 +119,7 @@
 }
 - (recurrenceFrequency)frequency
 {
-  return recur.freq;
+  return (recurrenceFrequency)recur.freq;
 }
 - (Date *)until
 {

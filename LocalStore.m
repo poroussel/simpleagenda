@@ -79,17 +79,17 @@
     NSLog(@"Created directory %@", _globalPath);
   }
   if ([fm fileExistsAtPath:_globalFile isDirectory:&isDir] && !isDir) {
-    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];       
+    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %d appointment(s)", _globalFile, [[self events] count]);
+      NSLog(@"LocalStore from %@ : loaded %lu appointment(s)", _globalFile, [[self events] count]);
     }
   }
   if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {
-    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];       
+    savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %d tasks(s)", _globalTaskFile, [[self tasks] count]);
+      NSLog(@"LocalStore from %@ : loaded %lu tasks(s)", _globalTaskFile, [[self tasks] count]);
     }
   }
 }
@@ -98,7 +98,7 @@
 {
   if (![self modified])
     return;
-  if ([NSKeyedArchiver archiveRootObject:[NSSet setWithArray:[self events]] toFile:_globalFile] && 
+  if ([NSKeyedArchiver archiveRootObject:[NSSet setWithArray:[self events]] toFile:_globalFile] &&
       [NSKeyedArchiver archiveRootObject:[NSSet setWithArray:[self tasks]] toFile:_globalTaskFile]) {
     NSLog(@"LocalStore written to %@", _globalFile);
     [self setModified:NO];

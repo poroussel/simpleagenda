@@ -399,13 +399,13 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   }
   if (error) {
     NSLog(@"Error while reading %@", [self description]);
-    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore 
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorReadingStore
 							object:self
 						      userInfo:[NSDictionary dictionary]];
   } else {
     [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:loadedData waitUntilDone:YES];
-    NSLog(@"GroupDAVStore from %@ : loaded %d appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-    NSLog(@"GroupDAVStore from %@ : loaded %d tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+    NSLog(@"GroupDAVStore from %@ : loaded %lu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+    NSLog(@"GroupDAVStore from %@ : loaded %lu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
   }
   [loadedData release];
 }

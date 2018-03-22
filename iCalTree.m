@@ -28,7 +28,6 @@
     NSLog(@"No string to parse");
     return NO;
   }
-  NSDebugMLLog(@"iCalTree", string);
   icomp = icalparser_parse_string([string UTF8String]);
   if (icomp) {
     icalcomponent_free(root);
@@ -48,7 +47,7 @@
   /* OGo workaround  ? */
   icalproperty *prop = icalcomponent_get_first_property(root, ICAL_METHOD_PROPERTY);
   if (prop)
-    icalcomponent_remove_property(root, prop); 
+    icalcomponent_remove_property(root, prop);
   icalcomponent_strip_errors(root);
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
 }
@@ -65,7 +64,7 @@
   Task *task;
   NSMutableSet *work = [NSMutableSet setWithCapacity:32];
 
-  for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT); 
+  for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT);
        ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VEVENT_COMPONENT)) {
     ev = [[Event alloc] initWithICalComponent:ic];
     if (ev) {
@@ -73,7 +72,7 @@
       [ev release];
     }
   }
-  for (ic = icalcomponent_get_first_component(root, ICAL_VTODO_COMPONENT); 
+  for (ic = icalcomponent_get_first_component(root, ICAL_VTODO_COMPONENT);
        ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VTODO_COMPONENT)) {
     task = [[Task alloc] initWithICalComponent:ic];
     if (task) {
@@ -91,7 +90,7 @@
   NSString *uid = [elt UID];
   int type = [elt iCalComponentType];
 
-  for (ic = icalcomponent_get_first_component(root, type); 
+  for (ic = icalcomponent_get_first_component(root, type);
        ic != NULL; ic = icalcomponent_get_next_component(root, type)) {
     prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
     if (prop && [uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
