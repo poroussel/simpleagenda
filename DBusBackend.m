@@ -55,7 +55,7 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
       }
     NS_HANDLER
       {
-	NSLog([localException description]);
+	NSLog(@"%@", [localException description]);
 	NSLog(@"Exception during DBus backend setup, backend disabled");
 	DESTROY(self);
       }
