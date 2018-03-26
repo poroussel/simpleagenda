@@ -189,7 +189,7 @@
 @end
 
 @implementation AlarmEditor(NSTableViewDataSource)
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [_alarms count];
 }
@@ -197,7 +197,7 @@
 {
   return NO;
 }
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   return [[_alarms objectAtIndex:rowIndex] shortDescription];
 }
