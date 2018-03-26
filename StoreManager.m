@@ -338,7 +338,7 @@ static StoreManager *singleton;
   Event *event;
 
   NSAssert(date != nil, @"No date specified, am I supposed to guess ?");
-  dayEvents = [_dayEventsCache objectForKey:date];
+  dayEvents = [_dayEventsCache objectForKey:(id)date];
   if (dayEvents)
     return dayEvents;
 
@@ -347,7 +347,7 @@ static StoreManager *singleton;
   while ((event = [enumerator nextObject]))
     if ([event isScheduledForDay:date])
       [dayEvents addObject:event];
-  [_dayEventsCache setObject:dayEvents forKey:date];
+  [_dayEventsCache setObject:dayEvents forKey:(id)date];
   return dayEvents;
 }
 
