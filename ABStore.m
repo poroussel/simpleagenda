@@ -60,7 +60,7 @@
       [event release];
     }
   }
-  NSLog(@"ABStore : found %d contact(s) with a birthdate", [[self events] count]);
+  NSLog(@"ABStore : found %lu contact(s) with a birthdate", [[self events] count]);
   [rrule release];
 }
 
