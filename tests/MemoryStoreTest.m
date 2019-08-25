@@ -1,7 +1,8 @@
-#import "MemoryStoreTest.h"
-#import "../MemoryStore.h"
-#import "../Event.h"
-#import "../Date.h"
+/* -*- objc -*- */
+
+#import "ObjectTesting.h"
+#import "MemoryStore.h"
+#import "Event.h"
 
 @interface SimpleStore : MemoryStore
 {
@@ -14,53 +15,48 @@
 }
 @end
 
-@implementation MemoryStoreTest
-- (void)setUp
+int main ()
 {
+  CREATE_AUTORELEASE_POOL(arp);
+
+  MemoryStore *testStore;
+
+  test_alloc(@"MemoryStore");
+
   testStore = [[SimpleStore alloc] initWithName:@"testStore"];
-}
 
-- (void)tearDown
-{
-  [testStore release];
-}
+  test_NSObject(@"MemoryStore", [NSArray arrayWithObject:testStore]);
 
-- (void)testStoreCreation
-{
   MemoryStore *ms = [[SimpleStore alloc] initWithName:@"elementCount"];
 
-  [self assertTrue:(ms != nil) message:@"MemoryStore created."];
-  [self assertTrue:[ms events] && [ms tasks] message:@"Events and tasks dictionaries exist."];
-  [self assertTrue:([[ms events] count] == 0 && [[ms tasks] count] == 0) message:@"MemoryStore is empty on creation."];
-  [ms release];
-}
+  PASS(ms != nil, "MemoryStore created.");
+  PASS([ms events] && [ms tasks], "Events and tasks dictionaries exist.");
+  PASS([[ms events] count] == 0 && [[ms tasks] count] == 0,
+       "MemoryStore is empty on creation.");
 
-- (void)testStoreRetainCount
-{
   Event *ev = [[Event alloc] initWithStartDate:[Date now] duration:60 title:@"Title"];
 
-  [self assertInt:[ev retainCount] equals:1 message:@""];
+  PASS([ev retainCount] == 1, "");
   [testStore add:ev];
-  [self assertInt:[ev retainCount] equals:2 message:@""];
+  PASS([ev retainCount] == 2, "");
   [testStore add:ev];
-  [self assertInt:[ev retainCount] equals:2 message:@""];
+  PASS([ev retainCount] == 2, "");
   [testStore remove:ev];
-  [self assertInt:[ev retainCount] equals:1 message:@""];
-  [ev release];
-}
-
-- (void)testStoreElementCount
-{
-  MemoryStore *ms = [[SimpleStore alloc] initWithName:@"elementCount"];
-  Event *ev = [[Event alloc] initWithStartDate:[Date now] duration:60 title:@"Title"];
+  PASS([ev retainCount] == 1, "");
 
   [ms add:ev];
-  [self assertInt:[[ms events] count] equals:1 message:@"We added an event to the store."];
+  PASS([[ms events] count] == 1, "We added an event to the store.");
   [ms add:ev];
-  [self assertInt:[[ms events] count] equals:1 message:@"If adding the same event twice, it appears only once."];
+  PASS([[ms events] count] == 1,
+       "If adding the same event twice, it appears only once.");
   [ms remove:ev];
-  [self assertInt:[[ms events] count] equals:0 message:@"After removing this event the store is empty again."];
+  PASS([[ms events] count] == 0,
+       "After removing this event the store is empty again.");
   [ev release];
   [ms release];
+  [testStore release];
+
+  RELEASE(arp);
+
+  exit(EXIT_SUCCESS);
 }
-@end

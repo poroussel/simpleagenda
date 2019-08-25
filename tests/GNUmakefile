@@ -1,36 +1,32 @@
+# __GENERATED__ makefile marker
+#
+
 include $(GNUSTEP_MAKEFILES)/common.make
-include ../local.make
+-include ../GNUmakefile.super
 
-TOOL_NAME = SimpleAgendaTests
+GNUSTEP_OBJ_DIR=./obj
 
-SimpleAgendaTests_OBJC_FILES = \
-	../Date.m \
-	../DateRange.m \
-	../RecurrenceRule.m \
-	../MemoryStore.m \
-	../ConfigManager.m \
-	../Event.m \
-	../Element.m \
-	../NSString+SimpleAgenda.m \
-	../Alarm.m \
-	../HourFormatter.m \
-	DateTest.m \
-	ElementTest.m \
-	RecurrenceRuleTest.m \
-	MemoryStoreTest.m \
-	AllTests.m \
-	main.m
+TEST_TOOL_NAME =  DateTest ElementTest MemoryStoreTest RecurrenceRuleTest
 
-SimpleAgendaTests_TOOL_LIBS = -lObjcUnit -lical -lgnustep-gui
-#ifeq(have_libuuid,yes)
-ifeq ($(findstring openbsd, $(GNUSTEP_TARGET_OS)), openbsd)
-SimpleAgendaTests_TOOL_LIBS += -le2fs-uuid
-else
-SimpleAgendaTests_TOOL_LIBS += -luuid
+ifeq ($(gcov),yes)
+ADDITIONAL_OBJCFLAGS += -ftest-coverage -fprofile-arcs
+ADDITIONAL_OBJCCFLAGS += -ftest-coverage -fprofile-arcs
+ADDITIONAL_LDFLAGS += -ftest-coverage -fprofile-arcs
+ADDITIONAL_TOOL_LIBS+=-lgcov
 endif
-#endif
 
-ADDITIONAL_OBJCFLAGS = -Wno-import -Wall
 
-include $(GNUSTEP_MAKEFILES)/tool.make
+DateTest_OBJC_FILES=DateTest.m
+ElementTest_OBJC_FILES=ElementTest.m
+MemoryStoreTest_OBJC_FILES=MemoryStoreTest.m
+RecurrenceRuleTest_OBJC_FILES=RecurrenceRuleTest.m
+
+-include GNUmakefile.preamble
+-include make-check.mak
+include $(GNUSTEP_MAKEFILES)/test-tool.make
 -include GNUmakefile.postamble
+
+after-clean::
+	rm -f core core.* *.core \
+	tests.log tests.sum oldtests.log oldtests.sum
+

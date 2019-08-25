@@ -1,0 +1,36 @@
+# -*- makefile-gmake -*-
+
+include ../local.make
+
+DateTest_OBJC_FILES += \
+	../Date.m 
+
+ElementTest_OBJC_FILES += \
+	../Alarm.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../HourFormatter.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m
+
+MemoryStoreTest_OBJC_FILES += \
+	../Alarm.m \
+	../ConfigManager.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../Event.m \
+	../HourFormatter.m \
+	../MemoryStore.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m \
+
+RecurrenceRuleTest_OBJC_FILES += \
+	../Date.m \
+	../DateRange.m \
+	../RecurrenceRule.m
+
+NEEDS_GUI=yes
+ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
+ADDITIONAL_TOOL_LIBS += -lical

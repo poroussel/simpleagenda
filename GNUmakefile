@@ -85,10 +85,6 @@ endif
 SimpleAgenda_OBJC_FILES += \
 SimpleAgenda.m 
 
-ifeq ($(tests),yes)
-SUBPROJECTS = tests
-endif
-
 #
 # Makefiles
 #
