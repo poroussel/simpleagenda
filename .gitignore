@@ -1,5 +1,6 @@
 SimpleAgenda.app/*
 obj/*
+tests/obj/*
 
 config.h
 config.log
