@@ -54,8 +54,8 @@
     _attrs = [[NSDictionary alloc] initWithObjectsAndKeys:[NSFont systemFontOfSize:8],NSFontAttributeName,nil];
     _cm = [ConfigManager globalConfig];
     [self setup];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(configChanged:) 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(configChanged:)
 						 name:SAConfigManagerValueChanged object:_cm];
   }
   return self;
@@ -213,6 +213,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
     return self;
   [self initSummary];
   [[ConfigManager globalConfig] registerDefaults:[self defaults]];
+  _sm = [StoreManager globalManager];
   return self;
 }
 
@@ -230,6 +231,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
+
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  /* FIXME : this is overkill, we should only refresh the views for visual changes */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
@@ -239,7 +245,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 
   win = [NSApp iconWindow];
   width = [[win contentView] bounds].size.width;
-  height = [[win contentView] bounds].size.height;  
+  height = [[win contentView] bounds].size.height;
   [[win contentView] addSubview:AUTORELEASE([[AppIcon alloc] initWithFrame: NSMakeRect(1, 1, width - 2, height - 2)])];
 
   [self registerForServices];
@@ -248,29 +254,20 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   /* Set the selected day : this will update all views and titles (but not the summary) */
   [calendar setDataSource:self];
   /*
-   * FIXME : this has to be called before the StoreManager is setup
-   * so that the calendar date is setup when -dataChanged is called
-   * and the view redrawn by calling -reloadData
-   */
-  /*
    * FIXME : setting the calendar date ends up calling -calendarView:selectedDateChanged
    * then [DayView -setDate:] which calls [DayView -reloadData] where we find
    * [StoreManager globalManager] => the StoreManager is hiddenly initialized
-   * 
+   *
    * This is all too complex and should be redone maybe based on notifications
    */
   [calendar setDate:[Date today]];
-  _sm = [StoreManager globalManager];
 
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
-  /* FIXME : this is overkill, we should only refresh the views for visual changes */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
   /* This will init the alarms for all loaded elements needing one */
   _am = [AlarmManager globalManager];
   _selm = [SelectionManager globalManager];
   _pc = [PreferencesController new];
+
+  [self updateSummaryData];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -327,7 +324,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 - (int)_sensibleStartForDuration:(int)duration
 {
   int minute = [dayView firstHour] * 60;
-  NSEnumerator *enumerator = [[[[_sm visibleAppointmentsForDay:_selectedDay] allObjects] 
+  NSEnumerator *enumerator = [[[[_sm visibleAppointmentsForDay:_selectedDay] allObjects]
 				sortedArrayUsingFunction:compareEventTime context:nil] objectEnumerator];
   Event *apt;
 
@@ -369,7 +366,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
   NSArray *allTypes;
   Task *task;
 
-  allTypes = [pboard types];  
+  allTypes = [pboard types];
   if (![allTypes containsObject: NSStringPboardType]) {
     *error = @"No string type supplied on pasteboard";
     return;
@@ -474,7 +471,7 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
       /* FIXME : this isn't enough : we have to find a writable store or error out */
       if (![store writable])
 	store = [_sm defaultStore];
-	
+
       start = [[el startDate] minuteOfDay];
       if ([_selm lastOperation] == SMCopy)
 	el = [el copy];
@@ -483,15 +480,15 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
       if ([_selm lastOperation] == SMCopy) {
 	[store add:el];
 	/*
-	 * FIXME : the new event is now in store's dictionary, we 
-	 * should be able to release it. If we do, the application 
+	 * FIXME : the new event is now in store's dictionary, we
+	 * should be able to release it. If we do, the application
 	 * crashes when we delete this event, trying to release it
 	 * one time too many. I can't find the bug
 	 * [el release];
 	 */
       } else {
 	[store update:el];
-      }     
+      }
     }
     [date release];
   }
@@ -586,8 +583,8 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 
 - (void)dataChanged:(NSNotification *)not
 {
-  /* 
-   * FIXME : if a selected event was deleted by another application, 
+  /*
+   * FIXME : if a selected event was deleted by another application,
    * the selection will reference a non existing object
    */
   [calendar reloadData];
@@ -766,8 +763,8 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
   Date *date = [[calendar date] copy];
   [date setIsDate:NO];
   [date setMinute:start];
-  Event *apt = [[Event alloc] initWithStartDate:date 
-			               duration:end - start 
+  Event *apt = [[Event alloc] initWithStartDate:date
+			               duration:end - start
 			                  title:_(@"edit title...")];
   if (apt)
     [AppointmentEditor editorForEvent:apt];
