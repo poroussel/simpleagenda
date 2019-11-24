@@ -378,6 +378,24 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   delegate = theDelegate;
 }
 
+- (id)dataSource
+{
+  return _dataSource;
+}
+
+- (void)dataChanged:(NSNotification *)not
+{
+  [self reloadData];
+}
+
+- (void)setDataSource:(id)dataSource
+{
+  if (_dataSource == nil)
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  ASSIGN(_dataSource, dataSource);
+  [self reloadData];
+}
+
 - (void)selectAppointmentView:(AppointmentView *)aptv
 {
   _selected = aptv;
@@ -395,7 +413,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   NSSet *events;
   BOOL found;
 
-  events = [[StoreManager globalManager] visibleAppointmentsForDay:_date];
+  events = [_dataSource visibleAppointmentsForDay:_date];
   enumerator = [[self subviews] objectEnumerator];
   while ((aptv = [enumerator nextObject])) {
     if (![events containsObject:[aptv appointment]] || ![[[aptv appointment] store] displayed]) {

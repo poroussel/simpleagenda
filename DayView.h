@@ -20,6 +20,7 @@
   NSColor *_backgroundColor;
   NSColor *_alternateBackgroundColor;
   Date *_date;
+  id _dataSource;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
@@ -29,4 +30,7 @@
 - (int)lastHour;
 - (int)minimumStep;
 - (void)setDate:(Date *)date;
+- (void)dataChanged:(NSNotification *)not;
+- (id)dataSource;
+- (void)setDataSource:(id)dataSource;
 @end

@@ -34,14 +34,11 @@ typedef enum {
 - (id)dataSource;
 - (void)setDataSource:(id)dataSource;
 - (void)reloadData;
+- (void)dataChanged:(NSNotification *)not;
 @end
 
 @interface NSObject(CalendarViewDelegate)
 - (void)calendarView:(CalendarView *)cs selectedDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs currentDateChanged:(Date *)date;
 - (void)calendarView:(CalendarView *)cs userActionForDate:(Date *)date;
-@end
-
-@interface NSObject(CalendarViewDataSource)
-- (CVCellStatus)calendarView:(CalendarView *)view cellStatusForDate:(Date *)date;
 @end

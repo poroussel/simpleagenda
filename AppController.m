@@ -231,11 +231,6 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
-
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
-  /* FIXME : this is overkill, we should only refresh the views for visual changes */
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
@@ -251,16 +246,10 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [self registerForServices];
   [NSApp setServicesProvider: self];
 
-  /* Set the selected day : this will update all views and titles (but not the summary) */
-  [calendar setDataSource:self];
-  /*
-   * FIXME : setting the calendar date ends up calling -calendarView:selectedDateChanged
-   * then [DayView -setDate:] which calls [DayView -reloadData] where we find
-   * [StoreManager globalManager] => the StoreManager is hiddenly initialized
-   *
-   * This is all too complex and should be redone maybe based on notifications
-   */
   [calendar setDate:[Date today]];
+  [calendar setDataSource:_sm];
+  [dayView setDataSource:_sm];
+  [weekView setDataSource:_sm];
 
   /* This will init the alarms for all loaded elements needing one */
   _am = [AlarmManager globalManager];
@@ -268,6 +257,11 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   _pc = [PreferencesController new];
 
   [self updateSummaryData];
+
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  /* FIXME : this is overkill, we should only refresh the views for visual changes */
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -587,9 +581,6 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
    * FIXME : if a selected event was deleted by another application,
    * the selection will reference a non existing object
    */
-  [calendar reloadData];
-  [dayView reloadData];
-  [weekView reloadData];
   [taskView reloadData];
   [self performSearch];
   [self updateSummaryData];
@@ -707,15 +698,6 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
   if (object && [object isKindOfClass:[Task class]])
     return [self showElement:object onDay:[calendar date]];
   return NO;
-}
-@end
-
-@implementation AppController(CalendarViewDataSource)
-- (CVCellStatus)calendarView:(CalendarView *)view cellStatusForDate:(Date *)date
-{
-  if ([[_sm visibleAppointmentsForDay:date] count] > 0)
-    return CVHasDataCell;
-  return CVEmptyCell;
 }
 @end
 

@@ -1,6 +1,7 @@
 #import <AppKit/AppKit.h>
 #import "Date.h"
 #import "CalendarView.h"
+#import "StoreManager.h"
 
 @interface DayFormatter : NSFormatter
 @end
@@ -36,6 +37,7 @@ static NSImage *_2right;
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [_dayTimer invalidate];
   RELEASE(date);
   RELEASE(monthDisplayed);
@@ -147,6 +149,8 @@ static NSImage *_2right;
     [formatter release];
     [self addSubview: matrix];
 
+    _dataSource = nil;
+
     now = [Date today];
     [self setDate:now];
     [now incrementDay];
@@ -220,8 +224,8 @@ static NSImage *_2right;
       }
       [cell setObjectValue:AUTORELEASE([day copy])];
       if (_dataSource &&
-	  [_dataSource respondsToSelector:@selector(calendarView:cellStatusForDate:)] &&
-	  [_dataSource calendarView:self cellStatusForDate:day] & CVHasDataCell)
+	  [_dataSource respondsToSelector:@selector(visibleAppointmentsForDay:)] &&
+	  [[_dataSource visibleAppointmentsForDay:day] count] > 0)
 	[cell setFont:boldFont];
       else
 	[cell setFont: normalFont];
@@ -299,17 +303,25 @@ static NSImage *_2right;
   return delegate;
 }
 
+- (void)reloadData
+{
+  [self updateView];
+}
+
 - (id)dataSource
 {
   return _dataSource;
 }
+
 - (void)setDataSource:(id)dataSource
 {
+  if (_dataSource == nil)
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   ASSIGN(_dataSource, dataSource);
   [self updateView];
 }
 
-- (void)reloadData
+- (void)dataChanged:(NSNotification *)not
 {
   [self updateView];
 }

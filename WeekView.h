@@ -12,10 +12,14 @@
   int weekNumber;
   int year;
   Date *_date;
+  id _dataSource;
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv;
-- (void)reloadData;
 - (id)delegate;
 - (void)setDate:(Date *)date;
+- (id)dataSource;
+- (void)setDataSource:(id)dataSource;
+- (void)dataChanged:(NSNotification *)not;
+- (void)reloadData;
 @end

@@ -74,7 +74,7 @@
 {
   WeekView *parent = (WeekView *)[[self superview] superview];
   id delegate = [parent delegate];
-   
+
   if ([theEvent clickCount] > 1) {
     if ([delegate respondsToSelector:@selector(viewEditEvent:)])
       [delegate viewEditEvent:_apt];
@@ -212,6 +212,7 @@ static struct {
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_date);
   [super dealloc];
 }
@@ -225,7 +226,25 @@ static struct {
   delegate = theDelegate;
 }
 
+- (id)dataSource
+{
+  return _dataSource;
+}
+
+- (void)setDataSource:(id)dataSource
+{
+  if (_dataSource == nil)
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
+  ASSIGN(_dataSource, dataSource);
+  [self reloadData];
+}
+- (void)dataChanged:(NSNotification *)not
+{
+  [self reloadData];
+}
+
 - (void)selectAppointmentView:(AppointmentView *)aptv
+
 {
   if ([delegate respondsToSelector:@selector(viewSelectDate:)])
     [delegate viewSelectDate:[(WeekDayView *)[aptv superview] day]];
@@ -245,7 +264,7 @@ static struct {
   enumerator = [[self subviews] objectEnumerator];
   while ((wdv = [enumerator nextObject])) {
     [wdv clear];
-    events = [[StoreManager globalManager] visibleAppointmentsForDay:[wdv day]];
+    events = [_dataSource visibleAppointmentsForDay:[wdv day]];
     enm = [events objectEnumerator];
     while ((apt = [enm nextObject]))
       [wdv addAppointment:apt];
