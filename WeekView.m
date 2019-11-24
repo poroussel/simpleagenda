@@ -214,6 +214,7 @@ static struct {
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_date);
+  RELEASE(_dataSource);
   [super dealloc];
 }
 

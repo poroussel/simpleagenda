@@ -257,6 +257,7 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
   [_alternateBackgroundColor release];
   [_textAttributes release];
   RELEASE(_date);
+  RELEASE(_dataSource);
   [super dealloc];
 }
 
