@@ -770,10 +770,15 @@ NSComparisonResult compareEventTime(id a, id b, void *context)
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   Task *task = [[_sm visibleTasks] objectAtIndex:rowIndex];
+  Date *dueDate = [task dueDate];
 
   if ([[aTableColumn identifier] isEqualToString:@"summary"])
     return [task summary];
-  return [NSNumber numberWithInt:[task state]];
+  if ([[aTableColumn identifier] isEqualToString:@"state"])
+    return [NSNumber numberWithInt:[task state]];
+  if (dueDate != nil)
+     return [[dueDate calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortDateFormatString]];
+  return @"";
 }
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
