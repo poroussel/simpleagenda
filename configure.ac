@@ -4,6 +4,32 @@
 AC_PREREQ(2.57)
 
 AC_INIT(SimpleAgenda)
+
+if test -z "$GNUSTEP_MAKEFILES"; then
+  AC_MSG_ERROR([You must run the GNUstep initialization script first!])
+fi
+
+#--------------------------------------------------------------------
+# Find the compiler
+#--------------------------------------------------------------------
+if test "$CC" = ""; then
+  CC=`gnustep-config --variable=CC`
+fi
+if test "$CPP" = ""; then
+  CPP=`gnustep-config --variable=CPP`
+fi
+if test "$CXX" = ""; then
+  CXX=`gnustep-config --variable=CXX`
+fi
+AC_PROG_CC
+AC_PROG_CPP
+
+MAKECC=`gnustep-config --variable=CC`
+if test "$CC" != "$MAKECC"; then
+  AC_MSG_ERROR([You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make])
+  exit 1
+fi
+
 AC_CONFIG_SRCDIR([MemoryStore.h])
 AC_CONFIG_HEADER([config.h])
 
