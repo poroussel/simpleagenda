@@ -267,6 +267,7 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
+  [_sm synchronise];
   RELEASE(_am);
   RELEASE(_sm);
   RELEASE(_summaryRoot);

@@ -137,6 +137,7 @@ static StoreManager *singleton;
 
 - (void)dealloc
 {
+  // FIXME : this isn't called on exit, probably a dangling reference
   NSDebugLLog(@"SimpleAgenda", @"Releasing StoreManager");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self synchronise];
