@@ -103,6 +103,7 @@
   if ([[url stringValue] isValidURL]) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
+
       parser = [GSXMLParser parserWithData:[resource data]];
       if ([parser parse]) {
 	xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
@@ -112,6 +113,11 @@
 	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
 	for (i = 0; i < [set count]; i++)
 	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
+	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/calendar]/href/text()"];
+	for (i = 0; i < [set count]; i++) {
+	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
+	}
 	RELEASE(xpc);
 	if ([calendar numberOfItems] > 0)
 	  [calendar selectItemAtIndex:1];
@@ -173,9 +179,9 @@
     if ([[self config] objectForKey:ST_TASK_URL])
       _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] authFromURL:_url];
     [self read];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(configChanged:) 
-						 name:SAConfigManagerValueChanged 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(configChanged:)
+						 name:SAConfigManagerValueChanged
 					       object:[self config]];
   }
   return self;
@@ -297,8 +303,8 @@
 - (void)read
 {
   if ([self enabled])
-    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
-												    selector:@selector(doRead) 
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
+												    selector:@selector(doRead)
 												      object:nil] autorelease]];
 }
 
@@ -306,7 +312,7 @@
 {
   if (![self enabled] || ![self writable])
     return;
-  [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+  [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
 												  selector:@selector(doWrite)
 												    object:nil] autorelease]];
 }
@@ -334,7 +340,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   GSXPathNodeSet *set;
   NSURL *elementURL;
 
-  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding] 
+  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding]
 		attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
     return nil;
   result = [NSMutableArray arrayWithCapacity:256];
@@ -426,7 +432,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
     element = [_hrefresource objectForKey:href];
     tree = [_hreftree objectForKey:href];
     if ([element put:[tree iCalTreeAsData] attributes:attr]) {
-      /* Read it back to update the attributes */ 
+      /* Read it back to update the attributes */
       /* FIXME : RFC says we should update the list instead */
       [element updateAttributes];
       [_modifiedhref removeObject:href];
@@ -438,7 +444,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   }
   if (error) {
     NSLog(@"Calendar %@ will be made read only and data reread", [self description]);
-    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore 
+    [[NSNotificationCenter defaultCenter] postNotificationName:SAErrorWritingStore
 							object:self
 						      userInfo:[NSDictionary dictionary]];
   }
