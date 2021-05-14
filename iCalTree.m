@@ -6,7 +6,7 @@
 - (id)init
 {
   if ((self = [super init])) {
-    root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("1.0"),
+    root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("2.0"),
 			       icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
     if (!root)
       DESTROY(self);
