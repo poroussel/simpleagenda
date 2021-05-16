@@ -30,12 +30,19 @@ libuuid (optional)
 Addresses framework (optional)
 DBusKit 0.1 (optional)
 
-
 Author
 ======
 
 Philippe Roussel
 
+Contributors
+============
+
+Alex Myczko
+Graham Lee
+Nerijus Baliūnas
+Steven R. Baker
+Yavor Doganov
 
 Contact
 =======
