@@ -2,6 +2,10 @@ version 0.45
 	* Migrate testsuite from ObjcUnit to the GNUstep Test Framework
 	  patch from Yavor Doganov
 	* Add Due Date column in the task view as suggested by Xylemon
+	* Handle calendar resource type when looking for CalDAV directories
+	  (fixes GitHub issue #4)
+	* Advertise iCal v2
+	* Update configure to work with clang
 
 version 0.44 (2017/11/20)
 	* Fix missing -document methods in appointment and tasks editor
