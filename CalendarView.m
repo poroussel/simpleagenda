@@ -1,6 +1,8 @@
 #import <AppKit/AppKit.h>
+#import "defines.h"
 #import "Date.h"
 #import "CalendarView.h"
+#import "ConfigManager.h"
 #import "StoreManager.h"
 
 @interface DayFormatter : NSFormatter
@@ -21,6 +23,7 @@
 }
 @end
 
+static int WEEKDAYSTOP = 1;
 
 @implementation CalendarView
 static NSImage *_1left;
@@ -65,6 +68,9 @@ static NSImage *_2right;
 
   self = [super initWithFrame:frame];
   if (self) {
+    NSString *direction = [[ConfigManager globalConfig] objectForKey:CAL_DIRECTION];
+    WEEKDAYSTOP = ![direction isEqualToString:CAL_VERTICAL];
+
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);
@@ -114,8 +120,8 @@ static NSImage *_2right;
     matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(9, 6, 220, 128)
 			       mode: NSListModeMatrix
 			       prototype: cell
-			       numberOfRows: 7
-			       numberOfColumns: 8];
+			       numberOfRows: WEEKDAYSTOP ? 7 : 8
+			       numberOfColumns: WEEKDAYSTOP ? 8 : 7];
     [matrix setIntercellSpacing: NSZeroSize];
     [matrix setDelegate:self];
     [matrix setAction: @selector(selectDay:)];
@@ -124,7 +130,7 @@ static NSImage *_2right;
     NSColor *orange = [NSColor orangeColor];
     NSColor *white = [NSColor whiteColor];
     for (i = 0; i < 8; i++) {
-      cell = [matrix cellAtRow: 0 column: i];
+      cell = [matrix cellAtRow: WEEKDAYSTOP ? 0 : i column: WEEKDAYSTOP ? i : 0];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -134,7 +140,7 @@ static NSImage *_2right;
 	[cell setStringValue: [[days objectAtIndex: 0] substringToIndex:1]];
     }
     for (i = 0; i < 7; i++) {
-      cell = [matrix cellAtRow: i column: 0];
+      cell = [matrix cellAtRow: WEEKDAYSTOP ? i : 0 column: WEEKDAYSTOP ? 0 : i];
       [cell setBackgroundColor: orange];
       [cell setTextColor: white];
       [cell setDrawsBackground: YES];
@@ -142,8 +148,8 @@ static NSImage *_2right;
     formatter = [DayFormatter new];
     for (i = 1, tag = 1; i < 8; i++) {
       for (j = 1; j < 7; j++) {
-	[[matrix cellAtRow: j column: i] setFormatter:formatter];
-	[[matrix cellAtRow: j column: i] setTag:tag++];
+	[[matrix cellAtRow: WEEKDAYSTOP ? j : i column: WEEKDAYSTOP ? i : j] setFormatter:formatter];
+	[[matrix cellAtRow: WEEKDAYSTOP ? j : i column: WEEKDAYSTOP ? i : j] setTag:tag++];
       }
     }
     [formatter release];
@@ -183,7 +189,7 @@ static NSImage *_2right;
 
   for (i = 1; i < 8; i++) {
     for (j = 1; j < 7; j++) {
-      cell = [matrix cellAtRow:j column:i];
+      cell = [matrix cellAtRow:WEEKDAYSTOP ? j : i column:WEEKDAYSTOP ? i : j];
       object = [cell objectValue];
       if (object != nil && ![date compare:object withTime:NO]) {
 	bezeledCell = [cell tag];
@@ -212,9 +218,9 @@ static NSImage *_2right;
   [day changeDayBy:1-column];
   for (row = 1; row < 7; row++) {
     week = [day weekOfYear];
-    [[matrix cellAtRow:row column:0] setStringValue:[NSString stringWithFormat:@"%d ", week]];
+    [[matrix cellAtRow:WEEKDAYSTOP ? row : 0 column:WEEKDAYSTOP ? 0 : row] setStringValue:[NSString stringWithFormat:@"%d ", week]];
     for (column = 1; column < 8; column++, [day incrementDay]) {
-      cell = [matrix cellAtRow: row column: column];
+      cell = [matrix cellAtRow: WEEKDAYSTOP ? row : column column: WEEKDAYSTOP ? column : row];
       if ([day compare:today withTime:NO] == 0) {
 	[cell setBackgroundColor:[NSColor yellowColor]];
 	[cell setDrawsBackground:YES];

@@ -14,6 +14,12 @@ GNUstep frameworks. Its major features are:
     * simple text search
     * alarms with multiples backends
 
+It is possible to display weekdays on the left, not at the top by issuing command:
+defaults write SimpleAgenda calendarDirection Vertical
+
+You can go back to default view by:
+defaults write SimpleAgenda calendarDirection Horizontal
+
 Dependencies
 ============
 
@@ -26,7 +32,7 @@ DBusKit 0.1 (optional)
 
 
 Author
-=====
+======
 
 Philippe Roussel
 
