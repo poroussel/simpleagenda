@@ -23,6 +23,7 @@ typedef enum {
   NSTimer *_dayTimer;
   int bezeledCell;
   id _dataSource;
+  BOOL horizontalDisplay;
 }
 
 - (id)initWithFrame:(NSRect)frame;
