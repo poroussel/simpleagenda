@@ -207,7 +207,7 @@ static NSImage *_2right;
   Date *day, *today;
   NSTextFieldCell *cell;
   NSColor *clear = [NSColor clearColor];
-  NSColor *white = [NSColor whiteColor];
+  NSColor *gray = [NSColor grayColor];
   NSColor *black = [NSColor blackColor];
 
   [self clearSelectedDay];
@@ -238,7 +238,7 @@ static NSImage *_2right;
       if ([day monthOfYear] == [monthDisplayed monthOfYear])
 	[cell setTextColor:black];
       else
-	[cell setTextColor:white];
+	[cell setTextColor:gray];
     }
   }
   [self setSelectedDay];
