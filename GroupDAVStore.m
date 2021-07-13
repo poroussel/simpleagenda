@@ -100,6 +100,26 @@
   GSXPathNodeSet *set;
 
   [self clearPopUps];
+
+  // url is the thing that the user supplied
+  // get-user-principal on it
+  // that gives user principal
+  // ask for calendar-home-set
+  // that gives calendar home set
+  // use that below
+  resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
+  NSString *getUserPrincipalBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal/></d:prop></d:propfind>";
+  [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+  parser = [GSXMLParser parserWithData:[resource data]];
+  if ([parser parse]) {
+    xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+    set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
+    id node = [set nodeAtIndex:0];
+    id principalString = [node content];
+    NSLog(@"principalString: %@", principalString);
+  }
+
+
   if ([[url stringValue] isValidURL]) {
     resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
