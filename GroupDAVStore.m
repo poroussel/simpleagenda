@@ -98,6 +98,8 @@
   NSString *body = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getlastmodified/><executable/><resourcetype/></prop></propfind>";
   GSXPathContext *xpc;
   GSXPathNodeSet *set;
+  id originalURL = [NSURL URLWithString:[url stringValue]];
+  id newURL = nil;
 
   [self clearPopUps];
 
@@ -107,20 +109,18 @@
   // ask for calendar-home-set
   // that gives calendar home set
   // use that below
-  resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
+  resource = [[WebDAVResource alloc] initWithURL:originalURL];
   NSString *getUserPrincipalBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal/></d:prop></d:propfind>";
   NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
 
   [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
   parser = [GSXMLParser parserWithData:[resource data]];
-  id newURL = nil;
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
     id node = [set nodeAtIndex:0];
     id principalString = [node content];
     NSLog(@"principalString: %@", principalString);
-    NSURL *originalURL = [NSURL URLWithString:[url stringValue]];
     newURL = [NSURL URLWithString:
 			     [NSString stringWithFormat:
 						   @"%@://%@:%@@%@/%@",
