@@ -113,6 +113,7 @@
 
   [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
   parser = [GSXMLParser parserWithData:[resource data]];
+  id newURL = nil;
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
@@ -120,7 +121,7 @@
     id principalString = [node content];
     NSLog(@"principalString: %@", principalString);
     NSURL *originalURL = [NSURL URLWithString:[url stringValue]];
-    NSURL *newURL = [NSURL URLWithString:
+    newURL = [NSURL URLWithString:
 			     [NSString stringWithFormat:
 						   @"%@://%@:%@@%@/%@",
 				       [originalURL scheme],
@@ -138,12 +139,20 @@
       node = [set nodeAtIndex:0];
       id homeSetString = [node content];
       NSLog(@"homeSetString: %@", homeSetString);
+      newURL = [NSURL URLWithString:
+			     [NSString stringWithFormat:
+						   @"%@://%@:%@@%@/%@",
+				       [originalURL scheme],
+				       [originalURL user],
+				       [originalURL password],
+				       [originalURL host],
+				       homeSetString]];
     }
   }
 
-
-  if ([[url stringValue] isValidURL]) {
-    resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
+  // re introduce some error handling
+  if (YES) {
+    resource = [[WebDAVResource alloc] initWithURL:newURL];
     if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
 
       parser = [GSXMLParser parserWithData:[resource data]];
