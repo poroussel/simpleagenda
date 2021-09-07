@@ -136,7 +136,18 @@
 	newURL = [originalURL URLByAppendingPathComponent:homeSetString];
       }
     }
-
+    else {
+      NSRunAlertPanel(@"Unable to find your calendar",
+		      [NSString stringWithFormat:
+				  @"Couldn't parse the response to a get user "
+				@"principle request at %@",
+				wellKnownURL],
+		      @"OK",
+		      nil,
+		      nil);
+      [self updateOK];
+      return;
+    }
   }
   else {
     newURL = originalURL;
