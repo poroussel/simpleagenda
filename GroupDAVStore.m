@@ -133,17 +133,37 @@
 					  @"trying to find the current user "
 					  @"principal at %@",
 					  wellKnownURL]];
+      [resource release];
       return;
     };
     parser = [GSXMLParser parserWithData:[resource data]];
+    [resource release];
     if ([parser parse]) {
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
       set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
+      [xpc release];
+      if ([set count] == 0) {
+	[self reportGroupDAVError:@"Unable to find your calendar",
+			  message:[NSString stringWithFormat:
+					      @"Could not find current user "
+					    @"principal in data returned from "
+					    @"%@",
+					    wellKnownURL]];
+	return;
+      }
       id node = [set nodeAtIndex:0];
       id principalString = [node content];
-      NSLog(@"principalString: %@", principalString);
       newURL = [originalURL URLByAppendingPathComponent:principalString];
-      NSLog(@"newURL: %@", newURL);
+      if (newURL == nil) {
+	[self reportGroupDAVError:@"Unable to find your calendar",
+			  message:[NSString stringWithFormat:
+					      @"The current user "
+					    @"principal returned from "
+					    @"%@"
+					    @"is not a valid URL path.",
+					    wellKnownURL]];
+	return;
+      }
       resource = [[WebDAVResource alloc] initWithURL:newURL];
       [resource propfind:[getCalendarHomeSetBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
       parser = [GSXMLParser parserWithData:[resource data]];
