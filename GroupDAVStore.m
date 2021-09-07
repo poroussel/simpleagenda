@@ -101,6 +101,11 @@
   id originalURL = [NSURL URLWithString:[url stringValue]];
   id newURL = nil;
 
+  if (originalURL == nil) {
+    [self updateOK];
+    return;
+  }
+  
   [self clearPopUps];
 
   if ([[originalURL path] length] == 0) {
@@ -136,34 +141,31 @@
   else {
     newURL = originalURL;
   }
-  // re introduce some error handling
-  if (YES) {
-    resource = [[WebDAVResource alloc] initWithURL:newURL];
-    if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
+  resource = [[WebDAVResource alloc] initWithURL:newURL];
+  if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
 
-      parser = [GSXMLParser parserWithData:[resource data]];
-      if ([parser parse]) {
-	xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
-	for (i = 0; i < [set count]; i++)
-	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
-	for (i = 0; i < [set count]; i++)
-	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/calendar]/href/text()"];
-	for (i = 0; i < [set count]; i++) {
-	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
-	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
-	}
-	RELEASE(xpc);
-	if ([calendar numberOfItems] > 0)
-	  [calendar selectItemAtIndex:1];
-	if ([task numberOfItems] > 0)
-	  [task selectItemAtIndex:1];
+    parser = [GSXMLParser parserWithData:[resource data]];
+    if ([parser parse]) {
+      xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
+      for (i = 0; i < [set count]; i++)
+	[calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
+      for (i = 0; i < [set count]; i++)
+	[task addItemWithTitle:[[set nodeAtIndex:i] content]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/calendar]/href/text()"];
+      for (i = 0; i < [set count]; i++) {
+	[calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+	[task addItemWithTitle:[[set nodeAtIndex:i] content]];
       }
+      RELEASE(xpc);
+      if ([calendar numberOfItems] > 0)
+	[calendar selectItemAtIndex:1];
+      if ([task numberOfItems] > 0)
+	[task selectItemAtIndex:1];
     }
-    [resource release];
   }
+  [resource release];
   [self updateOK];
 }
 - (NSString *)url
