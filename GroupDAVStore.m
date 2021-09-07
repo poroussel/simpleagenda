@@ -90,6 +90,17 @@
 {
   [self updateOK];
 }
+
+- (void)reportGroupDAVError:(NSString *)title message:(NSString *)message
+{
+  NSRunAlertPanel(title,
+		  message,
+		  @"OK",
+		  nil,
+		  nil);
+  [self updateOK];
+}
+
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   int i;
@@ -115,6 +126,15 @@
     NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
 
     [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+    if ([resource data] == nil) {
+      [self reportGroupDAVError:@"Unable to find your calendar"
+			message:[NSString stringWithFormat:
+					    @"No data was returned when "
+					  @"trying to find the current user "
+					  @"principal at %@",
+					  wellKnownURL]];
+      return;
+    };
     parser = [GSXMLParser parserWithData:[resource data]];
     if ([parser parse]) {
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
@@ -137,15 +157,11 @@
       }
     }
     else {
-      NSRunAlertPanel(@"Unable to find your calendar",
-		      [NSString stringWithFormat:
-				  @"Couldn't parse the response to a get user "
-				@"principle request at %@",
-				wellKnownURL],
-		      @"OK",
-		      nil,
-		      nil);
-      [self updateOK];
+      [self reportGroupDAVError:@"Unable to find your calendar"
+			message:[NSString stringWithFormat:
+					    @"Couldn't parse the response to "
+					  @"a get user principal request at %@",
+					  wellKnownURL]];
       return;
     }
   }
