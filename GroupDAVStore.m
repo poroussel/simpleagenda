@@ -143,7 +143,7 @@
       set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
       [xpc release];
       if ([set count] == 0) {
-	[self reportGroupDAVError:@"Unable to find your calendar",
+	[self reportGroupDAVError:@"Unable to find your calendar"
 			  message:[NSString stringWithFormat:
 					      @"Could not find current user "
 					    @"principal in data returned from "
@@ -155,25 +155,62 @@
       id principalString = [node content];
       newURL = [originalURL URLByAppendingPathComponent:principalString];
       if (newURL == nil) {
-	[self reportGroupDAVError:@"Unable to find your calendar",
+	[self reportGroupDAVError:@"Unable to find your calendar"
 			  message:[NSString stringWithFormat:
 					      @"The current user "
 					    @"principal returned from "
 					    @"%@"
-					    @"is not a valid URL path.",
+					    @" is not a valid URL path.",
 					    wellKnownURL]];
 	return;
       }
       resource = [[WebDAVResource alloc] initWithURL:newURL];
       [resource propfind:[getCalendarHomeSetBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+      if ([resource data] == nil) {
+	[self reportGroupDAVError:@"Unable to find your calendar"
+			  message:[NSString stringWithFormat:
+					      @"No data was returned when "
+					    @"trying to find your home  "
+					    @"calendar set at %@",
+					    newURL]];
+	[resource release];
+	return;
+      };
       parser = [GSXMLParser parserWithData:[resource data]];
+      [resource release];
       if ([parser parse]) {
 	xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
 	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/calendar-home-set/href/text()"];
+	[xpc release];
+	if ([set count] == 0) {
+	  [self reportGroupDAVError:@"Unable to find your calendar"
+			    message:[NSString stringWithFormat:
+						@"Could not find home calendar "
+					      @"set in data returned from %@",
+					      wellKnownURL]];
+	  return;
+	}
 	node = [set nodeAtIndex:0];
 	id homeSetString = [node content];
-	NSLog(@"homeSetString: %@", homeSetString);
 	newURL = [originalURL URLByAppendingPathComponent:homeSetString];
+	if (newURL == nil) {
+	  [self reportGroupDAVError:@"Unable to find your calendar"
+			    message:[NSString stringWithFormat:
+						@"Home calendar set"
+					      @"discovered via %@ "
+					      @"is not a valid URL path.",
+					      wellKnownURL]];
+	  return;
+	}
+      }
+      else {
+	[self reportGroupDAVError:@"Unable to find your calendar"
+			  message:[NSString stringWithFormat:
+					      @"Couldn't parse the response to "
+					    @"a home calendar set request at "
+					    @"%@",
+					    newURL]];
+	return;
       }
     }
     else {
