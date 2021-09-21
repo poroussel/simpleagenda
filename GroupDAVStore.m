@@ -22,6 +22,17 @@
 }
 @end
 
+@interface GroupDAVStore (WellKnownLookups)
+
+- (NSURL*)calendarURLFromRootOfServer:(NSURL *)originalURL
+				error:(NSError **)error;
+- (NSError *)unableToFindCalendarError:(NSString *)message;
+- (NSError *)reportGroupDAVError:(NSString *)title
+			 message:(NSString *)message;
+- (void)reportError:(NSError *)error;
+
+@end
+
 @interface GroupDAVDialog : NSObject
 {
   IBOutlet id panel;
