@@ -6,6 +6,8 @@ version 0.45
 	  (fixes GitHub issue #4)
 	* Advertise iCal v2
 	* Update configure to work with clang
+	* Add support for GroupDAV well-known URL scheme, thanks to
+	  Graham Lee and Steven R. Baker
 
 version 0.44 (2017/11/20)
 	* Fix missing -document methods in appointment and tasks editor
