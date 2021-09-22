@@ -22,6 +22,17 @@
 }
 @end
 
+@interface GroupDAVStore (WellKnownLookups)
+
+- (NSURL*)calendarURLFromRootOfServer:(NSURL *)originalURL
+				error:(NSError **)error;
+- (NSError *)unableToFindCalendarError:(NSString *)message;
+- (NSError *)reportGroupDAVError:(NSString *)title
+			 message:(NSString *)message;
+- (void)reportError:(NSError *)error;
+
+@end
+
 @interface GroupDAVDialog : NSObject
 {
   IBOutlet id panel;
@@ -90,6 +101,157 @@
 {
   [self updateOK];
 }
+
+- (NSError *)unableToFindCalendarError:(NSString *)message
+{
+  return [self reportGroupDAVError: @"Unable to find your calendar"
+			   message: message];
+}
+
+- (NSError *)reportGroupDAVError:(NSString *)title message:(NSString *)message
+{
+  id userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+				title,  NSLocalizedDescriptionKey,
+			      message, NSLocalizedFailureReasonErrorKey,
+			      nil];
+
+  return [NSError errorWithDomain: @"GroupDAVStoreErrorDomain"
+			     code: 100
+			 userInfo: userInfo];
+}
+
+- (void)reportError:(NSError *)error
+{
+  NSRunAlertPanel([error localizedDescription],
+		  [error localizedFailureReason],
+		  @"OK",
+		  nil,
+		  nil);
+  [self updateOK];
+}
+
+- (NSURL*)calendarURLFromRootOfServer:(NSURL *)originalURL error:(NSError **)error
+{
+  id wellKnownURL = [originalURL URLByAppendingPathComponent:@".well-known/caldav"];
+  id resource = [[WebDAVResource alloc] initWithURL:wellKnownURL];
+  NSString *getUserPrincipalBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal/></d:prop></d:propfind>";
+  NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
+
+  [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+  if ([resource data] == nil) {
+    if (error) {
+      *error = [self unableToFindCalendarError:
+		       [NSString stringWithFormat:
+				   @"No data was returned when "
+				 @"trying to find the current user "
+				 @"principal at %@",
+				 wellKnownURL]];
+    }
+    [resource release];
+    return nil;
+  };
+  id parser = [GSXMLParser parserWithData:[resource data]];
+  [resource release];
+  if ([parser parse]) {
+    id xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+    GSXPathNodeSet *set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/current-user-principal/href/text()"];
+    [xpc release];
+    if ([set count] == 0) {
+      if (error) {
+	*error = [self unableToFindCalendarError:
+			 [NSString stringWithFormat:
+				     @"Could not find current user "
+				   @"principal in data returned from "
+				   @"%@",
+				   wellKnownURL]];
+      }
+      return nil;
+    }
+    id node = [set nodeAtIndex:0];
+    id principalString = [node content];
+    id newURL = [originalURL URLByAppendingPathComponent:principalString];
+    if (newURL == nil) {
+      if (error) {
+	*error = [self unableToFindCalendarError:
+			 [NSString stringWithFormat:
+				     @"The current user "
+				   @"principal returned from "
+				   @"%@"
+				   @" is not a valid URL path.",
+				   wellKnownURL]];
+      }
+      return nil;
+    }
+    resource = [[WebDAVResource alloc] initWithURL:newURL];
+    [resource propfind:[getCalendarHomeSetBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+    if ([resource data] == nil) {
+      if (error) {
+	*error = [self unableToFindCalendarError:
+			 [NSString stringWithFormat:
+				     @"No data was returned when "
+				   @"trying to find your home  "
+				   @"calendar set at %@",
+				   newURL]];
+      }
+      [resource release];
+      return nil;
+    };
+    parser = [GSXMLParser parserWithData:[resource data]];
+    [resource release];
+    if ([parser parse]) {
+      xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"(//response/propstat)[1]/prop/calendar-home-set/href/text()"];
+      [xpc release];
+      if ([set count] == 0) {
+	if (error) {
+	  *error = [self unableToFindCalendarError:
+			   [NSString stringWithFormat:
+				       @"Could not find home calendar "
+				     @"set in data returned from %@",
+				     wellKnownURL]];
+	}
+	return nil;
+      }
+      node = [set nodeAtIndex:0];
+      id homeSetString = [node content];
+      newURL = [originalURL URLByAppendingPathComponent:homeSetString];
+      if (newURL == nil) {
+	if (error) {
+	  *error = [self unableToFindCalendarError:
+			   [NSString stringWithFormat:
+				       @"Home calendar set"
+				     @"discovered via %@ "
+				     @"is not a valid URL path.",
+				     wellKnownURL]];
+	}
+	return nil;
+      }
+      return newURL;
+    }
+    else {
+      if (error) {
+	*error = [self unableToFindCalendarError:
+			 [NSString stringWithFormat:
+				     @"Couldn't parse the response to "
+				   @"a home calendar set request at "
+				   @"%@",
+				   newURL]];
+      }
+      return nil;
+    }
+  }
+  else {
+    if (error) {
+      *error = [self unableToFindCalendarError:
+		       [NSString stringWithFormat:
+				   @"Couldn't parse the response to "
+				 @"a get user principal request at %@",
+				 wellKnownURL]];
+    }
+    return nil;
+  }
+}
+
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   int i;
@@ -98,35 +260,52 @@
   NSString *body = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getlastmodified/><executable/><resourcetype/></prop></propfind>";
   GSXPathContext *xpc;
   GSXPathNodeSet *set;
+  id originalURL = [NSURL URLWithString:[url stringValue]];
+  id newURL = nil;
 
-  [self clearPopUps];
-  if ([[url stringValue] isValidURL]) {
-    resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]];
-    if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
-
-      parser = [GSXMLParser parserWithData:[resource data]];
-      if ([parser parse]) {
-	xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
-	for (i = 0; i < [set count]; i++)
-	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
-	for (i = 0; i < [set count]; i++)
-	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
-	set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/calendar]/href/text()"];
-	for (i = 0; i < [set count]; i++) {
-	  [calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
-	  [task addItemWithTitle:[[set nodeAtIndex:i] content]];
-	}
-	RELEASE(xpc);
-	if ([calendar numberOfItems] > 0)
-	  [calendar selectItemAtIndex:1];
-	if ([task numberOfItems] > 0)
-	  [task selectItemAtIndex:1];
-      }
-    }
-    [resource release];
+  if (originalURL == nil) {
+    [self updateOK];
+    return;
   }
+  
+  [self clearPopUps];
+
+  if ([[originalURL path] length] == 0) {
+    NSError *error = nil;
+    newURL = [self calendarURLFromRootOfServer:originalURL error:&error];
+    if (newURL == nil) {
+      [self reportError:error];
+      return;
+    }
+  }
+  else {
+    newURL = originalURL;
+  }
+  resource = [[WebDAVResource alloc] initWithURL:newURL];
+  if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
+
+    parser = [GSXMLParser parserWithData:[resource data]];
+    if ([parser parse]) {
+      xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vevent-collection]/href/text()"];
+      for (i = 0; i < [set count]; i++)
+	[calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/vtodo-collection]/href/text()"];
+      for (i = 0; i < [set count]; i++)
+	[task addItemWithTitle:[[set nodeAtIndex:i] content]];
+      set = (GSXPathNodeSet *)[xpc evaluateExpression:@"//response[propstat/prop/resourcetype/calendar]/href/text()"];
+      for (i = 0; i < [set count]; i++) {
+	[calendar addItemWithTitle:[[set nodeAtIndex:i] content]];
+	[task addItemWithTitle:[[set nodeAtIndex:i] content]];
+      }
+      RELEASE(xpc);
+      if ([calendar numberOfItems] > 0)
+	[calendar selectItemAtIndex:1];
+      if ([task numberOfItems] > 0)
+	[task selectItemAtIndex:1];
+    }
+  }
+  [resource release];
   [self updateOK];
 }
 - (NSString *)url
