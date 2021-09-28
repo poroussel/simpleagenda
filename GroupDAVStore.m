@@ -38,6 +38,8 @@
   IBOutlet id panel;
   IBOutlet id name;
   IBOutlet id url;
+  IBOutlet id usernameField;
+  IBOutlet id passwordField;
   IBOutlet id cancel;
   IBOutlet id ok;
   IBOutlet id check;
@@ -66,6 +68,8 @@
       return nil;
     [name setStringValue:storeName];
     [url setStringValue:@"http://"];
+    [usernameField setStringValue:@""];
+    [passwordField setStringValue:@""];
     [self clearPopUps];
   }
   return self;
@@ -87,7 +91,7 @@
   else if (sender == ok)
     [NSApp stopModalWithCode:1];
   else if (sender == check)
-    [self controlTextDidEndEditing:nil];
+    [self checkDirectories];
 }
 
 - (void)updateOK
@@ -252,7 +256,7 @@
   }
 }
 
-- (void)controlTextDidEndEditing:(NSNotification *)aNotification
+- (void)checkDirectories
 {
   int i;
   WebDAVResource *resource;

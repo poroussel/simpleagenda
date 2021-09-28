@@ -20,7 +20,9 @@
 	    url,
 	    check,
 	    calendar,
-	    task
+	    task,
+	    passwordField,
+	    usernameField
 	);
 	Super = NSObject;
     };
