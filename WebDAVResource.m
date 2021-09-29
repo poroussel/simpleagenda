@@ -46,6 +46,18 @@
   return self;
 }
 
+- (id)initWithURL:(NSURL *)url
+	 username:(NSString *)username
+	 password:(NSString *)password
+{
+  self = [self initWithURL:url];
+  if (self) {
+    ASSIGN(_user, username);
+    ASSIGN(_password, password);
+  }
+  return self;
+}
+
 /* FIXME : ugly hack to work around NSURLHandle shortcomings */
 - (NSString *)basicAuth
 {

@@ -137,7 +137,9 @@
 - (NSURL*)calendarURLFromRootOfServer:(NSURL *)originalURL error:(NSError **)error
 {
   id wellKnownURL = [originalURL URLByAppendingPathComponent:@".well-known/caldav"];
-  id resource = [[WebDAVResource alloc] initWithURL:wellKnownURL];
+  id resource = [[WebDAVResource alloc] initWithURL:wellKnownURL
+					   username:[usernameField stringValue]
+					   password:[passwordField stringValue]];
   NSString *getUserPrincipalBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal/></d:prop></d:propfind>";
   NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
 
@@ -186,7 +188,9 @@
       }
       return nil;
     }
-    resource = [[WebDAVResource alloc] initWithURL:newURL];
+    resource = [[WebDAVResource alloc] initWithURL:newURL
+					  username:[usernameField stringValue]
+					  password:[passwordField stringValue]];
     [resource propfind:[getCalendarHomeSetBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
     if ([resource data] == nil) {
       if (error) {
@@ -285,7 +289,9 @@
   else {
     newURL = originalURL;
   }
-  resource = [[WebDAVResource alloc] initWithURL:newURL];
+  resource = [[WebDAVResource alloc] initWithURL:newURL
+					username:[usernameField stringValue]
+					password:[passwordField stringValue]];
   if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
 
     parser = [GSXMLParser parserWithData:[resource data]];

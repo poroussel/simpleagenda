@@ -19,6 +19,9 @@
 
 - (id)initWithURL:(NSURL *)url;
 - (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent;
+- (id)initWithURL:(NSURL *)url
+	 username:(NSString *)username
+	 password:(NSString *)password;
 - (BOOL)readable;
 /* WARNING Destructive */
 - (BOOL)writableWithData:(NSData *)data;
