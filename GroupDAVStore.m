@@ -106,6 +106,12 @@
   [self updateOK];
 }
 
+- (NSError *)unauthorizedAccessError
+{
+  return [self reportGroupDAVError: @"Unauthorized"
+			   message: @"Username and password are incorrect."];
+}
+
 - (NSError *)unableToFindCalendarError:(NSString *)message
 {
   return [self reportGroupDAVError: @"Unable to find your calendar"
@@ -144,6 +150,14 @@
   NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
 
   [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
+  if (([resource httpStatus] == 401) ||
+      ([resource httpStatus] == 403)) {
+    if (error) {
+      *error = [self unauthorizedAccessError];
+      [resource release];
+      return nil;
+    }
+  }
   if ([resource data] == nil) {
     if (error) {
       *error = [self unableToFindCalendarError:
