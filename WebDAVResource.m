@@ -36,12 +36,14 @@
   return self;
 }
 
-- (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent
+- (id)initWithURL:(NSURL *)url
+	 username:(NSString *)username
+	 password:(NSString *)password
 {
-  self = [self initWithURL:anUrl];
-  if (self && [parent user]) {
-      ASSIGN(_user, [parent user]);
-      ASSIGN(_password, [parent password]);
+  self = [self initWithURL:url];
+  if (self) {
+    ASSIGN(_user, username);
+    ASSIGN(_password, password);
   }
   return self;
 }
