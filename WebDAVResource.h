@@ -18,7 +18,6 @@
 }
 
 - (id)initWithURL:(NSURL *)url;
-- (id)initWithURL:(NSURL *)anUrl authFromURL:(NSURL *)parent;
 - (id)initWithURL:(NSURL *)url
 	 username:(NSString *)username
 	 password:(NSString *)password;

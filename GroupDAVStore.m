@@ -19,6 +19,8 @@
   NSMutableDictionary *_hreftree;
   NSMutableDictionary *_hrefresource;
   NSMutableArray *_modifiedhref;
+  NSString *_username;
+  NSString *_password;
 }
 @end
 
@@ -48,6 +50,8 @@
 }
 - (BOOL)show;
 - (NSString *)url;
+- (NSString *)username;
+- (NSString *)password;
 - (NSString *)calendar;
 - (NSString *)task;
 - (void)selectItem:(id)sender;
@@ -336,6 +340,14 @@
 {
   return [url stringValue];
 }
+- (NSString *)username
+{
+  return [usernameField stringValue];
+}
+- (NSString *)password
+{
+  return [passwordField stringValue];
+}
 - (NSString *)calendar
 {
   if ([calendar indexOfItem:[calendar selectedItem]] == 0)
@@ -375,12 +387,21 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
+    _username = [[[self config] objectForKey:@"username"] copy];
+    _password = [[[self config] objectForKey:@"password"] copy];
+    if (_username == nil) {
+      _username = [[_url user] copy];
+    }
+    if (_password == nil) {
+      _password = [[_url password] copy];
+    }
+    
     _calendar = nil;
     _task = nil;
     if ([[self config] objectForKey:ST_CALENDAR_URL])
-      _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] authFromURL:_url];
+      _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] username: _username password: _password];
     if ([[self config] objectForKey:ST_TASK_URL])
-      _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] authFromURL:_url];
+      _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] username: _username password: _password];
     [self read];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					     selector:@selector(configChanged:)
@@ -410,9 +431,11 @@
       calendarURL = [NSURL URLWithString:[dialog calendar] possiblyRelativeToURL:baseURL];
     if ([dialog task])
       taskURL = [NSURL URLWithString:[dialog task] possiblyRelativeToURL:baseURL];
-    [dialog release];
     cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[dialog url] forKey:ST_URL];
+    [cm setObject:[dialog username] forKey:@"username"];
+    [cm setObject:[dialog password] forKey:@"password"];
+    [dialog release];
     if (calendarURL)
       [cm setObject:[calendarURL absoluteString] forKey:ST_CALENDAR_URL];
     if (taskURL)
@@ -440,6 +463,8 @@
   [_hreftree release];
   [_hrefresource release];
   [_modifiedhref release];
+  [_username release];
+  [_password release];
   [super dealloc];
 }
 
@@ -458,7 +483,9 @@
     url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[_calendar url] absoluteString], [elt UID]]];
   else
     url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[_task url] absoluteString], [elt UID]]];
-  resource = [[WebDAVResource alloc] initWithURL:url authFromURL:_url];
+  resource = [[WebDAVResource alloc] initWithURL:url
+					username:_username
+					password:_password];
   tree = [iCalTree new];
   if ([tree add:elt]) {
     [resource put:[tree iCalTreeAsData] attributes:[NSDictionary dictionaryWithObjectsAndKeys:@"text/calendar; charset=utf-8", @"Content-Type", @"*", @"If-None-Match", nil, nil]];
@@ -571,7 +598,9 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 
   enumerator = [items objectEnumerator];
   while ((href = [enumerator nextObject])) {
-    element = [[WebDAVResource alloc] initWithURL:href authFromURL:_url];
+    element = [[WebDAVResource alloc] initWithURL:href
+					 username:_username
+					 password:_password];
     tree = [iCalTree new];
     if ([element get] && [tree parseData:[element data]]) {
       components = [tree components];
