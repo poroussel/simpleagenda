@@ -435,7 +435,6 @@
     [cm setObject:[dialog url] forKey:ST_URL];
     [cm setObject:[dialog username] forKey:ST_USERNAME];
     [cm setObject:[dialog password] forKey:ST_PASSWORD];
-    [dialog release];
     if (calendarURL)
       [cm setObject:[calendarURL absoluteString] forKey:ST_CALENDAR_URL];
     if (taskURL)
