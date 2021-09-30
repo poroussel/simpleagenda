@@ -387,8 +387,8 @@
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
     _modifiedhref = [NSMutableArray new];
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
-    _username = [[[self config] objectForKey:@"username"] copy];
-    _password = [[[self config] objectForKey:@"password"] copy];
+    _username = [[[self config] objectForKey:ST_USERNAME] copy];
+    _password = [[[self config] objectForKey:ST_PASSWORD] copy];
     if (_username == nil) {
       _username = [[_url user] copy];
     }
@@ -433,8 +433,8 @@
       taskURL = [NSURL URLWithString:[dialog task] possiblyRelativeToURL:baseURL];
     cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[dialog url] forKey:ST_URL];
-    [cm setObject:[dialog username] forKey:@"username"];
-    [cm setObject:[dialog password] forKey:@"password"];
+    [cm setObject:[dialog username] forKey:ST_USERNAME];
+    [cm setObject:[dialog password] forKey:ST_PASSWORD];
     [dialog release];
     if (calendarURL)
       [cm setObject:[calendarURL absoluteString] forKey:ST_CALENDAR_URL];

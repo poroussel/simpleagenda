@@ -24,5 +24,7 @@
 #define ST_REFRESH_INTERVAL @"storeRefreshInterval"
 #define ST_DISPLAY @"storeDisplay"
 #define ST_ENABLED @"storeEnabled"
+#define ST_USERNAME @"username"
+#define ST_PASSWORD @"password"
 #define APPICON_DATE @"appIconShowDate"
 #define APPICON_TIME @"appIconShowTime"
