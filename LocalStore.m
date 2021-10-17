@@ -27,9 +27,10 @@
 {
   self = [super initWithName:name];
   if (self) {
+    ConfigManager *gc = [ConfigManager globalConfig];
     _globalPath = [[[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] 
 		     stringByAppendingPathComponent:@"SimpleAgenda"] retain];
-    _globalFile = [[_globalPath stringByAppendingPathComponent:[[self config] objectForKey:ST_FILE]] retain];
+    _globalFile = [[_globalPath stringByAppendingPathComponent:[[gc objectForKey:name] objectForKey:ST_FILE]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
     [self read];
   }

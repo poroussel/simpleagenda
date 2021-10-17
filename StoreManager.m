@@ -201,11 +201,15 @@ static StoreManager *singleton;
 
   dict = [[ConfigManager globalConfig] objectForKey:name];
   if (dict) {
-    storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
+    if ([dict objectForKey:ST_CLASS] != nil)
+      storeClass = NSClassFromString([dict objectForKey:ST_CLASS]);
+    else
+      storeClass = NSClassFromString(@"LocalStore");
     store = [storeClass storeNamed:name];
     if (store) {
       [_stores setObject:store forKey:name];
-      NSLog(@"Added %@ to StoreManager", name);    } else {
+      NSLog(@"Added %@ to StoreManager", name);
+    } else {
       NSLog(@"Unable to initialize store %@", name);
     }
   }
