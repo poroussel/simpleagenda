@@ -1,3 +1,7 @@
+version 0.46 (2021/10/17)
+	* Make automatic local agenda work on first startup and
+	  afterwards
+
 version 0.45 (2021/10/10)
 	* Migrate testsuite from ObjcUnit to the GNUstep Test Framework
 	  patch from Yavor Doganov
