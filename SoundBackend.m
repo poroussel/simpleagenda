@@ -1,3 +1,4 @@
+#import <AppKit/AppKitDefines.h>
 #import <AppKit/NSSound.h>
 #import "AlarmBackend.h"
 #import "Alarm.h"
