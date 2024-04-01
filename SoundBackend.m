@@ -9,6 +9,7 @@
 }
 @end
 
+static NSString *logKey = @"SoundBackend";
 static NSMutableArray *sounds;
 
 @implementation SoundBackend
@@ -20,6 +21,7 @@ static NSMutableArray *sounds;
   NSEnumerator *enumerator, *fenum;
 
   if ([SoundBackend class] == self) {
+    NSDebugLLog(logKey, @"SoundBackend initialize");
     sounds = [[NSMutableArray alloc] initWithCapacity:8];
     paths = NSStandardLibraryPaths();
     enumerator = [paths objectEnumerator];
@@ -28,9 +30,13 @@ static NSMutableArray *sounds;
       files = [fm directoryContentsAtPath:path];
       if (files) {
 	fenum = [files objectEnumerator];
-	while ((file = [fenum nextObject])) {
-	  if ([NSSound soundNamed:[file stringByDeletingPathExtension]])
-	    [sounds addObject:[file stringByDeletingPathExtension]];
+        while ((file = [fenum nextObject])) {
+	  if ([NSSound soundNamed:[file stringByDeletingPathExtension]]) {
+            [sounds addObject:[file stringByDeletingPathExtension]];
+            NSDebugLLog(logKey, @"Loaded sound %@", file);
+          } else {
+            NSDebugLLog(logKey, @"Failed loading sound %@", file);
+          }
 	}
       }
     }
@@ -53,7 +59,7 @@ static NSMutableArray *sounds;
   if (self) {
     sound = [NSSound soundNamed:@"Basso"];
     if (!sound) {
-      NSLog(@"Could not find Basso default sound, SoundBackend disabled");
+      NSDebugLLog(logKey, @"Could not find Basso default sound, SoundBackend disabled");
       [self release];
       self = nil;
     }
