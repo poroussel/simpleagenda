@@ -53,6 +53,7 @@ static NSMutableArray *sounds;
   if (self) {
     sound = [NSSound soundNamed:@"Basso"];
     if (!sound) {
+      NSLog(@"Could not find Basso default sound, SoundBackend disabled");
       [self release];
       self = nil;
     }
