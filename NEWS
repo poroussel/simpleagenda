@@ -1,3 +1,8 @@
+version 0.47 (2025/02/05)
+	* Disable alarm sound backend and log a error if the sound
+	  file can't be found
+	* Fix cross-compilation (Yavor Doganov)
+
 version 0.46 (2021/10/17)
 	* Make automatic local agenda work on first startup and
 	  afterwards
