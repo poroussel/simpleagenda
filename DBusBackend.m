@@ -12,6 +12,7 @@
 @interface DBusBackend : AlarmBackend
 @end
 
+static NSString *logKey = @"DBusBackend";
 static NSString * const DBUS_BUS = @"org.freedesktop.Notifications";
 static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 
@@ -52,6 +53,7 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 	  DESTROY(self);
 	}
 	[c invalidate];
+	NSDebugLLog(logKey, @"DBus connection checked");
       }
     NS_HANDLER
       {
@@ -73,17 +75,18 @@ static NSString * const DBUS_PATH = @"/org/freedesktop/Notifications";
 
     c = [NSConnection connectionWithReceivePort:[DKPort port] sendPort:[[DKPort alloc] initWithRemote:DBUS_BUS]];
     remote = (id <NSObject,Notifications>)[c proxyAtPath:DBUS_PATH];
-    if ([el text])
+    if ([el text] && [[el text] length] > 0)
       desc = [NSString stringWithFormat:@"%@\n\n%@ : %@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary], [[el text] string]];
     else
       desc = [NSString stringWithFormat:@"%@\n\n%@", [[[el nextActivationDate] calendarDate] descriptionWithCalendarFormat:[[NSUserDefaults standardUserDefaults] objectForKey:NSShortTimeDateFormatString]], [el summary]];
-    [remote Notify:@"SimpleAgenda" 
-		  :0 
-		  :@"" 
-		  :_(@"SimpleAgenda Reminder !") 
+    NSDebugLLog(logKey, @"display alarm for %@", [el UID]);
+    [remote Notify:@"SimpleAgenda"
+		  :0
+		  :@""
+		  :_(@"SimpleAgenda Reminder !")
 		  :desc
-		  :[NSArray array] 
-		  :[NSDictionary dictionary] 
+		  :[NSArray array]
+		  :[NSDictionary dictionary]
 		  :-1];
     [c invalidate];
 }

@@ -45,6 +45,8 @@ Currently the following keys are usable :
  * AlarmManager
  * WebDAVResource
  * SimpleAgenda
+ * SoundBackend
+ * DBusBackend
 
 You can specify multiple keys by repeating --GNU-Debug options :
 
