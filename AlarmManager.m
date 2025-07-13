@@ -37,8 +37,10 @@ static AlarmManager *singleton;
 - (void)runAlarm:(Alarm *)alarm
 {
   [[NSNotificationCenter defaultCenter] postNotificationName:SAEventReminderWillRun object:alarm];
-  if (_defaultBackend)
+  if (_defaultBackend) {
+    NSDebugLLog(@"AlarmManager", @"runAlarm %@ with %@", [[alarm element] UID], [_defaultBackend className]);
     [_defaultBackend display:alarm];
+  }
 }
 
 - (void)addAlarm:(Alarm *)alarm forUID:(NSString *)uid
@@ -49,6 +51,7 @@ static AlarmManager *singleton;
     alarms = [NSMutableArray arrayWithCapacity:2];
     [_activeAlarms setObject:alarms forKey:uid];
   }
+  NSDebugLLog(@"AlarmManager", @"addAlarm forUID %@", uid);
   [alarms addObject:alarm];
 }
 
@@ -59,6 +62,7 @@ static AlarmManager *singleton;
   Alarm *alarm;
 
   if (alarms) {
+    NSDebugLLog(@"AlarmManager", @"removeAlarmsforUID %@", uid);
     enumerator = [alarms objectEnumerator];
     while ((alarm = [enumerator nextObject]))
       [NSObject cancelPreviousPerformRequestsWithTarget:self
@@ -75,6 +79,7 @@ static AlarmManager *singleton;
   delay = [[alarm absoluteTrigger] timeIntervalSinceNow];
   if (delay < 0)
     return NO;
+  NSDebugLLog(@"AlarmManager", @"addAbsoluteAlarm for %@ in %f seconds", [[alarm element] UID], delay);
   [self performSelector:@selector(runAlarm:)
 	     withObject:alarm
 	     afterDelay:delay];
@@ -96,6 +101,7 @@ static AlarmManager *singleton;
     delay = 1;
   if (delay < 0)
     return NO;
+  NSDebugLLog(@"AlarmManager", @"addRelativeAlarm for %@ in %f seconds", [[alarm element] UID], delay);
   [self performSelector:@selector(runAlarm:)
 	     withObject:alarm
 	     afterDelay:delay];
@@ -110,6 +116,7 @@ static AlarmManager *singleton;
 
   if (![[element store] displayed] || ![element hasAlarms])
     return;
+  NSDebugLLog(@"AlarmManager", @"setAlarmsForElement %@", [element UID]);
   enumAlarm = [[element alarms] objectEnumerator];
   while ((alarm = [enumAlarm nextObject])) {
     NSAssert([alarm element] != nil, @"Alarm is not linked with an element");
@@ -206,7 +213,7 @@ static AlarmManager *singleton;
 
 - (void)dealloc
 {
-  NSDebugLLog(@"SimpleAgenda", @"Releasing AlarmManager");
+  NSDebugLLog(@"AlarmManager", @"Releasing AlarmManager");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_activeAlarms);
   RELEASE(backendsArray);
