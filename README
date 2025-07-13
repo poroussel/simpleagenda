@@ -1,18 +1,18 @@
 About
 =====
 
-SimpleAgenda is an easy to use agenda and calendar application supporting 
-events/appointments and tasks. It is written in Objective-C and uses the 
+SimpleAgenda is an easy to use agenda and calendar application supporting
+events/appointments and tasks. It is written in Objective-C and uses the
 GNUstep frameworks. Its major features are:
 
-    * multiple agendas with text and background colors
-    * support local and iCalendar data sources
-    * calendar, day view, week view, summary and tasks view
-    * create, resize and move appointments easily
-    * export individual elements as files and to pasteboard
-    * import .ics files
-    * simple text search
-    * alarms with multiples backends
+ * multiple agendas with text and background colors
+ * support local and iCalendar data sources
+ * calendar, day view, week view, summary and tasks view
+ * create, resize and move appointments easily
+ * export individual elements as files and to pasteboard
+ * import .ics files
+ * simple text search
+ * alarms with multiples backends
 
 It is possible to display weekdays on the left, not at the top by issuing command:
 defaults write SimpleAgenda calendarDirection Vertical
@@ -29,6 +29,26 @@ libical 0.27 or later
 libuuid (optional)
 Addresses framework (optional)
 DBusKit 0.1 (optional)
+
+Debugging
+=========
+
+In case you need to debug SimpleAgenda you can activate debug logs by starting
+the program from the command line using the --GNU-Debug option. This mechanism
+allows activating logs for specific keys, usually class names. For example to
+see more logs about alarms you can use this :
+
+    SimpleAgenda --GNU-Debug=AlarmManager
+
+Currently the following keys are usable :
+
+ * AlarmManager
+ * WebDAVResource
+ * SimpleAgenda
+
+You can specify multiple keys by repeating --GNU-Debug options :
+
+    SimpleAgenda --GNU-Debug=AlarmManager --GNU-Debug=WebDAVResource
 
 Author
 ======
