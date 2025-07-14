@@ -23,7 +23,7 @@
     _current = nil;
     return;
   }
-  [action setEnabled:YES];
+  // [action setEnabled:YES];
   [type setEnabled:YES];
   [remove setEnabled:YES];
   _current = [_alarms objectAtIndex:[table selectedRow]];
@@ -68,7 +68,7 @@
     _simple = RETAIN([Alarm alarm]);
     [_simple setRelativeTrigger:-15*60];
     [_simple setAction:ICAL_ACTION_DISPLAY];
-    
+
     [table setDelegate:self];
 
     [type removeAllItems];

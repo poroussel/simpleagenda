@@ -1,3 +1,6 @@
+version 0.48
+	* AlarmDialog : disable action combobox for now, it has no effect
+
 version 0.47 (2025/02/05)
 	* Disable alarm sound backend and log a error if the sound
 	  file can't be found
@@ -18,7 +21,7 @@ version 0.45 (2021/10/10)
 	* Add support for GroupDAV well-known URL scheme, thanks to
 	  Graham Lee and Steven R. Baker
 	* Handle login and password cleanly in GroupDAV creation dialog
-	  Graham Lee and Steven R. Baker	
+	  Graham Lee and Steven R. Baker
 
 version 0.44 (2017/11/20)
 	* Fix missing -document methods in appointment and tasks editor
