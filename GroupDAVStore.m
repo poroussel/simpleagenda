@@ -55,6 +55,8 @@
 - (NSString *)calendar;
 - (NSString *)task;
 - (void)selectItem:(id)sender;
+- (void)checkDirectories;
+- (NSError *)reportGroupDAVError:(NSString *)title message:(NSString *)message;
 @end
 @implementation GroupDAVDialog
 - (void)clearPopUps
@@ -293,7 +295,7 @@
     [self updateOK];
     return;
   }
-  
+
   [self clearPopUps];
 
   if ([[originalURL path] length] == 0) {
@@ -395,7 +397,7 @@
     if (_password == nil) {
       _password = [[_url password] copy];
     }
-    
+
     _calendar = nil;
     _task = nil;
     if ([[self config] objectForKey:ST_CALENDAR_URL])
