@@ -10,6 +10,8 @@
 #import "StoreManager.h"
 #import "defines.h"
 
+static NSString *logKey = @"GroupDAVStore";
+
 @interface GroupDAVStore : MemoryStore <AgendaStore>
 {
   NSURL *_url;
@@ -384,6 +386,7 @@
 {
   self = [super initWithName:name];
   if (self) {
+    NSDebugLLog(logKey, @"GroupDAVStore initWithName %@", name);
     _uidhref = [[NSMutableDictionary alloc] initWithCapacity:512];
     _hreftree = [[NSMutableDictionary alloc] initWithCapacity:512];
     _hrefresource = [[NSMutableDictionary alloc] initWithCapacity:512];
@@ -400,10 +403,14 @@
 
     _calendar = nil;
     _task = nil;
-    if ([[self config] objectForKey:ST_CALENDAR_URL])
+    if ([[self config] objectForKey:ST_CALENDAR_URL]) {
       _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] username: _username password: _password];
-    if ([[self config] objectForKey:ST_TASK_URL])
+      NSDebugLLog(logKey, @"GroupDAVStore calendar URL %@", [[_calendar url] anonymousAbsoluteString]);
+    }
+    if ([[self config] objectForKey:ST_TASK_URL]) {
       _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] username: _username password: _password];
+      NSDebugLLog(logKey, @"GroupDAVStore task URL %@", [[_task url] anonymousAbsoluteString]);
+    }
     [self read];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					     selector:@selector(configChanged:)
@@ -534,8 +541,9 @@
 - (void)read
 {
   if ([self enabled])
+    // [self doRead];
     [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
-												    selector:@selector(doRead)
+  												    selector:@selector(doRead)
 												      object:nil] autorelease]];
 }
 
@@ -562,7 +570,7 @@
 @implementation GroupDAVStore(Private)
 static NSString * const PROPFINDGETETAG = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><propfind xmlns=\"DAV:\"><prop><getetag/></prop></propfind>";
 static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/text()";
-- (NSArray *)itemsUnderRessource:(WebDAVResource *)ressource
+- (NSArray *)itemsUnderRessource:(WebDAVResource *)resource
 {
   int i;
   GSXMLParser *parser;
@@ -571,20 +579,26 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   GSXPathNodeSet *set;
   NSURL *elementURL;
 
-  if (![ressource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding]
+  NSDebugLLog(logKey, @"itemsUnderRessource %@", [[resource url] anonymousAbsoluteString]);
+  if (![resource propfind:[PROPFINDGETETAG dataUsingEncoding:NSUTF8StringEncoding]
 		attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]])
     return nil;
   result = [NSMutableArray arrayWithCapacity:256];
-  parser = [GSXMLParser parserWithData:[ressource data]];
+  parser = [GSXMLParser parserWithData:[resource data]];
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:EXPRGETHREF];
+    NSDebugLLog(logKey, @"found %d item(s)", [set count]);
     for (i = 0; i < [set count]; i++) {
-      elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[ressource url]];
-      if (elementURL)
+      elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[resource url]];
+      if (elementURL) {
 	[result addObject:elementURL];
+	NSDebugLLog(logKey, @" * items #%d : %@", i, [elementURL anonymousAbsoluteString]);
+      }
     }
     RELEASE(xpc);
+  } else {
+    NSLog(@"XML parsing failed...");
   }
   return result;
 }
@@ -622,6 +636,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   BOOL error = NO;
   NSArray *items;
 
+  NSDebugLLog(logKey, @"GroupDAVStore doRead");
   if (_calendar) {
     items = [self itemsUnderRessource:_calendar];
     if (items)

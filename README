@@ -47,6 +47,8 @@ Currently the following keys are usable :
  * SimpleAgenda
  * SoundBackend
  * DBusBackend
+ * GroupDAVStore
+ * InvocationOperation
 
 You can specify multiple keys by repeating --GNU-Debug options :
 

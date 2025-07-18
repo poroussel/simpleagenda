@@ -3,6 +3,8 @@
 #import "NSString+SimpleAgenda.h"
 #import "WebDAVResource.h"
 
+static NSString *logKey = @"WebDAVResource";
+
 @implementation WebDAVResource
 - (void)dealloc
 {
@@ -60,6 +62,7 @@
   else
     toEncode = [NSString stringWithFormat: @"%@", _user];
   [authorisation appendFormat: @"Basic %@", [GSMimeDocument encodeBase64String: toEncode]];
+  NSDebugLLog(logKey, @"basicAuth authorisation %@", authorisation);
   return authorisation;
 }
 
@@ -71,24 +74,28 @@
   NSString *property;
   NSURLHandle *handle;
 
- restart:
+restart:
   handle = [[_handleClass alloc] initWithURL:_url cached:NO];
   [handle writeProperty:method forKey:GSHTTPPropertyMethodKey];
   if (attributes) {
     keys = [attributes keyEnumerator];
-    while ((key = [keys nextObject]))
+    while ((key = [keys nextObject])) {
+      NSDebugLLog(logKey, @"requestWithMethod %@ = %@", key, [attributes objectForKey:key]);
       [handle writeProperty:[attributes objectForKey:key] forKey:key];
+    }
   }
   if (_user && ![_url user])
     [handle writeProperty:[self basicAuth] forKey:@"Authorization"];
   if (_etag && ([method isEqual:@"PUT"] || [method isEqual:@"DELETE"]))
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
-  if (body)
+  if (body) {
     [handle writeData:body];
+    NSDebugLLog(logKey, @"requestWithMethod body [%@]", AUTORELEASE([[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding]));
+  }
   if (attributes)
-    NSDebugMLLog(@"WebDAVResource", @"%@ %@ (%@)", method, [_url anonymousAbsoluteString], [attributes description]);
+    NSDebugLLog(logKey, @"requestWithMethod %@ %@ (%@)", method, [_url anonymousAbsoluteString], [attributes description]);
   else
-    NSDebugMLLog(@"WebDAVResource", @"%@ %@", method, [_url anonymousAbsoluteString]);
+    NSDebugLLog(logKey, @"requestWithMethod %@ %@", method, [_url anonymousAbsoluteString]);
   DESTROY(_data);
   data = [handle resourceData];
   /* FIXME : this is more than ugly */
@@ -99,12 +106,12 @@
 
   /* FIXME : why do we have to check for httpStatus == 0 */
   if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
-    NSDebugMLLog(@"WebDAVResource", @"Redirection to %@", [handle propertyForKey:@"Location"]);
+    NSDebugLLog(logKey, @"requestWithMethod redirection to %@", [handle propertyForKey:@"Location"]);
     [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
     goto restart;
   }
 
-  NSDebugMLLog(@"WebDAVResource", @"%@ status %d", method, _httpStatus);
+  NSDebugLLog(logKey, @"requestWithMethod status %d", _httpStatus);
   property = [handle propertyForKeyIfAvailable:NSHTTPPropertyStatusReasonKey];
   if (property)
     ASSIGN(_reason, property);
@@ -121,15 +128,18 @@
 
   if (data)
     ASSIGN(_data, data);
+
   if ([method isEqual:@"GET"]) {
     property = [handle propertyForKeyIfAvailable:@"Last-Modified"];
     if (!_lastModified || (property && ![property isEqual:_lastModified])) {
       _dataChanged = YES;
+      NSDebugLLog(logKey, @"requestWithMethod lastModified dataChanged [%@]", property);
       ASSIGN(_lastModified, property);
     }
     property = [handle propertyForKeyIfAvailable:@"ETag"];
     if (!_etag || (property && ![property isEqual:_etag])) {
       _dataChanged = YES;
+      NSDebugLLog(logKey, @"requestWithMethod etag dataChanged [%@]", property);
       ASSIGN(_etag, property);
     }
   }

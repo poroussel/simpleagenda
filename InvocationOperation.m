@@ -3,11 +3,15 @@
 #import <Foundation/Foundation.h>
 #import "InvocationOperation.h"
 
+static NSString *logKey = @"InvocationOperation";
+
 @implementation InvocationOperation
 - (id)initWithInvocation:(NSInvocation *)inv
 {
-  if ((self = [super init]))
-    _invocation = [inv retain];
+  if ((self = [super init])) {
+    _invocation = RETAIN(inv);
+    NSDebugLLog(logKey, @"initWithInvocation %@", [_invocation description]);
+  }
   return self;
 }
 - (id)initWithTarget:(id)target selector:(SEL)sel object:(id)arg
@@ -23,12 +27,12 @@
 }
 - (void)dealloc
 {
-  [_invocation release];
-  [super dealloc];
+  RELEASE(_invocation);
+  DEALLOC;
 }
 - (void)main
 {
-  NSDebugLLog(@"SimpleAgenda", @"%@", [_invocation description]);
+  NSDebugLLog(logKey, @"run %@", [_invocation description]);
   [_invocation invoke];
 }
 @end
