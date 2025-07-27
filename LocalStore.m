@@ -32,7 +32,6 @@
 		     stringByAppendingPathComponent:@"SimpleAgenda"] retain];
     _globalFile = [[_globalPath stringByAppendingPathComponent:[[gc objectForKey:name] objectForKey:ST_FILE]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
-    [self read];
   }
   return self;
 }

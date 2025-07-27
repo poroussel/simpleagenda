@@ -251,17 +251,17 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [dayView setDataSource:_sm];
   [weekView setDataSource:_sm];
 
-  /* This will init the alarms for all loaded elements needing one */
   _am = [AlarmManager globalManager];
   _selm = [SelectionManager globalManager];
   _pc = [PreferencesController new];
-
-  [self updateSummaryData];
 
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SADataChangedInStoreManager object:nil];
   /* FIXME : this is overkill, we should only refresh the views for visual changes */
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dataChanged:) name:SAStatusChangedForStore object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reminderWillRun:) name:SAEventReminderWillRun object:nil];
+
+  // Load data
+  [_sm refresh];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification

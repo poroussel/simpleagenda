@@ -411,7 +411,6 @@ static NSString *logKey = @"GroupDAVStore";
       _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] username: _username password: _password];
       NSDebugLLog(logKey, @"GroupDAVStore task URL %@", [[_task url] anonymousAbsoluteString]);
     }
-    [self read];
     [[NSNotificationCenter defaultCenter] addObserver:self
 					     selector:@selector(configChanged:)
 						 name:SAConfigManagerValueChanged
@@ -541,7 +540,6 @@ static NSString *logKey = @"GroupDAVStore";
 - (void)read
 {
   if ([self enabled])
-    // [self doRead];
     [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
   												    selector:@selector(doRead)
 												      object:nil] autorelease]];
@@ -625,6 +623,8 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 	[_hrefresource setObject:element forKey:href];
 	[_uidhref setObject:href forKey:[[components anyObject] UID]];
       }
+    } else {
+      NSLog(@"GroupDAVStore add : couldn't read item at %@", [href anonymousAbsoluteString]);
     }
     [tree release];
     [element release];

@@ -114,7 +114,6 @@
     assert(_tree != nil);
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
     _resource = [[WebDAVResource alloc] initWithURL:_url];
-    [self read];
     [self initTimer];
     [[NSNotificationCenter defaultCenter] addObserver:self 
 					     selector:@selector(configChanged:) 
