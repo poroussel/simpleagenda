@@ -104,8 +104,21 @@ static NSTimeZone *gl_nstz = nil;
  */
 - (NSComparisonResult)compare:(id)aDate withTime:(BOOL)time
 {
-  if (!time)
-    return icaltime_compare_date_only(_time, ((Date *)aDate)->_time);
+  if (!time) {
+    if (_time.year < ((Date *)aDate)->_time.year)
+      return -1;
+    if (_time.year > ((Date *)aDate)->_time.year)
+      return 1;
+    if (_time.month < ((Date *)aDate)->_time.month)
+      return -1;
+    if (_time.month > ((Date *)aDate)->_time.month)
+      return 1;
+    if (_time.day < ((Date *)aDate)->_time.day)
+      return -1;
+    if (_time.day > ((Date *)aDate)->_time.day)
+      return 1;
+    return 0;
+  }
 
   NSComparisonResult res;
   int a_isdate = _time.is_date;
@@ -148,7 +161,7 @@ static NSTimeZone *gl_nstz = nil;
 + (id)dateWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate
 {
   Date *d = [[Date alloc] init];
-  
+
   d->_time = refDate->_time;
   /* To be able to add hours and minutes, it has to be a datetime */
   d-> _time.is_date = 0;
@@ -163,7 +176,7 @@ static NSTimeZone *gl_nstz = nil;
 + (id)dateWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
 {
   Date *d = [[Date alloc] init];
-  
+
   d->_time.is_date = !time;
   d->_time.year = [cd yearOfCommonEra];
   d->_time.month = [cd monthOfYear];
@@ -189,7 +202,7 @@ static NSTimeZone *gl_nstz = nil;
 
 - (NSCalendarDate *)calendarDate
 {
-  return [NSCalendarDate dateWithYear:_time.year 
+  return [NSCalendarDate dateWithYear:_time.year
 			 month:_time.month
 			 day:_time.day
 			 hour:_time.hour
