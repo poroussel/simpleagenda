@@ -17,7 +17,6 @@
   NSData *_data;
 }
 
-- (id)initWithURL:(NSURL *)url;
 - (id)initWithURL:(NSURL *)url
 	 username:(NSString *)username
 	 password:(NSString *)password;

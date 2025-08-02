@@ -26,7 +26,9 @@
 	    ok,
 	    url,
 	    error,
-	    warning
+	    warning,
+	    password,
+	    username
 	);
 	Super = NSObject;
     };

@@ -17,10 +17,15 @@
   IBOutlet id ok;
   IBOutlet id error;
   IBOutlet id warning;
+  IBOutlet id username;
+  IBOutlet id password;
 }
 - (BOOL)show;
 - (NSString *)url;
+- (NSString *)username;
+- (NSString *)password;
 @end
+
 @implementation iCalStoreDialog
 - (id)initWithName:(NSString *)storeName
 {
@@ -30,6 +35,8 @@
     [warning setHidden:YES];
     [name setStringValue:storeName];
     [url setStringValue:@"http://"];
+    [username setStringValue:@""];
+    [password setStringValue:@""];
   }
   return self;
 }
@@ -38,6 +45,7 @@
   [panel close];
   [super dealloc];
 }
+
 - (BOOL)show
 {
   [ok setEnabled:NO];
@@ -48,19 +56,23 @@
   BOOL readable;
   WebDAVResource *resource;
 
-  resource = AUTORELEASE([[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]]);
+  resource = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[url stringValue]]
+					username:[username stringValue]
+					password:[password stringValue]];
   readable = [resource readable];
   /* Read will fail if there's no resource yet, try to create an empty one */
   if (!readable && [resource httpStatus] != 401) {
     [resource writableWithData:[NSData data]];
     readable = [resource readable];
   }
+
   if (readable)
     [NSApp stopModalWithCode:1];
   else {
     [error setStringValue:[NSString stringWithFormat:@"Unable to read from this URL : %@", [[resource url] propertyForKey:NSHTTPPropertyStatusReasonKey]]];
     [warning setHidden:NO];
   }
+  [resource release];
 }
 - (void)cancelClicked:(id)sender
 {
@@ -82,6 +94,14 @@
 {
   return [url stringValue];
 }
+- (NSString *)username
+{
+  return [username stringValue];
+}
+- (NSString *)password
+{
+  return [password stringValue];
+}
 @end
 
 
@@ -95,6 +115,7 @@
 - (void)initTimer;
 - (void)doRead;
 @end
+
 @implementation iCalStore
 - (NSDictionary *)defaults
 {
@@ -113,15 +134,18 @@
     _tree = [iCalTree new];
     assert(_tree != nil);
     _url = [[NSURL alloc] initWithString:[[self config] objectForKey:ST_URL]];
-    _resource = [[WebDAVResource alloc] initWithURL:_url];
+    _resource = [[WebDAVResource alloc] initWithURL:_url
+					   username:[[self config] objectForKey:ST_USERNAME]
+					   password:[[self config] objectForKey:ST_PASSWORD]];
     [self initTimer];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					     selector:@selector(configChanged:) 
-						 name:SAConfigManagerValueChanged 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(configChanged:)
+						 name:SAConfigManagerValueChanged
 					       object:[self config]];
   }
   return self;
 }
+
 
 + (BOOL)isUserInstanciable
 {
@@ -139,17 +163,21 @@
   dialog = [[iCalStoreDialog alloc] initWithName:name];
   if ([dialog show] == YES) {
     storeURL = [NSURL URLWithString:[dialog url]];
-    resource = [[WebDAVResource alloc] initWithURL:storeURL];
+    resource = [[WebDAVResource alloc] initWithURL:storeURL
+					  username:[dialog username]
+					  password:[dialog password]];
     writable = NO;
     if ([resource get])
       writable = [resource writableWithData:[resource data]];
     [resource release];
-    [dialog release];
     cm = [[ConfigManager alloc] initForKey:name];
     [cm setObject:[storeURL description] forKey:ST_URL];
+    [cm setObject:[dialog username] forKey:ST_USERNAME];
+    [cm setObject:[dialog password] forKey:ST_PASSWORD];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:writable] forKey:ST_RW];
     [cm release];
+    [dialog release];
     return YES;
   }
   [dialog release];
@@ -204,8 +232,8 @@
 - (void)read
 {
   if ([self enabled])
-    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
-												    selector:@selector(doRead) 
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
+												    selector:@selector(doRead)
 												      object:nil] autorelease]];
 }
 
@@ -217,7 +245,7 @@
     return;
   data = [_tree iCalTreeAsData];
   if (data)
-    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self 
+    [[[StoreManager globalManager] operationQueue] addOperation:[[[InvocationOperation alloc] initWithTarget:self
 												    selector:@selector(doWrite:)
 												      object:[data retain]] autorelease]];
 }
@@ -252,7 +280,7 @@
       [self read];
     [self initTimer];
   }
-  if ([key isEqualToString:ST_REFRESH] || [key isEqualToString:ST_REFRESH_INTERVAL]) 
+  if ([key isEqualToString:ST_REFRESH] || [key isEqualToString:ST_REFRESH_INTERVAL])
     [self initTimer];
 }
 
@@ -268,8 +296,8 @@
     _refreshTimer = [[NSTimer alloc] initWithFireDate:nil
 				             interval:[self refreshInterval]
                    			       target:self
-				             selector:@selector(refreshData:) 
-				             userInfo:nil 
+				             selector:@selector(refreshData:)
+				             userInfo:nil
 				              repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_refreshTimer forMode:NSDefaultRunLoopMode];
     NSLog(@"Store %@ will refresh every %d seconds", [self description], (int)[self refreshInterval]);

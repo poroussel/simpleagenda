@@ -8,62 +8,47 @@ static NSString *logKey = @"WebDAVResource";
 @implementation WebDAVResource
 - (void)dealloc
 {
-  [_user release];
-  [_password release];
-  [_url release];
-  [_lastModified release];
-  [_data release];
-  [_reason release];
-  [_etag release];
-  [super dealloc];
+  RELEASE(_user);
+  RELEASE(_password);
+  RELEASE(_url);
+  RELEASE(_lastModified);
+  RELEASE(_data);
+  RELEASE(_reason);
+  RELEASE(_etag);
+  DEALLOC;
 }
 
 - (void)setURL:(NSURL *)anURL
 {
+  NSURL *full;
+
   if ([[anURL scheme] hasPrefix:@"webcal"])
     ASSIGN(_url, [NSURL URLWithString:[[anURL absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
   else
     ASSIGN(_url, anURL);
+  full = [[NSURL alloc] initWithScheme:[_url scheme]
+				  user:_user
+			      password:_password
+				  host:[_url host]
+				  port:[_url port]
+			      fullPath:[_url fullPath]
+		       parameterString:[_url parameterString]
+				 query:[_url query]
+			      fragment:[_url fragment]];
+  ASSIGN(_url, full);
   _handleClass = [NSURLHandle URLHandleClassForURL:_url];
-  if ([_url user])
-    ASSIGN(_user, [_url user]);
-  if ([_url password])
-    ASSIGN(_password, [_url password]);
-}
-
-- (id)initWithURL:(NSURL *)anUrl
-{
-  if ((self = [super init]))
-    [self setURL:anUrl];
-  return self;
 }
 
 - (id)initWithURL:(NSURL *)url
 	 username:(NSString *)username
 	 password:(NSString *)password
 {
-  self = [self initWithURL:url];
-  if (self) {
+  if ((self = [super init])) {
     ASSIGN(_user, username);
     ASSIGN(_password, password);
+    [self setURL:url];
   }
   return self;
-}
-
-/* FIXME : ugly hack to work around NSURLHandle shortcomings */
-- (NSString *)basicAuth
-{
-  NSMutableString *authorisation;
-  NSString *toEncode;
-
-  authorisation = [NSMutableString stringWithCapacity: 64];
-  if ([_password length] > 0)
-    toEncode = [NSString stringWithFormat: @"%@:%@", _user, _password];
-  else
-    toEncode = [NSString stringWithFormat: @"%@", _user];
-  [authorisation appendFormat: @"Basic %@", [GSMimeDocument encodeBase64String: toEncode]];
-  NSDebugLLog(logKey, @"basicAuth authorisation %@", authorisation);
-  return authorisation;
 }
 
 - (BOOL)requestWithMethod:(NSString *)method body:(NSData *)body attributes:(NSDictionary *)attributes
@@ -79,19 +64,13 @@ restart:
   [handle writeProperty:method forKey:GSHTTPPropertyMethodKey];
   if (attributes) {
     keys = [attributes keyEnumerator];
-    while ((key = [keys nextObject])) {
-      NSDebugLLog(logKey, @"requestWithMethod %@ = %@", key, [attributes objectForKey:key]);
+    while ((key = [keys nextObject]))
       [handle writeProperty:[attributes objectForKey:key] forKey:key];
-    }
   }
-  if (_user && ![_url user])
-    [handle writeProperty:[self basicAuth] forKey:@"Authorization"];
   if (_etag && ([method isEqual:@"PUT"] || [method isEqual:@"DELETE"]))
     [handle writeProperty:[NSString stringWithFormat:@"([%@])", _etag] forKey:@"If"];
-  if (body) {
+  if (body)
     [handle writeData:body];
-    NSDebugLLog(logKey, @"requestWithMethod body [%@]", AUTORELEASE([[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding]));
-  }
   if (attributes)
     NSDebugLLog(logKey, @"requestWithMethod %@ %@ (%@)", method, [_url anonymousAbsoluteString], [attributes description]);
   else
@@ -108,6 +87,7 @@ restart:
   if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
     NSDebugLLog(logKey, @"requestWithMethod redirection to %@", [handle propertyForKey:@"Location"]);
     [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
+    RELEASE(handle);
     goto restart;
   }
 
@@ -118,11 +98,8 @@ restart:
   else
     DESTROY(_reason);
   if (_httpStatus < 200 || _httpStatus > 299) {
-    if (_reason)
-      NSLog(@"%s %@ : %d %@", __PRETTY_FUNCTION__, method, _httpStatus, _reason);
-    else
-      NSLog(@"%s %@ : %d", __PRETTY_FUNCTION__, method, _httpStatus);
-    [handle release];
+    NSLog(@"Error %@ on %@ : %d %@", method, [_url anonymousAbsoluteString], _httpStatus, _reason);
+    RELEASE(handle);
     return NO;
   }
 
@@ -143,7 +120,7 @@ restart:
       ASSIGN(_etag, property);
     }
   }
-  [handle release];
+  RELEASE(handle);
   return YES;
 }
 
@@ -256,7 +233,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
   if (![self user] && ![self password])
     return as;
   return [as stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@:%@@", [self user], [self password]]
-				       withString:@""];
+				       withString:@"xxx:yyy@"];
 }
 @end
 

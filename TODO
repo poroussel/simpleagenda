@@ -1,10 +1,20 @@
 In no particular order :
 
-* redesign networking
+* redesign networking : using NRURLHandle isn't really encourgaged but
+  NSURLConnection doesn't accept PROPFIND and other webdav extensions
+  without implementing our own subclass of NSURLProtocol, mimikcing
+  _NSHTTPURLProtocol which seems like a waste of effort...
+
+  using NSURLSession would be the modern solution but I'm not sure
+  it would need the same NSURLProtocol subclass and it seems to
+  also require block usage, not sure how to do that without clang
+  and libobjc2
+
+* only store passwords if the user asks for it
 
 * month view
 
 * build a framework to allow other applications to access the data ?
    (or let somebody else implement Apple Calendar framework)
-   
+
 Want to help out ? Contact me at p.o.roussel@free.fr
