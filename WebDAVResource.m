@@ -44,8 +44,8 @@ static NSString *logKey = @"WebDAVResource";
 	 password:(NSString *)password
 {
   if ((self = [super init])) {
-    ASSIGN(_user, username);
-    ASSIGN(_password, password);
+    ASSIGN(_user, [username stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLUserAllowedCharacterSet]]);
+    ASSIGN(_password, [password stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPasswordAllowedCharacterSet]]);
     [self setURL:url];
   }
   return self;
@@ -229,11 +229,12 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 - (NSString *)anonymousAbsoluteString
 {
   NSString *as = [self absoluteString];
-
   if (![self user] && ![self password])
     return as;
-  return [as stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@:%@@", [self user], [self password]]
-				       withString:@"xxx:yyy@"];
+
+  NSURLComponents *comp = [NSURLComponents componentsWithURL:self resolvingAgainstBaseURL:NO];
+  NSString *toReplace = [NSString stringWithFormat:@"%@:%@@", [comp percentEncodedUser], [comp percentEncodedPassword]];
+  return [as stringByReplacingOccurrencesOfString:toReplace withString:@"xxx:yyy@"];
 }
 @end
 
