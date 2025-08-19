@@ -49,6 +49,7 @@ Currently the following keys are usable :
  * DBusBackend
  * GroupDAVStore
  * InvocationOperation
+ * iCalTree
 
 You can specify multiple keys by repeating --GNU-Debug options :
 

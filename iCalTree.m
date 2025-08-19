@@ -2,6 +2,8 @@
 #import "Event.h"
 #import "Task.h"
 
+static NSString *logKey = @"iCalTree";
+
 @implementation iCalTree
 - (id)init
 {
@@ -24,6 +26,7 @@
 {
   icalcomponent *icomp;
 
+  NSDebugLLog(logKey, @"iCalTree parseString %@", string);
   if (string == nil) {
     NSLog(@"No string to parse");
     return NO;
@@ -80,6 +83,7 @@
       [task release];
     }
   }
+  // Return work directly ?
   return [NSSet setWithSet:work];
 }
 
