@@ -586,7 +586,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:EXPRGETHREF];
-    NSDebugLLog(logKey, @"found %d item(s)", [set count]);
+    NSDebugLLog(logKey, @"found %lu item(s)", [set count]);
     for (i = 0; i < [set count]; i++) {
       elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[resource url]];
       if (elementURL) {
