@@ -2,6 +2,8 @@ version 0.48
 	* AlarmDialog : disable action combobox for now, it has no effect
 	* WebDAVResource : don't handle authentication manually and badly and
 	  enjoy digest authentication offered by NSURLAuthenticationChallenge
+	* WebDAVResource : percent encode user and password in URLs
+	* iCalStoreDialog : add username and password fields
 
 version 0.47 (2025/02/05)
 	* Disable alarm sound backend and log a error if the sound
