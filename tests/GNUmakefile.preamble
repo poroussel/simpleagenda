@@ -3,7 +3,7 @@
 include ../local.make
 
 DateTest_OBJC_FILES += \
-	../Date.m 
+	../Date.m
 
 ElementTest_OBJC_FILES += \
 	../Alarm.m \
@@ -30,6 +30,10 @@ RecurrenceRuleTest_OBJC_FILES += \
 	../Date.m \
 	../DateRange.m \
 	../RecurrenceRule.m
+
+WebDAVTest_OBJC_FILES += \
+	../WebDAVResource.m \
+	../NSString+SimpleAgenda.m \
 
 NEEDS_GUI=yes
 ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
