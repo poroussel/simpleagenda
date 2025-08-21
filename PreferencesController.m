@@ -29,13 +29,13 @@
     [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
     /* FIXME : could we call setupDefaultStore directly ? */
-    [[NSNotificationCenter defaultCenter] addObserver:self 
-					  selector:@selector(storeStateChanged:) 
-					  name:SAStatusChangedForStore 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					  selector:@selector(storeStateChanged:)
+					  name:SAStatusChangedForStore
 					  object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self 
- 					  selector:@selector(storeStateChanged:) 
- 					  name:SAEnabledStatusChangedForStore 
+    [[NSNotificationCenter defaultCenter] addObserver:self
+ 					  selector:@selector(storeStateChanged:)
+ 					  name:SAEnabledStatusChangedForStore
 					  object:nil];
   }
   return self;
@@ -111,6 +111,7 @@
   [showTooltip setState:[config integerForKey:TOOLTIP]];
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
+  [switchDayWeekAxis setState:[config integerForKey:CAL_SWITCH_AXIS]];
 
   [alarmEnabled setState:[[AlarmManager globalManager] alarmsEnabled]];
   [alarmBackendPopUp removeAllItems];
@@ -262,6 +263,11 @@
 - (void)toggleShowTime:(id)sender
 {
   [[ConfigManager globalConfig] setInteger:[showTimeAppIcon state] forKey:APPICON_TIME];
+}
+
+- (void)toggleSwitchAxis:(id)sender
+{
+  [[ConfigManager globalConfig] setInteger:[switchDayWeekAxis state] forKey:CAL_SWITCH_AXIS];
 }
 
 - (void)toggleAlarms:(id)sender

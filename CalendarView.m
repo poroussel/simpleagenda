@@ -54,7 +54,7 @@ static NSImage *_2right;
   RELEASE(tbl);
   RELEASE(obr);
   RELEASE(tbr);
-  [super dealloc];
+  DEALLOC;
 }
 
 - (id)initWithFrame:(NSRect)frame
@@ -67,9 +67,7 @@ static NSImage *_2right;
 
   self = [super initWithFrame:frame];
   if (self) {
-    NSString *direction = [[ConfigManager globalConfig] objectForKey:CAL_DIRECTION];
-    horizontalDisplay = ![direction isEqualToString:CAL_VERTICAL];
-
+    horizontalDisplay = ![[ConfigManager globalConfig] integerForKey:CAL_SWITCH_AXIS];
     NSArray *days = [[NSUserDefaults standardUserDefaults] objectForKey:NSShortWeekDayNameArray];
     boldFont = RETAIN([NSFont boldSystemFontOfSize:11]);
     normalFont = RETAIN([NSFont systemFontOfSize:11]);

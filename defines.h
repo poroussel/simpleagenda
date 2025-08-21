@@ -5,8 +5,7 @@
 #define MIN_STEP @"minimumStep"
 #define TOOLTIP @"showTooltip"
 
-#define CAL_DIRECTION @"calendarDirection"
-#define CAL_VERTICAL @"Vertical"
+#define CAL_SWITCH_AXIS @"calendarSwitchAxis"
 
 #define STORE_CLASSES @"storeClasses"
 

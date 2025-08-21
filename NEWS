@@ -4,6 +4,8 @@ version 0.48
 	  enjoy digest authentication offered by NSURLAuthenticationChallenge
 	* WebDAVResource : percent encode user and password in URLs
 	* iCalStoreDialog : add username and password fields
+	* UI Preferences panel : add a toggle to switch day and week axis of
+	  the calendar view (needs a restart to take effect)
 
 version 0.47 (2025/02/05)
 	* Disable alarm sound backend and log a error if the sound
