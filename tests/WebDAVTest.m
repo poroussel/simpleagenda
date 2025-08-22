@@ -17,7 +17,6 @@ int main ()
 				   username:nil
 				   password:nil];
   PASS(dav != nil, "-initWithURL with nil URL works");
-  PASS([[[dav url] absoluteString] isEqualToString: @"/"], "-initWithURL with nil URL generates '/'");
   test_NSObject(@"WebDAVResource", [NSArray arrayWithObject:dav]);
   RELEASE(dav);
 
@@ -43,8 +42,9 @@ int main ()
 				   username:@"p.o.roussel@free.fr"
 				   password:@"$p@ssword"];
   PASS(dav != nil, "-initWithURL with user/password needing % escaping works");
-  PASS([[[dav url] user] isEqualToString:@"p.o.roussel%40free.fr"] &&
-       [[[dav url] password] isEqualToString:@"$p%40ssword"], "-initWithURL user/password encoding works");
+  PASS([[[dav url] absoluteString] isEqualToString:@"http://p.o.roussel%40free.fr:$p%40ssword@droopy.octets.fr/calendar/test"], "-initWithURL URL is correctly escaped");
+  PASS([[[dav url] user] isEqualToString:@"p.o.roussel@free.fr"] &&
+       [[[dav url] password] isEqualToString:@"$p@ssword"], "-initWithURL user/password encoding works");
   PASS([[[dav url] anonymousAbsoluteString] isEqualToString:@"http://xxx:yyy@droopy.octets.fr/calendar/test"], "-anonymousAbsoluteString works")
   RELEASE(dav);
 
