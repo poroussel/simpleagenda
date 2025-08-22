@@ -20,22 +20,18 @@ static NSString *logKey = @"WebDAVResource";
 
 - (void)setURL:(NSURL *)anURL
 {
-  NSURL *full;
-
   if ([[anURL scheme] hasPrefix:@"webcal"])
     ASSIGN(_url, [NSURL URLWithString:[[anURL absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
   else
     ASSIGN(_url, anURL);
-  full = [[NSURL alloc] initWithScheme:[_url scheme]
-				  user:_user
-			      password:_password
-				  host:[_url host]
-				  port:[_url port]
-			      fullPath:[_url fullPath]
-		       parameterString:[_url parameterString]
-				 query:[_url query]
-			      fragment:[_url fragment]];
-  ASSIGN(_url, full);
+
+  // FIXME : this is more than ugly but NSURL -initWithScheme:user:password:host:port:path:query:fragment
+  // doesn't work as expected (it double escapes user and password)
+  if (_user && _password && ![_url user] && ![_url password]) {
+    NSString *withauth = [[_url absoluteString] stringByReplacingString:[NSString stringWithFormat:@"%@://", [_url scheme]]
+							     withString:[NSString stringWithFormat:@"%@://%@:%@@", [_url scheme], _user, _password]];
+    ASSIGN(_url, [NSURL URLWithString:withauth]);
+  }
   _handleClass = [NSURLHandle URLHandleClassForURL:_url];
 }
 
