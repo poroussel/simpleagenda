@@ -307,6 +307,8 @@
     [storeArray addObject:[storeName stringValue]];
     [config setObject:storeArray forKey:STORES];
     [self setupStores];
+    /* This is overkill : we should only load data for the newly added store */
+    [_sm refresh];
   }
   [storeName setStringValue:@""];
   [createButton setEnabled:NO];
