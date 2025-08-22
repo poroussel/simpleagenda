@@ -45,6 +45,7 @@ int main ()
   PASS(dav != nil, "-initWithURL with user/password needing % escaping works");
   PASS([[[dav url] user] isEqualToString:@"p.o.roussel%40free.fr"] &&
        [[[dav url] password] isEqualToString:@"$p%40ssword"], "-initWithURL user/password encoding works");
+  PASS([[[dav url] anonymousAbsoluteString] isEqualToString:@"http://xxx:yyy@droopy.octets.fr/calendar/test"], "-anonymousAbsoluteString works")
   RELEASE(dav);
 
 
