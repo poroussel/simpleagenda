@@ -449,6 +449,8 @@ static NSString *logKey = @"GroupDAVStore";
       [cm setObject:[taskURL absoluteString] forKey:ST_TASK_URL];
     [cm setObject:[[self class] description] forKey:ST_CLASS];
     [cm setObject:[NSNumber numberWithBool:YES] forKey:ST_RW];
+    [cm release];
+    [dialog release];
     return YES;
   }
   [dialog release];
