@@ -90,7 +90,17 @@ static struct {
   float my;
   float sx;
   float sy;
-} wdcoord[7] = {{0, 2, 1, 1}, {0, 1, 1, 1}, {0, 0, 1, 1}, {1, 2, 1, 1}, {1, 1, 1, 1}, {1, 0.5, 1, 0.5}, {1, 0, 1, 0.5}};
+} wdcoord[7] = {{0, 2, 1, 1}, {0, 1, 1, 1}, {0, 0, 1, 1},
+		{1, 2, 1, 1}, {1, 1, 1, 1}, {1, 0.5, 1, 0.5}, {1, 0, 1, 0.5}};
+
+/* Alternate coordinates to favor saturday and sunday */
+static struct {
+  float mx;
+  float my;
+  float sx;
+  float sy;
+} alwdcoord[7] = {{0, 3, 1, 1}, {0, 2, 1, 1}, {0, 1, 1, 1}, {0, 0, 1, 1},
+		  {1, 3, 1, 1}, {1, 1.5, 1, 1.5}, {1, 0, 1, 1.5}};
 
 @interface WeekDayView : NSView
 {
@@ -105,6 +115,13 @@ static struct {
 @implementation WeekDayView
 + (NSRect)rectForDay:(int)weekday frame:(NSRect)frame
 {
+  BOOL bigWeekEnd = [[ConfigManager globalConfig] integerForKey:WV_BIG_WEEKEND];
+
+  if (bigWeekEnd) {
+    int dwidth = frame.size.width / 2;
+    int dheight = frame.size.height / 4;
+    return NSMakeRect(dwidth * alwdcoord[weekday - 1].mx, dheight * alwdcoord[weekday - 1].my, dwidth * alwdcoord[weekday - 1].sx, dheight * alwdcoord[weekday - 1].sy);
+  }
   int dwidth = frame.size.width / 2;
   int dheight = frame.size.height / 3;
   return NSMakeRect(dwidth * wdcoord[weekday - 1].mx, dheight * wdcoord[weekday - 1].my, dwidth * wdcoord[weekday - 1].sx, dheight * wdcoord[weekday - 1].sy);

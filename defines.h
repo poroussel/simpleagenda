@@ -6,6 +6,7 @@
 #define TOOLTIP @"showTooltip"
 
 #define CAL_SWITCH_AXIS @"calendarSwitchAxis"
+#define WV_BIG_WEEKEND @"weekViewFavorWeekend"
 
 #define STORE_CLASSES @"storeClasses"
 
