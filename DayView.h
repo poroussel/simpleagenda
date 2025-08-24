@@ -31,6 +31,7 @@
 - (int)minimumStep;
 - (void)setDate:(Date *)date;
 - (void)dataChanged:(NSNotification *)not;
+- (void)configChanged:(NSNotification *)not;
 - (id)dataSource;
 - (void)setDataSource:(id)dataSource;
 @end

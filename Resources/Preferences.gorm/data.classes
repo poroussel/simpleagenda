@@ -7,7 +7,7 @@
 	    "changeStart:",
 	    "changeStep:",
 	    "createStore:",
-	    "toggleSwitchAxis:",
+	    "toggleBiggerWeekend:",
 	    "removeStore:",
 	    "selectAlarmBackend:",
 	    "selectDefaultStore:",
@@ -20,6 +20,7 @@
 	    "toggleRefresh:",
 	    "toggleShowDate:",
 	    "toggleShowTime:",
+	    "toggleSwitchAxis:",
 	    "toggleTooltip:",
 	    "toggleWritable:"
 	);
@@ -47,7 +48,8 @@
 	    "toggleEnabled:",
 	    "toggleAlarms:",
 	    "selectAlarmBackend:",
-	    "toggleSwitchAxis:"
+	    "toggleSwitchAxis:",
+	    "toggleBiggerWeekend:"
 	);
 	Outlets = (
 	    panel,
@@ -83,7 +85,8 @@
 	    alarmPreferences,
 	    alarmEnabled,
 	    alarmBackendPopUp,
-	    switchDayWeekAxis
+	    switchDayWeekAxis,
+	    useBiggerWeekend
 	);
 	Super = NSObject;
     };

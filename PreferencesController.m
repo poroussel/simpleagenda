@@ -112,6 +112,7 @@
   [showDateAppIcon setState:[config integerForKey:APPICON_DATE]];
   [showTimeAppIcon setState:[config integerForKey:APPICON_TIME]];
   [switchDayWeekAxis setState:[config integerForKey:CAL_SWITCH_AXIS]];
+  [useBiggerWeekend setState:[config integerForKey:WV_BIG_WEEKEND]];
 
   [alarmEnabled setState:[[AlarmManager globalManager] alarmsEnabled]];
   [alarmBackendPopUp removeAllItems];
@@ -268,6 +269,11 @@
 - (void)toggleSwitchAxis:(id)sender
 {
   [[ConfigManager globalConfig] setInteger:[switchDayWeekAxis state] forKey:CAL_SWITCH_AXIS];
+}
+
+- (void)toggleBiggerWeekend:(id)sender
+{
+  [[ConfigManager globalConfig] setInteger:[useBiggerWeekend state] forKey:WV_BIG_WEEKEND];
 }
 
 - (void)toggleAlarms:(id)sender

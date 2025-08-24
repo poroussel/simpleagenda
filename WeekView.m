@@ -202,6 +202,17 @@ static struct {
 @end
 
 @implementation WeekView
+- (id)initWithFrame:(NSRect)frameRect
+{
+  if ((self = [super initWithFrame:frameRect])) {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+					     selector:@selector(configChanged:)
+						 name:SAConfigManagerValueChanged
+					       object:nil];
+  }
+  return self;
+}
+
 - (void)setupSelectWeek
 {
   NSRect frame = [self frame];
@@ -224,6 +235,19 @@ static struct {
       [date incrementDay];
     }
     [date release];
+  }
+}
+
+- (void)configChanged:(NSNotification *)not
+{
+  NSString *key = [[not userInfo] objectForKey:@"key"];
+
+  if ([key isEqualToString:WV_BIG_WEEKEND]) {
+    // TODO : do something smarter to reinit the subviews...
+    // Force setupSelectWeek to recreate subviews
+    weekNumber = 0;
+    [self setupSelectWeek];
+    [self reloadData];
   }
 }
 
@@ -262,7 +286,6 @@ static struct {
 }
 
 - (void)selectAppointmentView:(AppointmentView *)aptv
-
 {
   if ([delegate respondsToSelector:@selector(viewSelectDate:)])
     [delegate viewSelectDate:[(WeekDayView *)[aptv superview] day]];
@@ -292,11 +315,6 @@ static struct {
 - (BOOL)acceptsFirstResponder
 {
   return YES;
-}
-
-- (void)config:(ConfigManager *)config dataDidChangedForKey:(NSString *)key
-{
-  [self reloadData];
 }
 
 - (void)setDate:(Date *)date

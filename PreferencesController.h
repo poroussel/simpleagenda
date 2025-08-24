@@ -40,6 +40,7 @@
   IBOutlet id alarmEnabled;
   IBOutlet id alarmBackendPopUp;
   IBOutlet id switchDayWeekAxis;
+  IBOutlet id useBiggerWeekend;
   StoreManager *_sm;
 }
 
@@ -63,6 +64,7 @@
 - (void)toggleShowDate:(id)sender;
 - (void)toggleShowTime:(id)sender;
 - (void)toggleSwitchAxis:(id)sender;
+- (void)toggleBiggerWeekend:(id)sender;
 - (void)toggleAlarms:(id)sender;
 - (void)selectAlarmBackend:(id)sender;
 @end

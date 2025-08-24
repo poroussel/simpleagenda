@@ -21,5 +21,6 @@
 - (id)dataSource;
 - (void)setDataSource:(id)dataSource;
 - (void)dataChanged:(NSNotification *)not;
+- (void)configChanged:(NSNotification *)not;
 - (void)reloadData;
 @end
