@@ -32,8 +32,9 @@ RecurrenceRuleTest_OBJC_FILES += \
 	../RecurrenceRule.m
 
 WebDAVTest_OBJC_FILES += \
+	../Date.m \
 	../WebDAVResource.m \
-	../NSString+SimpleAgenda.m \
+	../NSString+SimpleAgenda.m
 
 NEEDS_GUI=yes
 ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
