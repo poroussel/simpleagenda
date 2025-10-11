@@ -74,6 +74,7 @@ add comments above this one
 "Today" = "Aujourd'hui";
 /* File: AppController.m:152 */
 "Tomorrow" = "Demain";
+"Open tasks (%lu)" = "Tâches ouvertes (%lu)";
 /* File: AppController.m:786 */
 /* File: AppController.m:242 */
 "Week %d" = "Semaine %d";
