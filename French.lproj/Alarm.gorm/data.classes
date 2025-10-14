@@ -1,0 +1,48 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AlarmEditor = {
+	Actions = (
+	    "addAlarm:",
+	    "selectType:",
+	    "removeAlarm:",
+	    "changeDelay:",
+	    "switchBeforeAfter:"
+	);
+	Outlets = (
+	    panel,
+	    type,
+	    action,
+	    window,
+	    table,
+	    add,
+	    remove,
+	    relativeSlider,
+	    relativeText,
+	    radio,
+	    date,
+	    time
+	);
+	Super = NSObject;
+    };
+    CalendarView = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate,
+	    dataSource
+	);
+	Super = NSView;
+    };
+    FirstResponder = {
+	Actions = (
+	    "addAlarm:",
+	    "changeDelay:",
+	    "removeAlarm:",
+	    "selectType:",
+	    "setDelegate:",
+	    "switchBeforeAfter:"
+	);
+	Super = NSObject;
+    };
+}

@@ -1,0 +1,100 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AppController = {
+	Actions = (
+	    "copy:",
+	    "cut:",
+	    "paste:",
+	    "editAppointment:",
+	    "delAppointment:",
+	    "exportAppointment:",
+	    "saveAll:",
+	    "showPrefPanel:",
+	    "addAppointment:",
+	    "addTask:",
+	    "editAppointment:",
+	    "delAppointment:",
+	    "exportAppointment:",
+	    "doSearch:",
+	    "clearSearch:",
+	    "reloadAll:",
+	    "previousWeek:",
+	    "nextDay:",
+	    "nextWeek:",
+	    "previousDay:",
+	    "today:"
+	);
+	Outlets = (
+	    calendar,
+	    dayView,
+	    summary,
+	    search,
+	    taskView,
+	    window,
+	    tabs,
+	    weekView
+	);
+	Super = NSObject;
+    };
+    CalendarView = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSBox;
+    };
+    DayView = {
+	Actions = (
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSView;
+    };
+    DayViewController = {
+	Actions = (
+	    "setDelegate:"
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "addAppointment:",
+	    "addTask:",
+	    "clearSearch:",
+	    "createOrEditAnAppointment:",
+	    "delAppointment:",
+	    "doSearch:",
+	    "editAppointment:",
+	    "exportAppointment:",
+	    "previousWeek:",
+	    "nextDay:",
+	    "nextWeek:",
+	    "orderFrontFontPanel:",
+	    "previousDay:",
+	    "reloadAll:",
+	    "saveAll:",
+	    "setDataSource:",
+	    "setDelegate:",
+	    "showPrefPanel:",
+	    "today:",
+	    "updateDate:",
+	    "updateView:"
+	);
+	Super = NSObject;
+    };
+    WeekView = {
+	Actions = (
+	    "deselectAll:"
+	);
+	Outlets = (
+	    delegate
+	);
+	Super = NSView;
+    };
+}

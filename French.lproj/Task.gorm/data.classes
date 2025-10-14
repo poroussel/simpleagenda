@@ -1,0 +1,32 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "editAlarms:",
+	    "toggleDueDate:",
+	    "validate:"
+	);
+	Super = NSObject;
+    };
+    TaskEditor = {
+	Actions = (
+	    "validate:",
+	    "cancel:",
+	    "editAlarms:",
+	    "toggleDueDate:"
+	);
+	Outlets = (
+	    window,
+	    description,
+	    summary,
+	    store,
+	    state,
+	    ok,
+	    dueDate,
+	    dueTime,
+	    toggleDueDate,
+	    alarms
+	);
+	Super = NSObject;
+    };
+}
