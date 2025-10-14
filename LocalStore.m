@@ -28,7 +28,7 @@
   self = [super initWithName:name];
   if (self) {
     ConfigManager *gc = [ConfigManager globalConfig];
-    _globalPath = [[[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] 
+    _globalPath = [[[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject]
 		     stringByAppendingPathComponent:@"SimpleAgenda"] retain];
     _globalFile = [[_globalPath stringByAppendingPathComponent:[[gc objectForKey:name] objectForKey:ST_FILE]] retain];
     _globalTaskFile = [[NSString stringWithFormat:@"%@.tasks", _globalFile] retain];
@@ -82,14 +82,14 @@
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %lu appointment(s)", _globalFile, [[self events] count]);
+      NSLog(@"LocalStore from %@ : loaded %llu appointment(s)", _globalFile, [[self events] count]);
     }
   }
   if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %lu tasks(s)", _globalTaskFile, [[self tasks] count]);
+      NSLog(@"LocalStore from %@ : loaded %llu tasks(s)", _globalTaskFile, [[self tasks] count]);
     }
   }
 }

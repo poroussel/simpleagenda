@@ -312,8 +312,8 @@
       [self performSelectorOnMainThread:@selector(fillWithElements:)
 			     withObject:[_tree components]
 			  waitUntilDone:YES];
-      NSLog(@"iCalStore from %@ : loaded %lu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-      NSLog(@"iCalStore from %@ : loaded %lu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+      NSLog(@"iCalStore from %@ : loaded %llu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+      NSLog(@"iCalStore from %@ : loaded %llu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
     } else{
       NSLog(@"Couldn't parse data from %@", [_url anonymousAbsoluteString]);
     }
