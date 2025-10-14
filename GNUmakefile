@@ -13,13 +13,9 @@ SimpleAgenda_APPLICATION_ICON = Calendar.tiff
 # Resource files
 #
 SimpleAgenda_RESOURCE_FILES = \
-Resources/Agenda.gorm \
-Resources/Appointment.gorm \
-Resources/Preferences.gorm \
-Resources/iCalendar.gorm \
-Resources/Task.gorm \
-Resources/GroupDAV.gorm \
-Resources/Alarm.gorm \
+French.lproj \
+English.lproj \
+Italian.lproj \
 Resources/Calendar.tiff \
 Resources/ical-file.tiff \
 Resources/repeat.tiff \

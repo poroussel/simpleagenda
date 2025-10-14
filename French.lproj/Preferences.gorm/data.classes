@@ -1,0 +1,93 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "changeEnd:",
+	    "changeInterval:",
+	    "changeStart:",
+	    "changeStep:",
+	    "createStore:",
+	    "toggleBiggerWeekend:",
+	    "removeStore:",
+	    "selectAlarmBackend:",
+	    "selectDefaultStore:",
+	    "selectItem:",
+	    "selectStore:",
+	    "setColor:",
+	    "toggleAlarms:",
+	    "toggleDisplay:",
+	    "toggleEnabled:",
+	    "toggleRefresh:",
+	    "toggleShowDate:",
+	    "toggleShowTime:",
+	    "toggleSwitchAxis:",
+	    "toggleTooltip:",
+	    "toggleWritable:"
+	);
+	Super = NSObject;
+    };
+    PreferencesController = {
+	Actions = (
+	    "selectStore:",
+	    "changeColor:",
+	    "changeTextColor:",
+	    "changeEnd:",
+	    "changeStart:",
+	    "changeStep:",
+	    "selectDefaultStore:",
+	    "toggleDisplay:",
+	    "toggleWritable:",
+	    "removeStore:",
+	    "createStore:",
+	    "selectItem:",
+	    "toggleRefresh:",
+	    "changeInterval:",
+	    "toggleTooltip:",
+	    "toggleShowTime:",
+	    "toggleShowDate:",
+	    "toggleEnabled:",
+	    "toggleAlarms:",
+	    "selectAlarmBackend:",
+	    "toggleSwitchAxis:",
+	    "toggleBiggerWeekend:"
+	);
+	Outlets = (
+	    panel,
+	    dayStart,
+	    dayEnd,
+	    dayStartText,
+	    dayEndText,
+	    minStep,
+	    minStepText,
+	    storeColor,
+	    storeTextColor,
+	    storePopUp,
+	    defaultStorePopUp,
+	    storeDisplay,
+	    storeWritable,
+	    removeButton,
+	    storeClass,
+	    storeName,
+	    createButton,
+	    slot,
+	    globalPreferences,
+	    itemPopUp,
+	    storeFactory,
+	    storePreferences,
+	    storeRefresh,
+	    refreshInterval,
+	    refreshIntervalText,
+	    showTooltip,
+	    showTimeAppIcon,
+	    showDateAppIcon,
+	    uiPreferences,
+	    storeEnabled,
+	    alarmPreferences,
+	    alarmEnabled,
+	    alarmBackendPopUp,
+	    switchDayWeekAxis,
+	    useBiggerWeekend
+	);
+	Super = NSObject;
+    };
+}

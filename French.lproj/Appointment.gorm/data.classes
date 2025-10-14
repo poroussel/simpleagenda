@@ -1,0 +1,39 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    AppointmentEditor = {
+	Actions = (
+	    "cancel:",
+	    "validate:",
+	    "selectFrequency:",
+	    "toggleUntil:",
+	    "toggleAllDay:",
+	    "editAlarms:"
+	);
+	Outlets = (
+	    description,
+	    title,
+	    duration,
+	    repeat,
+	    endDate,
+	    durationText,
+	    location,
+	    store,
+	    allDay,
+	    ok,
+	    until,
+	    timeText,
+	    time
+	);
+	Super = NSWindowController;
+    };
+    FirstResponder = {
+	Actions = (
+	    "editAlarms:",
+	    "selectFrequency:",
+	    "toggleAllDay:",
+	    "toggleUntil:",
+	    "validate:"
+	);
+	Super = NSObject;
+    };
+}
