@@ -10,6 +10,7 @@ version 0.48
 	* Preferences : load store data after creation
 	* UI Preferences panel : add a toggle to increase the size of saturday
 	  and sunday in the weekview
+	* Full french translation (Patrick Cardona)
 
 version 0.47 (2025/02/05)
 	* Disable alarm sound backend and log a error if the sound
