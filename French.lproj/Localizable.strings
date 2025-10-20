@@ -60,7 +60,7 @@ add comments above this one
 /* File: AppController.m:155 */
 "Open tasks" = "Tâches en cours";
 /* File: AppController.m:230 */
-"Open tasks (%d)" = "Tâches en cours (%d)";
+"Open tasks (%llu)" = "Tâches en cours (%llu)";
 /* File: AppController.m:588 */
 /* File: AppController.m:154 */
 "Search results" = "Résultats recherche";
