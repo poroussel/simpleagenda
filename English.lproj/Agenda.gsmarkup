@@ -66,51 +66,73 @@
 
   <!-- Main window -->
   <window title="SimpleAgenda" id="window">
-    <vbox>
-      <!-- Navigation toolbar -->
-      <hbox>
-        <button title="&lt;" action="previousDay:" target="#appController" />
-        <button title="Today" action="today:" target="#appController" />
-        <button title="&gt;" action="nextDay:" target="#appController" />
-        <hspace />
-        <textField id="search" width="150" action="doSearch:"
-                   target="#appController" />
-        <button title="Clear" action="clearSearch:"
-                target="#appController" />
-      </hbox>
-      <!-- Tab view -->
+    <!--
+      Horizontal split:
+        Left  — tab view with Day / Week / Tasks (fills all available space)
+        Right — fixed-width column: monthly CalendarView (fixed),
+                search bar, then expanding summary outline view
+    -->
+    <hbox>
+
+      <!-- LEFT: 3-tab view (Day, Week, Tasks) -->
       <tabView id="tabs" halign="expand" valign="expand">
-        <tabViewItem label="Calendar" identifier="Calendar">
-          <instance instanceOf="CalendarView" id="calendar" />
-        </tabViewItem>
+
         <tabViewItem label="Day" identifier="Day">
-          <scrollView>
+          <scrollView halign="expand" valign="expand">
             <instance instanceOf="DayView" id="dayView" />
           </scrollView>
         </tabViewItem>
+
         <tabViewItem label="Week" identifier="Week">
-          <scrollView>
+          <scrollView halign="expand" valign="expand">
             <instance instanceOf="WeekView" id="weekView" />
           </scrollView>
         </tabViewItem>
-        <tabViewItem label="Summary" identifier="Summary">
-          <scrollView>
-            <outlineView id="summary">
-              <tableColumn identifier="title" title="Summary" />
-            </outlineView>
-          </scrollView>
-        </tabViewItem>
+
         <tabViewItem label="Tasks" identifier="Tasks">
-          <scrollView>
+          <scrollView halign="expand" valign="expand">
             <tableView id="taskView">
               <tableColumn identifier="summary" title="Task" />
-              <tableColumn identifier="state" title="State" />
+              <tableColumn identifier="state"   title="State" />
               <tableColumn identifier="dueDate" title="Due date" />
             </tableView>
           </scrollView>
         </tabViewItem>
+
       </tabView>
-    </vbox>
+
+      <!-- RIGHT: calendar + search + summary results -->
+      <vbox valign="expand">
+
+        <!-- Navigation row above the monthly calendar -->
+        <hbox>
+          <button title="&lt;" action="previousDay:" target="#appController" />
+          <button title="Today" action="today:" target="#appController" />
+          <button title="&gt;" action="nextDay:" target="#appController" />
+        </hbox>
+
+        <!-- Monthly calendar (fixed size) -->
+        <instance instanceOf="CalendarView" id="calendar"
+                  width="180" height="160" />
+
+        <!-- Search bar -->
+        <hbox>
+          <textField id="search" halign="expand" action="doSearch:"
+                     target="#appController" />
+          <button title="Clear" action="clearSearch:"
+                  target="#appController" />
+        </hbox>
+
+        <!-- Summary / results outline view (expands to fill remaining height) -->
+        <scrollView halign="expand" valign="expand">
+          <outlineView id="summary">
+            <tableColumn identifier="title" title="Summary" />
+          </outlineView>
+        </scrollView>
+
+      </vbox>
+
+    </hbox>
   </window>
 
 </objects>
@@ -120,22 +142,22 @@
   <outlet source="#NSApp" target="#appController" key="delegate" />
 
   <!-- AppController outlets -->
-  <outlet source="#appController" target="#window" key="window" />
-  <outlet source="#appController" target="#tabs" key="tabs" />
+  <outlet source="#appController" target="#window"   key="window" />
+  <outlet source="#appController" target="#tabs"     key="tabs" />
   <outlet source="#appController" target="#calendar" key="calendar" />
-  <outlet source="#appController" target="#dayView" key="dayView" />
+  <outlet source="#appController" target="#dayView"  key="dayView" />
   <outlet source="#appController" target="#weekView" key="weekView" />
-  <outlet source="#appController" target="#summary" key="summary" />
-  <outlet source="#appController" target="#search" key="search" />
+  <outlet source="#appController" target="#summary"  key="summary" />
+  <outlet source="#appController" target="#search"   key="search" />
   <outlet source="#appController" target="#taskView" key="taskView" />
 
-  <!-- Delegate/DataSource connections -->
-  <outlet source="#summary" target="#appController" key="delegate" />
-  <outlet source="#summary" target="#appController" key="dataSource" />
+  <!-- Delegate / DataSource connections -->
+  <outlet source="#summary"  target="#appController" key="delegate" />
+  <outlet source="#summary"  target="#appController" key="dataSource" />
   <outlet source="#taskView" target="#appController" key="delegate" />
   <outlet source="#taskView" target="#appController" key="dataSource" />
   <outlet source="#calendar" target="#appController" key="delegate" />
-  <outlet source="#dayView" target="#appController" key="delegate" />
+  <outlet source="#dayView"  target="#appController" key="delegate" />
   <outlet source="#weekView" target="#appController" key="delegate" />
 </connectors>
 
