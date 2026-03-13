@@ -69,24 +69,26 @@
     <!--
       Horizontal split:
         Left  — tab view with Day / Week / Tasks (fills all available space)
-        Right — fixed-width column: monthly CalendarView (fixed),
+        Right — fixed-width column: monthly CalendarView (fixed size),
                 search bar, then expanding summary outline view
     -->
     <hbox>
 
       <!-- LEFT: 3-tab view (Day, Week, Tasks) -->
+      <!--
+        <instance> is placed directly inside <tabViewItem> so that
+        GSMarkupTagTabViewItem calls setView: on the platform object without
+        going through the autolayout system (which would require
+        gsAutoLayoutHAlignment, not implemented by GSMarkupTagInstance).
+      -->
       <tabView id="tabs" halign="expand" valign="expand">
 
         <tabViewItem label="Day" identifier="Day">
-          <scrollView halign="expand" valign="expand">
-            <instance instanceOf="DayView" id="dayView" />
-          </scrollView>
+          <instance instanceOf="DayView" id="dayView" />
         </tabViewItem>
 
         <tabViewItem label="Week" identifier="Week">
-          <scrollView halign="expand" valign="expand">
-            <instance instanceOf="WeekView" id="weekView" />
-          </scrollView>
+          <instance instanceOf="WeekView" id="weekView" />
         </tabViewItem>
 
         <tabViewItem label="Tasks" identifier="Tasks">
@@ -111,9 +113,18 @@
           <button title="&gt;" action="nextDay:" target="#appController" />
         </hbox>
 
-        <!-- Monthly calendar (fixed size) -->
-        <instance instanceOf="CalendarView" id="calendar"
-                  width="180" height="160" />
+        <!--
+          CalendarView is an NSView subclass; <instance> cannot be used inside
+          autolayout containers (hbox/vbox) because GSMarkupTagInstance does not
+          implement gsAutoLayoutHAlignment.  Wrapping it in a <view> avoids this:
+          <view> uses the traditional addSubview: mechanism for its children
+          (shouldTreatContentAsSubviews returns YES) and does not invoke autolayout
+          on them.  The <instance> fills the whole <view> frame.
+        -->
+        <view width="180" height="160">
+          <instance instanceOf="CalendarView" id="calendar"
+                    x="0" y="0" width="180" height="160" />
+        </view>
 
         <!-- Search bar -->
         <hbox>
