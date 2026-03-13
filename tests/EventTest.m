@@ -22,10 +22,8 @@
     return NO;
   if ([self location] && ![[self location] isEqualToString:[other location]])
     return NO;
-  /* compare:withTime:YES uses icaltime_compare which converts to UTC.
-   * After an NSCoding round-trip, Date loses its timezone (icaltime_from_string
-   * gives a floating time) so UTC conversion differs from the zoned original.
-   * Compare date fields and time-of-day independently to avoid this. */
+  if ([self startDate] == nil || [other startDate] == nil)
+    return [self startDate] == [other startDate];
   if ([[self startDate] compare:[other startDate] withTime:NO] != NSOrderedSame)
     return NO;
   if ([[self startDate] minuteOfDay] != [[other startDate] minuteOfDay])
@@ -122,8 +120,28 @@ int main ()
   PASS([allDayEv isScheduledForDay:day],
        "-isScheduledForDay: YES for allDay event on its day");
 
-  /* NSCoding */
-  test_keyed_NSCoding([NSArray arrayWithObject:ev]);
+  /* NSCoding — manual round-trip instead of test_keyed_NSCoding, which wraps
+   * everything in NS_DURING and silently fails the whole set if any step raises
+   * (e.g. a nil startDate dereference inside isEqualForTestcase:). */
+  {
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:ev];
+    PASS(data != nil && [data length] > 0, "Event can be archived");
+    Event *decoded = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    PASS(decoded != nil, "Event can be unarchived");
+    PASS([[decoded summary] isEqualToString:[ev summary]],
+         "NSCoding preserves summary");
+    PASS([decoded duration] == [ev duration],
+         "NSCoding preserves duration");
+    PASS([decoded allDay] == [ev allDay],
+         "NSCoding preserves allDay");
+    PASS([decoded sticky] == [ev sticky],
+         "NSCoding preserves sticky");
+    PASS([[decoded location] isEqualToString:[ev location]],
+         "NSCoding preserves location");
+    PASS([[decoded startDate] compare:[ev startDate] withTime:NO] == NSOrderedSame
+         && [[decoded startDate] minuteOfDay] == [[ev startDate] minuteOfDay],
+         "NSCoding preserves startDate");
+  }
 
   /* Recurrence: weekly event should also appear 7 days later */
   RecurrenceRule *rule = [[RecurrenceRule alloc]

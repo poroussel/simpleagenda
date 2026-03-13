@@ -39,10 +39,24 @@
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];
+  /* icaltime_as_ical_string does not include timezone info, so encode it
+   * separately to allow faithful restoration on decode. */
+  if (_time.zone) {
+    const char *tzid = icaltimezone_get_tzid((icaltimezone *)_time.zone);
+    if (tzid)
+      [coder encodeObject:[NSString stringWithCString:tzid] forKey:@"timezone"];
+  }
 }
 - (id)initWithCoder:(NSCoder *)coder
 {
+  NSString *tzid;
   _time = icaltime_from_string([[coder decodeObjectForKey:@"icalTime"] cString]);
+  tzid = [coder decodeObjectForKey:@"timezone"];
+  if (tzid) {
+    icaltimezone *tz = icaltimezone_get_builtin_timezone([tzid cString]);
+    if (tz)
+      _time = icaltime_set_timezone(&_time, tz);
+  }
   return self;
 }
 @end
