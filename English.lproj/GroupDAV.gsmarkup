@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <panel title="GroupDAV Store" id="panel">
+    <vbox>
+      <form width="320">
+        <formItem title="Name:" id="name" />
+        <formItem title="URL:" id="url" />
+        <formItem title="Username:" id="usernameField" />
+        <formItem title="Password:" id="passwordField" secure="yes" />
+      </form>
+      <hbox>
+        <label>Calendar:</label>
+        <popUpButton id="calendar" action="selectItem:" target="#NSOwner"
+                     halign="expand" />
+      </hbox>
+      <hbox>
+        <label>Tasks:</label>
+        <popUpButton id="task" action="selectItem:" target="#NSOwner"
+                     halign="expand" />
+      </hbox>
+      <hbox>
+        <button title="Check" id="check" action="buttonClicked:" target="#NSOwner" />
+        <hspace />
+        <button title="Cancel" id="cancel" action="buttonClicked:" target="#NSOwner"
+                keyEquivalent="&#27;" />
+        <button title="OK" id="ok" action="buttonClicked:" target="#NSOwner"
+                keyEquivalent="&#13;" />
+      </hbox>
+    </vbox>
+  </panel>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#panel" key="panel" />
+  <outlet source="#NSOwner" target="#name" key="name" />
+  <outlet source="#NSOwner" target="#url" key="url" />
+  <outlet source="#NSOwner" target="#usernameField" key="usernameField" />
+  <outlet source="#NSOwner" target="#passwordField" key="passwordField" />
+  <outlet source="#NSOwner" target="#calendar" key="calendar" />
+  <outlet source="#NSOwner" target="#task" key="task" />
+  <outlet source="#NSOwner" target="#check" key="check" />
+  <outlet source="#NSOwner" target="#cancel" key="cancel" />
+  <outlet source="#NSOwner" target="#ok" key="ok" />
+</connectors>
+
+</gsmarkup>

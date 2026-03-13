@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Task" id="window">
+    <vbox>
+      <hbox>
+        <label>Title:</label>
+        <textField id="summary" halign="expand" />
+      </hbox>
+      <scrollView width="300" height="80">
+        <textView id="description" />
+      </scrollView>
+      <hbox>
+        <label>State:</label>
+        <popUpButton id="state" halign="expand" />
+      </hbox>
+      <hbox>
+        <button title="Due date" id="toggleDueDate" type="switch"
+                action="toggleDueDate:" target="#NSOwner" />
+        <textField id="dueDate" width="100" />
+        <textField id="dueTime" width="80" />
+      </hbox>
+      <hbox>
+        <label>Store:</label>
+        <popUpButton id="store" halign="expand" />
+        <button title="Alarms" id="alarms" action="editAlarms:" target="#NSOwner" />
+      </hbox>
+      <hbox>
+        <hspace />
+        <button title="Cancel" action="cancel:" target="#NSOwner"
+                keyEquivalent="&#27;" />
+        <button title="OK" id="ok" action="validate:" target="#NSOwner"
+                keyEquivalent="&#13;" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" key="window" />
+  <outlet source="#NSOwner" target="#summary" key="summary" />
+  <outlet source="#NSOwner" target="#description" key="description" />
+  <outlet source="#NSOwner" target="#state" key="state" />
+  <outlet source="#NSOwner" target="#toggleDueDate" key="toggleDueDate" />
+  <outlet source="#NSOwner" target="#dueDate" key="dueDate" />
+  <outlet source="#NSOwner" target="#dueTime" key="dueTime" />
+  <outlet source="#NSOwner" target="#store" key="store" />
+  <outlet source="#NSOwner" target="#alarms" key="alarms" />
+  <outlet source="#NSOwner" target="#ok" key="ok" />
+</connectors>
+
+</gsmarkup>

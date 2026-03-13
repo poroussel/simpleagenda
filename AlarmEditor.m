@@ -1,4 +1,5 @@
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 #import "AlarmEditor.h"
 #import "Element.h"
 #import "Alarm.h"
@@ -61,7 +62,7 @@
   HourFormatter *formatter;
   NSDateFormatter *dateFormatter;
 
-  if (![NSBundle loadNibNamed:@"Alarm" owner:self])
+  if (![NSBundle loadGSMarkupNamed:@"Alarm" owner:self])
     return nil;
   if ((self = [super init])) {
     _current = nil;

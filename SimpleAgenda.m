@@ -23,8 +23,9 @@
 */
 
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 
 int main(int argc, const char *argv[])
 {
-  return NSApplicationMain (argc, argv);
+  return GSMarkupApplicationMain (argc, argv);
 }

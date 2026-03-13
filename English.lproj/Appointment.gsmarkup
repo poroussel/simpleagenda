@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Appointment" id="window">
+    <vbox>
+      <hbox>
+        <label>Title:</label>
+        <textField id="title" halign="expand" />
+      </hbox>
+      <hbox>
+        <label>Location:</label>
+        <textField id="location" halign="expand" />
+      </hbox>
+      <hbox>
+        <label>Time:</label>
+        <textField id="timeText" width="80" />
+        <textField id="time" width="80" />
+        <button title="All day" id="allDay" type="switch"
+                action="toggleAllDay:" target="#NSOwner" />
+      </hbox>
+      <hbox>
+        <label>Duration:</label>
+        <textField id="durationText" width="80" />
+        <textField id="duration" width="80" />
+      </hbox>
+      <hbox>
+        <label>Repeat:</label>
+        <popUpButton id="repeat" action="selectFrequency:" target="#NSOwner">
+          <popUpButtonItem title="None" />
+          <popUpButtonItem title="Daily" />
+          <popUpButtonItem title="Weekly" />
+          <popUpButtonItem title="Monthly" />
+          <popUpButtonItem title="Yearly" />
+        </popUpButton>
+        <button title="Until" id="until" type="switch"
+                action="toggleUntil:" target="#NSOwner" />
+        <textField id="endDate" width="100" />
+      </hbox>
+      <scrollView width="300" height="80">
+        <textView id="description" />
+      </scrollView>
+      <hbox>
+        <label>Store:</label>
+        <popUpButton id="store" halign="expand" />
+        <button title="Alarms" action="editAlarms:" target="#NSOwner" />
+      </hbox>
+      <hbox>
+        <hspace />
+        <button title="Cancel" action="cancel:" target="#NSOwner"
+                keyEquivalent="&#27;" />
+        <button title="OK" id="ok" action="validate:" target="#NSOwner"
+                keyEquivalent="&#13;" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" key="window" />
+  <outlet source="#NSOwner" target="#title" key="title" />
+  <outlet source="#NSOwner" target="#location" key="location" />
+  <outlet source="#NSOwner" target="#timeText" key="timeText" />
+  <outlet source="#NSOwner" target="#time" key="time" />
+  <outlet source="#NSOwner" target="#allDay" key="allDay" />
+  <outlet source="#NSOwner" target="#durationText" key="durationText" />
+  <outlet source="#NSOwner" target="#duration" key="duration" />
+  <outlet source="#NSOwner" target="#repeat" key="repeat" />
+  <outlet source="#NSOwner" target="#until" key="until" />
+  <outlet source="#NSOwner" target="#endDate" key="endDate" />
+  <outlet source="#NSOwner" target="#description" key="description" />
+  <outlet source="#NSOwner" target="#store" key="store" />
+  <outlet source="#NSOwner" target="#ok" key="ok" />
+</connectors>
+
+</gsmarkup>

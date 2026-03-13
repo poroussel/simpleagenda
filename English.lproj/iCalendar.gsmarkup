@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <panel title="iCalendar Store" id="panel">
+    <vbox>
+      <form width="320">
+        <formItem title="Name:" id="name" />
+        <formItem title="URL:" id="url" />
+        <formItem title="Username:" id="username" />
+        <formItem title="Password:" id="password" secure="yes" />
+      </form>
+      <label id="error" halign="center" textColor="red"></label>
+      <hbox>
+        <hspace />
+        <button title="Cancel" action="cancelClicked:" target="#NSOwner"
+                keyEquivalent="&#27;" />
+        <button title="OK" id="ok" action="okClicked:" target="#NSOwner"
+                keyEquivalent="&#13;" />
+      </hbox>
+    </vbox>
+  </panel>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#panel" key="panel" />
+  <outlet source="#NSOwner" target="#name" key="name" />
+  <outlet source="#NSOwner" target="#url" key="url" />
+  <outlet source="#NSOwner" target="#username" key="username" />
+  <outlet source="#NSOwner" target="#password" key="password" />
+  <outlet source="#NSOwner" target="#error" key="error" />
+  <outlet source="#NSOwner" target="#error" key="warning" />
+  <outlet source="#NSOwner" target="#ok" key="ok" />
+  <outlet source="#panel" target="#NSOwner" key="delegate" />
+</connectors>
+
+</gsmarkup>

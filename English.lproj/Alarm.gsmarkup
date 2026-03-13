@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Alarms" id="window">
+    <vbox>
+      <scrollView width="300" height="120">
+        <tableView id="table">
+          <tableColumn identifier="description" title="Alarms" />
+        </tableView>
+      </scrollView>
+      <hbox>
+        <button title="Add" id="add" action="addAlarm:" target="#NSOwner" />
+        <button title="Remove" id="remove" action="removeAlarm:" target="#NSOwner" />
+        <hspace />
+        <popUpButton id="type" action="selectType:" target="#NSOwner">
+          <popUpButtonItem title="Relative" />
+          <popUpButtonItem title="Absolute" />
+        </popUpButton>
+        <popUpButton id="action">
+          <popUpButtonItem title="Display" />
+          <popUpButtonItem title="Sound" />
+          <popUpButtonItem title="Email" />
+          <popUpButtonItem title="Procedure" />
+        </popUpButton>
+      </hbox>
+      <hbox>
+        <slider id="relativeSlider" min="0" max="86400"
+                action="changeDelay:" target="#NSOwner" halign="expand" />
+        <textField id="relativeText" width="60" />
+      </hbox>
+      <hbox>
+        <matrix id="radio" mode="radio" action="switchBeforeAfter:" target="#NSOwner">
+          <matrixRow>
+            <matrixCell type="radio" tag="0" title="Before" />
+            <matrixCell type="radio" tag="1" title="After" />
+          </matrixRow>
+        </matrix>
+      </hbox>
+      <hbox>
+        <label>Date:</label>
+        <textField id="date" width="100" />
+        <label>Time:</label>
+        <textField id="time" width="80" />
+      </hbox>
+      <hbox>
+        <hspace />
+        <button title="OK" action="stopModal:" target="#NSApp"
+                keyEquivalent="&#13;" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" key="window" />
+  <outlet source="#NSOwner" target="#window" key="panel" />
+  <outlet source="#NSOwner" target="#table" key="table" />
+  <outlet source="#NSOwner" target="#add" key="add" />
+  <outlet source="#NSOwner" target="#remove" key="remove" />
+  <outlet source="#NSOwner" target="#type" key="type" />
+  <outlet source="#NSOwner" target="#action" key="action" />
+  <outlet source="#NSOwner" target="#relativeSlider" key="relativeSlider" />
+  <outlet source="#NSOwner" target="#relativeText" key="relativeText" />
+  <outlet source="#NSOwner" target="#radio" key="radio" />
+  <outlet source="#NSOwner" target="#date" key="date" />
+  <outlet source="#NSOwner" target="#time" key="time" />
+  <outlet source="#table" target="#NSOwner" key="delegate" />
+  <outlet source="#table" target="#NSOwner" key="dataSource" />
+</connectors>
+
+</gsmarkup>

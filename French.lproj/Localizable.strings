@@ -91,6 +91,104 @@ add comments above this one
 "SimpleAgenda Reminder !" = "Rappel SimpleAgenda !";
 
 
+/*** Strings from gsmarkup UI files ***/
+
+/* Alarm.gsmarkup */
+"Alarms" = "Alarmes";
+"Add" = "Ajouter";
+"Remove" = "Supprimer";
+"Date:" = "Date :";
+"Time:" = "Heure :";
+"Before" = "Avant";
+"After" = "Après";
+
+/* Appointment.gsmarkup */
+"Appointment" = "Rendez-vous";
+"Title:" = "Titre :";
+"Location:" = "Lieu :";
+"Time:" = "Heure :";
+"All day" = "Toute la journée";
+"Duration:" = "Durée :";
+"Repeat:" = "Répéter :";
+"Until" = "Jusqu'à";
+"Store:" = "Agenda :";
+"None" = "Aucune";
+"Daily" = "Quotidien";
+"Weekly" = "Hebdomadaire";
+"Monthly" = "Mensuel";
+"Yearly" = "Annuel";
+
+/* Task.gsmarkup */
+"Task" = "Tâche";
+"Due date" = "Échéance";
+"State:" = "État :";
+
+/* GroupDAV.gsmarkup */
+"GroupDAV Store" = "Agenda GroupDAV";
+"Name:" = "Nom :";
+"URL:" = "URL :";
+"Username:" = "Utilisateur :";
+"Password:" = "Mot de passe :";
+"Calendar:" = "Calendrier :";
+"Tasks:" = "Tâches :";
+"Check" = "Vérifier";
+"Cancel" = "Annuler";
+"OK" = "OK";
+
+/* iCalendar.gsmarkup */
+"iCalendar Store" = "Agenda iCalendar";
+
+/* Preferences.gsmarkup */
+"Preferences" = "Préférences";
+"Global" = "Général";
+"Stores" = "Agendas";
+"New store" = "Nouvel agenda";
+"Interface" = "Interface";
+"Store:" = "Agenda :";
+"Color:" = "Couleur :";
+"Text color:" = "Couleur du texte :";
+"Displayed" = "Visible";
+"Writable" = "Modifiable";
+"Enabled" = "Activé";
+"Refresh" = "Actualiser";
+"Default store:" = "Agenda par défaut :";
+"Type:" = "Type :";
+"Create" = "Créer";
+"Show tooltip" = "Afficher les bulles d'aide";
+"Show date in application icon" = "Afficher la date dans l'icône";
+"Show time in application icon" = "Afficher l'heure dans l'icône";
+"Switch day/week axis" = "Inverser l'axe jour/semaine";
+"Bigger weekend" = "Week-end agrandi";
+"Enable alarms" = "Activer les alarmes";
+"Backend:" = "Moteur :";
+"Day start:" = "Début de journée :";
+"Day end:" = "Fin de journée :";
+"Min step:" = "Pas minimum :";
+
+/* Agenda.gsmarkup - menu */
+"SimpleAgenda" = "SimpleAgenda";
+"Info Panel..." = "Informations...";
+"Hide" = "Masquer";
+"Quit" = "Quitter";
+"Appointment" = "Rendez-vous";
+"New appointment" = "Nouveau rendez-vous";
+"Edit" = "Modifier";
+"Delete" = "Supprimer";
+"Export" = "Exporter";
+"Navigate" = "Navigation";
+"Next day" = "Jour suivant";
+"Previous day" = "Jour précédent";
+"Next week" = "Semaine suivante";
+"Previous week" = "Semaine précédente";
+"Calendar" = "Calendrier";
+"Save all" = "Tout enregistrer";
+"Reload all" = "Tout recharger";
+"Windows" = "Fenêtres";
+"Miniaturize" = "Miniaturiser";
+"Close" = "Fermer";
+"Summary" = "Résumé";
+"Clear" = "Effacer";
+
 /*** Strings from Task.m ***/
 /* File: Task.m:30 */
 "Canceled" = "Annulée";

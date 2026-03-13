@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <panel title="Preferences" id="panel">
+    <vbox>
+      <tabView>
+        <!-- Global preferences -->
+        <tabViewItem label="Global">
+          <vbox>
+            <hbox>
+              <label>Day start:</label>
+              <slider id="dayStart" min="0" max="86400"
+                      action="changeStart:" target="#NSOwner" halign="expand" />
+              <textField id="dayStartText" width="60" />
+            </hbox>
+            <hbox>
+              <label>Day end:</label>
+              <slider id="dayEnd" min="0" max="86400"
+                      action="changeEnd:" target="#NSOwner" halign="expand" />
+              <textField id="dayEndText" width="60" />
+            </hbox>
+            <hbox>
+              <label>Min step:</label>
+              <slider id="minStep" min="0" max="3600"
+                      action="changeStep:" target="#NSOwner" halign="expand" />
+              <textField id="minStepText" width="60" />
+            </hbox>
+            <vspace />
+          </vbox>
+        </tabViewItem>
+        <!-- Stores preferences -->
+        <tabViewItem label="Stores">
+          <vbox>
+            <hbox>
+              <label>Store:</label>
+              <popUpButton id="storePopUp" action="selectStore:" target="#NSOwner"
+                           halign="expand" />
+              <button title="Remove" id="removeButton"
+                      action="removeStore:" target="#NSOwner" />
+            </hbox>
+            <hbox>
+              <label>Color:</label>
+              <colorWell id="storeColor" action="changeColor:" target="#NSOwner" />
+              <label>Text color:</label>
+              <colorWell id="storeTextColor" action="changeTextColor:"
+                         target="#NSOwner" />
+            </hbox>
+            <hbox>
+              <button title="Displayed" id="storeDisplay" type="switch"
+                      action="toggleDisplay:" target="#NSOwner" />
+              <button title="Writable" id="storeWritable" type="switch"
+                      action="toggleWritable:" target="#NSOwner" />
+              <button title="Enabled" id="storeEnabled" type="switch"
+                      action="toggleEnabled:" target="#NSOwner" />
+            </hbox>
+            <hbox>
+              <button title="Refresh" id="storeRefresh" type="switch"
+                      action="toggleRefresh:" target="#NSOwner" />
+              <slider id="refreshInterval" min="0" max="3600"
+                      action="changeInterval:" target="#NSOwner" halign="expand" />
+              <textField id="refreshIntervalText" width="60" />
+            </hbox>
+            <hbox>
+              <label>Default store:</label>
+              <popUpButton id="defaultStorePopUp"
+                           action="selectDefaultStore:" target="#NSOwner"
+                           halign="expand" />
+            </hbox>
+            <vspace />
+          </vbox>
+        </tabViewItem>
+        <!-- New store tab -->
+        <tabViewItem label="New store">
+          <vbox>
+            <hbox>
+              <label>Type:</label>
+              <popUpButton id="storeClass" halign="expand" />
+            </hbox>
+            <hbox>
+              <label>Name:</label>
+              <textField id="storeName" halign="expand" />
+            </hbox>
+            <hbox>
+              <hspace />
+              <button title="Create" id="createButton"
+                      action="createStore:" target="#NSOwner" />
+            </hbox>
+            <vspace />
+          </vbox>
+        </tabViewItem>
+        <!-- UI preferences -->
+        <tabViewItem label="Interface">
+          <vbox>
+            <button title="Show tooltip" id="showTooltip" type="switch"
+                    action="toggleTooltip:" target="#NSOwner" halign="wexpand" />
+            <button title="Show date in application icon" id="showDateAppIcon"
+                    type="switch" action="toggleShowDate:" target="#NSOwner"
+                    halign="wexpand" />
+            <button title="Show time in application icon" id="showTimeAppIcon"
+                    type="switch" action="toggleShowTime:" target="#NSOwner"
+                    halign="wexpand" />
+            <button title="Switch day/week axis" id="switchDayWeekAxis"
+                    type="switch" action="toggleSwitchAxis:" target="#NSOwner"
+                    halign="wexpand" />
+            <button title="Bigger weekend" id="useBiggerWeekend"
+                    type="switch" action="toggleBiggerWeekend:" target="#NSOwner"
+                    halign="wexpand" />
+            <vspace />
+          </vbox>
+        </tabViewItem>
+        <!-- Alarms preferences -->
+        <tabViewItem label="Alarms">
+          <vbox>
+            <button title="Enable alarms" id="alarmEnabled" type="switch"
+                    action="toggleAlarms:" target="#NSOwner" halign="wexpand" />
+            <hbox>
+              <label>Backend:</label>
+              <popUpButton id="alarmBackendPopUp"
+                           action="selectAlarmBackend:" target="#NSOwner"
+                           halign="expand" />
+            </hbox>
+            <vspace />
+          </vbox>
+        </tabViewItem>
+      </tabView>
+    </vbox>
+  </panel>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#panel" key="panel" />
+  <outlet source="#NSOwner" target="#dayStart" key="dayStart" />
+  <outlet source="#NSOwner" target="#dayEnd" key="dayEnd" />
+  <outlet source="#NSOwner" target="#minStep" key="minStep" />
+  <outlet source="#NSOwner" target="#dayStartText" key="dayStartText" />
+  <outlet source="#NSOwner" target="#dayEndText" key="dayEndText" />
+  <outlet source="#NSOwner" target="#minStepText" key="minStepText" />
+  <outlet source="#NSOwner" target="#storePopUp" key="storePopUp" />
+  <outlet source="#NSOwner" target="#storeColor" key="storeColor" />
+  <outlet source="#NSOwner" target="#storeTextColor" key="storeTextColor" />
+  <outlet source="#NSOwner" target="#defaultStorePopUp" key="defaultStorePopUp" />
+  <outlet source="#NSOwner" target="#storeDisplay" key="storeDisplay" />
+  <outlet source="#NSOwner" target="#storeWritable" key="storeWritable" />
+  <outlet source="#NSOwner" target="#storeRefresh" key="storeRefresh" />
+  <outlet source="#NSOwner" target="#storeEnabled" key="storeEnabled" />
+  <outlet source="#NSOwner" target="#refreshInterval" key="refreshInterval" />
+  <outlet source="#NSOwner" target="#refreshIntervalText" key="refreshIntervalText" />
+  <outlet source="#NSOwner" target="#removeButton" key="removeButton" />
+  <outlet source="#NSOwner" target="#storeClass" key="storeClass" />
+  <outlet source="#NSOwner" target="#storeName" key="storeName" />
+  <outlet source="#NSOwner" target="#createButton" key="createButton" />
+  <outlet source="#NSOwner" target="#showTooltip" key="showTooltip" />
+  <outlet source="#NSOwner" target="#showDateAppIcon" key="showDateAppIcon" />
+  <outlet source="#NSOwner" target="#showTimeAppIcon" key="showTimeAppIcon" />
+  <outlet source="#NSOwner" target="#switchDayWeekAxis" key="switchDayWeekAxis" />
+  <outlet source="#NSOwner" target="#useBiggerWeekend" key="useBiggerWeekend" />
+  <outlet source="#NSOwner" target="#alarmEnabled" key="alarmEnabled" />
+  <outlet source="#NSOwner" target="#alarmBackendPopUp" key="alarmBackendPopUp" />
+  <outlet source="#storeName" target="#NSOwner" key="delegate" />
+</connectors>
+
+</gsmarkup>

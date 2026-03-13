@@ -1,4 +1,5 @@
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 #import <GNUstepBase/GSXML.h>
 #import "Event.h"
 #import "Task.h"
@@ -72,7 +73,7 @@ static NSString *logKey = @"GroupDAVStore";
 {
   self = [super init];
   if (self) {
-    if (![NSBundle loadNibNamed:@"GroupDAV" owner:self])
+    if (![NSBundle loadGSMarkupNamed:@"GroupDAV" owner:self])
       return nil;
     [name setStringValue:storeName];
     [url setStringValue:@"http://"];

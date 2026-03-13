@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 #import "AppointmentEditor.h"
 #import "HourFormatter.h"
 #import "AgendaStore.h"
@@ -22,8 +23,8 @@ static NSMutableDictionary *editors;
   HourFormatter *formatter;
   NSDateFormatter *dateFormatter;
 
-  if (![NSBundle loadNibNamed:@"Appointment" owner:self]) {
-    NSLog(@"Unable to load Appointment.gorm");
+  if (![NSBundle loadGSMarkupNamed:@"Appointment" owner:self]) {
+    NSLog(@"Unable to load Appointment.gsmarkup");
     return nil;
   }
   self = [super init];

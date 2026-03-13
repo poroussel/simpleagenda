@@ -21,11 +21,11 @@ ADDITIONAL_TOOL_LIBS += -lDBusKit
 endif
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += 
+ADDITIONAL_INCLUDE_DIRS += -I/usr/local/include
 
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += -L/usr/local/lib 
 
 # Additional GUI libraries to link
-ADDITIONAL_GUI_LIBS += 
+ADDITIONAL_GUI_LIBS += -lRenaissance
 
