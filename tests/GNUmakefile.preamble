@@ -36,6 +36,42 @@ WebDAVTest_OBJC_FILES += \
 	../WebDAVResource.m \
 	../NSString+SimpleAgenda.m
 
+EventTest_OBJC_FILES += \
+	../Alarm.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../Event.m \
+	../HourFormatter.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m
+
+TaskTest_OBJC_FILES += \
+	../Alarm.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../HourFormatter.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m \
+	../Task.m
+
+DateRangeTest_OBJC_FILES += \
+	../Date.m \
+	../DateRange.m
+
+iCalTreeTest_OBJC_FILES += \
+	../Alarm.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../Event.m \
+	../HourFormatter.m \
+	../iCalTree.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m \
+	../Task.m
+
 NEEDS_GUI=yes
 ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
 ADDITIONAL_TOOL_LIBS += -lical
