@@ -23,7 +23,7 @@ static NSString *logKey = @"InvocationOperation";
   [inv setSelector:sel];
   if (arg)
     [inv setArgument:&arg atIndex:2];
-  return [[InvocationOperation alloc] initWithInvocation:inv];
+  return [self initWithInvocation:inv];
 }
 - (void)dealloc
 {

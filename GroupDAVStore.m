@@ -404,11 +404,11 @@ static NSString *logKey = @"GroupDAVStore";
     _calendar = nil;
     _task = nil;
     if ([[self config] objectForKey:ST_CALENDAR_URL]) {
-      _calendar = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_CALENDAR_URL]] username: _username password: _password];
+      _calendar = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[[self config] objectForKey:ST_CALENDAR_URL]] username: _username password: _password];
       NSDebugLLog(logKey, @"GroupDAVStore calendar URL %@", [[_calendar url] anonymousAbsoluteString]);
     }
     if ([[self config] objectForKey:ST_TASK_URL]) {
-      _task = [[WebDAVResource alloc] initWithURL:[[NSURL alloc] initWithString:[[self config] objectForKey:ST_TASK_URL]] username: _username password: _password];
+      _task = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:[[self config] objectForKey:ST_TASK_URL]] username: _username password: _password];
       NSDebugLLog(logKey, @"GroupDAVStore task URL %@", [[_task url] anonymousAbsoluteString]);
     }
     [[NSNotificationCenter defaultCenter] addObserver:self
