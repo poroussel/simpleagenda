@@ -106,24 +106,19 @@
       <!-- RIGHT: calendar + search + summary results -->
       <vbox valign="expand">
 
-        <!-- Navigation row above the monthly calendar -->
-        <hbox>
-          <button title="&lt;" action="previousDay:" target="#appController" />
-          <button title="Today" action="today:" target="#appController" />
-          <button title="&gt;" action="nextDay:" target="#appController" />
-        </hbox>
-
         <!--
           CalendarView is an NSView subclass; <instance> cannot be used inside
           autolayout containers (hbox/vbox) because GSMarkupTagInstance does not
           implement gsAutoLayoutHAlignment.  Wrapping it in a <view> avoids this:
           <view> uses the traditional addSubview: mechanism for its children
           (shouldTreatContentAsSubviews returns YES) and does not invoke autolayout
-          on them.  The <instance> fills the whole <view> frame.
+          on them.
+          CalendarView includes its own navigation arrows — no external buttons needed.
+          The view is created with initWithFrame:NSZeroRect by <instance>; AppController
+          resizes it to fill this container in applicationWillFinishLaunching:.
         -->
-        <view width="180" height="160">
-          <instance instanceOf="CalendarView" id="calendar"
-                    x="0" y="0" width="180" height="160" />
+        <view width="220" height="190">
+          <instance instanceOf="CalendarView" id="calendar" />
         </view>
 
         <!-- Search bar -->

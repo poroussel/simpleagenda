@@ -23,6 +23,9 @@
     [[minStepText cell] setFormatter:formatter];
     [[refreshIntervalText cell] setFormatter:formatter];
     [panel setFrameAutosaveName:@"preferencesPanel"];
+    /* Renaissance shows panels immediately when loaded; hide until the user
+     * explicitly opens Preferences via the menu. */
+    [panel orderOut:nil];
     /* FIXME : could we call setupDefaultStore directly ? */
     [[NSNotificationCenter defaultCenter] addObserver:self
 					  selector:@selector(storeStateChanged:)

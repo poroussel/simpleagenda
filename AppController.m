@@ -231,6 +231,16 @@ NSComparisonResult compareDataTreeElements(id a, id b, void *context)
   [summary setTarget:self];
   [summary setDoubleAction:@selector(editAppointment:)];
   [window setFrameAutosaveName:@"mainWindow"];
+  /* Renaissance creates custom views via <instance> using initWithFrame:NSZeroRect.
+   * Resize the calendar to fill the fixed-size <view> container defined in the
+   * gsmarkup now that the view hierarchy is fully set up. */
+  {
+    NSView *container = [calendar superview];
+    if (container != nil) {
+      [calendar setFrame:[container bounds]];
+      [calendar setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+    }
+  }
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)not
