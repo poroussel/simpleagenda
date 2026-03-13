@@ -48,8 +48,7 @@
       </hbox>
       <hbox>
         <hspace />
-        <button title="Cancel" action="cancel:" target="#NSOwner"
-                keyEquivalent="&#27;" />
+        <button title="Cancel" action="cancel:" target="#NSOwner" />
         <button title="OK" id="ok" action="validate:" target="#NSOwner"
                 keyEquivalent="&#13;" />
       </hbox>

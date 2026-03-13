@@ -14,8 +14,7 @@
       <label id="error" halign="center" textColor="red"></label>
       <hbox>
         <hspace />
-        <button title="Cancel" action="cancelClicked:" target="#NSOwner"
-                keyEquivalent="&#27;" />
+        <button title="Cancel" action="cancelClicked:" target="#NSOwner" />
         <button title="OK" id="ok" action="okClicked:" target="#NSOwner"
                 keyEquivalent="&#13;" />
       </hbox>

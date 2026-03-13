@@ -24,8 +24,7 @@
       <hbox>
         <button title="Check" id="check" action="buttonClicked:" target="#NSOwner" />
         <hspace />
-        <button title="Cancel" id="cancel" action="buttonClicked:" target="#NSOwner"
-                keyEquivalent="&#27;" />
+        <button title="Cancel" id="cancel" action="buttonClicked:" target="#NSOwner" />
         <button title="OK" id="ok" action="buttonClicked:" target="#NSOwner"
                 keyEquivalent="&#13;" />
       </hbox>
