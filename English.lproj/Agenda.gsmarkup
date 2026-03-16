@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="SimpleAgenda" id="window" width="600" height="500">
+    <hbox>
+
+      <!-- Left: tab view with day, week, and task views -->
+      <tabView id="tabs" halign="expand" valign="expand">
+
+        <tabViewItem label="Day" identifier="Day">
+          <view instanceOf="DayView" id="dayView" halign="expand" valign="expand" />
+        </tabViewItem>
+
+        <tabViewItem label="Week" identifier="Week">
+          <view instanceOf="WeekView" id="weekView" halign="expand" valign="expand" />
+        </tabViewItem>
+
+        <tabViewItem label="Tasks" identifier="Tasks">
+          <scrollView halign="expand" valign="expand">
+            <tableView id="taskView" usesAlternatingRowBackgroundColors="yes">
+              <tableColumn title="Task" identifier="title" halign="expand" />
+              <tableColumn title="State" identifier="state" width="100" />
+            </tableView>
+          </scrollView>
+        </tabViewItem>
+
+      </tabView>
+
+      <!-- Right: calendar, navigation, search and summary -->
+      <vbox>
+        <hbox>
+          <button title="&lt;" action="previousDay:" target="#NSOwner" />
+          <button title="Today" action="today:" target="#NSOwner" />
+          <button title="&gt;" action="nextDay:" target="#NSOwner" />
+        </hbox>
+        <view instanceOf="CalendarView" id="calendar" width="230" height="200" />
+        <hbox>
+          <textField id="search" halign="expand" />
+          <button title="Clear" action="clearSearch:" target="#NSOwner" />
+        </hbox>
+        <scrollView halign="expand" valign="expand">
+          <outlineView id="summary" usesAlternatingRowBackgroundColors="yes">
+            <tableColumn title="Summary" identifier="title" halign="expand" />
+          </outlineView>
+        </scrollView>
+      </vbox>
+
+    </hbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" label="window" />
+  <outlet source="#NSOwner" target="#tabs" label="tabs" />
+  <outlet source="#NSOwner" target="#dayView" label="dayView" />
+  <outlet source="#NSOwner" target="#weekView" label="weekView" />
+  <outlet source="#NSOwner" target="#taskView" label="taskView" />
+  <outlet source="#NSOwner" target="#calendar" label="calendar" />
+  <outlet source="#NSOwner" target="#search" label="search" />
+  <outlet source="#NSOwner" target="#summary" label="summary" />
+</connectors>
+
+</gsmarkup>

@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Edit appointment">
+    <vbox>
+      <hbox>
+        <label halign="right" width="70">Summary :</label>
+        <textField id="title" halign="expand" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="70">Time :</label>
+        <textField id="timeText" width="60" />
+        <slider id="time" halign="expand" min="0" max="86400"
+                action="validate:" target="#NSOwner" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="70">Duration :</label>
+        <textField id="durationText" width="60" />
+        <label>hour(s)</label>
+        <slider id="duration" halign="expand" min="0" max="86400"
+                action="validate:" target="#NSOwner" />
+        <label>All day</label>
+        <button type="switch" title="" id="allDay"
+                action="toggleAllDay:" target="#NSOwner" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="70">Location :</label>
+        <textField id="location" halign="expand" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="70">Repeat :</label>
+        <popUpButton id="repeat" action="selectFrequency:" target="#NSOwner" />
+        <button type="switch" title="" id="until"
+                action="toggleUntil:" target="#NSOwner" />
+        <label>Until :</label>
+        <textField id="endDate" width="90" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="70">Store :</label>
+        <popUpButton id="store" halign="expand" />
+        <button title="Alarms" action="editAlarms:" target="#NSOwner" />
+      </hbox>
+      <hbox valign="expand">
+        <label halign="right" width="70" valign="top">Description :</label>
+        <scrollView halign="expand" valign="expand">
+          <textView id="description" />
+        </scrollView>
+      </hbox>
+      <hbox halign="right">
+        <button title="Cancel" action="cancel:" target="#NSOwner" />
+        <button title="Ok" id="ok" action="validate:" target="#NSOwner" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#title" label="title" />
+  <outlet source="#NSOwner" target="#timeText" label="timeText" />
+  <outlet source="#NSOwner" target="#time" label="time" />
+  <outlet source="#NSOwner" target="#durationText" label="durationText" />
+  <outlet source="#NSOwner" target="#duration" label="duration" />
+  <outlet source="#NSOwner" target="#location" label="location" />
+  <outlet source="#NSOwner" target="#repeat" label="repeat" />
+  <outlet source="#NSOwner" target="#until" label="until" />
+  <outlet source="#NSOwner" target="#endDate" label="endDate" />
+  <outlet source="#NSOwner" target="#allDay" label="allDay" />
+  <outlet source="#NSOwner" target="#store" label="store" />
+  <outlet source="#NSOwner" target="#description" label="description" />
+  <outlet source="#NSOwner" target="#ok" label="ok" />
+</connectors>
+
+</gsmarkup>

@@ -1,5 +1,6 @@
 /* emacs buffer mode hint -*- objc -*- */
 
+#import <Renaissance/Renaissance.h>
 #import "PreferencesController.h"
 #import "HourFormatter.h"
 #import "ConfigManager.h"
@@ -12,7 +13,7 @@
 {
   self = [super init];
   if (self) {
-    if (![NSBundle loadNibNamed:@"Preferences" owner:self])
+    if (![NSBundle loadGSMarkupNamed:@"Preferences" owner:self])
       return nil;
 
     _sm = [StoreManager globalManager];
@@ -21,12 +22,6 @@
     [[dayEndText cell] setFormatter:formatter];
     [[minStepText cell] setFormatter:formatter];
     [[refreshIntervalText cell] setFormatter:formatter];
-    RETAIN(globalPreferences);
-    RETAIN(storePreferences);
-    RETAIN(storeFactory);
-    RETAIN(uiPreferences);
-    RETAIN(alarmPreferences);
-    [self selectItem:itemPopUp];
     [panel setFrameAutosaveName:@"preferencesPanel"];
     /* FIXME : could we call setupDefaultStore directly ? */
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -43,11 +38,6 @@
 
 - (void)dealloc
 {
-  RELEASE(globalPreferences);
-  RELEASE(storePreferences);
-  RELEASE(storeFactory);
-  RELEASE(uiPreferences);
-  RELEASE(alarmPreferences);
   [super dealloc];
 }
 
@@ -320,37 +310,6 @@
   [createButton setEnabled:NO];
 }
 
-- (void)setContent:(id)content
-{
-  id old = [slot contentView];
-
-  if (old == content)
-    return;
-  [slot setContentView: content];
-  [itemPopUp setNextKeyView:[slot contentView]];
-}
-
-
-- (void)selectItem:(id)sender
-{
-  switch ([sender indexOfSelectedItem]) {
-  case 0:
-    [self setContent:globalPreferences];
-    break;
-  case 1:
-    [self setContent:storePreferences];
-    break;
-  case 2:
-    [self setContent:storeFactory];
-    break;
-  case 3:
-    [self setContent:uiPreferences];
-    break;
-  case 4:
-    [self setContent:alarmPreferences];
-    break;
-  }
-}
 
 - (void)controlTextDidChange:(NSNotification *)notification
 {

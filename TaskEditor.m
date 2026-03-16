@@ -1,6 +1,7 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 #import "TaskEditor.h"
 #import "StoreManager.h"
 #import "Task.h"
@@ -22,7 +23,7 @@ static NSMutableDictionary *editors;
   HourFormatter *formatter;
   NSDateFormatter *dateFormatter;
 
-  if (![NSBundle loadNibNamed:@"Task" owner:self])
+  if (![NSBundle loadGSMarkupNamed:@"Task" owner:self])
     return nil;
   if ((self = [super init])) {
     formatter = AUTORELEASE([[HourFormatter alloc] init]);

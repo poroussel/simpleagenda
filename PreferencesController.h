@@ -27,16 +27,9 @@
   IBOutlet id storeClass;
   IBOutlet id storeName;
   IBOutlet id createButton;
-  IBOutlet NSBox *slot;
-  IBOutlet id globalPreferences;
-  IBOutlet id storePreferences;
-  IBOutlet id storeFactory;
-  IBOutlet id itemPopUp;
   IBOutlet id showTooltip;
-  IBOutlet id uiPreferences;
   IBOutlet id showDateAppIcon;
   IBOutlet id showTimeAppIcon;
-  IBOutlet id alarmPreferences;
   IBOutlet id alarmEnabled;
   IBOutlet id alarmBackendPopUp;
   IBOutlet id switchDayWeekAxis;
@@ -59,7 +52,6 @@
 - (void)toggleEnabled:(id)sender;
 - (void)removeStore:(id)sender;
 - (void)createStore:(id)sender;
-- (void)selectItem:(id)sender;
 - (void)toggleTooltip:(id)sender;
 - (void)toggleShowDate:(id)sender;
 - (void)toggleShowTime:(id)sender;

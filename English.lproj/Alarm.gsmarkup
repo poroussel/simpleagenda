@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Alarm editor" id="window">
+    <vbox>
+      <hbox valign="expand">
+        <!-- Left: list of existing alarms -->
+        <scrollView width="200" valign="expand">
+          <tableView id="table" usesAlternatingRowBackgroundColors="yes">
+            <tableColumn title="Existing alarms" width="180" identifier="alarm" />
+          </tableView>
+        </scrollView>
+        <!-- Right: alarm configuration -->
+        <vbox>
+          <popUpButton id="action" action="selectType:" target="#NSOwner" />
+          <popUpButton id="type" action="selectType:" target="#NSOwner" />
+          <hbox>
+            <label>Relative delay :</label>
+            <matrix type="radio" id="radio"
+                    action="switchBeforeAfter:" target="#NSOwner">
+              <matrixRow>
+                <matrixCell tag="0" title="Before" />
+                <matrixCell tag="1" title="After" />
+              </matrixRow>
+            </matrix>
+          </hbox>
+          <hbox>
+            <slider id="relativeSlider" halign="expand" min="0" max="86400"
+                    action="changeDelay:" target="#NSOwner" />
+            <textField id="relativeText" width="60" />
+          </hbox>
+          <label>Absolute date :</label>
+          <hbox>
+            <textField id="date" width="100" />
+            <textField id="time" width="80" />
+          </hbox>
+          <vspace />
+        </vbox>
+      </hbox>
+      <!-- Bottom buttons -->
+      <hbox>
+        <button title="Add" id="add" action="addAlarm:" target="#NSOwner" />
+        <button title="Remove" id="remove" action="removeAlarm:" target="#NSOwner" />
+        <hspace />
+        <button title="Close" action="stopModal:" target="#NSApp" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" label="window" />
+  <outlet source="#NSOwner" target="#window" label="panel" />
+  <outlet source="#NSOwner" target="#action" label="action" />
+  <outlet source="#NSOwner" target="#type" label="type" />
+  <outlet source="#NSOwner" target="#table" label="table" />
+  <outlet source="#NSOwner" target="#add" label="add" />
+  <outlet source="#NSOwner" target="#remove" label="remove" />
+  <outlet source="#NSOwner" target="#relativeSlider" label="relativeSlider" />
+  <outlet source="#NSOwner" target="#relativeText" label="relativeText" />
+  <outlet source="#NSOwner" target="#radio" label="radio" />
+  <outlet source="#NSOwner" target="#date" label="date" />
+  <outlet source="#NSOwner" target="#time" label="time" />
+</connectors>
+
+</gsmarkup>

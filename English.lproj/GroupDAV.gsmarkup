@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <panel title="GroupDAV calendar setup" id="panel">
+    <vbox>
+      <form width="350">
+        <formItem title="Calendar name :" id="name" />
+        <formItem title="Calendar URL :" id="url" />
+        <formItem title="Username :" id="usernameField" />
+        <formItem title="Password :" id="passwordField" />
+      </form>
+      <button title="Check directories" id="check"
+              action="buttonClicked:" target="#NSOwner" />
+      <hbox>
+        <label halign="right" width="130">Appointments path :</label>
+        <popUpButton id="calendar" halign="expand"
+                     action="selectItem:" target="#NSOwner">
+          <popUpButtonItem title="None" />
+        </popUpButton>
+      </hbox>
+      <hbox>
+        <label halign="right" width="130">Tasks path :</label>
+        <popUpButton id="task" halign="expand"
+                     action="selectItem:" target="#NSOwner">
+          <popUpButtonItem title="None" />
+        </popUpButton>
+      </hbox>
+      <hbox halign="right">
+        <button title="Cancel" id="cancel"
+                action="buttonClicked:" target="#NSOwner" />
+        <button title="OK" id="ok"
+                action="buttonClicked:" target="#NSOwner" />
+      </hbox>
+    </vbox>
+  </panel>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#panel" label="panel" />
+  <outlet source="#NSOwner" target="#name" label="name" />
+  <outlet source="#NSOwner" target="#url" label="url" />
+  <outlet source="#NSOwner" target="#usernameField" label="usernameField" />
+  <outlet source="#NSOwner" target="#passwordField" label="passwordField" />
+  <outlet source="#NSOwner" target="#check" label="check" />
+  <outlet source="#NSOwner" target="#calendar" label="calendar" />
+  <outlet source="#NSOwner" target="#task" label="task" />
+  <outlet source="#NSOwner" target="#cancel" label="cancel" />
+  <outlet source="#NSOwner" target="#ok" label="ok" />
+</connectors>
+
+</gsmarkup>

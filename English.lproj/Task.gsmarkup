@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <window title="Edit task" id="window">
+    <vbox>
+      <hbox>
+        <label halign="right" width="80">Summary :</label>
+        <textField id="summary" halign="expand" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="80">Store :</label>
+        <popUpButton id="store" halign="expand" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="80">State :</label>
+        <popUpButton id="state" halign="expand" />
+      </hbox>
+      <hbox>
+        <label halign="right" width="80">Due date :</label>
+        <button type="switch" title="" id="toggleDueDate"
+                action="toggleDueDate:" target="#NSOwner" />
+        <textField id="dueDate" width="90" />
+        <textField id="dueTime" width="70" />
+        <button title="Alarms" id="alarms"
+                action="editAlarms:" target="#NSOwner" />
+      </hbox>
+      <hbox valign="expand">
+        <label halign="right" width="80" valign="top">Description :</label>
+        <scrollView halign="expand" valign="expand">
+          <textView id="description" />
+        </scrollView>
+      </hbox>
+      <hbox halign="right">
+        <button title="Cancel" action="cancel:" target="#NSOwner" />
+        <button title="Ok" id="ok" action="validate:" target="#NSOwner" />
+      </hbox>
+    </vbox>
+  </window>
+</objects>
+
+<connectors>
+  <outlet source="#NSOwner" target="#window" label="window" />
+  <outlet source="#NSOwner" target="#summary" label="summary" />
+  <outlet source="#NSOwner" target="#store" label="store" />
+  <outlet source="#NSOwner" target="#state" label="state" />
+  <outlet source="#NSOwner" target="#toggleDueDate" label="toggleDueDate" />
+  <outlet source="#NSOwner" target="#dueDate" label="dueDate" />
+  <outlet source="#NSOwner" target="#dueTime" label="dueTime" />
+  <outlet source="#NSOwner" target="#alarms" label="alarms" />
+  <outlet source="#NSOwner" target="#description" label="description" />
+  <outlet source="#NSOwner" target="#ok" label="ok" />
+</connectors>
+
+</gsmarkup>

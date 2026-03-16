@@ -27,5 +27,5 @@ ADDITIONAL_INCLUDE_DIRS +=
 ADDITIONAL_LIB_DIRS += -L/usr/local/lib 
 
 # Additional GUI libraries to link
-ADDITIONAL_GUI_LIBS += 
+ADDITIONAL_GUI_LIBS += -lRenaissance
 

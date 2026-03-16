@@ -1,4 +1,5 @@
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
 #import "Event.h"
 #import "Task.h"
 #import "AgendaStore.h"
@@ -30,7 +31,7 @@
 - (id)initWithName:(NSString *)storeName
 {
   if ((self = [super init])) {
-    if (![NSBundle loadNibNamed:@"iCalendar" owner:self])
+    if (![NSBundle loadGSMarkupNamed:@"iCalendar" owner:self])
       return nil;
     [warning setHidden:YES];
     [name setStringValue:storeName];
