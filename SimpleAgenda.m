@@ -25,6 +25,9 @@
 #import <AppKit/AppKit.h>
 #import <Renaissance/Renaissance.h>
 
+/* Force the linker to load Renaissance and register its ObjC categories. */
+int (*linkRenaissanceIn)(int, const char **) = GSMarkupApplicationMain;
+
 @interface AppController : NSObject
 @end
 
