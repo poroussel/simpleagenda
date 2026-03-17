@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+<gsmarkup>
+
+<objects>
+  <menu type="main">
+
+    <menuItem title="Info..." action="orderFrontStandardInfoPanel:" />
+    <menuItem title="Preferences..." action="showPrefPanel:"
+              keyEquivalent="," target="#NSOwner" />
+
+    <menu title="Event">
+      <menuItem title="New Appointment" action="addAppointment:"
+                keyEquivalent="n" target="#NSOwner" />
+      <menuItem title="New Task" action="addTask:" target="#NSOwner" />
+      <menuSeparator />
+      <menuItem title="Edit" action="editAppointment:"
+                keyEquivalent="e" target="#NSOwner" />
+      <menuItem title="Delete" action="delAppointment:"
+                keyEquivalent="d" target="#NSOwner" />
+      <menuItem title="Export" action="exportAppointment:"
+                target="#NSOwner" />
+      <menuSeparator />
+      <menuItem title="Save" action="saveAll:"
+                keyEquivalent="s" target="#NSOwner" />
+      <menuItem title="Reload" action="reloadAll:" target="#NSOwner" />
+    </menu>
+
+    <menu title="Edit">
+      <menuItem title="Cut" action="cut:" keyEquivalent="x" />
+      <menuItem title="Copy" action="copy:" keyEquivalent="c" />
+      <menuItem title="Paste" action="paste:" keyEquivalent="v" />
+      <menuSeparator />
+      <menuItem title="Find" action="doSearch:"
+                keyEquivalent="f" target="#NSOwner" />
+      <menuItem title="Clear Search" action="clearSearch:"
+                target="#NSOwner" />
+    </menu>
+
+    <menu title="Navigate">
+      <menuItem title="Previous Day" action="previousDay:"
+                keyEquivalent="[" target="#NSOwner" />
+      <menuItem title="Next Day" action="nextDay:"
+                keyEquivalent="]" target="#NSOwner" />
+      <menuItem title="Today" action="today:"
+                keyEquivalent="t" target="#NSOwner" />
+      <menuSeparator />
+      <menuItem title="Previous Week" action="previousWeek:"
+                target="#NSOwner" />
+      <menuItem title="Next Week" action="nextWeek:" target="#NSOwner" />
+    </menu>
+
+    <menu title="Services" type="services" />
+
+    <menu title="Windows" type="windows">
+      <menuItem title="Arrange" action="arrangeInFront:" />
+      <menuItem title="Miniaturize" action="performMiniaturize:"
+                keyEquivalent="m" />
+      <menuItem title="Close" action="performClose:" keyEquivalent="w" />
+    </menu>
+
+    <menuItem title="Hide" action="hide:" keyEquivalent="h" />
+    <menuItem title="Quit" action="terminate:" keyEquivalent="q" />
+
+  </menu>
+</objects>
+
+</gsmarkup>

@@ -15,7 +15,6 @@
     FullVersionID = 0.47;
     NSExecutable = SimpleAgenda;
     NSIcon = Calendar.tiff;
-    NSMainNibFile = Agenda.gorm;
     NSPrincipalClass = NSApplication;
     NSRole = Application;
     NSServices = (

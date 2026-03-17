@@ -23,8 +23,37 @@
 */
 
 #import <AppKit/AppKit.h>
+#import <Renaissance/Renaissance.h>
+
+@interface AppController : NSObject
+@end
 
 int main(int argc, const char *argv[])
 {
-  return NSApplicationMain (argc, argv);
+  CREATE_AUTORELEASE_POOL(pool);
+  AppController *controller;
+
+  [NSApplication sharedApplication];
+
+  controller = [AppController new];
+  [NSApp setDelegate:controller];
+
+  /* Load menus before the window so they are in place when the app starts. */
+#ifdef GNUSTEP
+  [NSBundle loadGSMarkupNamed:@"MainMenu-GNUstep" owner:controller];
+#endif
+
+  /* Load the main window; this sets all IBOutlet ivars on the controller
+     so that applicationWillFinishLaunching: can use them safely. */
+  [NSBundle loadGSMarkupNamed:@"Agenda" owner:controller];
+
+  RELEASE(pool);
+
+  {
+    CREATE_AUTORELEASE_POOL(appPool);
+    [NSApp run];
+    RELEASE(appPool);
+  }
+
+  return 0;
 }
