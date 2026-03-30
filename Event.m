@@ -39,7 +39,7 @@
 {
   Event *new = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
   [new generateUID];
-  return new;
+  return RETAIN(new);
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle

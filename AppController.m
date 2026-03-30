@@ -474,13 +474,7 @@ NSComparisonResult compareEventTime(Event  *a, Event *b, void *context)
       [el setStartDate:date];
       if ([_selm lastOperation] == SMCopy) {
 	[store add:el];
-	/*
-	 * FIXME : the new event is now in store's dictionary, we
-	 * should be able to release it. If we do, the application
-	 * crashes when we delete this event, trying to release it
-	 * one time too many. I can't find the bug
-	 * [el release];
-	 */
+	[el release];
       } else {
 	[store update:el];
       }
