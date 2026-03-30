@@ -217,7 +217,6 @@ static AlarmManager *singleton;
   NSDebugLLog(logKey, @"AlarmManager dealloc");
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE(_activeAlarms);
-  RELEASE(backendsArray);
   DEALLOC;
 }
 
