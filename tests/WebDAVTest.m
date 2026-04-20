@@ -41,7 +41,7 @@ int main ()
   dav = [[WebDAVResource alloc] initWithURL:url
 				   username:@"p.o.roussel@free.fr"
 				   password:@"$p@ssword"];
-  PASS(dav != nil, "-initWithURL with user/password needing % escaping works");
+  PASS(dav != nil, "-initWithURL with user/password needing %% escaping works");
   PASS([[[dav url] absoluteString] isEqualToString:@"http://p.o.roussel%40free.fr:$p%40ssword@droopy.octets.fr/calendar/test"], "-initWithURL URL is correctly escaped");
   PASS([[[dav url] user] isEqualToString:@"p.o.roussel@free.fr"] &&
        [[[dav url] password] isEqualToString:@"$p@ssword"], "-initWithURL user/password encoding works");
