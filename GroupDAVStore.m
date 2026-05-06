@@ -300,7 +300,7 @@ static NSString *logKey = @"GroupDAVStore";
 
   [self clearPopUps];
 
-  if ([[originalURL path] length] == 0) {
+  if ([[originalURL path] length] <= 1) {
     NSError *error = nil;
     newURL = [self calendarURLFromRootOfServer:originalURL error:&error];
     if (newURL == nil) {
