@@ -697,8 +697,13 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
       [element updateAttributes];
       [_modifiedhref removeObject:href];
       NSLog(@"Written %@", [href anonymousAbsoluteString]);
+    } else if ([element httpStatus] == 412) {
+      NSLog(@"GroupDAVStore: write conflict on %@, refreshing etag",
+	    [href anonymousAbsoluteString]);
+      [element updateAttributes];
     } else {
-      NSLog(@"Unable to write to %@", [href anonymousAbsoluteString]);
+      NSLog(@"GroupDAVStore: unable to write to %@, HTTP %d %@",
+	    [href anonymousAbsoluteString], [element httpStatus], [element reason]);
       error = YES;
     }
   }
