@@ -535,9 +535,13 @@ static NSString *logKey = @"GroupDAVStore";
 /* FIXME : update the iCal tree iif data was written succesfully */
 - (void)update:(Element *)elt
 {
-  NSString *href = [_uidhref objectForKey:[elt UID]];
+  NSURL *href = [_uidhref objectForKey:[elt UID]];
   iCalTree *tree = [_hreftree objectForKey:href];
 
+  if (href == nil || tree == nil) {
+    NSLog(@"GroupDAVStore: element %@ not in sync cache, update ignored", [elt UID]);
+    return;
+  }
   if ([tree update:(Event *)elt]) {
     [super update:elt];
     [_modifiedhref addObject:href];
