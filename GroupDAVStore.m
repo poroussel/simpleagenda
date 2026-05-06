@@ -314,7 +314,7 @@ static NSString *logKey = @"GroupDAVStore";
   resource = [[WebDAVResource alloc] initWithURL:newURL
 					username:[usernameField stringValue]
 					password:[passwordField stringValue]];
-  if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]]) {
+  if ([resource propfind:[body dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"1" forKey:@"Depth"]]) {
 
     parser = [GSXMLParser parserWithData:[resource data]];
     if ([parser parse]) {
