@@ -633,7 +633,8 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 	[loadedData unionSet:components];
 	[_hreftree setObject:tree forKey:href];
 	[_hrefresource setObject:element forKey:href];
-	[_uidhref setObject:href forKey:[[components anyObject] UID]];
+	for (Element *comp in components)
+	  [_uidhref setObject:href forKey:[comp UID]];
       }
     } else {
       NSLog(@"GroupDAVStore add : couldn't read item at %@", [href anonymousAbsoluteString]);
