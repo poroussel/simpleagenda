@@ -515,14 +515,20 @@ static NSString *logKey = @"GroupDAVStore";
   WebDAVResource *resource = [_hrefresource objectForKey:href];
 
   [resource delete];
-  if ([resource httpStatus] == 412) {
-    /* FIXME : force a visual refresh ? */
-    [resource updateAttributes];
-    NSLog(@"Couldn't delete item, it has changed on the server");
-  } else {
-    [_hrefresource removeObjectForKey:href];
-    [_uidhref removeObjectForKey:[elt UID]];
-    [super remove:elt];
+  {
+    int status = [resource httpStatus];
+    if (status == 412) {
+      /* FIXME : force a visual refresh ? */
+      [resource updateAttributes];
+      NSLog(@"Couldn't delete item, it has changed on the server");
+    } else if ((status >= 200 && status < 300) || status == 404) {
+      [_hrefresource removeObjectForKey:href];
+      [_uidhref removeObjectForKey:[elt UID]];
+      [super remove:elt];
+    } else {
+      NSLog(@"GroupDAVStore: couldn't delete %@, HTTP %d %@",
+	    [href absoluteString], status, [resource reason]);
+    }
   }
 }
 
