@@ -11,6 +11,29 @@ version 0.48
 	* UI Preferences panel : add a toggle to increase the size of saturday
 	  and sunday in the weekview
 	* Full french translation (Patrick Cardona)
+	* GroupDAVStore : fix data loss when a DELETE request fails with a
+	  non-412 HTTP error (e.g. 401 or 403) — the item was previously
+	  removed from the local store even when the server refused the deletion
+	* GroupDAVStore : fix silent update loss when update: is called before
+	  the first synchronisation completes
+	* GroupDAVStore : fix PUT conflicts (HTTP 412) treated as fatal errors
+	  instead of refreshing the ETag for the next write cycle
+	* GroupDAVStore : fix incomplete UID mapping when a single iCalendar
+	  resource on the server contains multiple components
+	* GroupDAV well-known discovery : fix invalid <d:self/> element in the
+	  calendar-home-set PROPFIND request body, which caused strict servers
+	  to return 400 Bad Request
+	* GroupDAV well-known discovery : use Depth: 0 instead of Depth: Infinity
+	  for single-resource PROPFINDs — Infinity is rejected with 403 by
+	  Apple Calendar Server and other strict servers
+	* GroupDAV well-known discovery : use Depth: 1 instead of Depth: Infinity
+	  when listing calendar collections
+	* GroupDAV well-known discovery : fix URL resolution for server-returned
+	  principal and home-set hrefs — full URLs (as returned by Apple iCloud
+	  or FastMail) were previously appended as path components instead of
+	  being resolved correctly
+	* GroupDAV well-known discovery : fix discovery being skipped when the
+	  server URL is entered with a trailing slash
 
 version 0.47 (2025/02/05)
 	* Disable alarm sound backend and log a error if the sound
