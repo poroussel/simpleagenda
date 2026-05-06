@@ -197,7 +197,7 @@ static NSString *logKey = @"GroupDAVStore";
     }
     id node = [set nodeAtIndex:0];
     id principalString = [node content];
-    id newURL = [originalURL URLByAppendingPathComponent:principalString];
+    id newURL = [NSURL URLWithString:principalString possiblyRelativeToURL:originalURL];
     if (newURL == nil) {
       if (error) {
 	*error = [self unableToFindCalendarError:
@@ -244,7 +244,7 @@ static NSString *logKey = @"GroupDAVStore";
       }
       node = [set nodeAtIndex:0];
       id homeSetString = [node content];
-      newURL = [originalURL URLByAppendingPathComponent:homeSetString];
+      newURL = [NSURL URLWithString:homeSetString possiblyRelativeToURL:originalURL];
       if (newURL == nil) {
 	if (error) {
 	  *error = [self unableToFindCalendarError:
