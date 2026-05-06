@@ -155,7 +155,7 @@ static NSString *logKey = @"GroupDAVStore";
 					   username:[usernameField stringValue]
 					   password:[passwordField stringValue]];
   NSString *getUserPrincipalBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:current-user-principal/></d:prop></d:propfind>";
-  NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:self/><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
+  NSString *getCalendarHomeSetBody = @"<?xml version=\"1.0\" encoding=\"utf-8\"?><d:propfind xmlns:d=\"DAV:\" xmlns:c=\"urn:ietf:params:xml:ns:caldav\"><d:prop><c:calendar-home-set /></d:prop></d:propfind>";
 
   [resource propfind:[getUserPrincipalBody dataUsingEncoding:NSUTF8StringEncoding] attributes:[NSDictionary dictionaryWithObject:@"Infinity" forKey:@"Depth"]];
   if (([resource httpStatus] == 401) ||
