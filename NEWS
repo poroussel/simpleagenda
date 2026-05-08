@@ -1,4 +1,4 @@
-version 0.48
+version 0.48 (2026/05/08)
 	* AlarmDialog : disable action combobox for now, it has no effect
 	* WebDAVResource : don't handle authentication manually and badly and
 	  enjoy digest authentication offered by NSURLAuthenticationChallenge
