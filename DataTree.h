@@ -9,7 +9,6 @@
 }
 
 + (id)dataTreeWithAttributes:(NSDictionary *)attributes;
-- (void)setChildren:(NSArray *)children;
 - (void)addChild:(id)child;
 - (void)removeChildren;
 - (NSArray *)children;

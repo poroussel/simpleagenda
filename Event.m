@@ -187,11 +187,6 @@
   _sticky = sticky;
 }
 
-- (NSEnumerator *)dateEnumerator
-{
-  return [_rrule enumeratorFromDate:_startDate];
-}
-
 - (NSEnumerator *)dateRangeEnumerator
 {
   return [_rrule enumeratorFromDate:_startDate length:_allDay?86400:_duration*60];
@@ -286,7 +281,7 @@
     prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
     while (prop) {
       if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT"))
-	icalcomponent_remove_property(ic, prop); 
+	icalcomponent_remove_property(ic, prop);
       prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
     }
     prop = icalproperty_new_from_string("X-MICROSOFT-CDO-ALLDAYEVENT:TRUE");
@@ -296,7 +291,7 @@
   prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
   while (prop) {
     if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY"))
-      icalcomponent_remove_property(ic, prop); 
+      icalcomponent_remove_property(ic, prop);
     prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
   }
   if ([self sticky]) {

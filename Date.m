@@ -366,12 +366,6 @@ static NSTimeZone *gl_nstz = nil;
 {
   return [self timeIntervalSinceDate:[Date now]];
 }
-
-- (BOOL)belongsToDay:(Date *)day
-{
-  NSAssert([day isDate], @"This method expects a date, not a datetime");
-  return _time.year == day->_time.year && _time.month == day->_time.month && _time.day == day->_time.day;
-}
 @end
 
 /*

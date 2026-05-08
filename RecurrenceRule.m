@@ -140,12 +140,6 @@
     recur = rrule;
   return self;
 }
-- (id)initWithICalString:(NSString *)rrule
-{
-  if ((self = [super init]))
-    recur = icalrecurrencetype_from_string([rrule cString]);
-  return self;
-}
 - (struct icalrecurrencetype)iCalRRule
 {
   return recur;

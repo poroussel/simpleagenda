@@ -4,7 +4,7 @@
 #import <Foundation/Foundation.h>
 #import "Date.h"
 
-typedef enum 
+typedef enum
 {
   /* Simple recurrence rules handled by AppointmentEditor */
   recurrenceFrequenceDaily = 3,
@@ -32,6 +32,5 @@ typedef enum
 
 @interface RecurrenceRule(iCalendar)
 - (id)initWithICalRRule:(struct icalrecurrencetype)rrule;
-- (id)initWithICalString:(NSString *)rrule;
 - (struct icalrecurrencetype)iCalRRule;
 @end

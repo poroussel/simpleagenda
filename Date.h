@@ -40,7 +40,6 @@
 - (NSTimeInterval)timeIntervalSince1970;
 - (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate;
 - (NSTimeInterval)timeIntervalSinceNow;
-- (BOOL)belongsToDay:(Date *)day;
 @end
 
 @interface Date(iCalendar)

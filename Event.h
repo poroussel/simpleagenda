@@ -34,7 +34,6 @@
 - (void)setRRule:(RecurrenceRule *)rrule;
 - (void)setSticky:(BOOL)sticky;
 
-- (NSEnumerator *)dateEnumerator;
 - (NSEnumerator *)dateRangeEnumerator;
 @end
 

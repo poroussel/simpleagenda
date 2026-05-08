@@ -29,11 +29,6 @@
   return [[[DataTree alloc] initWithAttributes:attributes] autorelease];
 }
 
-- (void)setChildren:(NSArray *)children
-{
-  [_children setArray:children];
-}
-
 - (void)addChild:(id)child
 {
   [_children addObject:child];
