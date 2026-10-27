@@ -598,7 +598,7 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
   if ([parser parse]) {
     xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
     set = (GSXPathNodeSet *)[xpc evaluateExpression:EXPRGETHREF];
-    NSDebugLLog(logKey, @"found %llu item(s)", [set count]);
+    NSDebugLLog(logKey, @"found %tu item(s)", [set count]);
     for (i = 0; i < [set count]; i++) {
       elementURL = [NSURL URLWithString:[[set nodeAtIndex:i] content] possiblyRelativeToURL:[resource url]];
       if (elementURL) {
@@ -671,8 +671,8 @@ static NSString * const EXPRGETHREF = @"//response[propstat/prop/getetag]/href/t
 						      userInfo:[NSDictionary dictionary]];
   } else {
     [self performSelectorOnMainThread:@selector(fillWithElements:) withObject:loadedData waitUntilDone:YES];
-    NSLog(@"GroupDAVStore from %@ : loaded %llu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
-    NSLog(@"GroupDAVStore from %@ : loaded %llu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
+    NSLog(@"GroupDAVStore from %@ : loaded %tu appointment(s)", [_url anonymousAbsoluteString], [[self events] count]);
+    NSLog(@"GroupDAVStore from %@ : loaded %tu tasks(s)", [_url anonymousAbsoluteString], [[self tasks] count]);
   }
   [loadedData release];
 }

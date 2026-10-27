@@ -82,14 +82,14 @@
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %llu appointment(s)", _globalFile, [[self events] count]);
+      NSLog(@"LocalStore from %@ : loaded %tu appointment(s)", _globalFile, [[self events] count]);
     }
   }
   if ([fm fileExistsAtPath:_globalTaskFile isDirectory:&isDir] && !isDir) {
     savedData = [NSKeyedUnarchiver unarchiveObjectWithFile:_globalTaskFile];
     if (savedData) {
       [self fillWithElements:savedData];
-      NSLog(@"LocalStore from %@ : loaded %llu tasks(s)", _globalTaskFile, [[self tasks] count]);
+      NSLog(@"LocalStore from %@ : loaded %tu tasks(s)", _globalTaskFile, [[self tasks] count]);
     }
   }
 }
