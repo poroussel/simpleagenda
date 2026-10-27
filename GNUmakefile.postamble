@@ -4,12 +4,20 @@
 
 # Things to do before compiling
 before-all:: config.h local.make
+# If the prerequisites are missing, that is presumably a clean tree,
+# so let configure create them.  This avoids running configure in the
+# clean/distclean target.
+ifeq ($(_generated_files),)
+	./configure
 
+config.h local.make: ;
+else
 config.h: config.h.in
 	./configure
 
 local.make: local.make.in
 	./configure    
+endif
 
 check::
 	@gnustep-tests tests

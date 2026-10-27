@@ -1,6 +1,9 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 include local.make
 
+# Helper variable to check if the generated files are present.
+_generated_files := $(shell test -f config.h -o -f local.make && echo yes)
+
 #
 # Application
 #
