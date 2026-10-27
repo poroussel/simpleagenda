@@ -4,12 +4,15 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install dependencies
         run: |
@@ -26,17 +29,27 @@ jobs:
             uuid-dev \
             xvfb
 
-      - name: Configure
+      - name: Set up GNUstep environment
         run: |
           . /usr/share/GNUstep/Makefiles/GNUstep.sh
-          ./configure --disable-dbuskit
+          env | grep '^GNUSTEP_' >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+          echo "PATH=$PATH" >> "$GITHUB_ENV"
+
+      - name: Configure
+        run: ./configure --disable-dbuskit
 
       - name: Build
-        run: |
-          . /usr/share/GNUstep/Makefiles/GNUstep.sh
-          make
+        run: make
 
       - name: Test
-        run: |
-          . /usr/share/GNUstep/Makefiles/GNUstep.sh
-          xvfb-run make check
+        run: xvfb-run make check
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            tests.log
+            tests.sum

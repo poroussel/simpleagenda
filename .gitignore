@@ -9,3 +9,8 @@ local.make
 
 .vscode/*
 *.patch
+tests/GNUmakefile
+/tests.log
+/tests.sum
+/oldtests.log
+/oldtests.sum
