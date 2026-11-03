@@ -26,6 +26,7 @@
 - (int)httpStatus;
 - (NSData *)data;
 - (NSURL *)url;
+- (NSString *)reason;
 - (BOOL)get;
 - (BOOL)delete;
 - (BOOL)put:(NSData *)data attributes:(NSDictionary *)attributes;
