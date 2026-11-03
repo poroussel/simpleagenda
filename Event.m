@@ -256,7 +256,7 @@
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   Date *end;
-  icalproperty *prop;
+  icalproperty *prop, *next;
 
   if (![super updateICalComponent:ic])
     return NO;
@@ -280,9 +280,12 @@
     /* OGo workaround ? */
     prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
     while (prop) {
-      if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT"))
+      next = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+      if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT")) {
 	icalcomponent_remove_property(ic, prop);
-      prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+	icalproperty_free(prop);
+      }
+      prop = next;
     }
     prop = icalproperty_new_from_string("X-MICROSOFT-CDO-ALLDAYEVENT:TRUE");
     icalcomponent_add_property(ic, prop);
@@ -290,9 +293,12 @@
 
   prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
   while (prop) {
-    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY"))
+    next = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY")) {
       icalcomponent_remove_property(ic, prop);
-    prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
+      icalproperty_free(prop);
+    }
+    prop = next;
   }
   if ([self sticky]) {
     prop = icalproperty_new_from_string("X-SIMPLEAGENDA-STICKY:TRUE");

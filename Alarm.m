@@ -9,8 +9,10 @@
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
   icalproperty *prop = icalcomponent_get_first_property(ic, kind);
-  if (prop)
-      icalcomponent_remove_property(ic, prop);
+  if (prop) {
+    icalcomponent_remove_property(ic, prop);
+    icalproperty_free(prop);
+  }
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -71,7 +73,7 @@
     NSLog(@"Error : no summary property");
     return nil;
   }
-  return [NSString stringWithUTF8String:icalproperty_get_summary(prop)];    
+  return [NSString stringWithUTF8String:icalproperty_get_summary(prop)];
 }
 
 - (void)setSummary:(NSString *)summary
@@ -274,7 +276,7 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  return [[Alarm allocWithZone:zone] initWithICalComponent:[self asICalComponent]];
+  return [[Alarm allocWithZone:zone] initWithICalComponent:_ic];
 }
 
 

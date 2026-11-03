@@ -49,8 +49,10 @@ static NSString *logKey = @"iCalTree";
 {
   /* OGo workaround  ? */
   icalproperty *prop = icalcomponent_get_first_property(root, ICAL_METHOD_PROPERTY);
-  if (prop)
+  if (prop) {
     icalcomponent_remove_property(root, prop);
+    icalproperty_free(prop);
+  }
   icalcomponent_strip_errors(root);
   return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
 }
@@ -119,6 +121,7 @@ static NSString *logKey = @"iCalTree";
   if (!ic)
     return NO;
   icalcomponent_remove_component(root, ic);
+  icalcomponent_free(ic);
   return YES;
 }
 

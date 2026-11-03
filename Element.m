@@ -250,7 +250,7 @@ static NSArray *availableCategories;
     NSLog(@"No UID");
     goto init_error;
   }
-  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];    
+  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
   prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
   if (!prop) {
     NSLog(@"No summary");
@@ -303,15 +303,17 @@ static NSArray *availableCategories;
 - (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
 {
   icalproperty *prop = icalcomponent_get_first_property(ic, kind);
-  if (prop)
-      icalcomponent_remove_property(ic, prop);
+  if (prop) {
+    icalcomponent_remove_property(ic, prop);
+    icalproperty_free(prop);
+  }
 }
 
 - (BOOL)updateICalComponent:(icalcomponent *)ic
 {
   NSEnumerator *enumerator;
   Alarm *alarm;
-  icalcomponent *subc;
+  icalcomponent *subc, *next;
 
   [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_uid([[self UID] cString]));
@@ -322,21 +324,22 @@ static NSArray *availableCategories;
   if ([self text])
     icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
   [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp UTCICalTime]));  
+  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp UTCICalTime]));
   [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
   icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
   [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];
   if ([[self categories] count] > 0)
     icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
 
-  subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
-  for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT))
+  for (subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT); subc != NULL; subc = next) {
+    next = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT);
     icalcomponent_remove_component(ic, subc);
+    icalcomponent_free(subc);
+  }
   enumerator = [[self alarms] objectEnumerator];
   while ((alarm = [enumerator nextObject])) {
     subc = [alarm asICalComponent];
     icalcomponent_add_component(ic, subc);
-    icalcomponent_free(subc);
   }
   return YES;
 }
