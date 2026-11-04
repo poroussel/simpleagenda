@@ -62,8 +62,8 @@ static NSUserDefaults *appDefaults;
     [mdict removeObjectForKey:key];
     [appDefaults setObject:mdict forKey:_key];
     [[NSNotificationCenter defaultCenter] postNotificationName:SAConfigManagerValueChanged
-							object:self
-						      userInfo:[NSDictionary dictionaryWithObject:_key forKey:@"key"]];
+                    object:self
+						      userInfo:[NSDictionary dictionaryWithObject:key forKey:@"key"]];
   } else
     [appDefaults removeObjectForKey:key];
   [appDefaults synchronize];
