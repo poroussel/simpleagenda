@@ -193,7 +193,7 @@ restart:
 
 static NSString * const GETETAG = @"string(/multistatus/response/propstat/prop/getetag/text())";
 static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propstat/prop/getlastmodified/text())";
-- (void)updateAttributes;
+- (void)updateAttributes
 {
   GSXMLParser *parser;
   GSXPathContext *xpc;
@@ -205,10 +205,10 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
       result = (GSXPathString *)[xpc evaluateExpression:GETETAG];
       if (result)
-	ASSIGN(_etag, [result stringValue]);
+	      ASSIGN(_etag, [result stringValue]);
       result = (GSXPathString *)[xpc evaluateExpression:GETLASTMODIFIED];
       if (result)
-	ASSIGN(_lastModified, [result stringValue]);
+	      ASSIGN(_lastModified, [result stringValue]);
       [xpc release];
     }
   }
