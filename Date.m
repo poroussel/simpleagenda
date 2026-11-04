@@ -305,6 +305,7 @@ static NSTimeZone *gl_nstz = nil;
 - (void)setYear:(int)year
 {
   _time.year = year;
+  _time = icaltime_normalize(_time);
 }
 
 - (void)incrementDay
@@ -316,6 +317,7 @@ static NSTimeZone *gl_nstz = nil;
 - (void)changeYearBy:(int)diff
 {
   _time.year += diff;
+  _time = icaltime_normalize(_time);
 }
 
 - (void)changeDayBy:(int)diff

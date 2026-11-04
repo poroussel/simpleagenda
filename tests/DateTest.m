@@ -2,6 +2,13 @@
 
 #import "ObjectTesting.h"
 #import "Date.h"
+#import <math.h>
+
+/* Builds a date or a datetime in the local timezone from an iCalendar string */
+static Date *dt(const char *string)
+{
+  return AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string(string)]);
+}
 
 int main ()
 {
@@ -68,7 +75,7 @@ int main ()
  */
   Date *d1, *d2, *d3;
   struct icaltimetype iid;
-  
+
   d1 = [Date now];
 
   iid = [d1 localICalTime];
@@ -84,6 +91,219 @@ int main ()
   PASS([[d1 calendarDate] compare:[d3 calendarDate]] == NSOrderedSame, "");
   PASS([[d1 calendarDate] isEqualToDate:[d3 calendarDate]], "");
   [d3 release];
+
+  /* Field accessors on a fixed datetime : saturday 2024-06-15 14:30:45 */
+  Date *fixed = dt("20240615T143045");
+  PASS([fixed year] == 2024 && [fixed monthOfYear] == 6 && [fixed dayOfMonth] == 15,
+       "-year, -monthOfYear and -dayOfMonth work");
+  PASS([fixed hourOfDay] == 14 && [fixed minuteOfHour] == 30 && [fixed secondOfMinute] == 45,
+       "-hourOfDay, -minuteOfHour and -secondOfMinute work");
+  PASS([fixed minuteOfDay] == 870, "-minuteOfDay works");
+  PASS(![fixed isDate], "a value with a time isn't a date");
+  PASS([dt("20240615") isDate], "a value without a time is a date");
+  PASS_EQUAL([fixed description], @"20240615T143045", "-description works");
+  PASS_EQUAL([dt("20240615") description], @"20240615", "-description of a date works");
+
+  /* Weekdays go from 1 (monday) to 7 (sunday) */
+  PASS([dt("20240610") weekday] == 1, "a monday is day 1");
+  PASS([dt("20240615") weekday] == 6, "a saturday is day 6");
+  PASS([dt("20240616") weekday] == 7, "a sunday is day 7");
+
+  /* ISO 8601 weeks */
+  PASS([dt("20240101") weekOfYear] == 1, "2024-01-01 is in week 1");
+  PASS([dt("20240615") weekOfYear] == 24, "2024-06-15 is in week 24");
+  PASS([dt("20241230") weekOfYear] == 1, "2024-12-30 is in week 1 of the next year");
+  PASS([dt("20210103") weekOfYear] == 53, "2021-01-03 is in week 53 of the previous year");
+
+  /* Number of days in month */
+  PASS([dt("20240115") numberOfDaysInMonth] == 31, "January has 31 days");
+  PASS([dt("20240415") numberOfDaysInMonth] == 30, "April has 30 days");
+  PASS([dt("20240215") numberOfDaysInMonth] == 29, "February 2024 has 29 days");
+  PASS([dt("20230215") numberOfDaysInMonth] == 28, "February 2023 has 28 days");
+  PASS([dt("19000215") numberOfDaysInMonth] == 28, "February 1900 has 28 days");
+  PASS([dt("20000215") numberOfDaysInMonth] == 29, "February 2000 has 29 days");
+
+  /* Setters */
+  Date *d = dt("20240615T143045");
+  [d setSecondOfMinute:10];
+  PASS([d secondOfMinute] == 10 && [d minuteOfHour] == 30, "-setSecondOfMinute: works");
+  [d setSecondOfMinute:70];
+  PASS([d secondOfMinute] == 10 && [d minuteOfHour] == 31,
+       "-setSecondOfMinute: normalizes the time");
+
+  d = dt("20240615T143000");
+  [d setMinute:60];
+  PASS([d minuteOfDay] == 60 && [d dayOfMonth] == 15,
+       "-setMinute: sets the minute of the day, backward");
+  [d setMinute:1000];
+  PASS([d minuteOfDay] == 1000 && [d dayOfMonth] == 15,
+       "-setMinute: sets the minute of the day, forward");
+  PASS_EXCEPTION([dt("20240615") setMinute:10], NSInternalInconsistencyException,
+		 "-setMinute: raises an exception on a date");
+  PASS_EXCEPTION([dt("20240615") setSecondOfMinute:10], NSInternalInconsistencyException,
+		 "-setSecondOfMinute: raises an exception on a date");
+
+  d = dt("20240131");
+  [d setDay:32];
+  PASS([d monthOfYear] == 2 && [d dayOfMonth] == 1, "-setDay: normalizes the date");
+  d = dt("20240615");
+  [d setMonth:13];
+  PASS([d year] == 2025 && [d monthOfYear] == 1, "-setMonth: normalizes the date");
+  d = dt("20240615");
+  [d setYear:2030];
+  PASS([d year] == 2030 && [d monthOfYear] == 6 && [d dayOfMonth] == 15, "-setYear: works");
+
+  d = dt("20240229");
+  [d setYear:2023];
+  PASS([d monthOfYear] == 3 && [d dayOfMonth] == 1,
+       "-setYear: on february 29th doesn't give an invalid date");
+  d = dt("20240229");
+  [d changeYearBy:1];
+  PASS([d monthOfYear] == 3 && [d dayOfMonth] == 1,
+       "-changeYearBy: on february 29th doesn't give an invalid date");
+
+  /* Relative changes */
+  d = dt("20241231");
+  [d incrementDay];
+  PASS([d year] == 2025 && [d monthOfYear] == 1 && [d dayOfMonth] == 1,
+       "-incrementDay works across years");
+  d = dt("20240301");
+  [d changeDayBy:-1];
+  PASS([d monthOfYear] == 2 && [d dayOfMonth] == 29,
+       "-changeDayBy: with a negative value works across months");
+  d = dt("20240228");
+  [d changeDayBy:2];
+  PASS([d monthOfYear] == 3 && [d dayOfMonth] == 1,
+       "-changeDayBy: with a positive value works across months");
+  d = dt("20240615");
+  [d changeYearBy:-4];
+  PASS([d year] == 2020, "-changeYearBy: works");
+  d = dt("20240615T233000");
+  [d changeMinuteBy:45];
+  PASS([d dayOfMonth] == 16 && [d minuteOfDay] == 15,
+       "-changeMinuteBy: with a positive value works across days");
+  [d changeMinuteBy:-45];
+  PASS([d dayOfMonth] == 15 && [d minuteOfDay] == 1410,
+       "-changeMinuteBy: with a negative value works across days");
+
+  /* -setIsDate: */
+  d = dt("20240615T143045");
+  [d setIsDate:NO];
+  PASS(![d isDate] && [d minuteOfDay] == 870, "-setIsDate:NO keeps the time");
+  [d setIsDate:YES];
+  [d setIsDate:NO];
+  PASS(![d isDate] && [d minuteOfDay] == 0 && [d secondOfMinute] == 0,
+       "-setIsDate:YES resets the time");
+
+  /* Comparisons */
+  PASS([dt("20240615") compare:dt("20240616") withTime:NO] == NSOrderedAscending,
+       "-compare:withTime:NO on days");
+  PASS([dt("20240715") compare:dt("20240616") withTime:NO] == NSOrderedDescending,
+       "-compare:withTime:NO on months");
+  PASS([dt("20230715") compare:dt("20240616") withTime:NO] == NSOrderedAscending,
+       "-compare:withTime:NO on years");
+  PASS([dt("20240615T100000") compare:dt("20240615T230000") withTime:NO] == NSOrderedSame,
+       "-compare:withTime:NO ignores the time");
+  PASS([dt("20240615T230000") compare:dt("20240615T100000") withTime:YES] == NSOrderedDescending,
+       "-compare:withTime:YES uses the time");
+  PASS([dt("20240615T100000") compare:dt("20240615T100000") withTime:YES] == NSOrderedSame,
+       "-compare:withTime:YES on the same time");
+  Date *dateFlag = dt("20240615");
+  [dateFlag compare:dt("20240615T100000") withTime:YES];
+  PASS([dateFlag isDate], "-compare:withTime: doesn't change the date flag");
+  PASS_EXCEPTION([fixed compare:fixed], NSInvalidArgumentException, "-compare: isn't implemented");
+
+  /* Equality and hash */
+  PASS([dt("20240615T100000") isEqual:dt("20240615T100000")], "-isEqual: on the same time");
+  PASS(![dt("20240615T100000") isEqual:dt("20240615T100001")], "-isEqual: on different times");
+  PASS([dt("20240615T100000") hash] == [dt("20240615T100000") hash],
+       "equal objects have the same hash");
+
+  /* Factory methods */
+  Date *source = dt("20240615T143045");
+  d = [Date dayWithDate:source];
+  PASS([d isDate] && [d dayOfMonth] == 15 && [d minuteOfDay] == 0,
+       "+dayWithDate: returns the day of the date");
+  PASS(![source isDate] && [source minuteOfDay] == 870,
+       "+dayWithDate: doesn't modify the source date");
+
+  d = AUTORELEASE([source copy]);
+  [d changeDayBy:1];
+  PASS([source dayOfMonth] == 15, "a copy is independent from the original");
+
+  NSCalendarDate *cd = [NSCalendarDate dateWithYear:2024 month:6 day:15 hour:14 minute:30
+					     second:45 timeZone:[NSTimeZone defaultTimeZone]];
+  d = [Date dateWithCalendarDate:cd withTime:YES];
+  PASS(![d isDate] && [d year] == 2024 && [d monthOfYear] == 6 && [d dayOfMonth] == 15
+       && [d minuteOfDay] == 870 && [d secondOfMinute] == 45,
+       "+dateWithCalendarDate:withTime:YES keeps the time");
+  d = [Date dateWithCalendarDate:cd withTime:NO];
+  PASS([d isDate] && [d dayOfMonth] == 15 && [d minuteOfDay] == 0 && [d secondOfMinute] == 0,
+       "+dateWithCalendarDate:withTime:NO removes the time");
+
+  source = dt("20240615T233000");
+  d = [Date dateWithTimeInterval:3600 sinceDate:source];
+  PASS([d dayOfMonth] == 16 && [d minuteOfDay] == 30 && ![d isDate],
+       "+dateWithTimeInterval:sinceDate: forward");
+  PASS([source dayOfMonth] == 15, "+dateWithTimeInterval:sinceDate: keeps the source date");
+  d = [Date dateWithTimeInterval:-3600 sinceDate:source];
+  PASS([d minuteOfDay] == 1350, "+dateWithTimeInterval:sinceDate: backward");
+  d = [Date dateWithTimeInterval:1800 sinceDate:source];
+  PASS([d dayOfMonth] == 16 && [d isDate], "a result falling on midnight is a date");
+  PASS([[Date dateWithTimeInterval:86400 sinceDate:dt("20240615")] isDate],
+       "adding whole days to a date gives a date");
+
+  /* Time intervals */
+  PASS([dt("20240615T100000") timeIntervalSinceDate:dt("20240615T090000")] == 3600,
+       "-timeIntervalSinceDate: is positive for a later date");
+  PASS([dt("20240615T090000") timeIntervalSinceDate:dt("20240615T100000")] == -3600,
+       "-timeIntervalSinceDate: is negative for an earlier date");
+  PASS([dt("20240616T100000") timeIntervalSince1970]
+       - [dt("20240615T100000") timeIntervalSince1970] == 86400,
+       "-timeIntervalSince1970 works");
+  d = [Date dateWithTimeInterval:600 sinceDate:[Date now]];
+  PASS(fabs([d timeIntervalSinceNow] - 600) < 5, "-timeIntervalSinceNow works");
+
+  /* Date enumerators */
+  int count = 0;
+  enumerator = [dt("20240615T143000") enumeratorTo:dt("20240615T150000")];
+  while ((tmp = [enumerator nextObject]))
+    count++;
+  PASS(count == 1, "an enumerator on one day returns one date");
+  count = 0;
+  enumerator = [dt("20240228") enumeratorTo:dt("20240301")];
+  while ((tmp = [enumerator nextObject]))
+    count++;
+  PASS(count == 3, "an enumerator includes both bounds and leap days");
+  enumerator = [dt("20240616") enumeratorTo:dt("20240615")];
+  PASS([enumerator nextObject] == nil, "an enumerator with an end before the start is empty");
+
+  /* NSCoding */
+  Date *decoded = [NSKeyedUnarchiver unarchiveObjectWithData:
+				       [NSKeyedArchiver archivedDataWithRootObject:fixed]];
+  PASS(![decoded isDate] && [decoded compare:fixed withTime:YES] == NSOrderedSame,
+       "NSCoding preserves a datetime");
+  decoded = [NSKeyedUnarchiver unarchiveObjectWithData:
+				 [NSKeyedArchiver archivedDataWithRootObject:dt("20240615")]];
+  PASS([decoded isDate] && [decoded compare:dt("20240615") withTime:NO] == NSOrderedSame,
+       "NSCoding preserves a date");
+  [decoded changeDayBy:0];
+  PASS([[decoded description] isEqualToString:@"20240615"], "a decoded date is usable");
+
+  /* iCalendar conversions */
+  struct icaltimetype utc = [fixed UTCICalTime];
+  PASS(icaltime_is_utc(utc), "-UTCICalTime returns an UTC time");
+  decoded = AUTORELEASE([[Date alloc] initWithICalTime:utc]);
+  PASS([decoded compare:fixed withTime:YES] == NSOrderedSame
+       && [decoded minuteOfDay] == [fixed minuteOfDay],
+       "-initWithICalTime: converts an UTC time to the local timezone");
+  PASS(icaltime_is_date([dt("20240615") UTCICalTime]) &&
+       [[AUTORELEASE([[Date alloc] initWithICalTime:[dt("20240615") UTCICalTime]]) description]
+	 isEqualToString:@"20240615"],
+       "a date isn't changed by timezone conversions");
+  decoded = AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string("20240615T120000Z")]);
+  PASS(icaltime_compare([decoded UTCICalTime], icaltime_from_string("20240615T120000Z")) == 0,
+       "a fixed UTC instant is kept");
 
   RELEASE(arp);
   exit(EXIT_SUCCESS);
