@@ -102,6 +102,12 @@ static NSTimeZone *gl_nstz = nil;
 
 - (BOOL)isEqual:(id)aDate
 {
+  if (aDate == nil)
+    return NO;
+  if (aDate == self)
+    return YES;
+  if (![aDate isKindOfClass:[Date class]])
+    return NO;
   return icaltime_as_timet(_time) == icaltime_as_timet(((Date *)aDate)->_time);
 }
 

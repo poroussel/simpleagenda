@@ -196,6 +196,8 @@ int main ()
        "-setIsDate:YES resets the time");
 
   /* Comparisons */
+  PASS([fixed isEqual:nil] == NO, "-isEqual:nil returns NO");
+  PASS([fixed isEqual:fixed] == YES, "-isEqual: returns YES for the same object");
   PASS([dt("20240615") compare:dt("20240616") withTime:NO] == NSOrderedAscending,
        "-compare:withTime:NO on days");
   PASS([dt("20240715") compare:dt("20240616") withTime:NO] == NSOrderedDescending,
