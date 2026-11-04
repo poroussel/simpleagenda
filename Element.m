@@ -161,6 +161,7 @@ static NSArray *availableCategories;
   if (classification < ICAL_CLASS_X || classification > ICAL_CLASS_NONE) {
     NSLog(@"Wrong classification value %d, change it to ICAL_CLASS_PUBLIC", classification);
     _classification = ICAL_CLASS_PUBLIC;
+    return;
   }
   _classification = classification;
 }
@@ -191,7 +192,8 @@ static NSArray *availableCategories;
   Alarm *alarm;
 
   DESTROY(_alarms);
-  ASSIGNCOPY(_alarms, alarms);
+  _alarms = [NSMutableArray new];
+  [_alarms addObjectsFromArray:alarms];
   enumerator = [_alarms objectEnumerator];
   while ((alarm = [enumerator nextObject]))
     [alarm setElement:self];
