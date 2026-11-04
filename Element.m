@@ -207,7 +207,8 @@ static NSArray *availableCategories;
 
 - (void)removeAlarm:(Alarm *)alarm
 {
-  /* FIXME : do something */
+  [_alarms removeObject:alarm];
+  [alarm setElement:nil];
 }
 
 - (Date *)nextActivationDate

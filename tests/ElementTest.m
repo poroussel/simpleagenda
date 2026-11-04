@@ -84,6 +84,79 @@ int main ()
 
   [e3 release];
 
+  /* UID */
+  el = AUTORELEASE([[Element alloc] initWithSummary:@"UID"]);
+  NSString *uid = [el UID];
+  PASS([uid hasPrefix:@"SimpleAgenda-"], "generated UIDs have a prefix");
+  PASS_EQUAL([el UID], uid, "-UID always returns the same value");
+  [el generateUID];
+  PASS(![[el UID] isEqualToString:uid], "-generateUID changes the UID");
+  [el setUID:@"myUID"];
+  PASS_EQUAL([el UID], @"myUID", "-setUID: works");
+
+  /* Simple accessors */
+  [el setSummary:@"Summary"];
+  PASS_EQUAL([el summary], @"Summary", "-setSummary: works");
+  PASS([el text] == nil, "-text is nil by default");
+  [el setText:AUTORELEASE([[NSAttributedString alloc] initWithString:@"Text"])];
+  PASS_EQUAL([[el text] string], @"Text", "-setText: works");
+  PASS([el store] == nil, "-store is nil by default");
+  PASS([el nextActivationDate] == nil, "an Element has no activation date");
+
+  [el setClassification:ICAL_CLASS_PRIVATE];
+  PASS([el classification] == ICAL_CLASS_PRIVATE, "-setClassification: works");
+  [el setClassification:(icalproperty_class)0];
+  PASS([el classification] == ICAL_CLASS_PUBLIC,
+       "-setClassification: uses ICAL_CLASS_PUBLIC instead of a wrong value");
+
+  /* The date stamp is copied */
+  Date *stamp = [NSKeyedUnarchiver unarchiveObjectWithData:
+				     [NSKeyedArchiver archivedDataWithRootObject:[Date now]]];
+  [el setDateStamp:stamp];
+  PASS([el dateStamp] != stamp && [[el dateStamp] isEqual:stamp], "-setDateStamp: copies the date");
+
+  /* Categories */
+  PASS([[Element availableCategories] containsObject:@"Meeting"],
+       "+availableCategories returns the categories");
+  PASS(![el inCategory:@"Idea"], "-inCategory: NO for an unset category");
+  [el addCategory:@"Idea"];
+  PASS([el inCategory:@"Idea"], "-addCategory: works");
+  [el addCategory:@"Idea"];
+  PASS([[el categories] count] == 1, "-addCategory: doesn't add a category twice");
+  [el addCategory:@"Travel"];
+  PASS([[el categories] count] == 2, "an element can have multiple categories");
+  [el removeCategory:@"Unknown"];
+  PASS([[el categories] count] == 2, "-removeCategory: ignores an unset category");
+  [el removeCategory:@"Idea"];
+  PASS(![el inCategory:@"Idea"] && [el inCategory:@"Travel"], "-removeCategory: works");
+  [el setCategories:[NSArray arrayWithObjects:@"a", @"b", nil]];
+  PASS([el inCategory:@"a"] && [el inCategory:@"b"] && ![el inCategory:@"Travel"],
+       "-setCategories: replaces the categories");
+
+  /* Alarms */
+  el = AUTORELEASE([[Element alloc] initWithSummary:@"Alarms"]);
+  al1 = [Alarm alarm];
+  [al1 setRelativeTrigger:60];
+  [el addAlarm:al1];
+  PASS([el hasAlarms] && [[el alarms] count] == 1, "-addAlarm: works");
+  PASS([al1 element] == el, "-addAlarm: links the alarm to the element");
+
+  al2 = [Alarm alarm];
+  [al2 setRelativeTrigger:120];
+  [el setAlarms:[NSArray arrayWithObject:al2]];
+  PASS([[el alarms] count] == 1 && [[el alarms] lastObject] == al2,
+       "-setAlarms: replaces the alarms");
+  PASS([al2 element] == el, "-setAlarms: links the alarms to the element");
+
+  PASS_RUNS([el addAlarm:al1], "-addAlarm: works after -setAlarms:");
+  PASS([[el alarms] count] == 2, "-addAlarm: adds an alarm after -setAlarms:");
+  /* -removeAlarm: is an empty FIXME */
+  [el removeAlarm:al2];
+  PASS(![[el alarms] containsObject:al2], "-removeAlarm: removes the alarm");
+
+  [el setAlarms:nil];
+  PASS(![el hasAlarms], "-setAlarms:nil removes all the alarms");
+
   RELEASE(arp);
   exit(EXIT_SUCCESS);
 }
