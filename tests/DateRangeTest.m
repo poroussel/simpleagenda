@@ -143,7 +143,59 @@ int main ()
   NSRange interSpan = [spanRange intersectionWithDay:day];
   PASS(interSpan.length == 3600,
        "-intersectionWithDay: clipped to 1h at end of first day");
+  NSRange interSpan2 = [spanRange intersectionWithDay:otherDay];
+  PASS(interSpan2.location == 0 && interSpan2.length == 3600,
+       "-intersectionWithDay: starts at midnight on the second day");
   [spanRange release];
+
+  /* Bounds, on [10h00, 12h00] */
+  PASS([range contains:startDt], "-contains: YES for the start of the range");
+  Date *end = [Date dateWithTimeInterval:7200 sinceDate:startDt];
+  PASS([range contains:end], "-contains: YES for the end of the range");
+  Date *afterEnd = [Date dateWithTimeInterval:7201 sinceDate:startDt];
+  PASS(![range contains:afterEnd], "-contains: NO just after the end of the range");
+
+  /* Adjacent ranges don't intersect */
+  DateRange *adjacent = [[DateRange alloc] initWithStart:end duration:3600];
+  PASS(![range intersectsWith:adjacent], "-intersectsWith: NO for a range starting at the end");
+  PASS(![adjacent intersectsWith:range], "-intersectsWith: NO for a range ending at the start");
+  [adjacent release];
+
+  /* A range containing another one */
+  DateRange *included = [[DateRange alloc] initWithStart:inside duration:60];
+  PASS([range intersectsWith:included], "-intersectsWith: YES for an included range");
+  PASS([included intersectsWith:range], "-intersectsWith: YES for an including range");
+  [included release];
+
+  /* A range longer than the day is clipped on both sides */
+  Date *dayBefore = [day copy];
+  [dayBefore changeDayBy:-1];
+  DateRange *longRange = [[DateRange alloc] initWithStart:dayBefore duration:3 * 86400];
+  NSRange interLong = [longRange intersectionWithDay:day];
+  PASS(interLong.location == 0 && interLong.length == 86400,
+       "-intersectionWithDay: of a longer range is the whole day");
+  [longRange release];
+  [dayBefore release];
+
+  /* A range stopping at midnight doesn't intersect the next day */
+  DateRange *wholeDay = [[DateRange alloc] initWithDay:day];
+  PASS([wholeDay intersectsWithDay:day], "-intersectsWithDay: YES for its own day");
+  PASS(![wholeDay intersectsWithDay:otherDay], "-intersectsWithDay: NO for the next day");
+  PASS([wholeDay intersectionWithDay:otherDay].length == 0,
+       "-intersectionWithDay: is empty for the next day");
+  [wholeDay release];
+
+  /* Datetimes are refused where days are expected */
+  PASS_EXCEPTION(AUTORELEASE([[DateRange alloc] initWithDay:startDt]),
+		 NSInternalInconsistencyException,
+		 "-initWithDay: raises an exception on a datetime");
+  PASS_EXCEPTION([range intersectsWithDay:startDt], NSInternalInconsistencyException,
+		 "-intersectsWithDay: raises an exception on a datetime");
+  PASS_EXCEPTION([range intersectionWithDay:startDt], NSInternalInconsistencyException,
+		 "-intersectionWithDay: raises an exception on a datetime");
+
+  PASS([[range description] rangeOfString:@"7200 seconds"].length > 0,
+       "-description contains the length");
 
   [range release];
   RELEASE(arp);
