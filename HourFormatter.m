@@ -29,7 +29,7 @@
 
   if (!components || [components count] != 2) {
     if (error)
-      *error = [[NSString alloc] initWithString:@"Bad time formatting : cannot find hours and minutes separated by h"];
+      *error = @"Bad time formatting : cannot find hours and minutes separated by h";
     return NO;
   }
   nf = AUTORELEASE([[NSNumberFormatter alloc] init]);
@@ -37,20 +37,20 @@
   minutes = [nf numberFromString:[components objectAtIndex:1]];
   if (!hours || !minutes) {
     if (error)
-      *error = [[NSString alloc] initWithString:@"Bad time formatting"];
+      *error = @"Bad time formatting";
     return NO;
   }
   if ([hours intValue] < 0 || [hours intValue] > 23) {
     if (error)
-      *error = [[NSString alloc] initWithString:@"Hours must be between 0 and 23"];
+      *error = @"Hours must be between 0 and 23";
     return NO;
   }
   if ([minutes intValue] < 0 || [minutes intValue] > 59) {
     if (error)
-      *error = [[NSString alloc] initWithString:@"Minutes must be between 0 and 59"];
+      *error = @"Minutes must be between 0 and 59";
     return NO;
   }
-  *anObject = [[NSNumber alloc] initWithInt:[hours intValue] * 3600 + [minutes intValue] * 60.0];
+  *anObject = [NSNumber numberWithInt:[hours intValue] * 3600 + [minutes intValue] * 60.0];
   return YES;
 }
 
