@@ -72,6 +72,20 @@ iCalTreeTest_OBJC_FILES += \
 	../RecurrenceRule.m \
 	../Task.m
 
+LocalStoreTest_OBJC_FILES += \
+	../Alarm.m \
+	../ConfigManager.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../Event.m \
+	../HourFormatter.m \
+	../LocalStore.m \
+	../MemoryStore.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m \
+	../Task.m
+
 NEEDS_GUI=yes
 ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
 ADDITIONAL_TOOL_LIBS += -lical
