@@ -39,7 +39,7 @@ static NSArray *availableCategories;
   [coder encodeObject:_summary forKey:@"title"];
   if (_text)
     [coder encodeObject:[_text string] forKey:@"descriptionText"];
-  [coder encodeObject:_uid forKey:@"uid"];
+  [coder encodeObject:[self UID] forKey:@"uid"];
   [coder encodeInt:_classification forKey:@"classification"];
   if (_stamp)
     [coder encodeObject:_stamp forKey:@"dtstamp"];
