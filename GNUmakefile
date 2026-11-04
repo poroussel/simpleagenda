@@ -7,7 +7,7 @@ _generated_files := $(shell test -f config.h -o -f local.make && echo yes)
 #
 # Application
 #
-VERSION = 0.48
+VERSION = 0.49
 PACKAGE_NAME = SimpleAgenda
 APP_NAME = SimpleAgenda
 SimpleAgenda_APPLICATION_ICON = Calendar.tiff
