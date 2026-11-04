@@ -86,6 +86,24 @@ LocalStoreTest_OBJC_FILES += \
 	../RecurrenceRule.m \
 	../Task.m
 
+iCalStoreTest_OBJC_FILES += \
+	../Alarm.m \
+	../ConfigManager.m \
+	../Date.m \
+	../DateRange.m \
+	../Element.m \
+	../Event.m \
+	../HourFormatter.m \
+	../iCalStore.m \
+	../iCalTree.m \
+	../InvocationOperation.m \
+	../MemoryStore.m \
+	../NSString+SimpleAgenda.m \
+	../RecurrenceRule.m \
+	../StoreManager.m \
+	../Task.m \
+	../WebDAVResource.m
+
 NEEDS_GUI=yes
 ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
 ADDITIONAL_TOOL_LIBS += -lical
