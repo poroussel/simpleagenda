@@ -240,9 +240,8 @@
     [self setLocation:[NSString stringWithUTF8String:location]];
   prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
   while (prop) {
-    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY")) {
-      [self setSticky:strcmp("YES", icalproperty_get_value_as_string(prop))];
-    }
+    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY"))
+      [self setSticky:strcmp("TRUE", icalproperty_get_value_as_string(prop)) ? NO : YES];
     prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
   }
   return self;
@@ -282,8 +281,8 @@
     while (prop) {
       next = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
       if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT")) {
-	icalcomponent_remove_property(ic, prop);
-	icalproperty_free(prop);
+        icalcomponent_remove_property(ic, prop);
+        icalproperty_free(prop);
       }
       prop = next;
     }
