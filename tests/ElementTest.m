@@ -94,6 +94,20 @@ int main ()
   [el setUID:@"myUID"];
   PASS_EQUAL([el UID], @"myUID", "-setUID: works");
 
+  /*
+   * The UID is generated when first asked for : encoding an element must
+   * generate it, or the decoded element would get a different one.
+   */
+  {
+    Element *fresh = AUTORELEASE([[Element alloc] initWithSummary:@"Encoded"]);
+    Element *decoded = [NSKeyedUnarchiver unarchiveObjectWithData:
+					    [NSKeyedArchiver archivedDataWithRootObject:fresh]];
+
+    PASS(decoded != nil && [decoded UID] != nil, "a decoded element has a UID");
+    PASS_EQUAL([decoded UID], [fresh UID],
+	       "an element encoded before its UID is asked for keeps it when decoded");
+  }
+
   /* Simple accessors */
   [el setSummary:@"Summary"];
   PASS_EQUAL([el summary], @"Summary", "-setSummary: works");
