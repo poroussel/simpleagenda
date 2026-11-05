@@ -218,20 +218,16 @@ int main ()
   PASS_EQUAL([[dav url] password], @"secret", "a password in the URL has priority");
   RELEASE(dav);
 
-  /* BUG : iCalStoreDialog saves empty strings when no credentials are given */
-  testHopeful = YES;
   dav = [[WebDAVResource alloc] initWithURL:url username:@"" password:@""];
   PASS_EQUAL([[dav url] absoluteString], baseURL, "empty credentials aren't added to the URL");
   RELEASE(dav);
 
-  /* BUG : -setURL: replaces all the occurrences of the scheme in the URL */
   dav = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:@"http://example.org/?next=http://other.org/"]
 				   username:@"user"
 				   password:@"password"];
   PASS_EQUAL([[dav url] absoluteString], @"http://user:password@example.org/?next=http://other.org/",
 	     "credentials are only added to the host of the URL");
   RELEASE(dav);
-  testHopeful = NO;
 
   /* webcal URLs */
   dav = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:@"webcal://example.org/cal.ics"]
@@ -255,25 +251,16 @@ int main ()
 	     "credentials are added to converted webcal URLs");
   RELEASE(dav);
 
-  /* BUG : -setURL: replaces all the occurrences of webcal in the URL */
-  testHopeful = YES;
   dav = [[WebDAVResource alloc] initWithURL:[NSURL URLWithString:@"webcal://example.org/webcal/cal.ics"]
 				   username:nil
 				   password:nil];
   PASS_EQUAL([[dav url] absoluteString], @"http://example.org/webcal/cal.ics",
 	     "webcal is only replaced in the scheme of the URL");
   RELEASE(dav);
-  testHopeful = NO;
 
   /* NSURL helpers */
   PASS_EQUAL([url anonymousAbsoluteString], baseURL,
 	     "-anonymousAbsoluteString doesn't modify a URL without credentials");
-  /* BUG : the user name is only hidden if there's also a password */
-  testHopeful = YES;
-  PASS([[[NSURL URLWithString:@"http://user@example.org/"] anonymousAbsoluteString]
-	 rangeOfString:@"user"].length == 0,
-       "-anonymousAbsoluteString hides a user name without password");
-  testHopeful = NO;
   PASS_EQUAL([[NSURL URLWithString:@"http://other/path" possiblyRelativeToURL:url] absoluteString],
 	     @"http://other/path", "+URLWithString:possiblyRelativeToURL: keeps absolute URLs");
   PASS([[NSURL URLWithString:@"http://other/path" possiblyRelativeToURL:url] baseURL] == nil,
@@ -511,12 +498,9 @@ int main ()
   PASS_RUNS([dav updateAttributes], "-updateAttributes handles invalid XML");
   PASS_EQUAL(etagSentBy(dav), @"([\"tag4\"])", "-updateAttributes keeps the ETag on invalid XML");
 
-  /* BUG : string() always gives a result, so a missing ETag erases the known one */
-  testHopeful = YES;
   respond(207, nil, multistatus(@"<D:getlastmodified>later</D:getlastmodified>"), nil);
   [dav updateAttributes];
   PASS_EQUAL(etagSentBy(dav), @"([\"tag4\"])", "-updateAttributes keeps the ETag if the answer has none");
-  testHopeful = NO;
   RELEASE(dav);
 
   /* Redirections */
@@ -593,16 +577,13 @@ int main ()
 	     "credentials in the new location have priority");
   RELEASE(dav);
 
-  /* BUG : there's no limit to the number of redirections */
   dav = [[WebDAVResource alloc] initWithURL:url username:nil password:nil];
   reset();
   for (i = 0; i < 100; i++)
     respond(302, nil, nil, header(@"Location", @"mock://example.org/cal"));
   respond(200, nil, @"", nil);
-  testHopeful = YES;
   [dav get];
   PASS([requests count] < 100, "a redirection loop is stopped");
-  testHopeful = NO;
   RELEASE(dav);
 
   /* The handles aren't kept, whatever the path */

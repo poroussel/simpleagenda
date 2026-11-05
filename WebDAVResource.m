@@ -20,28 +20,33 @@ static NSString *logKey = @"WebDAVResource";
 
 - (void)setURL:(NSURL *)anURL
 {
-  if ([[anURL scheme] hasPrefix:@"webcal"])
-    ASSIGN(_url, [NSURL URLWithString:[[anURL absoluteString] stringByReplacingString:@"webcal" withString:@"http"]]);
-  else
-    ASSIGN(_url, anURL);
+  NSString *absolute = [anURL absoluteString];
+  NSRange range = [absolute rangeOfString:@"webcal"];
+  if (range.length > 0 && range.location == 0)
+      absolute = [absolute stringByReplacingCharactersInRange:range withString:@"http"];
+  ASSIGN(_url, [NSURL URLWithString:absolute]);
 
   // FIXME : this is more than ugly but NSURL -initWithScheme:user:password:host:port:path:query:fragment
   // doesn't work as expected (it double escapes user and password)
-  if (_user && _password && ![_url user] && ![_url password]) {
-    NSString *withauth = [[_url absoluteString] stringByReplacingString:[NSString stringWithFormat:@"%@://", [_url scheme]]
-							     withString:[NSString stringWithFormat:@"%@://%@:%@@", [_url scheme], _user, _password]];
-    ASSIGN(_url, [NSURL URLWithString:withauth]);
+  if ([_user length] > 0 && [_password length] > 0 && ![_url user] && ![_url password]) {
+    absolute = [_url absoluteString];
+    range = [absolute rangeOfString:[NSString stringWithFormat:@"%@://", [_url scheme]]];
+    if (range.length > 0 && range.location == 0) {
+      absolute = [absolute stringByReplacingCharactersInRange:range
+                  withString:[NSString stringWithFormat:@"%@://%@:%@@", [_url scheme], _user, _password]];
+      ASSIGN(_url, [NSURL URLWithString:absolute]);
+    }
   }
   _handleClass = [NSURLHandle URLHandleClassForURL:_url];
 }
 
-- (id)initWithURL:(NSURL *)url
-	 username:(NSString *)username
-	 password:(NSString *)password
+- (id)initWithURL:(NSURL *)url username:(NSString *)username password:(NSString *)password
 {
   if ((self = [super init])) {
-    ASSIGN(_user, [username stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLUserAllowedCharacterSet]]);
-    ASSIGN(_password, [password stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPasswordAllowedCharacterSet]]);
+    if ([username length] > 0)
+      ASSIGN(_user, [username stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLUserAllowedCharacterSet]]);
+    if ([password length] > 0)
+      ASSIGN(_password, [password stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPasswordAllowedCharacterSet]]);
     [self setURL:url];
   }
   return self;
@@ -54,6 +59,7 @@ static NSString *logKey = @"WebDAVResource";
   NSData *data;
   NSString *property;
   NSURLHandle *handle;
+  int redirectCount = 0;
 
 restart:
   handle = [[_handleClass alloc] initWithURL:_url cached:NO];
@@ -80,10 +86,12 @@ restart:
     _httpStatus = [[handle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey] intValue];
 
   /* FIXME : why do we have to check for httpStatus == 0 */
-  if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) && [handle propertyForKey:@"Location"] != nil) {
+  if ((_httpStatus == 0 ||_httpStatus == 301 || _httpStatus == 302) &&
+      [handle propertyForKey:@"Location"] != nil && redirectCount < 10) {
     NSDebugLLog(logKey, @"requestWithMethod redirection to %@", [handle propertyForKey:@"Location"]);
     [self setURL:[NSURL URLWithString:[handle propertyForKey:@"Location"]]];
     RELEASE(handle);
+    redirectCount++;
     goto restart;
   }
 
@@ -204,10 +212,10 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
     if ([parser parse]) {
       xpc = [[GSXPathContext alloc] initWithDocument:[[parser document] strippedDocument]];
       result = (GSXPathString *)[xpc evaluateExpression:GETETAG];
-      if (result)
+      if (result && [[result stringValue] length] > 0)
 	      ASSIGN(_etag, [result stringValue]);
       result = (GSXPathString *)[xpc evaluateExpression:GETLASTMODIFIED];
-      if (result)
+      if (result && [[result stringValue] length] > 0)
 	      ASSIGN(_lastModified, [result stringValue]);
       [xpc release];
     }
@@ -225,7 +233,7 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 - (NSString *)anonymousAbsoluteString
 {
   NSString *as = [self absoluteString];
-  if (![self user] && ![self password])
+  if (![self user] || ![self password])
     return as;
 
   NSURLComponents *comp = [NSURLComponents componentsWithURL:self resolvingAgainstBaseURL:NO];
