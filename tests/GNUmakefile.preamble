@@ -74,7 +74,6 @@ iCalTreeTest_OBJC_FILES += \
 
 LocalStoreTest_OBJC_FILES += \
 	../Alarm.m \
-	../ConfigManager.m \
 	../Date.m \
 	../DateRange.m \
 	../Element.m \
