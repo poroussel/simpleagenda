@@ -242,38 +242,76 @@ static NSString * const GETLASTMODIFIED = @"string(/multistatus/response/propsta
 }
 @end
 
+/*
+ * Copy of a document without any namespace, so XPath expressions can use
+ * the local names (servers use different prefixes and default namespaces).
+ *
+ * This used to be an XSLT transformation, but gnustep-base
+ * -[GSXMLDocument xsltTransform:] leaks the compiled stylesheet on every
+ * call (about 20KB, so on every PROPFIND response) and modifies the
+ * stylesheet document. Copying the tree with the public GSXML API needs
+ * neither libxslt nor a fixed gnustep-base.
+ */
+static NSInteger elementType, textType, cdataType, commentType, piType;
+
+static void copyAttributes(GSXMLNode *from, GSXMLNode *to)
+{
+  /* -attributes is keyed by local names */
+  NSDictionary *attributes = [from attributes];
+  NSEnumerator *keys = [attributes keyEnumerator];
+  NSString *key;
+
+  while ((key = [keys nextObject]))
+    [to setObject:[attributes objectForKey:key] forKey:key];
+}
+
+static void copyChildren(GSXMLNode *from, GSXMLNode *to)
+{
+  GSXMLNode *child, *copy;
+  NSInteger type;
+
+  for (child = [from firstChild]; child != nil; child = [child next]) {
+    type = [child type];
+    if (type == elementType) {
+      copy = [to makeChildWithNamespace:nil name:[child name] content:nil];
+      copyAttributes(child, copy);
+      copyChildren(child, copy);
+    } else if (type == textType || type == cdataType) {
+      if ([child content])
+	[to makeText:[child content]];
+    } else if (type == commentType) {
+      [to makeComment:[child content]];
+    } else if (type == piType) {
+      [to makePI:[child name] content:[child content]];
+    }
+    /*
+     * Unsubstituted entity references are dropped, as the XSLT version did :
+     * expanding them here would bypass libxml2 protections against
+     * exponential entity expansion. DAV servers don't use them.
+     */
+  }
+}
+
 @implementation GSXMLDocument(SimpleAgenda)
-static GSXMLDocument *removeXSLT;
-static const NSString *removeString = @"<?xml version='1.0' encoding='UTF-8'?> \
-<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'> \
-<xsl:output method='xml' encoding='UTF-8' /> \
-<xsl:template match='/'> \
-<xsl:copy> \
-<xsl:apply-templates /> \
-</xsl:copy> \
-</xsl:template> \
-<xsl:template match='*'> \
-<xsl:element name='{local-name()}'> \
-<xsl:apply-templates select='@* | node()' /> \
-</xsl:element> \
-</xsl:template> \
-<xsl:template match='@*'> \
-<xsl:attribute name='{local-name()}'><xsl:value-of select='.' /></xsl:attribute> \
-</xsl:template> \
-<xsl:template match='text() | processing-instruction() | comment()'> \
-<xsl:copy /> \
-</xsl:template> \
-</xsl:stylesheet>";
 - (GSXMLDocument *)strippedDocument
 {
-  if (removeXSLT == nil) {
-    GSXMLParser *parser = [GSXMLParser parserWithData:[removeString dataUsingEncoding:NSUTF8StringEncoding]];
-    if (![parser parse]) {
-      NSLog(@"Error parsing xslt document");
-      return nil;
-    }
-    removeXSLT = [[parser document] retain];
+  GSXMLDocument *stripped = [GSXMLDocument documentWithVersion:@"1.0"];
+  GSXMLNode *root = [self root];
+  GSXMLNode *copy;
+
+  if (elementType == 0) {
+    elementType = [GSXMLNode typeFromDescription:@"XML_ELEMENT_NODE"];
+    textType = [GSXMLNode typeFromDescription:@"XML_TEXT_NODE"];
+    cdataType = [GSXMLNode typeFromDescription:@"XML_CDATA_SECTION_NODE"];
+    commentType = [GSXMLNode typeFromDescription:@"XML_COMMENT_NODE"];
+    piType = [GSXMLNode typeFromDescription:@"XML_PI_NODE"];
   }
-  return [self xsltTransform:removeXSLT];
+  if (root != nil) {
+    copy = [stripped makeNodeWithNamespace:nil name:[root name] content:nil];
+    copyAttributes(root, copy);
+    [stripped setRoot:copy];
+    copyChildren(root, copy);
+  }
+  return stripped;
 }
 @end

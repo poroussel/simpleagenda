@@ -1,3 +1,16 @@
+version 0.50
+	* Date : fix crash when comparing a date with nil
+	* Element : make sure a UID is generated before encoding
+	* iCalendar parsing : only accept VCALENDAR as root component, fixes
+	  a crash when saving a calendar loaded from an invalid file
+	* WebDAVResource : don't add empty credentials to URLs, only rewrite
+	  a leading webcal scheme, limit redirections to 10 and keep the
+	  previous ETag and Last-Modified when a PROPFIND returns none
+	* WebDAVResource : fix a memory leak on every PROPFIND response
+	  (about 20KB, caused by gnustep-base XSLT transformations)
+	* Add fuzzers for iCalendar parsing and WebDAV/GroupDAV in tests/fuzz
+	* More unittests written by Claude
+
 version 0.49 (2026/11/04)
 	* Fix cross compilation (Yavor Doganov)
 	* Memory handling fixes

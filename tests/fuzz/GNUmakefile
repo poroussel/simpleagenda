@@ -79,14 +79,9 @@ obj/dav-ical.dict: dav.dict ical.dict
 	@mkdir -p obj
 	cat dav.dict ical.dict > $@
 
-# gnustep-base -[GSXMLDocument xsltTransform:] leaks the compiled stylesheet
-# (~20KB per -strippedDocument call) : fork mode restarts the fuzzing process
-# regularly so the leak doesn't end as an out-of-memory. Crashes still stop it.
-DAV_FUZZ_ARGS ?= -fork=1
-
 fuzz-dav:: FuzzDAV obj/dav-ical.dict
 	@mkdir -p corpus/dav
-	$(FUZZ_ENV) ./obj/FuzzDAV -dict=obj/dav-ical.dict $(DAV_FUZZ_ARGS) $(FUZZ_ARGS) corpus/dav seeds/dav
+	$(FUZZ_ENV) ./obj/FuzzDAV -dict=obj/dav-ical.dict $(FUZZ_ARGS) corpus/dav seeds/dav
 
 fuzz:: fuzz-ical
 
