@@ -99,8 +99,25 @@ int main ()
   PASS([updatedStr rangeOfString:@"SUMMARY:Updated Task"].length > 0,
        "-update: modifies the summary in the serialized output");
 
+  iCalTree *tree5 = [[iCalTree alloc] init];
+  PASS(![tree5 parseString:@"BEGIN:VEVENT\r\nUID:bare-event\r\nDTSTAMP:20240301T120000Z\r\nDTSTART:20240315T100000Z\r\nDURATION:PT1H\r\nSUMMARY:Bare\r\nEND:VEVENT\r\n"],
+       "-parseString: accepts only VCALENDAR as top-level component");
+
+  iCalTree *tree6 = [[iCalTree alloc] init];
+  [tree6 add:ev];
+  PASS(![tree6 parseString:@"BEGIN:VFOO\r\nSUMMARY:Unknown\r\nEND:VFOO\r\n"],
+       "-parseString: rejects an unknown top-level component");
+  PASS([[tree6 components] count] == 1,
+       "a rejected parse keeps the previous content");
+  PASS_RUNS([tree6 iCalTreeAsString],
+	    "-iCalTreeAsString doesn't raise after parsing an unknown component");
+  PASS_RUNS([tree6 iCalTreeAsData],
+	    "-iCalTreeAsData doesn't raise after parsing an unknown component");
+
   [ev release];
   [task release];
+  [tree5 release];
+  [tree6 release];
   [tree release];
   [tree2 release];
   [tree3 release];

@@ -9,7 +9,7 @@ static NSString *logKey = @"iCalTree";
 {
   if ((self = [super init])) {
     root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("2.0"),
-			       icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
+                              icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
     if (!root)
       DESTROY(self);
   }
@@ -32,12 +32,15 @@ static NSString *logKey = @"iCalTree";
     return NO;
   }
   icomp = icalparser_parse_string([string UTF8String]);
-  if (icomp) {
-    icalcomponent_free(root);
-    root = icomp;
-    return YES;
+  if (!icomp)
+    return NO;
+  if (icalcomponent_isa(icomp) != ICAL_VCALENDAR_COMPONENT) {
+    icalcomponent_free(icomp);
+    return NO;
   }
-  return NO;
+  icalcomponent_free(root);
+  root = icomp;
+  return YES;
 }
 
 - (BOOL)parseData:(NSData *)data
