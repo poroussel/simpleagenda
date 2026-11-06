@@ -1,0 +1,81 @@
+207 Multi-Status
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<D:multistatus xmlns:D="DAV:">
+<D:response><D:href>/dav/calendar/event1.ics</D:href><D:propstat><D:prop><D:getetag>"e1"</D:getetag></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response>
+<D:response><D:href>mock://example.org/dav/calendar/event2.ics</D:href><D:propstat><D:prop><D:getetag>"e2"</D:getetag></D:prop><D:status>HTTP/1.1 200 OK</D:status></D:propstat></D:response>
+<D:response><D:href>/dav/calendar/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/></D:resourcetype></D:prop></D:propstat></D:response>
+</D:multistatus>
+=====
+200 OK
+ETag: "e1"
+Last-Modified: Mon, 04 Mar 2024 10:00:00 GMT
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:fuzz
+BEGIN:VEVENT
+UID:event1
+DTSTAMP:20240301T120000Z
+DTSTART:20240315T100000Z
+DURATION:PT1H
+SUMMARY:First event
+END:VEVENT
+END:VCALENDAR
+=====
+200 OK
+ETag: "e2"
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:fuzz
+BEGIN:VEVENT
+UID:event2
+DTSTAMP:20240301T120000Z
+DTSTART;VALUE=DATE:20240316
+SUMMARY:Second event
+RRULE:FREQ=WEEKLY;COUNT=4
+END:VEVENT
+END:VCALENDAR
+=====
+207 Multi-Status
+
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:"><response><href>task1.ics</href><propstat><prop><getetag>"t1"</getetag></prop></propstat></response></multistatus>
+=====
+200 OK
+ETag: "t1"
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:fuzz
+BEGIN:VTODO
+UID:task1
+DTSTAMP:20240301T120000Z
+SUMMARY:A task
+STATUS:NEEDS-ACTION
+END:VTODO
+END:VCALENDAR
+=====
+204 No Content
+
+=====
+207 Multi-Status
+
+<?xml version="1.0"?>
+<D:multistatus xmlns:D="DAV:"><D:response><D:propstat><D:prop><D:getetag>"e1-2"</D:getetag><D:getlastmodified>Tue, 05 Mar 2024 10:00:00 GMT</D:getlastmodified></D:prop></D:propstat></D:response></D:multistatus>
+=====
+412 Precondition Failed
+
+=====
+207 Multi-Status
+
+<?xml version="1.0"?>
+<D:multistatus xmlns:D="DAV:"><D:response><D:propstat><D:prop><D:getetag>"e2-2"</D:getetag></D:prop></D:propstat></D:response></D:multistatus>
+=====
+204 No Content
+
+=====
+404 Not Found
+

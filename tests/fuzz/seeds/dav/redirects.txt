@@ -1,0 +1,25 @@
+301 Moved Permanently
+Location: mock://other.example.org/dav/calendar.ics
+
+=====
+302 Found
+Location: /relative/calendar.ics
+
+=====
+200 OK
+ETag: "r1"
+Last-Modified: Mon, 04 Mar 2024 10:00:00 GMT
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:fuzz
+END:VCALENDAR
+=====
+0
+Location: webcal://example.org/feed.ics
+
+=====
+207 Multi-Status
+
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:"><response><propstat><prop><getetag>"r2"</getetag></prop></propstat></response></multistatus>

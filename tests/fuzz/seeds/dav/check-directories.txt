@@ -1,0 +1,9 @@
+207 Multi-Status
+
+<?xml version="1.0" encoding="utf-8"?>
+<D:multistatus xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:G="http://groupdav.org/">
+<D:response><D:href>/dav/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/></D:resourcetype><D:getlastmodified>Mon, 04 Mar 2024 10:00:00 GMT</D:getlastmodified></D:prop></D:propstat></D:response>
+<D:response><D:href>/dav/home/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/><C:calendar/></D:resourcetype></D:prop></D:propstat></D:response>
+<D:response><D:href>/dav/events/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/><G:vevent-collection/></D:resourcetype></D:prop></D:propstat></D:response>
+<D:response><D:href>/dav/todos/</D:href><D:propstat><D:prop><D:resourcetype><D:collection/><G:vtodo-collection/></D:resourcetype></D:prop></D:propstat></D:response>
+</D:multistatus>

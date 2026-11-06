@@ -1,0 +1,18 @@
+401 Unauthorized
+WWW-Authenticate: Basic realm="dav"
+
+=====
+403 Forbidden
+
+=====
+207 Multi-Status
+
+<?xml version="1.0"?><!DOCTYPE multistatus [<!ENTITY e "&amp;entity">]><multistatus xmlns="DAV:"><response><href>&e;</href><propstat><prop><getetag><![CDATA["c1"]]></getetag></prop></propstat></response></multistatus>
+=====
+207 Multi-Status
+
+<?xml version="1.0"?><multistatus xmlns="DAV:"><response><href></href><propstat><prop><getetag/></prop></propstat></response>
+=====
+500 Internal Server Error
+
+not xml at all
