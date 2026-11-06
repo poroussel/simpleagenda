@@ -1,0 +1,9 @@
+obj/
+corpus/
+crash-*
+leak-*
+timeout-*
+oom-*
+slow-unit-*
+*.m.d
+*.m.o
