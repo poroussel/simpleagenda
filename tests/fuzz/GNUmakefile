@@ -5,15 +5,19 @@
 #   FuzzICal : iCalendar parsing (iCalTree, Event, Task, Alarm...)
 #   FuzzDAV  : WebDAV / GroupDAV / CalDAV client code, served by a mock
 #              HTTP server (see FuzzDAV.m for the input format)
+#   FuzzDate : Date creation and arithmetic, with invariant checks
+#              (see FuzzDate.m for the input format)
 #
 # Requires clang (libFuzzer + sanitizers). Build and run :
 #   make
 #   make fuzz-ical             # runs until a crash is found or ^C
 #   make fuzz-dav FUZZ_ARGS=-max_total_time=60
+#   make fuzz-date
 #
 # Reproduce a crash :
 #   ./obj/FuzzICal crash-<hash>
 #   ./obj/FuzzDAV crash-<hash>
+#   ./obj/FuzzDate crash-<hash>
 #
 # Build with sanitize=no to get a plain binary (still needs libFuzzer for main).
 
@@ -21,7 +25,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 GNUSTEP_OBJ_DIR = ./obj
 
-TOOL_NAME = FuzzICal FuzzDAV
+TOOL_NAME = FuzzICal FuzzDAV FuzzDate
 
 ICAL_FILES = \
 	../../Alarm.m \
@@ -38,6 +42,10 @@ ICAL_FILES = \
 FuzzICal_OBJC_FILES = \
 	FuzzICal.m \
 	$(ICAL_FILES)
+
+FuzzDate_OBJC_FILES = \
+	FuzzDate.m \
+	../../Date.m
 
 FuzzDAV_OBJC_FILES = \
 	FuzzDAV.m \
@@ -82,6 +90,10 @@ obj/dav-ical.dict: dav.dict ical.dict
 fuzz-dav:: FuzzDAV obj/dav-ical.dict
 	@mkdir -p corpus/dav
 	$(FUZZ_ENV) ./obj/FuzzDAV -dict=obj/dav-ical.dict $(FUZZ_ARGS) corpus/dav seeds/dav
+
+fuzz-date:: FuzzDate
+	@mkdir -p corpus/date
+	$(FUZZ_ENV) ./obj/FuzzDate $(FUZZ_ARGS) corpus/date seeds/date
 
 fuzz:: fuzz-ical
 
