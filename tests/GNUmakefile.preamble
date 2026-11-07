@@ -52,6 +52,16 @@ EventTest_OBJC_FILES += \
 	../Sources/NSString+SimpleAgenda.m \
 	../Sources/RecurrenceRule.m
 
+RecurrentEventTest_OBJC_FILES += \
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m
+
 TaskTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \

@@ -7,17 +7,21 @@
 #              HTTP server (see FuzzDAV.m for the input format)
 #   FuzzDate : Date creation and arithmetic, with invariant checks
 #              (see FuzzDate.m for the input format)
+#   FuzzRecur: recurrent events (RecurrenceRule, Event), with invariant
+#              checks (see FuzzRecur.m for the input format)
 #
 # Requires clang (libFuzzer + sanitizers). Build and run :
 #   make
 #   make fuzz-ical             # runs until a crash is found or ^C
 #   make fuzz-dav FUZZ_ARGS=-max_total_time=60
 #   make fuzz-date
+#   make fuzz-recur
 #
 # Reproduce a crash :
 #   ./obj/FuzzICal crash-<hash>
 #   ./obj/FuzzDAV crash-<hash>
 #   ./obj/FuzzDate crash-<hash>
+#   ./obj/FuzzRecur crash-<hash>
 #
 # Build with sanitize=no to get a plain binary (still needs libFuzzer for main).
 
@@ -25,7 +29,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 GNUSTEP_OBJ_DIR = ./obj
 
-TOOL_NAME = FuzzICal FuzzDAV FuzzDate
+TOOL_NAME = FuzzICal FuzzDAV FuzzDate FuzzRecur
 
 ICAL_FILES = \
 	../../Sources/Alarm.m \
@@ -46,6 +50,10 @@ FuzzICal_OBJC_FILES = \
 FuzzDate_OBJC_FILES = \
 	FuzzDate.m \
 	../../Sources/Date.m
+
+FuzzRecur_OBJC_FILES = \
+	FuzzRecur.m \
+	$(ICAL_FILES)
 
 FuzzDAV_OBJC_FILES = \
 	FuzzDAV.m \
@@ -94,6 +102,11 @@ fuzz-dav:: FuzzDAV obj/dav-ical.dict
 fuzz-date:: FuzzDate
 	@mkdir -p corpus/date
 	$(FUZZ_ENV) ./obj/FuzzDate $(FUZZ_ARGS) corpus/date seeds/date
+
+# Recurrence expansion can be slow : report inputs taking more than 10s
+fuzz-recur:: FuzzRecur
+	@mkdir -p corpus/recur
+	$(FUZZ_ENV) ./obj/FuzzRecur -dict=recur.dict -timeout=10 $(FUZZ_ARGS) corpus/recur seeds/recur
 
 fuzz:: fuzz-ical
 

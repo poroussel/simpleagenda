@@ -15,8 +15,11 @@ version 0.50
 	  start, and dates saved in another timezone showed the wrong hour
 	* Date : use UTC instead of floating times when the local timezone
 	  is UTC or a fixed offset (TZ=UTC, TZ=GMT)
-	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV and dates
-	  in tests/fuzz
+	* Use NSUUID to generate unique event ids : libuuid isn't needed
+	  anymore, gnustep-base 1.24.6 or later is required
+	* Move source files in Sources and headers in Headers
+	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV, dates and
+	  recurrent events in tests/fuzz
 	* More unittests written by Claude
 
 version 0.49 (2026/11/04)
