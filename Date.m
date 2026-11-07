@@ -386,7 +386,7 @@ static NSTimeZone *gl_nstz = nil;
 {
   self = [super init];
   if (self)
-    _time = icaltime_convert_to_zone(time, gl_tz);
+    _time = icaltime_convert_to_zone(icaltime_normalize(time), gl_tz);
   return self;
 }
 - (struct icaltimetype)UTCICalTime

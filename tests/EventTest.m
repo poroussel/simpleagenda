@@ -327,6 +327,18 @@ int main ()
     PASS([dst sticky], "X-SIMPLEAGENDA-STICKY:TRUE is read");
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000\r\nDURATION:PT1H\r\nX-SIMPLEAGENDA-STICKY:FALSE\r\n"));
     PASS(![dst sticky], "X-SIMPLEAGENDA-STICKY:FALSE is read");
+
+    /* libical accepts out of range fields : the start date must be normalized */
+    dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;VALUE=DATE:20262311\r\n"));
+    PASS_EQUAL([[dst startDate] description], @"20271111",
+	       "an all day event starting in month 23 starts in november of the next year");
+    PASS([dst isScheduledForDay:dt("20271111")],
+	 "an all day event starting in month 23 is scheduled on its normalized day");
+    dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20260230T100000\r\nDURATION:PT1H\r\n"));
+    PASS([[dst startDate] monthOfYear] == 3 && [[dst startDate] dayOfMonth] == 2,
+	 "an event starting on february 30th starts on march 2nd");
+    PASS([dst isScheduledForDay:dt("20260302")],
+	 "an event starting on february 30th is scheduled on march 2nd");
   }
 
   RELEASE(arp);

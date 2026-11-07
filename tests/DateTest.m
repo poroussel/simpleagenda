@@ -307,6 +307,43 @@ int main ()
   PASS(icaltime_compare([decoded UTCICalTime], icaltime_from_string("20240615T120000Z")) == 0,
        "a fixed UTC instant is kept");
 
+  /* Out of range fields : libical's parser accepts them (for example
+   * DTSTART;VALUE=DATE:20262311) and only normalizes times it converts
+   * between timezones, which leaves dates and floating times untouched */
+  Date *month23 = dt("20262311");
+  PASS([month23 year] == 2027 && [month23 monthOfYear] == 11 && [month23 dayOfMonth] == 11,
+       "a date with month 23 is normalized");
+  PASS_EQUAL([month23 description], @"20271111", "a date with month 23 is described normalized");
+  /* libical returns 30 for any month outside 1-12 : use one that isn't 30 days long */
+  PASS([dt("20261410") numberOfDaysInMonth] == 28, "a date with month 14 has the days of february");
+  PASS([month23 isEqual:dt("20271111")], "a date with month 23 is equal to its normalized date");
+  PASS([month23 hash] == [dt("20271111") hash],
+       "a date with month 23 has the hash of its normalized date");
+  PASS([month23 compare:dt("20271111") withTime:NO] == NSOrderedSame,
+       "a date with month 23 compares as its normalized date without time");
+  PASS(![month23 isEqual:dt("20261399")], "dates with different out of range fields are different");
+  PASS([dt("20261399") isEqual:dt("20270409")], "january 99th is april 9th");
+  PASS([[month23 calendarDate] monthOfYear] == 11, "-calendarDate works for a date with month 23");
+  PASS([month23 weekOfYear] == [dt("20271111") weekOfYear], "-weekOfYear works for a date with month 23");
+
+  Date *feb30 = dt("20260230T120000");
+  PASS([feb30 monthOfYear] == 3 && [feb30 dayOfMonth] == 2 && [feb30 hourOfDay] == 12,
+       "a floating datetime on february 30th is normalized");
+  PASS([feb30 isEqual:dt("20260302T120000")],
+       "a floating datetime on february 30th is equal to march 2nd");
+  PASS([feb30 compare:dt("20260302T120000") withTime:NO] == NSOrderedSame,
+       "february 30th compares as march 2nd without time");
+  PASS([feb30 timeIntervalSinceDate:dt("20260301T120000")] == 86400,
+       "february 30th is one day after march 1st");
+
+  Date *hour25 = dt("20260615T253000");
+  PASS([hour25 dayOfMonth] == 16 && [hour25 hourOfDay] == 1 && [hour25 minuteOfHour] == 30,
+       "a floating datetime at 25:30 is normalized");
+  PASS([hour25 minuteOfDay] == 90, "-minuteOfDay is less than a day for a datetime at 25:30");
+  PASS(dt("20261145T253000Z") != nil && [dt("20261145T253000Z") dayOfMonth] == 16
+       && [dt("20261145T253000Z") monthOfYear] == 12,
+       "an UTC datetime with out of range fields is normalized");
+
   RELEASE(arp);
   exit(EXIT_SUCCESS);
 }
