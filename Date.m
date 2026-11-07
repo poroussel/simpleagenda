@@ -93,6 +93,9 @@ static icaltimezone *timezoneNamed(NSString *name)
 
 /*
  * Based on ChronographerSource Appointment class
+ *
+ * See Date.h for the limitations with dates before 1902 or more
+ * than 68 years apart.
  */
 
 @implementation Date
