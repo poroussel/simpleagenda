@@ -10,6 +10,43 @@ static Date *dt(const char *string)
   return AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string(string)]);
 }
 
+/* Writes the same keys as -[Date encodeWithCoder:], to build the archive
+ * a Date would have written in another timezone */
+@interface ArchivedDate : NSObject
+{
+  NSString *_icalTime;
+  NSString *_timezone;
+}
+@end
+@implementation ArchivedDate
++ (Date *)decodeTime:(NSString *)time timezone:(NSString *)tzid
+{
+  ArchivedDate *a = AUTORELEASE([ArchivedDate new]);
+  NSKeyedArchiver *archiver;
+  NSMutableData *data = [NSMutableData data];
+
+  a->_icalTime = time;
+  a->_timezone = tzid;
+  archiver = AUTORELEASE([[NSKeyedArchiver alloc] initForWritingWithMutableData:data]);
+  [archiver setClassName:@"Date" forClass:[ArchivedDate class]];
+  [archiver encodeObject:a forKey:@"root"];
+  [archiver finishEncoding];
+  return [NSKeyedUnarchiver unarchiveObjectWithData:data];
+}
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+  [coder encodeObject:_icalTime forKey:@"icalTime"];
+  if (_timezone)
+    [coder encodeObject:_timezone forKey:@"timezone"];
+}
+@end
+
+static BOOL sameICalTime(struct icaltimetype a, struct icaltimetype b)
+{
+  return a.year == b.year && a.month == b.month && a.day == b.day &&
+    a.hour == b.hour && a.minute == b.minute && a.second == b.second;
+}
+
 int main ()
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -340,9 +377,72 @@ int main ()
   PASS([hour25 dayOfMonth] == 16 && [hour25 hourOfDay] == 1 && [hour25 minuteOfHour] == 30,
        "a floating datetime at 25:30 is normalized");
   PASS([hour25 minuteOfDay] == 90, "-minuteOfDay is less than a day for a datetime at 25:30");
-  PASS(dt("20261145T253000Z") != nil && [dt("20261145T253000Z") dayOfMonth] == 16
-       && [dt("20261145T253000Z") monthOfYear] == 12,
+  /* 2026-11-45 25:30 UTC is 2026-12-16 01:30 UTC, whatever the local timezone */
+  PASS([dt("20261145T253000Z") isEqual:dt("20261216T013000Z")]
+       && [dt("20261145T253000Z") hourOfDay] == [dt("20261216T013000Z") hourOfDay],
        "an UTC datetime with out of range fields is normalized");
+
+  /* NSCoding and timezones. Dates are kept in the local timezone in memory.
+   * -encodeWithCoder: writes the full timezone id
+   * (/freeassociation.sourceforge.net/Europe/Paris), -initWithCoder: must
+   * find it and convert the decoded datetime to the local timezone. */
+  START_SET("NSCoding and timezones")
+    icaltimezone *local = (icaltimezone *)[fixed localICalTime].zone;
+    const char *other;
+
+    /* Without a libical timezone (e.g. GNUstep calls UTC GMT+0000),
+     * Date only uses floating times */
+    if (local == NULL)
+      SKIP("libical has no timezone matching the local timezone");
+    other = strstr(icaltimezone_get_tzid(local), "Asia/Tokyo") ? "America/New_York" : "Asia/Tokyo";
+    icaltimezone *otherZone = icaltimezone_get_builtin_timezone(other);
+    /* 2024-06-15 12:00 UTC, in the other timezone */
+    struct icaltimetype instant = icaltime_from_string("20240615T120000Z");
+    NSString *otherTime = [NSString stringWithUTF8String:
+      icaltime_as_ical_string(icaltime_convert_to_zone(instant, otherZone))];
+    Date *expected = AUTORELEASE([[Date alloc] initWithICalTime:instant]);
+
+    decoded = [NSKeyedUnarchiver unarchiveObjectWithData:
+				   [NSKeyedArchiver archivedDataWithRootObject:fixed]];
+    PASS([decoded localICalTime].zone == local,
+	 "a decoded datetime is in the local timezone");
+    PASS(sameICalTime([decoded UTCICalTime], [fixed UTCICalTime]),
+	 "a decoded datetime has the same UTC time as the archived one");
+    PASS(icaltime_compare([decoded UTCICalTime], icaltime_from_string("20240615T143045Z")) != 0
+	 || icaltimezone_get_utc_offset(local, &instant, NULL) == 0,
+	 "a decoded datetime isn't read as UTC");
+
+    /* Archive written by a Date in another timezone, as Date writes it */
+    decoded = [ArchivedDate decodeTime:otherTime
+			      timezone:[NSString stringWithUTF8String:icaltimezone_get_tzid(otherZone)]];
+    PASS([decoded compare:expected withTime:YES] == NSOrderedSame,
+	 "a datetime archived in another timezone compares as the same instant");
+    PASS(sameICalTime([decoded UTCICalTime], instant),
+	 "a datetime archived in another timezone keeps its UTC time");
+    PASS([decoded localICalTime].zone == local,
+	 "a datetime archived in another timezone is decoded in the local timezone");
+    PASS([decoded hourOfDay] == [expected hourOfDay] && [decoded dayOfMonth] == [expected dayOfMonth],
+	 "a datetime archived in another timezone shows the local hour");
+    PASS([decoded isEqual:expected],
+	 "a datetime archived in another timezone is equal to the same local instant");
+    PASS([decoded hash] == [expected hash],
+	 "a datetime archived in another timezone has the hash of the same local instant");
+
+    /* Same archive with a location instead of a tzid : found by
+     * icaltimezone_get_builtin_timezone(), but kept instead of converted */
+    decoded = [ArchivedDate decodeTime:otherTime timezone:[NSString stringWithUTF8String:other]];
+    PASS(sameICalTime([decoded UTCICalTime], instant),
+	 "a datetime archived with a timezone location keeps its UTC time");
+    PASS([decoded localICalTime].zone == local,
+	 "a datetime archived with a timezone location is decoded in the local timezone");
+    PASS([decoded isEqual:expected],
+	 "a datetime archived with a timezone location is equal to the same local instant");
+
+    /* Dates have no timezone : the day must not change */
+    decoded = [ArchivedDate decodeTime:@"20240615" timezone:nil];
+    PASS([decoded isDate] && [[decoded description] isEqualToString:@"20240615"],
+	 "a date archived without timezone keeps its day");
+  END_SET("NSCoding and timezones")
 
   RELEASE(arp);
   exit(EXIT_SUCCESS);

@@ -35,6 +35,11 @@
 }
 @end
 
+/* Set by +[Date initialize] */
+static icaltimezone *gl_tz = NULL;
+static icaltimezone *gl_utc = NULL;
+static NSTimeZone *gl_nstz = nil;
+
 @implementation Date(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
 {
@@ -47,17 +52,42 @@
       [coder encodeObject:[NSString stringWithCString:tzid] forKey:@"timezone"];
   }
 }
+/*
+ * -encodeWithCoder: writes the full tzid (/freeassociation.sourceforge.net/
+ * Europe/Paris), which icaltimezone_get_builtin_timezone() doesn't know :
+ * look it up as a tzid first, then as a location.
+ */
+static icaltimezone *timezoneNamed(NSString *name)
+{
+  const char *cname = [name UTF8String];
+  icaltimezone *tz;
+
+  if (cname == NULL || *cname == 0)
+    return NULL;
+  if (!strcmp(cname, "UTC"))
+    return icaltimezone_get_utc_timezone();
+  tz = icaltimezone_get_builtin_timezone_from_tzid(cname);
+  if (tz == NULL)
+    tz = icaltimezone_get_builtin_timezone(cname);
+  return tz;
+}
+
 - (id)initWithCoder:(NSCoder *)coder
 {
-  NSString *tzid;
-  _time = icaltime_from_string([[coder decodeObjectForKey:@"icalTime"] cString]);
-  tzid = [coder decodeObjectForKey:@"timezone"];
-  if (tzid) {
-    icaltimezone *tz = icaltimezone_get_builtin_timezone([tzid cString]);
-    if (tz)
-      _time = icaltime_set_timezone(&_time, tz);
+  NSString *string = [coder decodeObjectForKey:@"icalTime"];
+  struct icaltimetype time = icaltime_null_time();
+  icaltimezone *tz;
+
+  if ([string isKindOfClass:[NSString class]])
+    time = icaltime_from_string([string UTF8String]);
+  /* A datetime without Z was written in the timezone stored next to it,
+   * or in the local timezone if it can't be found */
+  if (!time.is_date && time.zone == NULL && !icaltime_is_null_time(time)) {
+    tz = timezoneNamed([coder decodeObjectForKey:@"timezone"]);
+    time = icaltime_set_timezone(&time, tz ? tz : gl_tz);
   }
-  return self;
+  /* Like dates read from iCalendar data, keep it in the local timezone */
+  return [self initWithICalTime:time];
 }
 @end
 
@@ -66,9 +96,6 @@
  */
 
 @implementation Date
-static icaltimezone *gl_tz = NULL;
-static icaltimezone *gl_utc = NULL;
-static NSTimeZone *gl_nstz = nil;
 + (void)initialize
 {
   const char *tzone;

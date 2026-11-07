@@ -339,6 +339,22 @@ int main ()
 	 "an event starting on february 30th starts on march 2nd");
     PASS([dst isScheduledForDay:dt("20260302")],
 	 "an event starting on february 30th is scheduled on march 2nd");
+
+    /* LocalStore saves events with NSKeyedArchiver : an event loaded from
+     * it and exported again must keep its start instant */
+    {
+      icalcomponent *ic;
+      struct icaltimetype start;
+
+      dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000Z\r\nDURATION:PT1H\r\n"));
+      dst = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:dst]];
+      ic = [dst asICalComponent];
+      start = icalcomponent_get_dtstart(ic);
+      PASS(icaltime_compare(start, icaltime_from_string("20240615T100000Z")) == 0
+	   && start.hour == 10,
+	   "an archived event is exported with its original UTC start");
+      icalcomponent_free(ic);
+    }
   }
 
   RELEASE(arp);
