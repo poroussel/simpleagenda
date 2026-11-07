@@ -88,6 +88,33 @@ int main ()
   el = AUTORELEASE([[Element alloc] initWithSummary:@"UID"]);
   NSString *uid = [el UID];
   PASS([uid hasPrefix:@"SimpleAgenda-"], "generated UIDs have a prefix");
+  {
+    NSString *suffix = [uid substringFromIndex:[@"SimpleAgenda-" length]];
+    NSUUID *parsed = AUTORELEASE([[NSUUID alloc] initWithUUIDString:suffix]);
+
+    PASS([suffix length] == 36 && parsed != nil,
+	 "generated UIDs end with a UUID");
+    PASS(parsed != nil && [[parsed UUIDString] caseInsensitiveCompare:suffix] == NSOrderedSame,
+	 "the UUID in a generated UID is in its canonical form");
+    /* gnustep-base (1.31 and earlier) doesn't set the version and variant
+     * bits of random UUIDs correctly. The UUIDs are still random enough
+     * for UIDs, so this is only a hope */
+    testHopeful = YES;
+    PASS([suffix characterAtIndex:14] == '4',
+	 "the UUID in a generated UID is random (version 4)");
+    testHopeful = NO;
+  }
+  {
+    NSMutableSet *uids = [NSMutableSet set];
+    int i;
+
+    for (i = 0; i < 1000; i++) {
+      Element *e = [[Element alloc] initWithSummary:@"many"];
+      [uids addObject:[e UID]];
+      [e release];
+    }
+    PASS([uids count] == 1000, "1000 generated UIDs are all different");
+  }
   PASS_EQUAL([el UID], uid, "-UID always returns the same value");
   [el generateUID];
   PASS(![[el UID] isEqualToString:uid], "-generateUID changes the UID");

@@ -3,6 +3,5 @@
 #import <Foundation/Foundation.h>
 
 @interface NSString(SimpleAgenda)
-+ (NSString *)uuid;
 - (BOOL)isValidURL;
 @end

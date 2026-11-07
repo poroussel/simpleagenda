@@ -30,7 +30,6 @@ jobs:
             gnustep-back-common \
             gobjc \
             libical-dev \
-            uuid-dev \
             xvfb
 
       - name: Set up GNUstep environment

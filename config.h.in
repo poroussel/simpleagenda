@@ -9,9 +9,6 @@
 /* Define to 1 if you have the <libical/ical.h> header file. */
 #undef HAVE_LIBICAL_ICAL_H
 
-/* Define to 1 if you have the required UUID library implementation */
-#undef HAVE_LIBUUID
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -35,9 +32,6 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
-
-/* Define to 1 if you have the <uuid/uuid.h> header file. */
-#undef HAVE_UUID_UUID_H
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

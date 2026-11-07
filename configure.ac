@@ -50,10 +50,6 @@ AC_CHECK_HEADERS([libical/ical.h], ,[AC_CHECK_HEADERS([ical.h], ,[AC_MSG_ERROR(i
 CPPFLAGS=$old_cppflags
 LDFLAGS=$old_ldflags
 
-AC_CHECK_HEADERS([uuid/uuid.h])
-AC_SEARCH_LIBS([uuid_generate], [uuid e2fs-uuid],
-  [AC_DEFINE([HAVE_LIBUUID], [1],
-    [Define to 1 if you have the required UUID library implementation])])
 AC_CHECK_ADDRESSES(have_addresses=yes, have_addresses=no)
 
 AC_ARG_ENABLE([dbuskit],

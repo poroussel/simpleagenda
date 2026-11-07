@@ -24,9 +24,8 @@ Dependencies
 ============
 
 GNUstep stable version released on 2011/04/14
-(make 2.6.0, base 1.22.0, gui 0.20.0, back 0.20.0)
+(make 2.6.0, base 1.24.6, gui 0.20.0, back 0.20.0)
 libical 0.27 or later
-libuuid (optional)
 Addresses framework (optional)
 DBusKit 0.1 (optional)
 

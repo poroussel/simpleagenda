@@ -2,7 +2,6 @@
 #import "Date.h"
 #import "Element.h"
 #import "Alarm.h"
-#import "NSString+SimpleAgenda.h"
 
 static NSArray *availableCategories;
 
@@ -136,7 +135,7 @@ static NSArray *availableCategories;
 
 - (void)generateUID
 {
-  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@", [NSString uuid]]];
+  [self setUID:[NSString stringWithFormat:@"SimpleAgenda-%@", [[NSUUID UUID] UUIDString]]];
 }
 
 - (NSString *)UID
