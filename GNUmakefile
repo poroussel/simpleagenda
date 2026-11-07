@@ -37,52 +37,52 @@ SimpleAgenda_LOCALIZED_RESOURCE_FILES = Localizable.strings
 # Class files
 #
 SimpleAgenda_OBJC_FILES = \
-AppController.m \
-LocalStore.m \
-AppointmentEditor.m \
-CalendarView.m \
-StoreManager.m \
-DayView.m \
-Event.m \
-PreferencesController.m \
-HourFormatter.m \
-iCalStore.m \
-ConfigManager.m \
-Date.m \
-iCalTree.m \
-DataTree.m \
-Element.m \
-Task.m \
-TaskEditor.m \
-MemoryStore.m \
-GroupDAVStore.m \
-WebDAVResource.m \
-WeekView.m \
-AppointmentView.m \
-SelectionManager.m \
-RecurrenceRule.m \
-NSColor+SimpleAgenda.m \
-DateRange.m \
-Alarm.m \
-AlarmManager.m \
-NSString+SimpleAgenda.m \
-AlarmEditor.m \
-SoundBackend.m \
-InvocationOperation.m
+Sources/AppController.m \
+Sources/LocalStore.m \
+Sources/AppointmentEditor.m \
+Sources/CalendarView.m \
+Sources/StoreManager.m \
+Sources/DayView.m \
+Sources/Event.m \
+Sources/PreferencesController.m \
+Sources/HourFormatter.m \
+Sources/iCalStore.m \
+Sources/ConfigManager.m \
+Sources/Date.m \
+Sources/iCalTree.m \
+Sources/DataTree.m \
+Sources/Element.m \
+Sources/Task.m \
+Sources/TaskEditor.m \
+Sources/MemoryStore.m \
+Sources/GroupDAVStore.m \
+Sources/WebDAVResource.m \
+Sources/WeekView.m \
+Sources/AppointmentView.m \
+Sources/SelectionManager.m \
+Sources/RecurrenceRule.m \
+Sources/NSColor+SimpleAgenda.m \
+Sources/DateRange.m \
+Sources/Alarm.m \
+Sources/AlarmManager.m \
+Sources/NSString+SimpleAgenda.m \
+Sources/AlarmEditor.m \
+Sources/SoundBackend.m \
+Sources/InvocationOperation.m
 
 ifeq ($(ADDRESSES),yes)
-SimpleAgenda_OBJC_FILES += ABStore.m
+SimpleAgenda_OBJC_FILES += Sources/ABStore.m
 endif
 
 ifeq ($(DBUSKIT),yes)
-SimpleAgenda_OBJC_FILES += DBusBackend.m
+SimpleAgenda_OBJC_FILES += Sources/DBusBackend.m
 endif
 
 #
 # Other sources
 #
 SimpleAgenda_OBJC_FILES += \
-SimpleAgenda.m
+Sources/SimpleAgenda.m
 
 #
 # Makefiles

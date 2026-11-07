@@ -3,112 +3,112 @@
 include ../local.make
 
 DateTest_OBJC_FILES += \
-	../Date.m
+	../Sources/Date.m
 
 DateUTCTest_OBJC_FILES += \
-	../Date.m
+	../Sources/Date.m
 
 DateFixedOffsetTest_OBJC_FILES += \
-	../Date.m
+	../Sources/Date.m
 
 ElementTest_OBJC_FILES += \
-	../Alarm.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../HourFormatter.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/HourFormatter.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m
 
 MemoryStoreTest_OBJC_FILES += \
-	../Alarm.m \
-	../ConfigManager.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../Event.m \
-	../HourFormatter.m \
-	../MemoryStore.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m \
+	../Sources/Alarm.m \
+	../Sources/ConfigManager.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/MemoryStore.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m \
 
 RecurrenceRuleTest_OBJC_FILES += \
-	../Date.m \
-	../DateRange.m \
-	../RecurrenceRule.m
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/RecurrenceRule.m
 
 WebDAVTest_OBJC_FILES += \
-	../Date.m \
-	../WebDAVResource.m \
-	../NSString+SimpleAgenda.m
+	../Sources/Date.m \
+	../Sources/WebDAVResource.m \
+	../Sources/NSString+SimpleAgenda.m
 
 EventTest_OBJC_FILES += \
-	../Alarm.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../Event.m \
-	../HourFormatter.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m
 
 TaskTest_OBJC_FILES += \
-	../Alarm.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../HourFormatter.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m \
-	../Task.m
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/HourFormatter.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m \
+	../Sources/Task.m
 
 DateRangeTest_OBJC_FILES += \
-	../Date.m \
-	../DateRange.m
+	../Sources/Date.m \
+	../Sources/DateRange.m
 
 iCalTreeTest_OBJC_FILES += \
-	../Alarm.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../Event.m \
-	../HourFormatter.m \
-	../iCalTree.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m \
-	../Task.m
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/iCalTree.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m \
+	../Sources/Task.m
 
 LocalStoreTest_OBJC_FILES += \
-	../Alarm.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../Event.m \
-	../HourFormatter.m \
-	../LocalStore.m \
-	../MemoryStore.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m \
-	../Task.m
+	../Sources/Alarm.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/LocalStore.m \
+	../Sources/MemoryStore.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m \
+	../Sources/Task.m
 
 iCalStoreTest_OBJC_FILES += \
-	../Alarm.m \
-	../ConfigManager.m \
-	../Date.m \
-	../DateRange.m \
-	../Element.m \
-	../Event.m \
-	../HourFormatter.m \
-	../iCalStore.m \
-	../iCalTree.m \
-	../InvocationOperation.m \
-	../MemoryStore.m \
-	../NSString+SimpleAgenda.m \
-	../RecurrenceRule.m \
-	../StoreManager.m \
-	../Task.m \
-	../WebDAVResource.m
+	../Sources/Alarm.m \
+	../Sources/ConfigManager.m \
+	../Sources/Date.m \
+	../Sources/DateRange.m \
+	../Sources/Element.m \
+	../Sources/Event.m \
+	../Sources/HourFormatter.m \
+	../Sources/iCalStore.m \
+	../Sources/iCalTree.m \
+	../Sources/InvocationOperation.m \
+	../Sources/MemoryStore.m \
+	../Sources/NSString+SimpleAgenda.m \
+	../Sources/RecurrenceRule.m \
+	../Sources/StoreManager.m \
+	../Sources/Task.m \
+	../Sources/WebDAVResource.m
 
 NEEDS_GUI=yes
-ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../
+ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../Headers -I..
 ADDITIONAL_TOOL_LIBS += -lical

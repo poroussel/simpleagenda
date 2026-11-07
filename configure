@@ -606,7 +606,7 @@ PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
 ac_unique_file="SimpleAgenda"
-ac_unique_file="MemoryStore.h"
+ac_unique_file="Headers/MemoryStore.h"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stddef.h>

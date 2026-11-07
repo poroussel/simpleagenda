@@ -21,7 +21,7 @@ ADDITIONAL_TOOL_LIBS += -lDBusKit
 endif
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += 
+ADDITIONAL_INCLUDE_DIRS += -IHeaders
 
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += -L/usr/local/lib 

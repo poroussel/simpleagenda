@@ -28,16 +28,16 @@ GNUSTEP_OBJ_DIR = ./obj
 TOOL_NAME = FuzzICal FuzzDAV FuzzDate
 
 ICAL_FILES = \
-	../../Alarm.m \
-	../../Date.m \
-	../../DateRange.m \
-	../../Element.m \
-	../../Event.m \
-	../../HourFormatter.m \
-	../../iCalTree.m \
-	../../NSString+SimpleAgenda.m \
-	../../RecurrenceRule.m \
-	../../Task.m
+	../../Sources/Alarm.m \
+	../../Sources/Date.m \
+	../../Sources/DateRange.m \
+	../../Sources/Element.m \
+	../../Sources/Event.m \
+	../../Sources/HourFormatter.m \
+	../../Sources/iCalTree.m \
+	../../Sources/NSString+SimpleAgenda.m \
+	../../Sources/RecurrenceRule.m \
+	../../Sources/Task.m
 
 FuzzICal_OBJC_FILES = \
 	FuzzICal.m \
@@ -45,23 +45,23 @@ FuzzICal_OBJC_FILES = \
 
 FuzzDate_OBJC_FILES = \
 	FuzzDate.m \
-	../../Date.m
+	../../Sources/Date.m
 
 FuzzDAV_OBJC_FILES = \
 	FuzzDAV.m \
 	$(ICAL_FILES) \
-	../../ConfigManager.m \
-	../../GroupDAVStore.m \
-	../../InvocationOperation.m \
-	../../MemoryStore.m \
-	../../NSColor+SimpleAgenda.m \
-	../../StoreManager.m \
-	../../WebDAVResource.m
+	../../Sources/ConfigManager.m \
+	../../Sources/GroupDAVStore.m \
+	../../Sources/InvocationOperation.m \
+	../../Sources/MemoryStore.m \
+	../../Sources/NSColor+SimpleAgenda.m \
+	../../Sources/StoreManager.m \
+	../../Sources/WebDAVResource.m
 
 include ../../local.make
 
 NEEDS_GUI = yes
-ADDITIONAL_INCLUDE_DIRS += -I../..
+ADDITIONAL_INCLUDE_DIRS += -I../../Headers -I../..
 ADDITIONAL_TOOL_LIBS += -lical
 
 ifeq ($(sanitize),no)
