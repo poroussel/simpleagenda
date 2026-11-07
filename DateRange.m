@@ -44,15 +44,6 @@
   _length = length;
 }
 
-- (BOOL)contains:(Date *)date
-{
-  if ([_start compare:date withTime:YES] > 0)
-    return NO;
-  if ([date timeIntervalSinceDate:_start] > _length)
-    return NO;
-  return YES;
-}
-
 - (BOOL)intersectsWith:(DateRange *)range
 {
   NSTimeInterval s1 = [_start timeIntervalSince1970];

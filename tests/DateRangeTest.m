@@ -58,33 +58,12 @@ int main ()
   [range setStart:startDt];
   [range setLength:7200];
 
-  /* contains: — datetime at 11h00 inside [10h00, 12h00) */
   Date *inside = [Date today];
   [inside setYear:2024];
   [inside setMonth:6];
   [inside setDay:15];
   [inside setIsDate:NO];
   [inside changeMinuteBy:660]; /* 11h00 */
-  PASS([range contains:inside], "-contains: YES for datetime inside range");
-
-  /* before range */
-  Date *before = [Date today];
-  [before setYear:2024];
-  [before setMonth:6];
-  [before setDay:15];
-  [before setIsDate:NO];
-  [before changeMinuteBy:540]; /* 9h00 */
-  PASS(![range contains:before], "-contains: NO for datetime before range");
-
-  /* after range */
-  Date *after = [Date today];
-  [after setYear:2024];
-  [after setMonth:6];
-  [after setDay:15];
-  [after setIsDate:NO];
-  [after changeMinuteBy:780]; /* 13h00 */
-  PASS(![range contains:after], "-contains: NO for datetime after range");
-
   /* intersectsWith: — overlapping range [11h00, 12h00) vs [10h00, 12h00) */
   DateRange *overlapping = [[DateRange alloc] initWithStart:inside duration:3600];
   PASS([range intersectsWith:overlapping],
@@ -148,14 +127,8 @@ int main ()
        "-intersectionWithDay: starts at midnight on the second day");
   [spanRange release];
 
-  /* Bounds, on [10h00, 12h00] */
-  PASS([range contains:startDt], "-contains: YES for the start of the range");
-  Date *end = [Date dateWithTimeInterval:7200 sinceDate:startDt];
-  PASS([range contains:end], "-contains: YES for the end of the range");
-  Date *afterEnd = [Date dateWithTimeInterval:7201 sinceDate:startDt];
-  PASS(![range contains:afterEnd], "-contains: NO just after the end of the range");
-
   /* Adjacent ranges don't intersect */
+  Date *end = [Date dateWithTimeInterval:7200 sinceDate:startDt];
   DateRange *adjacent = [[DateRange alloc] initWithStart:end duration:3600];
   PASS(![range intersectsWith:adjacent], "-intersectsWith: NO for a range starting at the end");
   PASS(![adjacent intersectsWith:range], "-intersectsWith: NO for a range ending at the start");
