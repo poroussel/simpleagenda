@@ -96,15 +96,36 @@ static icaltimezone *timezoneNamed(NSString *name)
  */
 
 @implementation Date
+/*
+ * GNUstep uses a fixed offset timezone named GMT+0000, GMT+0300... for
+ * TZ=UTC or TZ=GMT and when it can't find the system timezone. libical
+ * doesn't know these names : use its UTC timezone or its POSIX style
+ * Etc/GMT-3 zones (the sign is inverted) for whole hour offsets.
+ */
+static icaltimezone *fixedOffsetTimezone(NSInteger offset)
+{
+  char name[16];
+  NSInteger hours = offset / 3600;
+
+  if (offset == 0)
+    return icaltimezone_get_utc_timezone();
+  if (offset % 3600 || hours < -12 || hours > 14)
+    return NULL;
+  snprintf(name, sizeof(name), "Etc/GMT%+ld", (long)-hours);
+  return icaltimezone_get_builtin_timezone(name);
+}
+
 + (void)initialize
 {
   const char *tzone;
 
   if (!gl_tz) {
     gl_nstz = RETAIN([[NSCalendarDate calendarDate] timeZone]);
-    tzone = [[gl_nstz description] cString];
+    tzone = [[gl_nstz name] UTF8String];
     gl_utc = icaltimezone_get_utc_timezone();
     gl_tz = icaltimezone_get_builtin_timezone(tzone);
+    if (!gl_tz)
+      gl_tz = fixedOffsetTimezone([gl_nstz secondsFromGMT]);
     if (!gl_tz)
       NSLog(@"Couldn't get a timezone corresponding to %s", tzone);
   }
@@ -180,7 +201,11 @@ static icaltimezone *timezoneNamed(NSString *name)
 
 - (NSString *)description
 {
-  return [NSString stringWithCString:icaltime_as_ical_string(_time)];
+  /* The local wall time : without the Z libical adds in its UTC timezone */
+  struct icaltimetype local = _time;
+
+  local.zone = NULL;
+  return [NSString stringWithCString:icaltime_as_ical_string(local)];
 }
 
 - (id)init

@@ -5,6 +5,12 @@ include ../local.make
 DateTest_OBJC_FILES += \
 	../Date.m
 
+DateUTCTest_OBJC_FILES += \
+	../Date.m
+
+DateFixedOffsetTest_OBJC_FILES += \
+	../Date.m
+
 ElementTest_OBJC_FILES += \
 	../Alarm.m \
 	../Date.m \

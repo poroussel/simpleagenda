@@ -8,7 +8,15 @@ version 0.50
 	  previous ETag and Last-Modified when a PROPFIND returns none
 	* WebDAVResource : fix a memory leak on every PROPFIND response
 	  (about 20KB, caused by gnustep-base XSLT transformations)
-	* Add fuzzers for iCalendar parsing and WebDAV/GroupDAV in tests/fuzz
+	* Date : normalize out of range values accepted by libical (for
+	  example a february 30th or a 13th month in an iCalendar file)
+	* Date : restore the timezone of dates saved in local calendars.
+	  Times were read back as UTC, so events were exported with a shifted
+	  start, and dates saved in another timezone showed the wrong hour
+	* Date : use UTC instead of floating times when the local timezone
+	  is UTC or a fixed offset (TZ=UTC, TZ=GMT)
+	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV and dates
+	  in tests/fuzz
 	* More unittests written by Claude
 
 version 0.49 (2026/11/04)
