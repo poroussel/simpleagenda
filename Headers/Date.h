@@ -69,3 +69,8 @@
 - (struct icaltimetype)UTCICalTime;
 - (struct icaltimetype)localICalTime;
 @end
+
+/* The time of a property, in the timezone given by its TZID parameter :
+   a VTIMEZONE of its calendar or a zone known by libical. Without TZID,
+   or with an unknown one, the time is returned unchanged */
+struct icaltimetype icaltimeWithTZID(icalproperty *prop, struct icaltimetype time);

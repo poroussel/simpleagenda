@@ -465,3 +465,29 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
   return _time;
 }
 @end
+
+struct icaltimetype icaltimeWithTZID(icalproperty *prop, struct icaltimetype time)
+{
+  icalparameter *param;
+  icalcomponent *root;
+  icaltimezone *zone = NULL;
+  const char *tzid;
+
+  if (time.is_date || time.zone != NULL || icaltime_is_null_time(time))
+    return time;
+  param = icalproperty_get_first_parameter(prop, ICAL_TZID_PARAMETER);
+  if (param == NULL || (tzid = icalparameter_get_tzid(param)) == NULL)
+    return time;
+  for (root = icalproperty_get_parent(prop); root && icalcomponent_get_parent(root);
+       root = icalcomponent_get_parent(root))
+    ;
+  if (root)
+    zone = icalcomponent_get_timezone(root, tzid);
+  if (zone == NULL)
+    zone = icaltimezone_get_builtin_timezone_from_tzid(tzid);
+  if (zone == NULL)
+    zone = icaltimezone_get_builtin_timezone(tzid);
+  if (zone == NULL)
+    return time;
+  return icaltime_set_timezone(&time, zone);
+}

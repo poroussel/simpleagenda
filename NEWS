@@ -37,6 +37,10 @@ version 0.50
 	  events with an hourly rule could get other occurrences once saved
 	  in a local calendar, and a time added to a date could be exported
 	  as UTC
+	* iCalendar : times with a TZID parameter (from Outlook, Google...)
+	  are read in their timezone, defined by a VTIMEZONE of the calendar
+	  or known by libical, instead of the local one. Unknown TZIDs still
+	  give local times
 	* Move source files in Sources and headers in Headers
 	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV, dates and
 	  recurrent events in tests/fuzz

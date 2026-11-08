@@ -119,7 +119,7 @@ static NSArray *stateName;
       [self setState:TK_NONE];
     prop = icalcomponent_get_first_property(ic, ICAL_DUE_PROPERTY);
     if (prop) 
-      [self setDueDate:AUTORELEASE([[Date alloc] initWithICalTime:icalproperty_get_due(prop)])];
+      [self setDueDate:AUTORELEASE([[Date alloc] initWithICalTime:icaltimeWithTZID(prop, icalproperty_get_due(prop))])];
   }
   return self;
 }

@@ -401,6 +401,39 @@ int main ()
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\n"));
     PASS(dst == nil, "an event without DTSTART is refused");
 
+    /* TZID : 10h00 in New York is 14h00 UTC in june (EDT) */
+    dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;TZID=America/New_York:20240615T100000\r\n"
+				 "DTEND;TZID=America/New_York:20240615T113000\r\n"));
+    PASS([[dst startDate] compare:dt("20240615T140000Z") withTime:YES] == NSOrderedSame,
+	 "a start with a TZID is read in that timezone");
+    PASS([dst duration] == 90, "the duration of an event with a TZID is read");
+    {
+      icalcomponent *ic = [dst asICalComponent];
+
+      PASS(strstr(icalcomponent_as_ical_string(ic), "DTSTART:20240615T140000Z\r\n") != NULL,
+	   "a start read with a TZID is exported in UTC");
+      icalcomponent_free(ic);
+    }
+    dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Not/AZone:20240615T100000\r\nDURATION:PT1H\r\n"));
+    PASS([[dst startDate] compare:dt("20240615T100000") withTime:YES] == NSOrderedSame,
+	 "a start with an unknown TZID is read in the local timezone");
+    /* Europe/Paris goes from 2h00 to 3h00 on 2024-03-31 : 23h00 to 4h00 is 4 hours */
+    dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Europe/Paris:20240330T230000\r\n"
+				 "DTEND;TZID=Europe/Paris:20240331T040000\r\n"));
+    PASS([dst duration] == 240, "the duration of an event with a TZID takes DST into account");
+    {
+      icalcomponent *cal = icalparser_parse_string("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:x\r\n"
+						   "BEGIN:VTIMEZONE\r\nTZID:Custom\r\nBEGIN:STANDARD\r\nDTSTART:19700101T000000\r\n"
+						   "TZOFFSETFROM:+0300\r\nTZOFFSETTO:+0300\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\n"
+						   "BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Custom:20240615T100000\r\n"
+						   "DURATION:PT1H\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");
+
+      dst = AUTORELEASE([[Event alloc] initWithICalComponent:icalcomponent_get_first_component(cal, ICAL_VEVENT_COMPONENT)]);
+      PASS([[dst startDate] compare:dt("20240615T070000Z") withTime:YES] == NSOrderedSame,
+	   "a TZID defined by a VTIMEZONE of the calendar is used");
+      icalcomponent_free(cal);
+    }
+
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000\r\nDURATION:PT1H\r\nX-SIMPLEAGENDA-STICKY:TRUE\r\n"));
     PASS([dst sticky], "X-SIMPLEAGENDA-STICKY:TRUE is read");
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000\r\nDURATION:PT1H\r\nX-SIMPLEAGENDA-STICKY:FALSE\r\n"));

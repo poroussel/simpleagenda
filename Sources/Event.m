@@ -286,7 +286,7 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
     NSLog(@"No start date");
     goto init_error;
   }
-  start = icalproperty_get_dtstart(pstart);
+  start = icaltimeWithTZID(pstart, icalproperty_get_dtstart(pstart));
   date = [[Date alloc] initWithICalTime:start];
   [self setStartDate:date];
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
@@ -300,8 +300,13 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
     if (!pend)
       diff = icalproperty_get_duration(pdur);
     else {
-      end = icalproperty_get_dtend(pend);
-      diff = icaltime_subtract(end, start);
+      end = icaltimeWithTZID(pend, icalproperty_get_dtend(pend));
+      /* icaltime_subtract() ignores timezones : subtract UTC times */
+      if (start.zone && end.zone)
+	diff = icaltime_subtract(icaltime_convert_to_zone(end, icaltimezone_get_utc_timezone()),
+				 icaltime_convert_to_zone(start, icaltimezone_get_utc_timezone()));
+      else
+	diff = icaltime_subtract(end, start);
     }
     [self setDuration:icaldurationtype_as_int(diff) / 60];
   }
