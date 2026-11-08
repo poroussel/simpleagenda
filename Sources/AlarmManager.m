@@ -320,9 +320,9 @@ static AlarmManager *singleton;
   NSDebugLLog(logKey, @"Alarm backend %@ released", [[self class] backendName]);
   DEALLOC;
 }
-- (enum icalproperty_action)backendType
+- (SAAlarmAction)backendType
 {
-  return ICAL_ACTION_DISPLAY;
+  return SAAlarmActionDisplay;
 }
 - (void)display:(Alarm *)alarm
 {

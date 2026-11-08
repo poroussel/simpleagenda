@@ -1,4 +1,4 @@
-#import "Date.h"
+#import "Date+ICal.h"
 
 @interface NSDateEnumerator : NSEnumerator
 {
@@ -40,9 +40,34 @@ static icaltimezone *gl_tz = NULL;
 static icaltimezone *gl_utc = NULL;
 static NSTimeZone *gl_nstz = nil;
 
+/*
+ * Date keeps the fields of a struct icaltimetype, so that its header
+ * doesn't depend on libical : the methods read them in a struct
+ * icaltimetype, and write it back when they change it
+ */
+#define TIME(date) timeOf(date)
+#define SET_TIME(date, time) setTimeOf(date, time)
+
+@interface Date(Fields)
+- (struct icaltimetype)fields;
+- (void)setFields:(struct icaltimetype)time;
+@end
+
+static inline struct icaltimetype timeOf(Date *date)
+{
+  return [date fields];
+}
+
+static inline void setTimeOf(Date *date, struct icaltimetype time)
+{
+  [date setFields:time];
+}
+
 @implementation Date(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
 {
+  struct icaltimetype _time = TIME(self);
+
   [coder encodeObject:[NSString stringWithCString:icaltime_as_ical_string(_time)] forKey:@"icalTime"];
   /* icaltime_as_ical_string does not include timezone info, so encode it
    * separately to allow faithful restoration on decode. */
@@ -98,6 +123,37 @@ static icaltimezone *timezoneNamed(NSString *name)
  * than 68 years apart.
  */
 
+@implementation Date(Fields)
+- (struct icaltimetype)fields
+{
+  struct icaltimetype time;
+
+  time.year = _year;
+  time.month = _month;
+  time.day = _day;
+  time.hour = _hour;
+  time.minute = _minute;
+  time.second = _second;
+  time.is_date = _isDate;
+  time.is_daylight = _isDaylight;
+  time.zone = _zone;
+  return time;
+}
+
+- (void)setFields:(struct icaltimetype)time
+{
+  _year = time.year;
+  _month = time.month;
+  _day = time.day;
+  _hour = time.hour;
+  _minute = time.minute;
+  _second = time.second;
+  _isDate = time.is_date;
+  _isDaylight = time.is_daylight;
+  _zone = time.zone;
+}
+@end
+
 @implementation Date
 /*
  * GNUstep uses a fixed offset timezone named GMT+0000, GMT+0300... for
@@ -137,7 +193,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 - (id)copyWithZone:(NSZone *)zone
 {
   Date *new = [Date allocWithZone:zone];
-  new->_time = _time;
+  SET_TIME(new, TIME(self));
   return new;
 }
 
@@ -159,12 +215,12 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
     return YES;
   if (![aDate isKindOfClass:[Date class]])
     return NO;
-  return icaltime_as_timet(_time) == icaltime_as_timet(((Date *)aDate)->_time);
+  return icaltime_as_timet(TIME(self)) == icaltime_as_timet(TIME(aDate));
 }
 
 - (NSUInteger)hash
 {
-  return icaltime_as_timet(_time);
+  return icaltime_as_timet(TIME(self));
 }
 /*
  * This is a bit convoluted because icaltime_compare
@@ -175,25 +231,28 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
  */
 - (NSComparisonResult)compare:(id)aDate withTime:(BOOL)time
 {
+  struct icaltimetype _time = TIME(self);
+  struct icaltimetype other = TIME(aDate);
+
   if (!time) {
-    if (_time.year < ((Date *)aDate)->_time.year)
+    if (_time.year < other.year)
       return -1;
-    if (_time.year > ((Date *)aDate)->_time.year)
+    if (_time.year > other.year)
       return 1;
-    if (_time.month < ((Date *)aDate)->_time.month)
+    if (_time.month < other.month)
       return -1;
-    if (_time.month > ((Date *)aDate)->_time.month)
+    if (_time.month > other.month)
       return 1;
-    if (_time.day < ((Date *)aDate)->_time.day)
+    if (_time.day < other.day)
       return -1;
-    if (_time.day > ((Date *)aDate)->_time.day)
+    if (_time.day > other.day)
       return 1;
     return 0;
   }
 
   /* Dates have no timezone : compare them as local datetimes */
   struct icaltimetype a = _time;
-  struct icaltimetype b = ((Date *)aDate)->_time;
+  struct icaltimetype b = other;
   a.is_date = 0;
   b.is_date = 0;
   if (a.zone == NULL)
@@ -206,7 +265,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 - (NSString *)description
 {
   /* The local wall time : without the Z libical adds in its UTC timezone */
-  struct icaltimetype local = _time;
+  struct icaltimetype local = TIME(self);
 
   local.zone = NULL;
   return [NSString stringWithCString:icaltime_as_ical_string(local)];
@@ -216,8 +275,9 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 {
   self = [super init];
   if (self) {
-    _time = icaltime_current_time_with_zone(gl_tz);
+    struct icaltimetype _time = icaltime_current_time_with_zone(gl_tz);
     _time = icaltime_set_timezone(&_time, gl_tz);
+    SET_TIME(self, _time);
   }
   return self;
 }
@@ -237,34 +297,38 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 + (id)dateWithTimeInterval:(NSTimeInterval)seconds sinceDate:(Date *)refDate
 {
   Date *d = [[Date alloc] init];
+  struct icaltimetype time = TIME(refDate);
 
-  d->_time = refDate->_time;
   /* To be able to add hours and minutes, it has to be a datetime */
-  d-> _time.is_date = 0;
-  if (d->_time.zone == NULL)
-    d->_time.zone = gl_tz;
-  d->_time = icaltime_add(d->_time, icaldurationtype_from_int(seconds));
-  [d setIsDate:!d->_time.hour && !d->_time.minute && !d->_time.second];
+  time.is_date = 0;
+  if (time.zone == NULL)
+    time.zone = gl_tz;
+  time = icaltime_add(time, icaldurationtype_from_int(seconds));
+  SET_TIME(d, time);
+  [d setIsDate:!time.hour && !time.minute && !time.second];
   return AUTORELEASE(d);
 }
 
 + (id)dateWithCalendarDate:(NSCalendarDate *)cd withTime:(BOOL)time
 {
   Date *d = [[Date alloc] init];
+  struct icaltimetype t;
 
   [d setIsDate:!time];
-  d->_time.year = [cd yearOfCommonEra];
-  d->_time.month = [cd monthOfYear];
-  d->_time.day = [cd dayOfMonth];
+  t = TIME(d);
+  t.year = [cd yearOfCommonEra];
+  t.month = [cd monthOfYear];
+  t.day = [cd dayOfMonth];
   if (time) {
-    d->_time.hour = [cd hourOfDay];
-    d->_time.minute = [cd minuteOfHour];
-    d->_time.second = [cd secondOfMinute];
+    t.hour = [cd hourOfDay];
+    t.minute = [cd minuteOfHour];
+    t.second = [cd secondOfMinute];
   } else {
-    d->_time.hour = 0;
-    d->_time.minute = 0;
-    d->_time.second = 0;
+    t.hour = 0;
+    t.minute = 0;
+    t.second = 0;
   }
+  SET_TIME(d, t);
   return AUTORELEASE(d);
 }
 
@@ -277,42 +341,42 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 
 - (NSCalendarDate *)calendarDate
 {
-  return [NSCalendarDate dateWithYear:_time.year
-			 month:_time.month
-			 day:_time.day
-			 hour:_time.hour
-			 minute:_time.minute
-			 second:_time.second
+  return [NSCalendarDate dateWithYear:_year
+			 month:_month
+			 day:_day
+			 hour:_hour
+			 minute:_minute
+			 second:_second
 			 timeZone:gl_nstz];
 }
 
 - (int)year
 {
-  return _time.year;
+  return _year;
 }
 - (int)monthOfYear
 {
-  return _time.month;
+  return _month;
 }
 - (int)hourOfDay
 {
-  return _time.hour;
+  return _hour;
 }
 - (int)secondOfMinute
 {
-  return _time.second;
+  return _second;
 }
 - (int)minuteOfHour
 {
-  return _time.minute;
+  return _minute;
 }
 - (int)minuteOfDay
 {
-  return _time.hour * 60 + _time.minute;
+  return _hour * 60 + _minute;
 }
 - (int)dayOfMonth
 {
-  return _time.day;
+  return _day;
 }
 /*
  * 1 : Monday
@@ -321,76 +385,88 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
  */
 - (int)weekday
 {
-  int dow = icaltime_day_of_week(_time) - 1;
+  int dow = icaltime_day_of_week(TIME(self)) - 1;
   return dow ? dow : 7;
 }
 - (int)weekOfYear
 {
   char week[3];
-  time_t tmt = icaltime_as_timet(_time);
+  time_t tmt = icaltime_as_timet(TIME(self));
   struct tm *tm = gmtime(&tmt);
   strftime(week, sizeof(week), "%V", tm);
   return atoi(week);
 }
 - (int)numberOfDaysInMonth
 {
-  return icaltime_days_in_month(_time.month, _time.year);
+  return icaltime_days_in_month(_month, _year);
 }
 
 - (void)setSecondOfMinute:(int)second
 {
+  struct icaltimetype _time = TIME(self);
+
   NSAssert(!_time.is_date, @"Works only with datetimes");
   _time.second = second;
-  _time = icaltime_normalize(_time);
+  SET_TIME(self, icaltime_normalize(_time));
 }
 
 - (void)setMinute:(int)minute
 {
+  struct icaltimetype _time = TIME(self);
+
   NSAssert(!_time.is_date, @"Works only with datetimes");
   struct icaldurationtype dt = {0, 0, 0, 0, minute - [self minuteOfDay], 0};
-  _time = icaltime_add(_time, dt);
+  SET_TIME(self, icaltime_add(_time, dt));
 }
 
 - (void)setDay:(int)day
 {
+  struct icaltimetype _time = TIME(self);
+
   _time.day = day;
-  _time = icaltime_normalize(_time);
+  SET_TIME(self, icaltime_normalize(_time));
 }
 
 - (void)setMonth:(int)month
 {
+  struct icaltimetype _time = TIME(self);
+
   _time.month = month;
-  _time = icaltime_normalize(_time);
+  SET_TIME(self, icaltime_normalize(_time));
 }
 
 - (void)setYear:(int)year
 {
+  struct icaltimetype _time = TIME(self);
+
   _time.year = year;
-  _time = icaltime_normalize(_time);
+  SET_TIME(self, icaltime_normalize(_time));
 }
 
 - (void)incrementDay
 {
   struct icaldurationtype dt = {0, 1, 0, 0, 0, 0};
-  _time = icaltime_add(_time, dt);
+  SET_TIME(self, icaltime_add(TIME(self), dt));
 }
 
 - (void)changeYearBy:(int)diff
 {
+  struct icaltimetype _time = TIME(self);
+
   _time.year += diff;
-  _time = icaltime_normalize(_time);
+  SET_TIME(self, icaltime_normalize(_time));
 }
 
 - (void)changeDayBy:(int)diff
 {
   struct icaldurationtype dt = {diff < 0, ABS(diff), 0, 0, 0, 0};
-  _time = icaltime_add(_time, dt);
+  SET_TIME(self, icaltime_add(TIME(self), dt));
 }
 
 - (void)changeMinuteBy:(int)diff
 {
   struct icaldurationtype dt = {diff < 0, 0, 0, 0, ABS(diff), 0};
-  _time = icaltime_add(_time, dt);
+  SET_TIME(self, icaltime_add(TIME(self), dt));
 }
 
 - (NSEnumerator *)enumeratorTo:(Date *)end
@@ -403,7 +479,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 
 - (BOOL)isDate
 {
-  return _time.is_date;
+  return _isDate;
 }
 /*
  * A date is a day without time, so without timezone : a timezone would
@@ -412,25 +488,25 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
  */
 - (void)setIsDate:(BOOL)date
 {
-  _time.is_date = date;
+  _isDate = date;
   if (date) {
-    _time.hour = 0;
-    _time.minute = 0;
-    _time.second = 0;
-    _time.zone = NULL;
-  } else if (_time.zone == NULL) {
-    _time.zone = gl_tz;
+    _hour = 0;
+    _minute = 0;
+    _second = 0;
+    _zone = NULL;
+  } else if (_zone == NULL) {
+    _zone = gl_tz;
   }
 }
 
 - (NSTimeInterval)timeIntervalSince1970
 {
-  return icaltime_as_timet(_time);
+  return icaltime_as_timet(TIME(self));
 }
 
 - (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate
 {
-  return icaldurationtype_as_int(icaltime_subtract(_time, anotherDate->_time));
+  return icaldurationtype_as_int(icaltime_subtract(TIME(self), TIME(anotherDate)));
 }
 
 - (NSTimeInterval)timeIntervalSinceNow
@@ -449,45 +525,20 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 {
   self = [super init];
   if (self) {
-    _time = icaltime_convert_to_zone(icaltime_normalize(time), gl_tz);
+    struct icaltimetype _time = icaltime_convert_to_zone(icaltime_normalize(time), gl_tz);
     /* icaltime_convert_to_zone() keeps the timezone of a date */
     if (_time.is_date)
       _time.zone = NULL;
+    SET_TIME(self, _time);
   }
   return self;
 }
 - (struct icaltimetype)UTCICalTime
 {
-  return icaltime_convert_to_zone(_time, gl_utc);
+  return icaltime_convert_to_zone(TIME(self), gl_utc);
 }
 - (struct icaltimetype)localICalTime
 {
-  return _time;
+  return TIME(self);
 }
 @end
-
-struct icaltimetype icaltimeWithTZID(icalproperty *prop, struct icaltimetype time)
-{
-  icalparameter *param;
-  icalcomponent *root;
-  icaltimezone *zone = NULL;
-  const char *tzid;
-
-  if (time.is_date || time.zone != NULL || icaltime_is_null_time(time))
-    return time;
-  param = icalproperty_get_first_parameter(prop, ICAL_TZID_PARAMETER);
-  if (param == NULL || (tzid = icalparameter_get_tzid(param)) == NULL)
-    return time;
-  for (root = icalproperty_get_parent(prop); root && icalcomponent_get_parent(root);
-       root = icalcomponent_get_parent(root))
-    ;
-  if (root)
-    zone = icalcomponent_get_timezone(root, tzid);
-  if (zone == NULL)
-    zone = icaltimezone_get_builtin_timezone_from_tzid(tzid);
-  if (zone == NULL)
-    zone = icaltimezone_get_builtin_timezone(tzid);
-  if (zone == NULL)
-    return time;
-  return icaltime_set_timezone(&time, zone);
-}

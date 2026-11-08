@@ -38,6 +38,7 @@ ICAL_FILES = \
 	../../Sources/Event.m \
 	../../Sources/HourFormatter.m \
 	../../Sources/iCalTree.m \
+	../../Sources/ICalComponent.m \
 	../../Sources/NSString+SimpleAgenda.m \
 	../../Sources/RecurrenceRule.m \
 	../../Sources/Task.m
@@ -68,7 +69,7 @@ FuzzDAV_OBJC_FILES = \
 include ../../local.make
 
 NEEDS_GUI = yes
-ADDITIONAL_INCLUDE_DIRS += -I../../Headers -I../..
+ADDITIONAL_INCLUDE_DIRS += -I../../Headers -I../../Sources -I../..
 ADDITIONAL_TOOL_LIBS += -lical
 
 ifeq ($(sanitize),no)

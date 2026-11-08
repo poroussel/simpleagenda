@@ -1,7 +1,8 @@
 /* -*- objc -*- */
 
 #import "ObjectTesting.h"
-#import "RecurrenceRule.h"
+#import "RecurrenceRule+ICal.h"
+#import "Date+ICal.h"
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */
 static Date *dt(const char *string)
@@ -9,10 +10,9 @@ static Date *dt(const char *string)
   return AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string(string)]);
 }
 
-/* Compares what the enumerator returns to a list of dates separated by spaces */
 static RecurrenceRule *ruleFromString(const char *string)
 {
-  return AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:icalrecurrencetype_from_string(string)]);
+  return AUTORELEASE([[RecurrenceRule alloc] initWithString:[NSString stringWithUTF8String:string]]);
 }
 
 static BOOL sameDates(NSEnumerator *enumerator, const char *expected)
@@ -205,6 +205,15 @@ int main ()
     PASS(back.freq == ICAL_WEEKLY_RECURRENCE && back.count == 3
 	 && back.by_day[0] != ICAL_RECURRENCE_ARRAY_MAX, "-iCalRRule returns the rule");
   }
+
+  /* RRULE values */
+  rule = ruleFromString("FREQ=WEEKLY;COUNT=3;BYDAY=MO,WE");
+  PASS([rule frequency] == recurrenceFrequenceWeekly && [rule count] == 3, "-initWithString: works");
+  PASS_EQUAL([rule stringValue], @"FREQ=WEEKLY;COUNT=3;BYDAY=MO,WE", "-stringValue gives the RRULE value");
+  PASS_EQUAL([AUTORELEASE([[RecurrenceRule alloc] initWithString:[rule stringValue]]) stringValue],
+	     [rule stringValue], "-stringValue can be read back");
+  rule = AUTORELEASE([[RecurrenceRule alloc] initWithString:nil]);
+  PASS(rule != nil && [rule count] == 0, "-initWithString:nil gives an empty rule");
 
   /* NSCoding */
   {

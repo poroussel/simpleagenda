@@ -56,7 +56,7 @@ int main ()
   [e2 release];
 
   Element *el = [Element new];
-  PASS([el classification] == ICAL_CLASS_PUBLIC, "-classification works");
+  PASS([el classification] == SAClassificationPublic, "-classification works");
   PASS([el dateStamp] != nil, "-dateStamp works");
   PASS([el categories] != nil, "-categories works");
   PASS([[el categories] count] == 0, "categories array is empty");
@@ -144,11 +144,11 @@ int main ()
   PASS([el store] == nil, "-store is nil by default");
   PASS([el nextActivationDate] == nil, "an Element has no activation date");
 
-  [el setClassification:ICAL_CLASS_PRIVATE];
-  PASS([el classification] == ICAL_CLASS_PRIVATE, "-setClassification: works");
-  [el setClassification:(icalproperty_class)0];
-  PASS([el classification] == ICAL_CLASS_PUBLIC,
-       "-setClassification: uses ICAL_CLASS_PUBLIC instead of a wrong value");
+  [el setClassification:SAClassificationPrivate];
+  PASS([el classification] == SAClassificationPrivate, "-setClassification: works");
+  [el setClassification:(SAClassification)0];
+  PASS([el classification] == SAClassificationPublic,
+       "-setClassification: uses SAClassificationPublic instead of a wrong value");
 
   /* The date stamp is copied */
   Date *stamp = [NSKeyedUnarchiver unarchiveObjectWithData:

@@ -11,8 +11,9 @@
 
 #import "ObjectTesting.h"
 #import "Event.h"
-#import "Date.h"
-#import "RecurrenceRule.h"
+#import "Date+ICal.h"
+#import "RecurrenceRule+ICal.h"
+#import "ICalComponent.h"
 
 #define VEVENT(content) ("BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\n" content "END:VEVENT\r\n")
 
@@ -24,11 +25,9 @@ static Date *dt(const char *string)
 
 static Event *eventFromString(const char *string)
 {
-  icalcomponent *ic = icalparser_parse_string(string);
-  Event *event = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
+  ICalComponent *component = [ICalComponent componentWithString:[NSString stringWithUTF8String:string]];
 
-  icalcomponent_free(ic);
-  return event;
+  return AUTORELEASE([[Event alloc] initWithICalComponent:component]);
 }
 
 static Event *archived(Event *event)
@@ -68,27 +67,30 @@ int main()
    * AddressSanitizer) : RecurrenceRule now owns a copy
    */
   {
-    icalcomponent *ic;
-    icalproperty *prop;
+    const char *string = VEVENT("DTSTART:20240315T100000Z\r\nDURATION:PT1H\r\n"
+				"RRULE:RSCALE=GREGORIAN;FREQ=YEARLY\r\n");
     struct icalrecurrencetype rule;
-    struct icalrecurrencetype exported;
+    ICalComponent *ic;
 
-    ic = icalparser_parse_string(VEVENT("DTSTART:20240315T100000Z\r\nDURATION:PT1H\r\n"
-					"RRULE:RSCALE=GREGORIAN;FREQ=YEARLY\r\n"));
-    prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
-    event = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
+    /* The component is freed with the pool : the rule mustn't point into it */
+    {
+      CREATE_AUTORELEASE_POOL(pool);
+      event = RETAIN(eventFromString(string));
+      rule = [[event rrule] iCalRRule];
+      PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
+	   "an event reads the RSCALE of its rule");
+      RELEASE(pool);
+      AUTORELEASE(event);
+    }
     rule = [[event rrule] iCalRRule];
     PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
-	 "an event reads the RSCALE of its rule");
-    PASS(rule.rscale != icalproperty_get_rrule(prop).rscale,
 	 "the rule of an event doesn't share its RSCALE with the iCalendar component");
 
+    ic = [ICalComponent componentWithString:[NSString stringWithUTF8String:string]];
+    event = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
     PASS([event updateICalComponent:ic], "an event with an RSCALE can be saved");
-    prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
-    exported = prop ? icalproperty_get_rrule(prop) : rule;
-    PASS(prop != NULL && exported.rscale != NULL && !strcmp(exported.rscale, "GREGORIAN"),
+    PASS([[[ic ruleForProperty:@"RRULE"] stringValue] rangeOfString:@"RSCALE=GREGORIAN"].location != NSNotFound,
 	 "an event saved in its own component keeps its RSCALE");
-    icalcomponent_free(ic);
     rule = [[archived(event) rrule] iCalRRule];
     PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
 	 "an archived rule keeps its RSCALE");
@@ -152,8 +154,7 @@ int main()
     [event setStartDate:dt("20240615T100000")];
     PASS(![event hasOccurrences], "-setStartDate: is taken into account");
     [event setStartDate:before];
-    [event setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:
-				    icalrecurrencetype_from_string("FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53")])];
+    [event setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithString:@"FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53"])];
     PASS(![event hasOccurrences], "-setRRule: is taken into account");
     [event setRRule:nil];
     PASS([event hasOccurrences], "an event that doesn't repeat has an occurrence");
@@ -165,8 +166,7 @@ int main()
    * event and dropped its time when it was saved
    */
   {
-    icalcomponent *ic;
-    struct icaltimetype start;
+    ICalComponent *ic;
 
     event = eventFromString(VEVENT("DTSTART:20240315T100000Z\r\nRRULE:FREQ=WEEKLY;COUNT=3\r\n"));
     PASS(event != nil && ![event allDay],
@@ -176,13 +176,10 @@ int main()
     PASS(event != nil && ![[event startDate] isDate],
 	 "an event with a start time and no end keeps its start time");
     ic = [event asICalComponent];
-    start = icalcomponent_get_dtstart(ic);
-    PASS(!start.is_date && icaltime_compare(start, icaltime_from_string("20240315T100000Z")) == 0,
+    PASS([[ic stringValue] rangeOfString:@"DTSTART:20240315T100000Z\r\n"].location != NSNotFound,
 	 "an event with a start time and no end is exported with its start time");
-    PASS(icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY) == NULL
-	 && icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY) == NULL,
+    PASS(![ic hasProperty:@"DTEND"] && ![ic hasProperty:@"DURATION"],
 	 "an event without duration is exported without end nor duration");
-    icalcomponent_free(ic);
 
     /* It is an instant, shown on the day of each occurrence */
     event = eventFromString(VEVENT("DTSTART:20240315T100000\r\nRRULE:FREQ=WEEKLY;COUNT=3\r\n"));

@@ -14,8 +14,6 @@
 
 static void exercise(Element *elt)
 {
-  icalcomponent *ic;
-
   [elt summary];
   [elt UID];
   [elt text];
@@ -43,10 +41,8 @@ static void exercise(Element *elt)
     [(Task *)elt dueDate];
     [(Task *)elt state];
   }
-  /* Reverse path : Element -> icalcomponent */
-  ic = [elt asICalComponent];
-  if (ic)
-    icalcomponent_free(ic);
+  /* Reverse path : Element -> iCalendar */
+  [[elt asICalComponent] stringValue];
   /* NSCoding path, used by LocalStore */
   [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:elt]];
 }

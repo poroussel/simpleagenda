@@ -5,6 +5,8 @@
 #import "Date.h"
 #import "RecurrenceRule.h"
 #import "Alarm.h"
+#import "ICalComponent.h"
+#import "Date+ICal.h"
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */
 static Date *dt(const char *string)
@@ -19,13 +21,24 @@ static BOOL sameRange(NSRange range, NSUInteger location, NSUInteger length)
   return range.location == location && range.length == length;
 }
 
+/* The number of name properties in the iCalendar text of component */
+static int propertyCount(ICalComponent *component, NSString *name)
+{
+  NSEnumerator *lines = [[[component stringValue] componentsSeparatedByString:@"\n"] objectEnumerator];
+  NSString *line;
+  int count = 0;
+
+  while ((line = [lines nextObject]))
+    if ([line hasPrefix:[name stringByAppendingString:@":"]] || [line hasPrefix:[name stringByAppendingString:@";"]])
+      count++;
+  return count;
+}
+
 static Event *eventFromString(const char *string)
 {
-  icalcomponent *ic = icalparser_parse_string(string);
-  Event *event = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
+  ICalComponent *component = [ICalComponent componentWithString:[NSString stringWithUTF8String:string]];
 
-  icalcomponent_free(ic);
-  return event;
+  return AUTORELEASE([[Event alloc] initWithICalComponent:component]);
 }
 
 @implementation Event(Testing)
@@ -305,21 +318,21 @@ int main ()
     [src addAlarm:alarm];
     [src setLocation:@"Room"];
     [src setSticky:YES];
-    [src setClassification:ICAL_CLASS_PRIVATE];
+    [src setClassification:SAClassificationPrivate];
     [src addCategory:@"Idea"];
     [src addCategory:@"Travel"];
     [src setText:AUTORELEASE([[NSAttributedString alloc] initWithString:@"Text"])];
     [src setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:5])];
 
-    icalcomponent *ic = [src asICalComponent];
-    PASS(ic != NULL && icalcomponent_isa(ic) == ICAL_VEVENT_COMPONENT, "-asICalComponent returns a VEVENT");
+    ICalComponent *ic = [src asICalComponent];
+    PASS(ic != nil && [ic kind] == ICalVEvent, "-asICalComponent returns a VEVENT");
     Event *dst = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
     PASS(dst != nil, "-initWithICalComponent: works");
     PASS_EQUAL([dst UID], [src UID], "iCalendar preserves the UID");
     PASS_EQUAL([dst summary], [src summary], "iCalendar preserves the summary");
     PASS_EQUAL([dst location], @"Room", "iCalendar preserves the location");
     PASS_EQUAL([[dst text] string], @"Text", "iCalendar preserves the text");
-    PASS([dst classification] == ICAL_CLASS_PRIVATE, "iCalendar preserves the classification");
+    PASS([dst classification] == SAClassificationPrivate, "iCalendar preserves the classification");
     PASS([dst inCategory:@"Idea"] && [dst inCategory:@"Travel"], "iCalendar preserves the categories");
     PASS([dst sticky], "iCalendar preserves the sticky state");
     PASS(![dst allDay], "iCalendar preserves the all day state");
@@ -338,26 +351,25 @@ int main ()
     [src setCategories:[NSArray array]];
     [src setAlarms:[NSArray array]];
     PASS([src updateICalComponent:ic], "-updateICalComponent: works");
-    PASS(icalcomponent_count_properties(ic, ICAL_SUMMARY_PROPERTY) == 1, "only one SUMMARY");
-    PASS(icalcomponent_count_properties(ic, ICAL_DTSTART_PROPERTY) == 1, "only one DTSTART");
-    PASS(icalcomponent_count_properties(ic, ICAL_DTEND_PROPERTY) == 1, "only one DTEND");
-    PASS(icalcomponent_count_properties(ic, ICAL_UID_PROPERTY) == 1, "only one UID");
-    PASS(icalcomponent_count_properties(ic, ICAL_LOCATION_PROPERTY) == 0, "the location is removed");
-    PASS(icalcomponent_count_properties(ic, ICAL_RRULE_PROPERTY) == 0, "the rule is removed");
-    PASS(icalcomponent_count_properties(ic, ICAL_DESCRIPTION_PROPERTY) == 0, "the text is removed");
-    PASS(icalcomponent_count_properties(ic, ICAL_CATEGORIES_PROPERTY) == 0, "the categories are removed");
-    PASS(icalcomponent_count_properties(ic, ICAL_X_PROPERTY) == 0, "the sticky state is removed");
-    PASS(icalcomponent_count_components(ic, ICAL_VALARM_COMPONENT) == 0, "the alarms are removed");
+    PASS([[ic textsForProperty:@"SUMMARY"] count] == 1, "only one SUMMARY");
+    PASS(propertyCount(ic, @"DTSTART") == 1, "only one DTSTART");
+    PASS(propertyCount(ic, @"DTEND") == 1, "only one DTEND");
+    PASS([[ic textsForProperty:@"UID"] count] == 1, "only one UID");
+    PASS(![ic hasProperty:@"LOCATION"], "the location is removed");
+    PASS(![ic hasProperty:@"RRULE"], "the rule is removed");
+    PASS(![ic hasProperty:@"DESCRIPTION"], "the text is removed");
+    PASS(![ic hasProperty:@"CATEGORIES"], "the categories are removed");
+    PASS([[ic stringValue] rangeOfString:@"\nX-"].location == NSNotFound, "the sticky state is removed");
+    PASS([[ic componentsOfKind:ICalVAlarm] count] == 0, "the alarms are removed");
     dst = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
     PASS_EQUAL([dst summary], @"Updated", "-updateICalComponent: writes the new values");
     PASS(![dst sticky], "the event isn't sticky anymore");
-    icalcomponent_free(ic);
   }
 
   /* iCalendar : all day events */
   {
     Event *src = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615") duration:0 title:@"All day"]);
-    icalcomponent *ic;
+    ICalComponent *ic;
     Event *dst;
 
     [src setAllDay:YES];
@@ -365,10 +377,9 @@ int main ()
     dst = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
     PASS([dst allDay] && [dst duration] == 1440, "iCalendar preserves an all day event");
     PASS([[dst startDate] isDate] && [[dst startDate] compare:dt("20240615") withTime:NO] == NSOrderedSame, "an all day event stays on its day");
-    PASS([[dt("20240616") description] isEqualToString:[AUTORELEASE([[Date alloc] initWithICalTime:icalcomponent_get_dtend(ic)]) description]], "DTEND of an all day event is the next day");
+    PASS([[dt("20240616") description] isEqualToString:[[ic dateForProperty:@"DTEND"] description]], "DTEND of an all day event is the next day");
     [src updateICalComponent:ic];
-    PASS(icalcomponent_count_properties(ic, ICAL_X_PROPERTY) == 1, "the all day property isn't added twice by an update");
-    icalcomponent_free(ic);
+    PASS([[ic textsForProperty:@"X-MICROSOFT-CDO-ALLDAYEVENT"] count] == 1, "the all day property isn't added twice by an update");
   }
 
 #define VEVENT(content) ("BEGIN:VEVENT\r\n" content "END:VEVENT\r\n")
@@ -407,13 +418,8 @@ int main ()
     PASS([[dst startDate] compare:dt("20240615T140000Z") withTime:YES] == NSOrderedSame,
 	 "a start with a TZID is read in that timezone");
     PASS([dst duration] == 90, "the duration of an event with a TZID is read");
-    {
-      icalcomponent *ic = [dst asICalComponent];
-
-      PASS(strstr(icalcomponent_as_ical_string(ic), "DTSTART:20240615T140000Z\r\n") != NULL,
-	   "a start read with a TZID is exported in UTC");
-      icalcomponent_free(ic);
-    }
+    PASS([[[dst asICalComponent] stringValue] rangeOfString:@"DTSTART:20240615T140000Z\r\n"].location != NSNotFound,
+	 "a start read with a TZID is exported in UTC");
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Not/AZone:20240615T100000\r\nDURATION:PT1H\r\n"));
     PASS([[dst startDate] compare:dt("20240615T100000") withTime:YES] == NSOrderedSame,
 	 "a start with an unknown TZID is read in the local timezone");
@@ -422,16 +428,16 @@ int main ()
 				 "DTEND;TZID=Europe/Paris:20240331T040000\r\n"));
     PASS([dst duration] == 240, "the duration of an event with a TZID takes DST into account");
     {
-      icalcomponent *cal = icalparser_parse_string("BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:x\r\n"
-						   "BEGIN:VTIMEZONE\r\nTZID:Custom\r\nBEGIN:STANDARD\r\nDTSTART:19700101T000000\r\n"
-						   "TZOFFSETFROM:+0300\r\nTZOFFSETTO:+0300\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\n"
-						   "BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Custom:20240615T100000\r\n"
-						   "DURATION:PT1H\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n");
+      ICalComponent *cal = [ICalComponent componentWithString:
+					    @"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:x\r\n"
+					  @"BEGIN:VTIMEZONE\r\nTZID:Custom\r\nBEGIN:STANDARD\r\nDTSTART:19700101T000000\r\n"
+					  @"TZOFFSETFROM:+0300\r\nTZOFFSETTO:+0300\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\n"
+					  @"BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\nDTSTART;TZID=Custom:20240615T100000\r\n"
+					  @"DURATION:PT1H\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"];
 
-      dst = AUTORELEASE([[Event alloc] initWithICalComponent:icalcomponent_get_first_component(cal, ICAL_VEVENT_COMPONENT)]);
+      dst = AUTORELEASE([[Event alloc] initWithICalComponent:[[cal componentsOfKind:ICalVEvent] lastObject]]);
       PASS([[dst startDate] compare:dt("20240615T070000Z") withTime:YES] == NSOrderedSame,
 	   "a TZID defined by a VTIMEZONE of the calendar is used");
-      icalcomponent_free(cal);
     }
 
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000\r\nDURATION:PT1H\r\nX-SIMPLEAGENDA-STICKY:TRUE\r\n"));
@@ -454,17 +460,13 @@ int main ()
     /* LocalStore saves events with NSKeyedArchiver : an event loaded from
      * it and exported again must keep its start instant */
     {
-      icalcomponent *ic;
-      struct icaltimetype start;
+      ICalComponent *ic;
 
       dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000Z\r\nDURATION:PT1H\r\n"));
       dst = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:dst]];
       ic = [dst asICalComponent];
-      start = icalcomponent_get_dtstart(ic);
-      PASS(icaltime_compare(start, icaltime_from_string("20240615T100000Z")) == 0
-	   && start.hour == 10,
+      PASS([[ic stringValue] rangeOfString:@"DTSTART:20240615T100000Z\r\n"].location != NSNotFound,
 	   "an archived event is exported with its original UTC start");
-      icalcomponent_free(ic);
     }
   }
 

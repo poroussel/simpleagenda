@@ -5,30 +5,24 @@
 #import "Element.h"
 #import "HourFormatter.h"
 
-@implementation Alarm
-- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
-{
-  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
-  if (prop) {
-    icalcomponent_remove_property(ic, prop);
-    icalproperty_free(prop);
-  }
-}
+/* The ACTION values, as libical writes them */
+static NSString *actionNames[] = {@"", @"AUDIO", @"DISPLAY", @"EMAIL", @"PROCEDURE"};
 
+@implementation Alarm
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-  [coder encodeObject:[NSString stringWithCString:icalcomponent_as_ical_string(_ic)] forKey:@"alarmComponent"];
+  [coder encodeObject:[_component stringValue] forKey:@"alarmComponent"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
-  _ic = icalcomponent_new_from_string([[coder decodeObjectForKey:@"alarmComponent"] cString]);
+  _component = RETAIN([ICalComponent componentWithString:[coder decodeObjectForKey:@"alarmComponent"]]);
   return self;
 }
 
 - (void)dealloc
 {
-  icalcomponent_free(_ic);
+  RELEASE(_component);
   [super dealloc];
 }
 
@@ -37,8 +31,8 @@
   self = [super init];
   if (self) {
     _element = nil;
-    _ic = icalcomponent_new([self iCalComponentType]);
-    if (!_ic) {
+    _component = RETAIN([ICalComponent componentWithKind:[self iCalComponentKind]]);
+    if (!_component) {
       NSLog(@"Error while creating an VALARM component");
       DESTROY(self);
     }
@@ -53,130 +47,103 @@
 
 - (NSAttributedString *)desc
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_DESCRIPTION_PROPERTY);
-  if (prop)
-    return AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]]);
+  if ([_component hasProperty:@"DESCRIPTION"])
+    return AUTORELEASE([[NSAttributedString alloc] initWithString:[_component textForProperty:@"DESCRIPTION"]]);
   return nil;
 }
 
 - (void)setDesc:(NSAttributedString *)desc
 {
-  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:_ic];
-  if (desc)
-    icalcomponent_add_property(_ic, icalproperty_new_description([[desc string] UTF8String]));
+  [_component setText:[desc string] forProperty:@"DESCRIPTION"];
 }
 
 - (NSString *)summary
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
+  if (![_component hasProperty:@"SUMMARY"]) {
     NSLog(@"Error : no summary property");
     return nil;
   }
-  return [NSString stringWithUTF8String:icalproperty_get_summary(prop)];
+  return [_component textForProperty:@"SUMMARY"];
 }
 
 - (void)setSummary:(NSString *)summary
 {
-  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:_ic];
-  if (summary)
-    icalcomponent_add_property(_ic, icalproperty_new_summary([summary UTF8String]));
+  [_component setText:summary forProperty:@"SUMMARY"];
 }
 
 - (BOOL)isAbsoluteTrigger
 {
-  struct icaltriggertype trigger;
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
-
-  if (!prop) {
+  if (![_component hasProperty:@"TRIGGER"]) {
     NSLog(@"Error : no trigger property");
     return NO;
   }
-  trigger = icalproperty_get_trigger(prop);
-  if (icaltime_is_null_time(trigger.time))
-    return NO;
-  return YES;
+  return [_component dateForProperty:@"TRIGGER"] != nil;
 }
 
 - (Date *)absoluteTrigger
 {
-  struct icaltriggertype trigger;
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
-
-  if (!prop) {
+  if (![_component hasProperty:@"TRIGGER"]) {
     NSLog(@"Error : no trigger property");
     return nil;
   }
-  trigger = icalproperty_get_trigger(prop);
-  return AUTORELEASE([[Date alloc] initWithICalTime:trigger.time]);
+  return [_component dateForProperty:@"TRIGGER"];
 }
 
 - (void)setAbsoluteTrigger:(Date *)date
 {
-  struct icaltriggertype trigger;
-
-  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:_ic];
-  memset(&trigger, 0, sizeof(trigger));
-  trigger.time = [date UTCICalTime];
-  icalcomponent_add_property(_ic, icalproperty_new_trigger(trigger));
+  [_component setDate:date forProperty:@"TRIGGER"];
 }
 
 - (NSTimeInterval)relativeTrigger
 {
-  struct icaltriggertype trigger;
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_TRIGGER_PROPERTY);
+  NSTimeInterval trigger;
 
-  if (!prop) {
+  if (![_component getDuration:&trigger forProperty:@"TRIGGER"]) {
     NSLog(@"Error : no trigger property");
     return -1;
   }
-  trigger = icalproperty_get_trigger(prop);
-  return icaldurationtype_as_int(trigger.duration);
+  return trigger;
 }
 
 - (void)setRelativeTrigger:(NSTimeInterval)duration
 {
-  struct icaltriggertype trigger;
-
-  [self deleteProperty:ICAL_TRIGGER_PROPERTY fromComponent:_ic];
-  memset(&trigger, 0, sizeof(trigger));
-  trigger.duration = icaldurationtype_from_int(duration);
-  icalcomponent_add_property(_ic, icalproperty_new_trigger(trigger));
+  [_component setDuration:duration forProperty:@"TRIGGER"];
 }
 
-- (enum icalproperty_action)action
+- (SAAlarmAction)action
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ACTION_PROPERTY);
+  NSString *action = [_component textForProperty:@"ACTION"];
+  SAAlarmAction a;
 
-  if (!prop) {
+  if (![_component hasProperty:@"ACTION"]) {
     NSLog(@"Error : no ACTION property");
-    return -1;
+    return SAAlarmActionNone;
   }
-  return icalproperty_get_action(prop);
+  for (a = SAAlarmActionAudio; a <= SAAlarmActionProcedure; a++)
+    if ([action isEqualToString:actionNames[a]])
+      return a;
+  return SAAlarmActionOther;
 }
 
-- (void)setAction:(enum icalproperty_action)action
+- (void)setAction:(SAAlarmAction)action
 {
-  [self deleteProperty:ICAL_ACTION_PROPERTY fromComponent:_ic];
-  icalcomponent_add_property(_ic, icalproperty_new_action(action));
+  if (action < SAAlarmActionAudio || action > SAAlarmActionProcedure) {
+    NSLog(@"Wrong alarm action %d", action);
+    return;
+  }
+  [_component setText:actionNames[action] forProperty:@"ACTION"];
 }
 
 - (NSString *)emailAddress
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_ATTENDEE_PROPERTY);
-
-  if (prop)
-    return [NSString stringWithUTF8String:icalproperty_get_attendee(prop)];
-  return nil;
+  return [_component textForProperty:@"ATTENDEE"];
 }
 
 - (void)setEmailAddress:(NSString *)emailAddress
 {
-  [self deleteProperty:ICAL_ATTENDEE_PROPERTY fromComponent:_ic];
-  if (emailAddress) {
-    icalcomponent_add_property(_ic, icalproperty_new_attendee([emailAddress UTF8String]));
-    [self setAction:ICAL_ACTION_EMAIL];
-  }
+  [_component setText:emailAddress forProperty:@"ATTENDEE"];
+  if (emailAddress)
+    [self setAction:SAAlarmActionEmail];
 }
 
 - (NSString *)sound
@@ -189,7 +156,7 @@
 {
   /* FIXME */
   if (sound) {
-    [self setAction:ICAL_ACTION_AUDIO];
+    [self setAction:SAAlarmActionAudio];
   }
 }
 
@@ -203,40 +170,35 @@
 {
   /* FIXME */
   if (url) {
-    [self setAction:ICAL_ACTION_PROCEDURE];
+    [self setAction:SAAlarmActionProcedure];
   }
 }
 
 - (int)repeatCount
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_REPEAT_PROPERTY);
-
-  if (prop)
-    return icalproperty_get_repeat(prop);
-  return 0;
+  return [[_component textForProperty:@"REPEAT"] intValue];
 }
 
 - (void)setRepeatCount:(int)count
 {
-  [self deleteProperty:ICAL_REPEAT_PROPERTY fromComponent:_ic];
-  if (count > 0)
-    icalcomponent_add_property(_ic, icalproperty_new_repeat(count));
+  [_component setText:count > 0 ? [NSString stringWithFormat:@"%d", count] : nil forProperty:@"REPEAT"];
 }
 
 - (NSTimeInterval)repeatInterval
 {
-  icalproperty *prop = icalcomponent_get_first_property(_ic, ICAL_DURATION_PROPERTY);
+  NSTimeInterval interval;
 
-  if (prop)
-    return icaldurationtype_as_int(icalproperty_get_duration(prop));
+  if ([_component getDuration:&interval forProperty:@"DURATION"])
+    return interval;
   return 0;
 }
 
 - (void)setRepeatInterval:(NSTimeInterval)interval
 {
-  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:_ic];
   if (interval > 0)
-    icalcomponent_add_property(_ic, icalproperty_new_duration(icaldurationtype_from_int(interval)));
+    [_component setDuration:interval forProperty:@"DURATION"];
+  else
+    [_component removeProperty:@"DURATION"];
 }
 
 - (Element *)element
@@ -276,31 +238,30 @@
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  return [[Alarm allocWithZone:zone] initWithICalComponent:_ic];
+  return [[Alarm allocWithZone:zone] initWithICalComponent:_component];
 }
 
-
-- (id)initWithICalComponent:(icalcomponent *)ic
+- (id)initWithICalComponent:(ICalComponent *)component
 {
   if ((self = [super init])) {
     _element = nil;
-    _ic = icalcomponent_new_clone(ic);
-    if (!_ic) {
+    _component = [component copy];
+    if (!_component) {
       NSLog(@"Error creating Alarm from iCal component");
-      NSLog(@"\n\n%s", icalcomponent_as_ical_string(ic));
+      NSLog(@"\n\n%@", [component stringValue]);
       DESTROY(self);
     }
   }
   return self;
 }
 
-- (icalcomponent *)asICalComponent
+- (ICalComponent *)asICalComponent
 {
-  return icalcomponent_new_clone(_ic);
+  return AUTORELEASE([_component copy]);
 }
 
-- (int)iCalComponentType
+- (ICalComponentKind)iCalComponentKind
 {
-  return ICAL_VALARM_COMPONENT;
+  return ICalVAlarm;
 }
 @end

@@ -1,12 +1,12 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "config.h"
 #import <Foundation/Foundation.h>
 #import "Element.h"
+#import "ICalComponent.h"
 
 @interface iCalTree : NSObject
 {
-  icalcomponent *root;
+  ICalComponent *_root;
 }
 
 - (BOOL)parseString:(NSString *)string;

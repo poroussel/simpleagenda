@@ -1,6 +1,5 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "config.h"
 #import <Foundation/Foundation.h>
 #import "Date.h"
 
@@ -15,9 +14,12 @@ typedef enum
   recurrenceFrequenceOther,
 } recurrenceFrequency;
 
+struct icalrecurrencetype;
+
 @interface RecurrenceRule : NSObject
 {
-  struct icalrecurrencetype recur;
+  /* A libical rule, owned by the receiver (see RecurrenceRule+ICal.h) */
+  struct icalrecurrencetype *_recur;
 }
 
 - (id)initWithFrequency:(recurrenceFrequency)frequency;
@@ -35,13 +37,7 @@ typedef enum
 - (recurrenceFrequency)frequency;
 - (Date *)until;
 - (int)count;
-@end
-
-@interface RecurrenceRule(iCalendar)
-- (id)initWithICalRRule:(struct icalrecurrencetype)rrule;
-/*
- * The rscale of the returned rule belongs to the receiver : it is only
- * valid as long as the receiver is
- */
-- (struct icalrecurrencetype)iCalRRule;
+/* An RRULE value (RFC 5545), and back */
+- (id)initWithString:(NSString *)string;
+- (NSString *)stringValue;
 @end

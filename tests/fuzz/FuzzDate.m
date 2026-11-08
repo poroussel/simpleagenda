@@ -33,7 +33,7 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "Date.h"
+#import "Date+ICal.h"
 
 #define MAX_OPS 64
 #define MAX_ENUM_DAYS 1000

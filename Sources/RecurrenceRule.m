@@ -1,6 +1,7 @@
 #import <stdlib.h>
 #import <string.h>
-#import "RecurrenceRule.h"
+#import "RecurrenceRule+ICal.h"
+#import "Date+ICal.h"
 
 /*
  * The iterator keeps a copy of the rule, rscale pointer included :
@@ -43,15 +44,17 @@
 - (id)init
 {
   self = [super init];
-  if (self)
-    icalrecurrencetype_clear(&recur);
+  if (self) {
+    _recur = malloc(sizeof(*_recur));
+    icalrecurrencetype_clear(_recur);
+  }
   return self;
 }
 - (id)initWithFrequency:(recurrenceFrequency)frequency
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
   if ((self = [self init]))
-    recur.freq = (icalrecurrencetype_frequency)frequency;
+    _recur->freq = (icalrecurrencetype_frequency)frequency;
   return self;
 }
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate
@@ -63,8 +66,8 @@
      * It's OK to use Date iCaltime: here as timezone modifications
      * only affect datetimes, not dates
      */
-    recur.until = [endDate UTCICalTime];
-    recur.freq = (icalrecurrencetype_frequency)frequency;
+    _recur->until = [endDate UTCICalTime];
+    _recur->freq = (icalrecurrencetype_frequency)frequency;
   }
   return self;
 }
@@ -72,8 +75,8 @@
 {
   NSAssert(frequency < recurrenceFrequenceOther, @"Wrong frequency");
   if ((self = [self init])) {
-    recur.count = count;
-    recur.freq = (icalrecurrencetype_frequency)frequency;
+    _recur->count = count;
+    _recur->freq = (icalrecurrencetype_frequency)frequency;
   }
   return self;
 }
@@ -103,28 +106,28 @@ static int countOf(const short *array, int size)
 - (BOOL)neverMatches
 {
   static const int daysInMonth[] = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  int nsetpos = countOf(recur.by_set_pos, ICAL_BY_SETPOS_SIZE);
-  int nmonthday = countOf(recur.by_month_day, ICAL_BY_MONTHDAY_SIZE);
-  int nmonth = countOf(recur.by_month, ICAL_BY_MONTH_SIZE);
+  int nsetpos = countOf(_recur->by_set_pos, ICAL_BY_SETPOS_SIZE);
+  int nmonthday = countOf(_recur->by_month_day, ICAL_BY_MONTHDAY_SIZE);
+  int nmonth = countOf(_recur->by_month, ICAL_BY_MONTH_SIZE);
   int i;
 
-  if (recur.rscale)
+  if (_recur->rscale)
     return NO;
-  if (recur.freq == ICAL_MONTHLY_RECURRENCE && nsetpos > 0
-      && countOf(recur.by_year_day, ICAL_BY_YEARDAY_SIZE) == 0
-      && countOf(recur.by_week_no, ICAL_BY_WEEKNO_SIZE) == 0) {
+  if (_recur->freq == ICAL_MONTHLY_RECURRENCE && nsetpos > 0
+      && countOf(_recur->by_year_day, ICAL_BY_YEARDAY_SIZE) == 0
+      && countOf(_recur->by_week_no, ICAL_BY_WEEKNO_SIZE) == 0) {
     int ndays = 0;
-    int nday = countOf(recur.by_day, ICAL_BY_DAY_SIZE);
+    int nday = countOf(_recur->by_day, ICAL_BY_DAY_SIZE);
 
     if (nmonthday > 0)
       ndays = nmonthday;
     else if (nday > 0)
       for (i = 0; i < nday; i++)
-	ndays += icalrecurrencetype_day_position(recur.by_day[i]) ? 1 : 5;
+	ndays += icalrecurrencetype_day_position(_recur->by_day[i]) ? 1 : 5;
     else
       ndays = 1;
     for (i = 0; i < nsetpos; i++)
-      if (abs(recur.by_set_pos[i]) <= ndays)
+      if (abs(_recur->by_set_pos[i]) <= ndays)
 	break;
     if (i == nsetpos)
       return YES;
@@ -133,13 +136,13 @@ static int countOf(const short *array, int size)
     int maxdays = 0;
 
     for (i = 0; i < nmonth; i++) {
-      int month = icalrecurrencetype_month_month(recur.by_month[i]);
+      int month = icalrecurrencetype_month_month(_recur->by_month[i]);
       if (month < 1 || month > 12)
 	return NO;
       maxdays = MAX(maxdays, daysInMonth[month]);
     }
     for (i = 0; i < nmonthday; i++)
-      if (abs(recur.by_month_day[i]) <= maxdays)
+      if (abs(_recur->by_month_day[i]) <= maxdays)
 	break;
     if (i == nmonthday)
       return YES;
@@ -155,13 +158,13 @@ static int countOf(const short *array, int size)
  */
 - (BOOL)isExpandable
 {
-  if (recur.freq == ICAL_SECONDLY_RECURRENCE || recur.freq == ICAL_MINUTELY_RECURRENCE)
+  if (_recur->freq == ICAL_SECONDLY_RECURRENCE || _recur->freq == ICAL_MINUTELY_RECURRENCE)
     return NO;
-  if (recur.freq == ICAL_HOURLY_RECURRENCE
-      && (countOf(recur.by_month, ICAL_BY_MONTH_SIZE) > 0
-	  || countOf(recur.by_week_no, ICAL_BY_WEEKNO_SIZE) > 0
-	  || countOf(recur.by_year_day, ICAL_BY_YEARDAY_SIZE) > 0
-	  || countOf(recur.by_month_day, ICAL_BY_MONTHDAY_SIZE) > 0))
+  if (_recur->freq == ICAL_HOURLY_RECURRENCE
+      && (countOf(_recur->by_month, ICAL_BY_MONTH_SIZE) > 0
+	  || countOf(_recur->by_week_no, ICAL_BY_WEEKNO_SIZE) > 0
+	  || countOf(_recur->by_year_day, ICAL_BY_YEARDAY_SIZE) > 0
+	  || countOf(_recur->by_month_day, ICAL_BY_MONTHDAY_SIZE) > 0))
     return NO;
   return YES;
 }
@@ -189,21 +192,42 @@ static int countOf(const short *array, int size)
 }
 - (recurrenceFrequency)frequency
 {
-  return (recurrenceFrequency)recur.freq;
+  return (recurrenceFrequency)_recur->freq;
 }
 - (Date *)until
 {
-  if (icaltime_is_null_time(recur.until))
+  if (icaltime_is_null_time(_recur->until))
     return nil;
-  return AUTORELEASE([[Date alloc] initWithICalTime:recur.until]);
+  return AUTORELEASE([[Date alloc] initWithICalTime:_recur->until]);
 }
 - (int)count
 {
-  return recur.count;
+  return _recur->count;
+}
+- (id)initWithString:(NSString *)string
+{
+  if ((self = [super init])) {
+    _recur = malloc(sizeof(*_recur));
+    /* icalrecurrencetype_from_string() allocates rscale, freed by -dealloc */
+    if (string)
+      *_recur = icalrecurrencetype_from_string([string UTF8String]);
+    else
+      icalrecurrencetype_clear(_recur);
+  }
+  return self;
+}
+- (NSString *)stringValue
+{
+  char *string = icalrecurrencetype_as_string(_recur);
+
+  return string ? [NSString stringWithUTF8String:string] : nil;
 }
 - (void)dealloc
 {
-  free(recur.rscale);
+  if (_recur) {
+    free(_recur->rscale);
+    free(_recur);
+  }
   [super dealloc];
 }
 @end
@@ -212,28 +236,30 @@ static int countOf(const short *array, int size)
 - (id)initWithICalRRule:(struct icalrecurrencetype)rrule
 {
   if ((self = [super init])) {
-    recur = rrule;
+    _recur = malloc(sizeof(*_recur));
+    *_recur = rrule;
     /* rrule.rscale belongs to the property it comes from */
     if (rrule.rscale)
-      recur.rscale = strdup(rrule.rscale);
+      _recur->rscale = strdup(rrule.rscale);
   }
   return self;
 }
 - (struct icalrecurrencetype)iCalRRule
 {
-  return recur;
+  return *_recur;
 }
 @end
 
 @implementation RecurrenceRule(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-  [coder encodeObject:[NSString stringWithCString:icalrecurrencetype_as_string(&recur)] forKey:@"rrule"];
+  [coder encodeObject:[NSString stringWithCString:icalrecurrencetype_as_string(_recur)] forKey:@"rrule"];
 }
 /* icalrecurrencetype_from_string() allocates rscale, freed by -dealloc */
 - (id)initWithCoder:(NSCoder *)coder
 {
-  recur = icalrecurrencetype_from_string([[coder decodeObjectForKey:@"rrule"] cString]);
+  _recur = malloc(sizeof(*_recur));
+  *_recur = icalrecurrencetype_from_string([[coder decodeObjectForKey:@"rrule"] cString]);
   return self;
 }
 @end

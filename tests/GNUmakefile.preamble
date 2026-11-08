@@ -2,6 +2,11 @@
 
 include ../local.make
 
+ICalComponentTest_OBJC_FILES += \
+	../Sources/Date.m \
+	../Sources/ICalComponent.m \
+	../Sources/RecurrenceRule.m
+
 DateTest_OBJC_FILES += \
 	../Sources/Date.m
 
@@ -15,6 +20,7 @@ ElementTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
 	../Sources/RecurrenceRule.m
@@ -24,6 +30,7 @@ MemoryStoreTest_OBJC_FILES += \
 	../Sources/ConfigManager.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/MemoryStore.m \
@@ -43,6 +50,7 @@ EventTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
@@ -52,6 +60,7 @@ RecurrentEventTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
@@ -61,6 +70,7 @@ TaskTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
 	../Sources/RecurrenceRule.m \
@@ -70,6 +80,7 @@ iCalTreeTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/iCalTree.m \
@@ -81,6 +92,7 @@ LocalStoreTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/LocalStore.m \
@@ -94,6 +106,7 @@ iCalStoreTest_OBJC_FILES += \
 	../Sources/ConfigManager.m \
 	../Sources/Date.m \
 	../Sources/Element.m \
+	../Sources/ICalComponent.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
 	../Sources/iCalStore.m \
@@ -107,5 +120,5 @@ iCalStoreTest_OBJC_FILES += \
 	../Sources/WebDAVResource.m
 
 NEEDS_GUI=yes
-ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../Headers -I..
+ADDITIONAL_INCLUDE_DIRS += -I$(GSTESTTOP) -I../Headers -I../Sources -I..
 ADDITIONAL_TOOL_LIBS += -lical

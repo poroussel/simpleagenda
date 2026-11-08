@@ -7,7 +7,7 @@
  */
 
 #import "ObjectTesting.h"
-#import "Date.h"
+#import "Date+ICal.h"
 
 static Date *dt(const char *string)
 {

@@ -50,6 +50,7 @@ Sources/iCalStore.m \
 Sources/ConfigManager.m \
 Sources/Date.m \
 Sources/iCalTree.m \
+Sources/ICalComponent.m \
 Sources/DataTree.m \
 Sources/Element.m \
 Sources/Task.m \

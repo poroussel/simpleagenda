@@ -60,7 +60,7 @@ static NSArray *availableCategories;
   if ([coder containsValueForKey:@"classification"])
     _classification = [coder decodeIntForKey:@"classification"];
   else
-    _classification = ICAL_CLASS_PUBLIC;
+    _classification = SAClassificationPublic;
   if ([coder containsValueForKey:@"dtstamp"])
     _stamp = [[coder decodeObjectForKey:@"dtstamp"] retain];
   else
@@ -79,7 +79,7 @@ static NSArray *availableCategories;
     return nil;
   _alarms = [NSMutableArray new];
   _categories = [NSMutableArray new];
-  _classification = ICAL_CLASS_PUBLIC;
+  _classification = SAClassificationPublic;
   _text = nil;
   ASSIGNCOPY(_stamp, [Date now]);
   return self;
@@ -150,16 +150,16 @@ static NSArray *availableCategories;
   ASSIGN(_uid, aUid);
 }
 
-- (icalproperty_class)classification
+- (SAClassification)classification
 {
   return _classification;
 }
 
-- (void)setClassification:(icalproperty_class)classification
+- (void)setClassification:(SAClassification)classification
 {
-  if (classification < ICAL_CLASS_X || classification > ICAL_CLASS_NONE) {
-    NSLog(@"Wrong classification value %d, change it to ICAL_CLASS_PUBLIC", classification);
-    _classification = ICAL_CLASS_PUBLIC;
+  if (classification < SAClassificationX || classification > SAClassificationNone) {
+    NSLog(@"Wrong classification value %d, change it to SAClassificationPublic", classification);
+    _classification = SAClassificationPublic;
     return;
   }
   _classification = classification;
@@ -238,42 +238,63 @@ static NSArray *availableCategories;
   return [_categories containsObject:category];
 }
 
-- (id)initWithICalComponent:(icalcomponent *)ic
+/* The CLASS values, as libical writes them */
+static NSString *classificationName(SAClassification classification)
 {
-  icalproperty *prop;
-  icalcomponent *subc;
+  switch (classification) {
+  case SAClassificationPublic:
+    return @"PUBLIC";
+  case SAClassificationPrivate:
+    return @"PRIVATE";
+  case SAClassificationConfidential:
+    return @"CONFIDENTIAL";
+  default:
+    return @"";
+  }
+}
+
+static SAClassification classificationNamed(NSString *name)
+{
+  if ([name isEqualToString:@"PUBLIC"])
+    return SAClassificationPublic;
+  if ([name isEqualToString:@"PRIVATE"])
+    return SAClassificationPrivate;
+  if ([name isEqualToString:@"CONFIDENTIAL"])
+    return SAClassificationConfidential;
+  return SAClassificationX;
+}
+
+- (id)initWithICalComponent:(ICalComponent *)component
+{
+  NSEnumerator *enumerator;
+  ICalComponent *subc;
+  NSString *text;
   Alarm *alarm;
 
   self = [self init];
   if (self == nil)
     return nil;
-  prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-  if (!prop) {
+  if (![component hasProperty:@"UID"]) {
     NSLog(@"No UID");
     goto init_error;
   }
-  [self setUID:[NSString stringWithCString:icalproperty_get_uid(prop)]];
-  prop = icalcomponent_get_first_property(ic, ICAL_SUMMARY_PROPERTY);
-  if (!prop) {
+  [self setUID:[component textForProperty:@"UID"]];
+  if (![component hasProperty:@"SUMMARY"]) {
     NSLog(@"No summary");
     goto init_error;
   }
-  [self setSummary:[NSString stringWithUTF8String:icalproperty_get_summary(prop)]];
-  prop = icalcomponent_get_first_property(ic, ICAL_DESCRIPTION_PROPERTY);
-  if (prop)
-    [self setText:AUTORELEASE([[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:icalproperty_get_description(prop)]])];
-  prop = icalcomponent_get_first_property(ic, ICAL_DTSTAMP_PROPERTY);
-  if (prop)
-    [self setDateStamp:AUTORELEASE([[Date alloc] initWithICalTime:icalproperty_get_dtstamp(prop)])];
-  prop = icalcomponent_get_first_property(ic, ICAL_CLASS_PROPERTY);
-  if (prop)
-    [self setClassification:icalproperty_get_class(prop)];
-  prop = icalcomponent_get_first_property(ic, ICAL_CATEGORIES_PROPERTY);
-  if (prop)
-    [self setCategories:[[NSString stringWithUTF8String:icalproperty_get_categories(prop)] componentsSeparatedByString:@","]];
+  [self setSummary:[component textForProperty:@"SUMMARY"]];
+  if ([component hasProperty:@"DESCRIPTION"])
+    [self setText:AUTORELEASE([[NSAttributedString alloc] initWithString:[component textForProperty:@"DESCRIPTION"]])];
+  if ([component hasProperty:@"DTSTAMP"])
+    [self setDateStamp:[component dateForProperty:@"DTSTAMP"]];
+  if ([component hasProperty:@"CLASS"])
+    [self setClassification:classificationNamed([component textForProperty:@"CLASS"])];
+  if ((text = [component textForProperty:@"CATEGORIES"]))
+    [self setCategories:[text componentsSeparatedByString:@","]];
 
-  subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT);
-  for (; subc != NULL; subc = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT)) {
+  enumerator = [[component componentsOfKind:ICalVAlarm] objectEnumerator];
+  while ((subc = [enumerator nextObject])) {
     alarm = [[Alarm alloc] initWithICalComponent:subc];
     if (alarm) {
       [self addAlarm:alarm];
@@ -288,67 +309,47 @@ static NSArray *availableCategories;
   return nil;
 }
 
-- (icalcomponent *)asICalComponent
+- (ICalComponent *)asICalComponent
 {
-  icalcomponent *ic = icalcomponent_new([self iCalComponentType]);
-  if (!ic) {
+  ICalComponent *component = [ICalComponent componentWithKind:[self iCalComponentKind]];
+
+  if (!component) {
     NSLog(@"Couldn't create iCalendar component");
-    return NULL;
+    return nil;
   }
-  if (![self updateICalComponent:ic]) {
-    icalcomponent_free(ic);
-    return NULL;
-  }
-  return ic;
+  if (![self updateICalComponent:component])
+    return nil;
+  return component;
 }
 
-- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic
-{
-  icalproperty *prop = icalcomponent_get_first_property(ic, kind);
-  if (prop) {
-    icalcomponent_remove_property(ic, prop);
-    icalproperty_free(prop);
-  }
-}
-
-- (BOOL)updateICalComponent:(icalcomponent *)ic
+- (BOOL)updateICalComponent:(ICalComponent *)component
 {
   NSEnumerator *enumerator;
+  ICalComponent *subc;
   Alarm *alarm;
-  icalcomponent *subc, *next;
 
-  [self deleteProperty:ICAL_UID_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_uid([[self UID] cString]));
-  [self deleteProperty:ICAL_SUMMARY_PROPERTY fromComponent:ic];
-  if ([self summary])
-    icalcomponent_add_property(ic, icalproperty_new_summary([[self summary] UTF8String]));
-  [self deleteProperty:ICAL_DESCRIPTION_PROPERTY fromComponent:ic];
-  if ([self text])
-    icalcomponent_add_property(ic, icalproperty_new_description([[[self text] string] UTF8String]));
-  [self deleteProperty:ICAL_DTSTAMP_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstamp([_stamp UTCICalTime]));
-  [self deleteProperty:ICAL_CLASS_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_class([self classification]));
-  [self deleteProperty:ICAL_CATEGORIES_PROPERTY fromComponent:ic];
+  [component setText:[self UID] forProperty:@"UID"];
+  [component setText:[self summary] forProperty:@"SUMMARY"];
+  [component setText:[[self text] string] forProperty:@"DESCRIPTION"];
+  [component setDate:_stamp forProperty:@"DTSTAMP"];
+  [component setText:classificationName([self classification]) forProperty:@"CLASS"];
   if ([[self categories] count] > 0)
-    icalcomponent_add_property(ic, icalproperty_new_categories([[[self categories] componentsJoinedByString:@","] UTF8String]));
+    [component setText:[[self categories] componentsJoinedByString:@","] forProperty:@"CATEGORIES"];
+  else
+    [component removeProperty:@"CATEGORIES"];
 
-  for (subc = icalcomponent_get_first_component(ic, ICAL_VALARM_COMPONENT); subc != NULL; subc = next) {
-    next = icalcomponent_get_next_component(ic, ICAL_VALARM_COMPONENT);
-    icalcomponent_remove_component(ic, subc);
-    icalcomponent_free(subc);
-  }
+  enumerator = [[component componentsOfKind:ICalVAlarm] objectEnumerator];
+  while ((subc = [enumerator nextObject]))
+    [component removeComponent:subc];
   enumerator = [[self alarms] objectEnumerator];
-  while ((alarm = [enumerator nextObject])) {
-    subc = [alarm asICalComponent];
-    icalcomponent_add_component(ic, subc);
-  }
+  while ((alarm = [enumerator nextObject]))
+    [component addComponent:[alarm asICalComponent]];
   return YES;
 }
 
-- (int)iCalComponentType
+- (ICalComponentKind)iCalComponentKind
 {
   NSLog(@"Shouldn't be used");
-  return -1;
+  return ICalOtherComponent;
 }
 @end

@@ -1,7 +1,7 @@
 /* -*- objc -*- */
 
 #import "ObjectTesting.h"
-#import "Date.h"
+#import "Date+ICal.h"
 #import <math.h>
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */

@@ -48,9 +48,9 @@ static NSMutableArray *sounds;
   return @"Sound notification";
 }
 
-- (enum icalproperty_action)backendType
+- (SAAlarmAction)backendType
 {
-  return ICAL_ACTION_AUDIO;
+  return SAAlarmActionAudio;
 }
 
 - (id)init

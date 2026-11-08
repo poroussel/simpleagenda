@@ -1,18 +1,21 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "config.h"
 #import "MemoryStore.h"
 #import "Date.h"
+#import "ICalComponent.h"
 
 /*
-  icalproperty_class
-
-  ICAL_CLASS_X = 10006,
-  ICAL_CLASS_PUBLIC = 10007,
-  ICAL_CLASS_PRIVATE = 10008,
-  ICAL_CLASS_CONFIDENTIAL = 10009,
-  ICAL_CLASS_NONE = 10010
-*/
+ * The CLASS property. The values are libical 3's, and are stored as they
+ * are in local calendars (LocalStore) : don't change them
+ */
+typedef enum
+{
+  SAClassificationX = 10300,		/* an X- or unknown value */
+  SAClassificationPublic = 10301,
+  SAClassificationPrivate = 10302,
+  SAClassificationConfidential = 10303,
+  SAClassificationNone = 10399
+} SAClassification;
 
 @class Alarm;
 
@@ -22,7 +25,7 @@
   NSString *_uid;
   NSString *_summary;
   NSAttributedString *_text;
-  icalproperty_class _classification;
+  SAClassification _classification;
   Date *_stamp;
   NSMutableArray *_alarms;
   NSMutableArray *_categories;
@@ -36,14 +39,14 @@
 - (NSAttributedString *)text;
 - (NSString *)summary;
 - (NSString *)UID;
-- (icalproperty_class)classification;
+- (SAClassification)classification;
 - (Date *)dateStamp;
 
 - (void)setStore:(id <MemoryStore>)store;
 - (void)setText:(NSAttributedString *)text;
 - (void)setSummary:(NSString *)summary;
 - (void)setUID:(NSString *)uid;
-- (void)setClassification:(icalproperty_class)classification;
+- (void)setClassification:(SAClassification)classification;
 - (void)setDateStamp:(Date *)stamp;
 
 - (BOOL)hasAlarms;
@@ -59,9 +62,8 @@
 - (void)removeCategory:(NSString *)category;
 - (BOOL)inCategory:(NSString *)category;
 
-- (id)initWithICalComponent:(icalcomponent *)ic;
-- (icalcomponent *)asICalComponent;
-- (void)deleteProperty:(icalproperty_kind)kind fromComponent:(icalcomponent *)ic;
-- (BOOL)updateICalComponent:(icalcomponent *)ic;
-- (int)iCalComponentType;
+- (id)initWithICalComponent:(ICalComponent *)component;
+- (ICalComponent *)asICalComponent;
+- (BOOL)updateICalComponent:(ICalComponent *)component;
+- (ICalComponentKind)iCalComponentKind;
 @end

@@ -265,64 +265,37 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
 @end
 
 @implementation Event(iCalendar)
-- (id)initWithICalComponent:(icalcomponent *)ic
+- (id)initWithICalComponent:(ICalComponent *)component
 {
-  icalproperty *prop;
-  icalproperty *pstart;
-  icalproperty *pend;
-  icalproperty *pdur;
-  struct icaltimetype start;
-  struct icaltimetype end;
-  struct icaldurationtype diff;
+  NSTimeInterval duration;
+  NSEnumerator *enumerator;
+  NSString *sticky;
   Date *date;
-  const char *location;
 
-  self = [super initWithICalComponent:ic];
+  self = [super initWithICalComponent:component];
   if (self == nil)
     return nil;
 
-  pstart = icalcomponent_get_first_property(ic, ICAL_DTSTART_PROPERTY);
-  if (!pstart) {
+  if (![component hasProperty:@"DTSTART"]) {
     NSLog(@"No start date");
     goto init_error;
   }
-  start = icaltimeWithTZID(pstart, icalproperty_get_dtstart(pstart));
-  date = [[Date alloc] initWithICalTime:start];
+  date = [component dateForProperty:@"DTSTART"];
   [self setStartDate:date];
-  pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
-  pdur = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
   if ([date isDate])
     [self setAllDay:YES];
-  else if (!pend && !pdur)
+  else if ([component hasProperty:@"DTEND"])
+    [self setDuration:(int)[component secondsFromProperty:@"DTSTART" toProperty:@"DTEND"] / 60];
+  else if ([component getDuration:&duration forProperty:@"DURATION"])
+    [self setDuration:(int)duration / 60];
+  else
     /* RFC 5545 3.6.1 : it ends at its start */
     [self setDuration:0];
-  else {
-    if (!pend)
-      diff = icalproperty_get_duration(pdur);
-    else {
-      end = icaltimeWithTZID(pend, icalproperty_get_dtend(pend));
-      /* icaltime_subtract() ignores timezones : subtract UTC times */
-      if (start.zone && end.zone)
-	diff = icaltime_subtract(icaltime_convert_to_zone(end, icaltimezone_get_utc_timezone()),
-				 icaltime_convert_to_zone(start, icaltimezone_get_utc_timezone()));
-      else
-	diff = icaltime_subtract(end, start);
-    }
-    [self setDuration:icaldurationtype_as_int(diff) / 60];
-  }
-  prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
-  if (prop)
-    _rrule = [[RecurrenceRule alloc] initWithICalRRule:icalproperty_get_rrule(prop)];
-  [date release];
-  location = icalcomponent_get_location(ic);
-  if (location)
-    [self setLocation:[NSString stringWithUTF8String:location]];
-  prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
-  while (prop) {
-    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY"))
-      [self setSticky:strcmp("TRUE", icalproperty_get_value_as_string(prop)) ? NO : YES];
-    prop = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
-  }
+  _rrule = RETAIN([component ruleForProperty:@"RRULE"]);
+  [self setLocation:[component textForProperty:@"LOCATION"]];
+  enumerator = [[component textsForProperty:@"X-SIMPLEAGENDA-STICKY"] objectEnumerator];
+  while ((sticky = [enumerator nextObject]))
+    [self setSticky:[sticky isEqualToString:@"TRUE"]];
   return self;
 
  init_error:
@@ -331,67 +304,42 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
   return nil;
 }
 
-- (BOOL)updateICalComponent:(icalcomponent *)ic
+- (BOOL)updateICalComponent:(ICalComponent *)component
 {
   Date *end;
-  icalproperty *prop, *next;
 
-  if (![super updateICalComponent:ic])
+  if (![super updateICalComponent:component])
     return NO;
 
-  [self deleteProperty:ICAL_LOCATION_PROPERTY fromComponent:ic];
-  if ([self location])
-    icalcomponent_add_property(ic, icalproperty_new_location([[self location] UTF8String]));
+  [component setText:[self location] forProperty:@"LOCATION"];
+  [component setDate:_startDate forProperty:@"DTSTART"];
 
-  [self deleteProperty:ICAL_DTSTART_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_dtstart([_startDate UTCICalTime]));
-
-  [self deleteProperty:ICAL_DTEND_PROPERTY fromComponent:ic];
-  [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
+  /* The -set... methods replace the first DTEND */
+  [component removeProperty:@"DURATION"];
   /* Without DTEND nor DURATION, an event ends at its start (RFC 5545 3.6.1) */
   if (![self allDay] && _duration != 0)
-    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate UTCICalTime], icaldurationtype_from_int(_duration * 60))));
+    [component setDate:_startDate plusSeconds:_duration * 60 forProperty:@"DTEND"];
   else if ([self allDay]) {
     end = [_startDate copy];
     [end incrementDay];
-    icalcomponent_add_property(ic, icalproperty_new_dtend([end UTCICalTime]));
+    [component setDate:end forProperty:@"DTEND"];
     [end release];
     /* OGo workaround ? */
-    prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
-    while (prop) {
-      next = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
-      if (!strcmp(icalproperty_get_x_name(prop), "X-MICROSOFT-CDO-ALLDAYEVENT")) {
-        icalcomponent_remove_property(ic, prop);
-        icalproperty_free(prop);
-      }
-      prop = next;
-    }
-    prop = icalproperty_new_from_string("X-MICROSOFT-CDO-ALLDAYEVENT:TRUE");
-    icalcomponent_add_property(ic, prop);
-  }
+    [component removeAllProperties:@"X-MICROSOFT-CDO-ALLDAYEVENT"];
+    [component setText:@"TRUE" forProperty:@"X-MICROSOFT-CDO-ALLDAYEVENT"];
+  } else
+    [component removeProperty:@"DTEND"];
 
-  prop = icalcomponent_get_first_property(ic, ICAL_X_PROPERTY);
-  while (prop) {
-    next = icalcomponent_get_next_property(ic, ICAL_X_PROPERTY);
-    if (!strcmp(icalproperty_get_x_name(prop), "X-SIMPLEAGENDA-STICKY")) {
-      icalcomponent_remove_property(ic, prop);
-      icalproperty_free(prop);
-    }
-    prop = next;
-  }
-  if ([self sticky]) {
-    prop = icalproperty_new_from_string("X-SIMPLEAGENDA-STICKY:TRUE");
-    icalcomponent_add_property(ic, prop);
-  }
+  [component removeAllProperties:@"X-SIMPLEAGENDA-STICKY"];
+  if ([self sticky])
+    [component setText:@"TRUE" forProperty:@"X-SIMPLEAGENDA-STICKY"];
 
-  [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
-  if (_rrule)
-    icalcomponent_add_property(ic, icalproperty_new_rrule([_rrule iCalRRule]));
+  [component setRule:_rrule forProperty:@"RRULE"];
   return YES;
 }
 
-- (int)iCalComponentType
+- (ICalComponentKind)iCalComponentKind
 {
-  return ICAL_VEVENT_COMPONENT;
+  return ICalVEvent;
 }
 @end

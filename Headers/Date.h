@@ -1,6 +1,5 @@
 /* emacs buffer mode hint -*- objc -*- */
 
-#import "config.h"
 #import <Foundation/Foundation.h>
 
 /*
@@ -27,7 +26,16 @@
  */
 @interface Date : NSObject
 {
-  struct icaltimetype _time;
+  /* The fields of a libical struct icaltimetype, see Date.m */
+  int _year;
+  int _month;
+  int _day;
+  int _hour;
+  int _minute;
+  int _second;
+  int _isDate;
+  int _isDaylight;
+  const void *_zone;		/* an icaltimezone, NULL for dates */
 }
 
 + (id)now;
@@ -63,14 +71,3 @@
 - (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate;
 - (NSTimeInterval)timeIntervalSinceNow;
 @end
-
-@interface Date(iCalendar)
-- (id)initWithICalTime:(struct icaltimetype)time;
-- (struct icaltimetype)UTCICalTime;
-- (struct icaltimetype)localICalTime;
-@end
-
-/* The time of a property, in the timezone given by its TZID parameter :
-   a VTIMEZONE of its calendar or a zone known by libical. Without TZID,
-   or with an unknown one, the time is returned unchanged */
-struct icaltimetype icaltimeWithTZID(icalproperty *prop, struct icaltimetype time);

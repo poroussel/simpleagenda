@@ -40,8 +40,8 @@
 #import <string.h>
 #import "iCalTree.h"
 #import "Event.h"
-#import "Date.h"
-#import "RecurrenceRule.h"
+#import "Date+ICal.h"
+#import "RecurrenceRule+ICal.h"
 
 /* Occurrences enumerated per event, and checked with -isScheduledForDay: */
 #define MAX_OCCURRENCES 300
@@ -54,11 +54,8 @@ static void failed(NSString *what, Event *ev, NSString *more)
 {
   NSString *rule = @"(none)";
 
-  if ([ev rrule]) {
-    struct icalrecurrencetype r = [[ev rrule] iCalRRule];
-    char *s = icalrecurrencetype_as_string(&r);
-    rule = s ? [NSString stringWithUTF8String:s] : @"(not printable)";
-  }
+  if ([ev rrule])
+    rule = [[ev rrule] stringValue] ? [[ev rrule] stringValue] : @"(not printable)";
   NSLog(@"Invariant failed : %@\n  start %@ allDay %d duration %d\n  rrule %@\n  %@",
         what, [ev startDate], [ev allDay], [ev duration], rule, more ? more : @"");
   abort();
@@ -66,14 +63,9 @@ static void failed(NSString *what, Event *ev, NSString *more)
 
 static NSString *ruleString(RecurrenceRule *rule)
 {
-  struct icalrecurrencetype r;
-  char *s;
-
   if (rule == nil)
     return nil;
-  r = [rule iCalRRule];
-  s = icalrecurrencetype_as_string(&r);
-  return s ? [NSString stringWithUTF8String:s] : @"";
+  return [rule stringValue] ? [rule stringValue] : @"";
 }
 
 static BOOL checkable(Date *d)
@@ -189,12 +181,11 @@ static void checkEvent(Event *ev)
 
   /* iCalendar export path */
   {
-    icalcomponent *ic = [ev asICalComponent];
+    ICalComponent *ic = [ev asICalComponent];
     Event *parsed;
 
     if (ic) {
       parsed = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
-      icalcomponent_free(ic);
       if (parsed == nil)
         failed(@"exported event can't be read back", ev, nil);
       sameOccurrences(ev, all, occurrences(parsed), @"exported event");

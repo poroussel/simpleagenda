@@ -41,6 +41,8 @@ version 0.50
 	  are read in their timezone, defined by a VTIMEZONE of the calendar
 	  or known by libical, instead of the local one. Unknown TZIDs still
 	  give local times
+	* libical is only used by ICalComponent, Date and RecurrenceRule : no
+	  header exposes it anymore, a first step towards replacing it
 	* Move source files in Sources and headers in Headers
 	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV, dates and
 	  recurrent events in tests/fuzz

@@ -67,7 +67,7 @@
     _current = nil;
     _simple = RETAIN([Alarm alarm]);
     [_simple setRelativeTrigger:-15*60];
-    [_simple setAction:ICAL_ACTION_DISPLAY];
+    [_simple setAction:SAAlarmActionDisplay];
 
     [table setDelegate:self];
 

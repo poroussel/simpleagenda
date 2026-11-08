@@ -1,14 +1,25 @@
 /* emacs buffer mode hint -*- objc -*- */
 
 #import <Foundation/Foundation.h>
-#import "config.h"
+#import "ICalComponent.h"
 
 @class Date;
 @class Element;
 
+/* The ACTION property */
+typedef enum
+{
+  SAAlarmActionNone = -1,	/* no ACTION */
+  SAAlarmActionOther = 0,	/* an X- or unknown action */
+  SAAlarmActionAudio,
+  SAAlarmActionDisplay,
+  SAAlarmActionEmail,
+  SAAlarmActionProcedure
+} SAAlarmAction;
+
 @interface Alarm : NSObject <NSCoding>
 {
-  icalcomponent *_ic;
+  ICalComponent *_component;
   Element *_element;
 }
 
@@ -22,8 +33,8 @@
 - (void)setAbsoluteTrigger:(Date *)trigger;
 - (NSTimeInterval)relativeTrigger;
 - (void)setRelativeTrigger:(NSTimeInterval)trigger;
-- (enum icalproperty_action)action;
-- (void)setAction:(enum icalproperty_action)action;
+- (SAAlarmAction)action;
+- (void)setAction:(SAAlarmAction)action;
 - (NSString *)emailAddress;
 - (void)setEmailAddress:(NSString *)emailAddress;
 - (NSString *)sound;
@@ -39,7 +50,7 @@
 - (Date *)triggerDateRelativeTo:(Date *)date;
 - (NSString *)shortDescription;
 
-- (id)initWithICalComponent:(icalcomponent *)ic;
-- (icalcomponent *)asICalComponent;
-- (int)iCalComponentType;
+- (id)initWithICalComponent:(ICalComponent *)component;
+- (ICalComponent *)asICalComponent;
+- (ICalComponentKind)iCalComponentKind;
 @end

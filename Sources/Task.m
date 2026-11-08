@@ -90,56 +90,40 @@ static NSArray *stateName;
 @end
 
 @implementation Task(iCalendar)
-- (id)initWithICalComponent:(icalcomponent *)ic
-{
-  icalproperty *prop;
+/* The STATUS values of the task states, as libical writes them */
+static NSString *statusNames[] = {@"", @"IN-PROCESS", @"COMPLETED", @"CANCELLED", @"NEEDS-ACTION"};
 
-  if ((self = [super initWithICalComponent:ic])) {
-    prop = icalcomponent_get_first_property(ic, ICAL_STATUS_PROPERTY);
-    if (prop) {
-      switch (icalproperty_get_status(prop))
-	{
-	case ICAL_STATUS_COMPLETED:
-	  [self setState:TK_COMPLETED];
-	  break;
-	case ICAL_STATUS_CANCELLED:
-	  [self setState:TK_CANCELED];
-	  break;
-	case ICAL_STATUS_INPROCESS:
-	  [self setState:TK_INPROCESS];
-	  break;
-	case ICAL_STATUS_NEEDSACTION:
-	  [self setState:TK_NEEDSACTION];
-	  break;
-	default:
-	  [self setState:TK_NONE];
-	}
-    }
-    else
-      [self setState:TK_NONE];
-    prop = icalcomponent_get_first_property(ic, ICAL_DUE_PROPERTY);
-    if (prop) 
-      [self setDueDate:AUTORELEASE([[Date alloc] initWithICalTime:icaltimeWithTZID(prop, icalproperty_get_due(prop))])];
+- (id)initWithICalComponent:(ICalComponent *)component
+{
+  NSString *status;
+  int state;
+
+  if ((self = [super initWithICalComponent:component])) {
+    status = [component textForProperty:@"STATUS"];
+    [self setState:TK_NONE];
+    for (state = TK_INPROCESS; status && state <= TK_NEEDSACTION; state++)
+      if ([status isEqualToString:statusNames[state]])
+	[self setState:state];
+    if ([component hasProperty:@"DUE"])
+      [self setDueDate:[component dateForProperty:@"DUE"]];
   }
   return self;
 }
 
-static int statusCorr[] = {ICAL_STATUS_NONE, ICAL_STATUS_INPROCESS, ICAL_STATUS_COMPLETED, ICAL_STATUS_CANCELLED, ICAL_STATUS_NEEDSACTION};
-
-- (BOOL)updateICalComponent:(icalcomponent *)ic
+- (BOOL)updateICalComponent:(ICalComponent *)component
 {
-  if (![super updateICalComponent:ic])
+  if (![super updateICalComponent:component])
     return NO;
-  [self deleteProperty:ICAL_STATUS_PROPERTY fromComponent:ic];
-  icalcomponent_add_property(ic, icalproperty_new_status(statusCorr[[self state]]));
-  [self deleteProperty:ICAL_DUE_PROPERTY fromComponent:ic];
+  [component setText:statusNames[[self state]] forProperty:@"STATUS"];
   if (_dueDate)
-    icalcomponent_add_property(ic, icalproperty_new_due([_dueDate UTCICalTime]));      
+    [component setDate:_dueDate forProperty:@"DUE"];
+  else
+    [component removeProperty:@"DUE"];
   return YES;
 }
 
-- (int)iCalComponentType
+- (ICalComponentKind)iCalComponentKind
 {
-  return ICAL_VTODO_COMPONENT;
+  return ICalVTodo;
 }
 @end

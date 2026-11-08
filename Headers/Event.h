@@ -47,7 +47,7 @@
 @end
 
 @interface Event(iCalendar)
-- (id)initWithICalComponent:(icalcomponent *)ic;
-- (BOOL)updateICalComponent:(icalcomponent *)ic;
+- (id)initWithICalComponent:(ICalComponent *)component;
+- (BOOL)updateICalComponent:(ICalComponent *)component;
 @end
 

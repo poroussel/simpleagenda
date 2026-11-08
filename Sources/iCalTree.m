@@ -8,38 +8,34 @@ static NSString *logKey = @"iCalTree";
 - (id)init
 {
   if ((self = [super init])) {
-    root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("2.0"),
-                              icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
-    if (!root)
+    _root = RETAIN([ICalComponent componentWithKind:ICalVCalendar]);
+    if (!_root)
       DESTROY(self);
+    [_root setText:@"2.0" forProperty:@"VERSION"];
+    [_root setText:@"-//Octets//NONSGML SimpleAgenda Calendar//EN" forProperty:@"PRODID"];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  icalcomponent_free(root);
+  RELEASE(_root);
   [super dealloc];
 }
 
 - (BOOL)parseString:(NSString *)string;
 {
-  icalcomponent *icomp;
+  ICalComponent *component;
 
   NSDebugLLog(logKey, @"iCalTree parseString %@", string);
   if (string == nil) {
     NSLog(@"No string to parse");
     return NO;
   }
-  icomp = icalparser_parse_string([string UTF8String]);
-  if (!icomp)
+  component = [ICalComponent componentWithString:string];
+  if (component == nil || [component kind] != ICalVCalendar)
     return NO;
-  if (icalcomponent_isa(icomp) != ICAL_VCALENDAR_COMPONENT) {
-    icalcomponent_free(icomp);
-    return NO;
-  }
-  icalcomponent_free(root);
-  root = icomp;
+  ASSIGN(_root, component);
   return YES;
 }
 
@@ -51,13 +47,9 @@ static NSString *logKey = @"iCalTree";
 - (NSString *)iCalTreeAsString
 {
   /* OGo workaround  ? */
-  icalproperty *prop = icalcomponent_get_first_property(root, ICAL_METHOD_PROPERTY);
-  if (prop) {
-    icalcomponent_remove_property(root, prop);
-    icalproperty_free(prop);
-  }
-  icalcomponent_strip_errors(root);
-  return [NSString stringWithUTF8String:icalcomponent_as_ical_string(root)];
+  [_root removeProperty:@"METHOD"];
+  [_root removeErrors];
+  return [_root stringValue];
 }
 
 - (NSData *)iCalTreeAsData;
@@ -67,72 +59,70 @@ static NSString *logKey = @"iCalTree";
 
 - (NSSet *)components
 {
-  icalcomponent *ic;
-  Event *ev;
-  Task *task;
   NSMutableSet *work = [NSMutableSet setWithCapacity:32];
+  NSEnumerator *enumerator;
+  ICalComponent *component;
+  Element *elt;
 
-  for (ic = icalcomponent_get_first_component(root, ICAL_VEVENT_COMPONENT);
-       ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VEVENT_COMPONENT)) {
-    ev = [[Event alloc] initWithICalComponent:ic];
-    if (ev) {
-      [work addObject:ev];
-      [ev release];
+  enumerator = [[_root componentsOfKind:ICalVEvent] objectEnumerator];
+  while ((component = [enumerator nextObject])) {
+    elt = [[Event alloc] initWithICalComponent:component];
+    if (elt) {
+      [work addObject:elt];
+      [elt release];
     }
   }
-  for (ic = icalcomponent_get_first_component(root, ICAL_VTODO_COMPONENT);
-       ic != NULL; ic = icalcomponent_get_next_component(root, ICAL_VTODO_COMPONENT)) {
-    task = [[Task alloc] initWithICalComponent:ic];
-    if (task) {
-      [work addObject:task];
-      [task release];
+  enumerator = [[_root componentsOfKind:ICalVTodo] objectEnumerator];
+  while ((component = [enumerator nextObject])) {
+    elt = [[Task alloc] initWithICalComponent:component];
+    if (elt) {
+      [work addObject:elt];
+      [elt release];
     }
   }
   // Return work directly ?
   return [NSSet setWithSet:work];
 }
 
-- (icalcomponent *)componentForEvent:(Element *)elt
+- (ICalComponent *)componentForEvent:(Element *)elt
 {
-  icalcomponent *ic;
-  icalproperty *prop;
+  NSEnumerator *enumerator = [[_root componentsOfKind:[elt iCalComponentKind]] objectEnumerator];
+  ICalComponent *component;
   NSString *uid = [elt UID];
-  int type = [elt iCalComponentType];
 
-  for (ic = icalcomponent_get_first_component(root, type);
-       ic != NULL; ic = icalcomponent_get_next_component(root, type)) {
-    prop = icalcomponent_get_first_property(ic, ICAL_UID_PROPERTY);
-    if (prop && [uid isEqual:[NSString stringWithCString:icalproperty_get_uid(prop)]])
-	return ic;
-  }
+  while ((component = [enumerator nextObject]))
+    if ([uid isEqual:[component textForProperty:@"UID"]])
+      return component;
   NSLog(@"iCalendar component not found for %@", [elt description]);
-  return NULL;
+  return nil;
 }
 
 - (BOOL)add:(Element *)elt
 {
-  icalcomponent *ic = [elt asICalComponent];
-  if (!ic)
+  ICalComponent *component = [elt asICalComponent];
+
+  if (!component)
     return NO;
-  icalcomponent_add_component(root, ic);
+  [_root addComponent:component];
   return YES;
 }
 
 - (BOOL)remove:(Element *)elt
 {
-  icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic)
+  ICalComponent *component = [self componentForEvent:elt];
+
+  if (!component)
     return NO;
-  icalcomponent_remove_component(root, ic);
-  icalcomponent_free(ic);
+  [_root removeComponent:component];
   return YES;
 }
 
 - (BOOL)update:(Element *)elt
 {
-  icalcomponent *ic = [self componentForEvent:elt];
-  if (!ic)
+  ICalComponent *component = [self componentForEvent:elt];
+
+  if (!component)
     return NO;
-  return [elt updateICalComponent:ic];
+  return [elt updateICalComponent:component];
 }
 @end

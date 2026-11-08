@@ -9,6 +9,7 @@
 #import "RecurrenceRule.h"
 #import "Task.h"
 #import "defines.h"
+#import "Date+ICal.h"
 
 /*
  * This test doesn't touch the real filesystem :
