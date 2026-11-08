@@ -57,6 +57,8 @@
   RELEASE(_location);
   RELEASE(_startDate);
   RELEASE(_rrule);
+  RELEASE(_checkedRule);
+  RELEASE(_checkedStart);
   [super dealloc];
 }
 
@@ -99,6 +101,11 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
 
   if (!_rrule)
     return intersectsDay(_startDate, length, day, range);
+  /* Don't look again for occurrences of a rule that has none */
+  if (![self hasOccurrences]) {
+    *range = NSMakeRange(0, 0);
+    return NO;
+  }
   enumerator = [self occurrenceEnumerator];
   while ((start = [enumerator nextObject])) {
     if (intersectsDay(start, length, day, range))
@@ -232,6 +239,28 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
 - (NSEnumerator *)occurrenceEnumerator
 {
   return [_rrule enumeratorFromDate:_startDate];
+}
+
+/*
+ * Looking for the first occurrence of a rule that matches rarely or never
+ * can take a second (finding 2 in findings.md), and the views ask for
+ * each day they show : remember the answer. The start date can be
+ * changed in place (DayView moves events), so the answer is kept with the
+ * rule and a copy of the start it was computed for
+ */
+- (BOOL)hasOccurrences
+{
+  if (!_rrule)
+    return YES;
+  if (_checkedRule != _rrule || _checkedStart == nil
+      || [_checkedStart isDate] != [_startDate isDate]
+      || [_checkedStart compare:_startDate withTime:YES] != NSOrderedSame) {
+    _hasOccurrences = [[self occurrenceEnumerator] nextObject] != nil;
+    ASSIGN(_checkedRule, _rrule);
+    DESTROY(_checkedStart);
+    _checkedStart = [_startDate copy];
+  }
+  return _hasOccurrences;
 }
 @end
 

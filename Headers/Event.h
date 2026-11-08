@@ -12,6 +12,10 @@
   int _duration;
   BOOL _sticky;
   RecurrenceRule *_rrule;
+  /* -hasOccurrences cache : the rule and start it was computed for */
+  RecurrenceRule *_checkedRule;
+  Date *_checkedStart;
+  BOOL _hasOccurrences;
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
@@ -38,6 +42,8 @@
 
 /* The start date of each occurrence, nil if the event doesn't repeat */
 - (NSEnumerator *)occurrenceEnumerator;
+/* NO for a recurrent event whose rule gives no occurrence */
+- (BOOL)hasOccurrences;
 @end
 
 @interface Event(iCalendar)

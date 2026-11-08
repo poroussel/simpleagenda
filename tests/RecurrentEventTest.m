@@ -95,14 +95,16 @@ int main()
   }
 
   /*
-   * A rule that never matches : the 53rd monday of a month. libical
-   * looks for it for about a second, and the views call
-   * -isScheduledForDay: for each day they show
+   * Finding 2 : a rule that never matches, like the 53rd monday of a
+   * month. libical looks for it for about a second, and the views call
+   * -isScheduledForDay: for each day they show. Such rules are detected
+   * without libical, and an event remembers it has no occurrence
    */
-  testHopeful = YES;	/* Finding 2, not fixed yet */
   {
     NSDate *start;
     NSTimeInterval elapsed;
+    Date *day;
+    int i;
 
     event = eventFromString(VEVENT("DTSTART:20240101T080000Z\r\nDURATION:PT1H\r\n"
 				   "RRULE:FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53\r\n"));
@@ -111,8 +113,51 @@ int main()
     elapsed = -[start timeIntervalSinceNow];
     PASS(elapsed < 0.1,
 	 "-isScheduledForDay: is fast for a rule without any occurrence (%.2fs)", elapsed);
+
+    event = eventFromString(VEVENT("DTSTART:20240101T080000\r\nDURATION:PT1H\r\n"
+				   "RRULE:FREQ=HOURLY;BYMONTH=2;BYMONTHDAY=30\r\n"));
+    start = [NSDate date];
+    [event isScheduledForDay:dt("20240102")];
+    elapsed = -[start timeIntervalSinceNow];
+    PASS(elapsed < 0.1,
+	 "-isScheduledForDay: is fast for an hourly rule on a day that doesn't exist (%.2fs)", elapsed);
+
+    /* Not detected (0.15s to look for it) : the event remembers it */
+    event = eventFromString(VEVENT("DTSTART:20240101T080000\r\nDURATION:PT1H\r\n"
+				   "RRULE:FREQ=YEARLY;BYDAY=MO;BYSETPOS=54\r\n"));
+    PASS(![event hasOccurrences], "an event whose rule never matches has no occurrence");
+    day = dt("20240101");
+    start = [NSDate date];
+    for (i = 0; i < 42; i++) {
+      [event isScheduledForDay:day];
+      [day incrementDay];
+    }
+    elapsed = -[start timeIntervalSinceNow];
+    PASS(elapsed < 0.1,
+	 "42 days of an event without occurrence are fast (%.2fs)", elapsed);
   }
-  testHopeful = NO;
+
+  /* -hasOccurrences follows the start and the rule */
+  {
+    Date *before;
+
+    event = eventFromString(VEVENT("DTSTART:20240615T100000\r\nDURATION:PT1H\r\n"
+				   "RRULE:FREQ=DAILY;UNTIL=20240601T000000\r\n"));
+    PASS(![event hasOccurrences] && ![event isScheduledForDay:dt("20240615")],
+	 "an event starting after its UNTIL has no occurrence");
+    before = dt("20240530T100000");
+    [[event startDate] changeDayBy:-16];
+    PASS([event hasOccurrences] && [event isScheduledForDay:dt("20240531")],
+	 "an event moved in place before its UNTIL has occurrences");
+    [event setStartDate:dt("20240615T100000")];
+    PASS(![event hasOccurrences], "-setStartDate: is taken into account");
+    [event setStartDate:before];
+    [event setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:
+				    icalrecurrencetype_from_string("FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53")])];
+    PASS(![event hasOccurrences], "-setRRule: is taken into account");
+    [event setRRule:nil];
+    PASS([event hasOccurrences], "an event that doesn't repeat has an occurrence");
+  }
 
   /*
    * Finding 3 : RFC 5545 3.6.1, a VEVENT with a DATE-TIME DTSTART and no

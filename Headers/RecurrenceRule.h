@@ -23,7 +23,15 @@ typedef enum
 - (id)initWithFrequency:(recurrenceFrequency)frequency;
 - (id)initWithFrequency:(recurrenceFrequency)frequency until:(Date *)endDate;
 - (id)initWithFrequency:(recurrenceFrequency)frequency count:(int)count;
+/*
+ * The occurrences from start. Empty for a rule that never matches, only
+ * start for a rule that isn't expanded (see -isExpandable)
+ */
 - (NSEnumerator *)enumeratorFromDate:(Date *)start;
+/* YES when the rule can't match any day (detected without libical) */
+- (BOOL)neverMatches;
+/* NO for rules repeating every second or minute, or every hour on some days */
+- (BOOL)isExpandable;
 - (recurrenceFrequency)frequency;
 - (Date *)until;
 - (int)count;

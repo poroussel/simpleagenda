@@ -21,6 +21,8 @@
  *    rules on all day events) and never before DTSTART
  *  - there are at most COUNT occurrences, none after UNTIL
  *  - the event is scheduled on the day of each of its first occurrences
+ *  - libical finds no occurrence for a rule detected as never matching
+ *    (-[RecurrenceRule neverMatches])
  *  - an archived event (LocalStore) and an event exported to iCalendar and
  *    parsed again have the same rule and the same occurrences
  *
@@ -132,6 +134,16 @@ static void checkEvent(Event *ev)
 
   if (!checkable(start))
     return;
+
+  /* A rule detected as never matching mustn't have any occurrence */
+  if ([rule neverMatches]) {
+    icalrecur_iterator *it = icalrecur_iterator_new(r, [start localICalTime]);
+
+    if (it && !icaltime_is_null_time(icalrecur_iterator_next(it)))
+      failed(@"a rule detected as never matching has occurrences", ev, nil);
+    if (it)
+      icalrecur_iterator_free(it);
+  }
 
   for (i = 0; i < [all count]; i++) {
     Date *d = [all objectAtIndex:i];

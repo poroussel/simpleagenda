@@ -21,6 +21,12 @@ version 0.50
 	  (RFC 7529), which could crash the application or save a wrong
 	  rule, and a memory leak when such rules are read from a local
 	  calendar
+	* Recurrent events : a rule that never matches (the 53rd monday of a
+	  month, the 30th of february...) could freeze the application for
+	  seconds to hours, as it was looked for again on each displayed
+	  day. Such rules are detected, events remember they have no
+	  occurrence, and rules repeating every second, every minute or
+	  every hour of some days only are shown once at their start
 	* Event : an event with a start time but without end nor duration
 	  isn't an all day event anymore. It lasts no time (RFC 5545) and
 	  keeps its start time when it is saved. Such events read from

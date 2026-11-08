@@ -10,6 +10,11 @@ static Date *dt(const char *string)
 }
 
 /* Compares what the enumerator returns to a list of dates separated by spaces */
+static RecurrenceRule *ruleFromString(const char *string)
+{
+  return AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:icalrecurrencetype_from_string(string)]);
+}
+
 static BOOL sameDates(NSEnumerator *enumerator, const char *expected)
 {
   NSMutableArray *dates = [NSMutableArray array];
@@ -130,6 +135,60 @@ int main ()
     }
     PASS(n == 2, "the enumerator of datetimes stops at the end of the rule");
   }
+
+  /* Rules that never match are detected without libical */
+  {
+    const char *never[] = {"FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53", "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=-6",
+			   "FREQ=MONTHLY;BYDAY=MO,TU;BYSETPOS=11", "FREQ=MONTHLY;BYDAY=MO;BYHOUR=8,9;BYSETPOS=6",
+			   "FREQ=MONTHLY;BYDAY=1MO,2TU;BYSETPOS=3", "FREQ=MONTHLY;BYMONTHDAY=1,2;BYSETPOS=3",
+			   "FREQ=MONTHLY;BYSETPOS=2", "FREQ=MONTHLY;BYDAY=MO;BYMONTHDAY=1,2,3;BYSETPOS=4",
+			   "FREQ=DAILY;BYMONTH=2;BYMONTHDAY=30", "FREQ=DAILY;BYMONTH=2;BYMONTHDAY=-30",
+			   "FREQ=YEARLY;BYMONTH=4,6;BYMONTHDAY=31", "FREQ=MINUTELY;BYMONTH=2;BYMONTHDAY=30", NULL};
+    const char *maybe[] = {"FREQ=MONTHLY;BYDAY=MO;BYSETPOS=5", "FREQ=MONTHLY;BYDAY=MO,TU;BYSETPOS=10",
+			   "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=-5", "FREQ=MONTHLY;BYSETPOS=1",
+			   "FREQ=WEEKLY;BYDAY=MO,TU;BYSETPOS=3", "FREQ=YEARLY;BYDAY=MO;BYSETPOS=54",
+			   "FREQ=MONTHLY;BYMONTH=2,3;BYMONTHDAY=31", "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29",
+			   "FREQ=DAILY;BYMONTH=2;BYMONTHDAY=-29", "RSCALE=GREGORIAN;FREQ=DAILY;BYMONTH=2;BYMONTHDAY=30",
+			   NULL};
+    int i;
+
+    for (i = 0; never[i]; i++)
+      PASS([ruleFromString(never[i]) neverMatches], "%s never matches", never[i]);
+    for (i = 0; maybe[i]; i++)
+      PASS(![ruleFromString(maybe[i]) neverMatches], "%s isn't detected as never matching", maybe[i]);
+    PASS([[ruleFromString(never[0]) enumeratorFromDate:dt("20240101T080000")] nextObject] == nil,
+	 "a rule that never matches has no occurrence");
+    /* libical agrees (this one only takes 0.1s) */
+    {
+      struct icalrecurrencetype r = icalrecurrencetype_from_string("FREQ=YEARLY;BYMONTH=4,6;BYMONTHDAY=31");
+      icalrecur_iterator *it = icalrecur_iterator_new(r, icaltime_from_string("20240101T080000"));
+
+      PASS(icaltime_is_null_time(icalrecur_iterator_next(it)),
+	   "libical finds no occurrence for a rule detected as never matching");
+      icalrecur_iterator_free(it);
+    }
+  }
+
+  /* Rules repeating every second or minute aren't expanded */
+  PASS(![ruleFromString("FREQ=MINUTELY") isExpandable] && ![ruleFromString("FREQ=SECONDLY") isExpandable],
+       "minutely and secondly rules aren't expanded");
+  PASS(![ruleFromString("FREQ=HOURLY;BYMONTHDAY=1") isExpandable]
+       && ![ruleFromString("FREQ=HOURLY;BYMONTH=1") isExpandable]
+       && ![ruleFromString("FREQ=HOURLY;BYYEARDAY=1") isExpandable]
+       && ![ruleFromString("FREQ=HOURLY;BYWEEKNO=1") isExpandable],
+       "hourly rules on some days only aren't expanded");
+  PASS([ruleFromString("FREQ=HOURLY;BYDAY=MO") isExpandable] && [ruleFromString("FREQ=DAILY;BYMONTHDAY=1") isExpandable],
+       "other rules are expanded");
+  PASS(sameDates([ruleFromString("FREQ=MINUTELY;COUNT=5") enumeratorFromDate:dt("20240615T143000")],
+		 "20240615T143000"),
+       "a rule that isn't expanded only gives its start");
+  PASS(sameDates([ruleFromString("FREQ=HOURLY;BYMONTHDAY=1;UNTIL=20240620T000000") enumeratorFromDate:dt("20240615T143000")],
+		 "20240615T143000"),
+       "a rule that isn't expanded gives its start before UNTIL");
+  PASS(sameDates([ruleFromString("FREQ=MINUTELY;UNTIL=20240101T000000Z") enumeratorFromDate:dt("20240615T143000")], ""),
+       "a rule that isn't expanded gives nothing after UNTIL");
+  PASS(sameDates([ruleFromString("FREQ=MINUTELY;UNTIL=20240101") enumeratorFromDate:dt("20240615")], ""),
+       "a rule on dates that isn't expanded gives nothing after UNTIL");
 
   /* iCalendar */
   {

@@ -77,9 +77,114 @@
   }
   return self;
 }
+/* Number of values in a libical BY array */
+static int countOf(const short *array, int size)
+{
+  int n = 0;
+
+  while (n < size && array[n] != ICAL_RECURRENCE_ARRAY_MAX)
+    n++;
+  return n;
+}
+
+/*
+ * libical looks for the next occurrence by testing each day, hour,
+ * minute or second up to the year 2582 : a rule that never matches costs
+ * up to seconds (finding 2 in findings.md). Detect rules that can't
+ * match without asking libical, for the Gregorian calendar only :
+ *
+ * - MONTHLY with BYSETPOS : libical applies BYSETPOS to the days of the
+ *   month only (BYHOUR doesn't multiply the set). They come from
+ *   BYMONTHDAY, or else BYDAY (5 per weekday, 1 per numbered weekday),
+ *   or else the day of DTSTART. Positions beyond that never match.
+ * - BYMONTHDAY values that none of the BYMONTH months have (the 30th
+ *   of february).
+ */
+- (BOOL)neverMatches
+{
+  static const int daysInMonth[] = {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  int nsetpos = countOf(recur.by_set_pos, ICAL_BY_SETPOS_SIZE);
+  int nmonthday = countOf(recur.by_month_day, ICAL_BY_MONTHDAY_SIZE);
+  int nmonth = countOf(recur.by_month, ICAL_BY_MONTH_SIZE);
+  int i;
+
+  if (recur.rscale)
+    return NO;
+  if (recur.freq == ICAL_MONTHLY_RECURRENCE && nsetpos > 0
+      && countOf(recur.by_year_day, ICAL_BY_YEARDAY_SIZE) == 0
+      && countOf(recur.by_week_no, ICAL_BY_WEEKNO_SIZE) == 0) {
+    int ndays = 0;
+    int nday = countOf(recur.by_day, ICAL_BY_DAY_SIZE);
+
+    if (nmonthday > 0)
+      ndays = nmonthday;
+    else if (nday > 0)
+      for (i = 0; i < nday; i++)
+	ndays += icalrecurrencetype_day_position(recur.by_day[i]) ? 1 : 5;
+    else
+      ndays = 1;
+    for (i = 0; i < nsetpos; i++)
+      if (abs(recur.by_set_pos[i]) <= ndays)
+	break;
+    if (i == nsetpos)
+      return YES;
+  }
+  if (nmonth > 0 && nmonthday > 0) {
+    int maxdays = 0;
+
+    for (i = 0; i < nmonth; i++) {
+      int month = icalrecurrencetype_month_month(recur.by_month[i]);
+      if (month < 1 || month > 12)
+	return NO;
+      maxdays = MAX(maxdays, daysInMonth[month]);
+    }
+    for (i = 0; i < nmonthday; i++)
+      if (abs(recur.by_month_day[i]) <= maxdays)
+	break;
+    if (i == nmonthday)
+      return YES;
+  }
+  return NO;
+}
+
+/*
+ * Rules repeating every second or minute, or every hour on some days
+ * only, can take seconds to minutes to expand, and the views couldn't
+ * show them anyway. SimpleAgenda can't create them : such events are
+ * shown once, at their start
+ */
+- (BOOL)isExpandable
+{
+  if (recur.freq == ICAL_SECONDLY_RECURRENCE || recur.freq == ICAL_MINUTELY_RECURRENCE)
+    return NO;
+  if (recur.freq == ICAL_HOURLY_RECURRENCE
+      && (countOf(recur.by_month, ICAL_BY_MONTH_SIZE) > 0
+	  || countOf(recur.by_week_no, ICAL_BY_WEEKNO_SIZE) > 0
+	  || countOf(recur.by_year_day, ICAL_BY_YEARDAY_SIZE) > 0
+	  || countOf(recur.by_month_day, ICAL_BY_MONTHDAY_SIZE) > 0))
+    return NO;
+  return YES;
+}
+
 /* start is a date or a datetime, and so are the occurrences */
 - (NSEnumerator *)enumeratorFromDate:(Date *)start
 {
+  if ([self neverMatches])
+    return [[NSArray array] objectEnumerator];
+  if (![self isExpandable]) {
+    Date *until = [self until];
+    BOOL ended;
+
+    if (until == nil)
+      ended = NO;
+    else if ([until isDate] || [start isDate])
+      ended = [start compare:until withTime:NO] > 0;
+    else
+      ended = [start compare:until withTime:YES] > 0;
+    if (ended)
+      return [[NSArray array] objectEnumerator];
+    return [[NSArray arrayWithObject:AUTORELEASE([start copy])] objectEnumerator];
+  }
   return AUTORELEASE([[DateRecurrenceEnumerator alloc] initWithRule:self start:start]);
 }
 - (recurrenceFrequency)frequency
