@@ -60,15 +60,13 @@
   [super dealloc];
 }
 
-- (BOOL)isScheduledForDay:(Date *)day
-{
-  return [self intersectionWithDay:day].length > 0;
-}
-
 /*
  * Intersection of [start, start + length[ with day, in seconds from the
  * start of the day. Dates are compared in local time (see
- * -[Date timeIntervalSince1970]), so a day always has 86400 seconds
+ * -[Date timeIntervalSince1970]), so a day always has 86400 seconds.
+ * An event without duration (RFC 5545 3.6.1 : a DATE-TIME DTSTART
+ * without DTEND nor DURATION) is an instant : it intersects the day it
+ * starts on, with an empty range at its start
  */
 static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange *range)
 {
@@ -80,12 +78,43 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
   NSTimeInterval s = MAX(s1, s2);
   NSTimeInterval e = MIN(e1, e2);
 
+  if (length == 0 && s1 >= s2 && s1 < e2) {
+    *range = NSMakeRange(s1 - s2, 0);
+    return YES;
+  }
   if (e <= s) {
     *range = NSMakeRange(0, 0);
     return NO;
   }
   *range = NSMakeRange(s - s2, e - s);
   return YES;
+}
+
+/* The first occurrence intersecting day */
+- (BOOL)occurrenceOnDay:(Date *)day range:(NSRange *)range
+{
+  NSEnumerator *enumerator;
+  NSTimeInterval length = [self duration] * 60;
+  Date *start;
+
+  if (!_rrule)
+    return intersectsDay(_startDate, length, day, range);
+  enumerator = [self occurrenceEnumerator];
+  while ((start = [enumerator nextObject])) {
+    if (intersectsDay(start, length, day, range))
+      return YES;
+    if ([start compare:day withTime:NO] > 0)
+      break;
+  }
+  *range = NSMakeRange(0, 0);
+  return NO;
+}
+
+- (BOOL)isScheduledForDay:(Date *)day
+{
+  NSRange range;
+
+  return [self occurrenceOnDay:day range:&range];
 }
 
 /*
@@ -95,23 +124,10 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
  */
 - (NSRange)intersectionWithDay:(Date *)day
 {
-  NSEnumerator *enumerator;
-  NSTimeInterval length = [self duration] * 60;
   NSRange range;
-  Date *start;
 
-  if (!_rrule) {
-    intersectsDay(_startDate, length, day, &range);
-    return range;
-  }
-  enumerator = [self occurrenceEnumerator];
-  while ((start = [enumerator nextObject])) {
-    if (intersectsDay(start, length, day, &range))
-      return range;
-    if ([start compare:day withTime:NO] > 0)
-      break;
-  }
-  return NSMakeRange(0, 0);
+  [self occurrenceOnDay:day range:&range];
+  return range;
 }
 
 - (Date *)nextActivationDate
@@ -246,8 +262,11 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
   [self setStartDate:date];
   pend = icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY);
   pdur = icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY);
-  if ((!pend && !pdur) || [date isDate])
+  if ([date isDate])
     [self setAllDay:YES];
+  else if (!pend && !pdur)
+    /* RFC 5545 3.6.1 : it ends at its start */
+    [self setDuration:0];
   else {
     if (!pend)
       diff = icalproperty_get_duration(pdur);
@@ -295,9 +314,10 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
 
   [self deleteProperty:ICAL_DTEND_PROPERTY fromComponent:ic];
   [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
-  if (![self allDay])
+  /* Without DTEND nor DURATION, an event ends at its start (RFC 5545 3.6.1) */
+  if (![self allDay] && _duration != 0)
     icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate UTCICalTime], icaldurationtype_from_int(_duration * 60))));
-  else {
+  else if ([self allDay]) {
     end = [_startDate copy];
     [end incrementDay];
     icalcomponent_add_property(ic, icalproperty_new_dtend([end UTCICalTime]));

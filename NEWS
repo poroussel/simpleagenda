@@ -17,6 +17,20 @@ version 0.50
 	  is UTC or a fixed offset (TZ=UTC, TZ=GMT)
 	* Use NSUUID to generate unique event ids : libuuid isn't needed
 	  anymore, gnustep-base 1.24.6 or later is required
+	* Recurrent events : fix a use after free with RRULE using RSCALE
+	  (RFC 7529), which could crash the application or save a wrong
+	  rule, and a memory leak when such rules are read from a local
+	  calendar
+	* Event : an event with a start time but without end nor duration
+	  isn't an all day event anymore. It lasts no time (RFC 5545) and
+	  keeps its start time when it is saved. Such events read from
+	  iCalendar or GroupDAV calendars are now shown at their time, and
+	  events lasting no time, which weren't shown at all, now appear on
+	  their day. Events already saved as all day ones stay so
+	* Date : dates (days without time) have no timezone anymore. All day
+	  events with an hourly rule could get other occurrences once saved
+	  in a local calendar, and a time added to a date could be exported
+	  as UTC
 	* Move source files in Sources and headers in Headers
 	* Add fuzzers for iCalendar parsing, WebDAV/GroupDAV, dates and
 	  recurrent events in tests/fuzz

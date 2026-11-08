@@ -444,6 +444,52 @@ int main ()
 	 "a date archived without timezone keeps its day");
   END_SET("NSCoding and timezones")
 
+  /* Dates have no timezone, datetimes are in the local timezone */
+  {
+    const icaltimezone *local = [[Date now] localICalTime].zone;
+    Date *d;
+
+    d = [Date now];
+    [d setIsDate:YES];
+    PASS([d isDate] && [d localICalTime].zone == NULL, "-setIsDate:YES removes the timezone");
+    [d setIsDate:NO];
+    PASS(![d isDate] && [d localICalTime].zone == local,
+	 "-setIsDate:NO on a date gives a datetime in the local timezone");
+    PASS([Date today] != nil && [[Date today] localICalTime].zone == NULL, "+today has no timezone");
+    PASS([[Date dayWithDate:[Date now]] localICalTime].zone == NULL, "+dayWithDate: has no timezone");
+    d = [Date dateWithCalendarDate:[NSCalendarDate calendarDate] withTime:NO];
+    PASS([d isDate] && [d localICalTime].zone == NULL,
+	 "+dateWithCalendarDate:withTime:NO has no timezone");
+    d = [Date dateWithCalendarDate:[NSCalendarDate calendarDate] withTime:YES];
+    PASS(![d isDate] && [d localICalTime].zone == local,
+	 "+dateWithCalendarDate:withTime:YES is in the local timezone");
+    d = [Date dateWithTimeInterval:86400 sinceDate:dt("20240615")];
+    PASS([d isDate] && [d localICalTime].zone == NULL && [[d description] isEqualToString:@"20240616"],
+	 "+dateWithTimeInterval:sinceDate: of a whole day gives a date without timezone");
+    d = [Date dateWithTimeInterval:3600 sinceDate:dt("20240615")];
+    PASS(![d isDate] && [d localICalTime].zone == local && [[d description] isEqualToString:@"20240615T010000"],
+	 "+dateWithTimeInterval:sinceDate: of an hour gives a local datetime");
+    {
+      icaltimezone *paris = icaltimezone_get_builtin_timezone("Europe/Paris");
+      struct icaltimetype t = icaltime_from_string("20240615");
+
+      t = icaltime_set_timezone(&t, paris);
+      d = AUTORELEASE([[Date alloc] initWithICalTime:t]);
+      PASS([d isDate] && [d localICalTime].zone == NULL && [[d description] isEqualToString:@"20240615"],
+	   "-initWithICalTime: drops the timezone of a date");
+    }
+
+    /* A date compares as the local midnight */
+    PASS([dt("20240615") compare:dt("20240615T000000") withTime:YES] == NSOrderedSame,
+	 "a date is equal to the local midnight of its day");
+    PASS([dt("20240615") compare:dt("20240615T010000") withTime:YES] == NSOrderedAscending,
+	 "a date is before 1h00 local time on its day");
+    PASS([dt("20240615T010000") compare:dt("20240615") withTime:YES] == NSOrderedDescending,
+	 "1h00 local time is after the date of its day");
+    PASS([dt("20240614T230000") compare:dt("20240615") withTime:YES] == NSOrderedAscending,
+	 "23h00 local time the day before is before a date");
+  }
+
   RELEASE(arp);
   exit(EXIT_SUCCESS);
 }

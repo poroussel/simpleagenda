@@ -191,15 +191,16 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
     return 0;
   }
 
-  NSComparisonResult res;
-  int a_isdate = _time.is_date;
-  int b_isdate = ((Date *)aDate)->_time.is_date;
-  _time.is_date = 0;
-  ((Date *)aDate)->_time.is_date = 0;
-  res = icaltime_compare(_time, ((Date *)aDate)->_time);
-  _time.is_date = a_isdate;
-  ((Date *)aDate)->_time.is_date = b_isdate;
-  return res;
+  /* Dates have no timezone : compare them as local datetimes */
+  struct icaltimetype a = _time;
+  struct icaltimetype b = ((Date *)aDate)->_time;
+  a.is_date = 0;
+  b.is_date = 0;
+  if (a.zone == NULL)
+    a.zone = gl_tz;
+  if (b.zone == NULL)
+    b.zone = gl_tz;
+  return icaltime_compare(a, b);
 }
 
 - (NSString *)description
@@ -240,11 +241,10 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
   d->_time = refDate->_time;
   /* To be able to add hours and minutes, it has to be a datetime */
   d-> _time.is_date = 0;
+  if (d->_time.zone == NULL)
+    d->_time.zone = gl_tz;
   d->_time = icaltime_add(d->_time, icaldurationtype_from_int(seconds));
-  if (!d->_time.hour && !d->_time.minute && !d->_time.second)
-    d->_time.is_date = 1;
-  else
-    d->_time.is_date = 0;
+  [d setIsDate:!d->_time.hour && !d->_time.minute && !d->_time.second];
   return AUTORELEASE(d);
 }
 
@@ -252,7 +252,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 {
   Date *d = [[Date alloc] init];
 
-  d->_time.is_date = !time;
+  [d setIsDate:!time];
   d->_time.year = [cd yearOfCommonEra];
   d->_time.month = [cd monthOfYear];
   d->_time.day = [cd dayOfMonth];
@@ -405,6 +405,11 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 {
   return _time.is_date;
 }
+/*
+ * A date is a day without time, so without timezone : a timezone would
+ * change the occurrences of a sub-daily rule (DST) and isn't archived
+ * or exported. A datetime made from a date is in the local timezone
+ */
 - (void)setIsDate:(BOOL)date
 {
   _time.is_date = date;
@@ -412,6 +417,9 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
     _time.hour = 0;
     _time.minute = 0;
     _time.second = 0;
+    _time.zone = NULL;
+  } else if (_time.zone == NULL) {
+    _time.zone = gl_tz;
   }
 }
 
@@ -440,8 +448,12 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 - (id)initWithICalTime:(struct icaltimetype)time
 {
   self = [super init];
-  if (self)
+  if (self) {
     _time = icaltime_convert_to_zone(icaltime_normalize(time), gl_tz);
+    /* icaltime_convert_to_zone() keeps the timezone of a date */
+    if (_time.is_date)
+      _time.zone = NULL;
+  }
   return self;
 }
 - (struct icaltimetype)UTCICalTime

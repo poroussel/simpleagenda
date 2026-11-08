@@ -325,7 +325,8 @@ NSComparisonResult compareAppointmentViews(id a, id b, void *data)
     return NSMakeRect(40, 0, [self frame].size.width - 48, [self frame].size.height);
   range = [apt intersectionWithDay:_date];
   start = [self minuteToPosition:range.location/60];
-  size = [self minuteToSize:range.length/60];
+  /* Show an event without duration with the height of a step */
+  size = [self minuteToSize:range.length ? range.length/60 : _minStep];
   return NSMakeRect(40, start - size, [self frame].size.width - 48, size);
 }
 

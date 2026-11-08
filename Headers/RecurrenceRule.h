@@ -31,5 +31,9 @@ typedef enum
 
 @interface RecurrenceRule(iCalendar)
 - (id)initWithICalRRule:(struct icalrecurrencetype)rrule;
+/*
+ * The rscale of the returned rule belongs to the receiver : it is only
+ * valid as long as the receiver is
+ */
 - (struct icalrecurrencetype)iCalRRule;
 @end

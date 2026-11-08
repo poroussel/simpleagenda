@@ -1,7 +1,14 @@
+#import <stdlib.h>
+#import <string.h>
 #import "RecurrenceRule.h"
 
+/*
+ * The iterator keeps a copy of the rule, rscale pointer included :
+ * the enumerator retains the rule, which owns rscale
+ */
 @interface DateRecurrenceEnumerator : NSEnumerator
 {
+  RecurrenceRule *_rule;
   icalrecur_iterator *_iterator;
 }
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start;
@@ -9,8 +16,10 @@
 @implementation DateRecurrenceEnumerator
 - (id)initWithRule:(RecurrenceRule *)rule start:(Date *)start;
 {
-  if ((self = [super init]))
+  if ((self = [super init])) {
+    _rule = RETAIN(rule);
     _iterator = icalrecur_iterator_new([rule iCalRRule],  [start localICalTime]);
+  }
   return self;
 }
 - (id)nextObject
@@ -25,6 +34,7 @@
 - (void)dealloc
 {
   icalrecur_iterator_free(_iterator);
+  RELEASE(_rule);
   [super dealloc];
 }
 @end
@@ -86,13 +96,22 @@
 {
   return recur.count;
 }
+- (void)dealloc
+{
+  free(recur.rscale);
+  [super dealloc];
+}
 @end
 
 @implementation RecurrenceRule(iCalendar)
 - (id)initWithICalRRule:(struct icalrecurrencetype)rrule
 {
-  if ((self = [super init]))
+  if ((self = [super init])) {
     recur = rrule;
+    /* rrule.rscale belongs to the property it comes from */
+    if (rrule.rscale)
+      recur.rscale = strdup(rrule.rscale);
+  }
   return self;
 }
 - (struct icalrecurrencetype)iCalRRule
@@ -106,6 +125,7 @@
 {
   [coder encodeObject:[NSString stringWithCString:icalrecurrencetype_as_string(&recur)] forKey:@"rrule"];
 }
+/* icalrecurrencetype_from_string() allocates rscale, freed by -dealloc */
 - (id)initWithCoder:(NSCoder *)coder
 {
   recur = icalrecurrencetype_from_string([[coder decodeObjectForKey:@"rrule"] cString]);

@@ -384,7 +384,8 @@ int main ()
     PASS(dst != nil && [dst duration] == 120, "DTEND is converted to a duration");
 
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART:20240615T100000\r\n"));
-    PASS(dst != nil && [dst allDay], "an event without end nor duration is an all day one");
+    PASS(dst != nil && ![dst allDay] && [dst duration] == 0 && [[dst startDate] minuteOfDay] == 600,
+	 "an event without end nor duration lasts no time (RFC 5545 3.6.1)");
 
     dst = eventFromString(VEVENT("UID:1\r\nSUMMARY:S\r\nDTSTART;VALUE=DATE:20240615\r\n"));
     PASS(dst != nil && [dst allDay] && [[dst startDate] dayOfMonth] == 15, "an event starting on a date is an all day one");

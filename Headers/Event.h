@@ -15,7 +15,9 @@
 }
 
 - (id)initWithStartDate:(Date *)start duration:(int)minutes title:(NSString *)aTitle;
+/* An event without duration is scheduled on the day it starts */
 - (BOOL)isScheduledForDay:(Date *)day;
+/* In seconds from the start of day. Empty for an event without duration */
 - (NSRange)intersectionWithDay:(Date *)day;
 - (NSString *)details;
 - (BOOL)contains:(NSString *)text;

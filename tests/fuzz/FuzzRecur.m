@@ -9,8 +9,9 @@
  *   line 1 : DTSTART, parameters and value (";TZID=Europe/Paris:20240315T100000",
  *            ":20240315" ...). A leading ':' is added if missing.
  *   line 2 : RRULE value ("FREQ=WEEKLY;COUNT=10;BYDAY=MO,WE")
- *   line 3 : DURATION value ("PT1H"), optional (no duration means an
- *            all day event)
+ *   line 3 : DURATION value ("PT1H"), optional (without it, an event
+ *            starting on a date is an all day one, and an event starting
+ *            at a time has no duration)
  *
  * They are wrapped in a VCALENDAR/VEVENT and parsed by iCalTree, like a
  * calendar file. Any crash, sanitizer report or uncaught ObjC exception is
@@ -150,7 +151,7 @@ static void checkEvent(Event *ev)
     failed(@"more occurrences than COUNT", ev, nil);
 
   /* The event must be visible on the day of its occurrences */
-  if ([ev allDay] || [ev duration] > 0) {
+  if ([ev allDay] || [ev duration] >= 0) {
     for (i = 0; i < [all count] && i < MAX_SCHEDULED; i++) {
       Date *d = [all objectAtIndex:i];
       Date *day = [Date dayWithDate:d];

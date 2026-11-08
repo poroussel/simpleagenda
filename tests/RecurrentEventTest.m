@@ -61,13 +61,12 @@ int main()
   Event *event;
 
   /*
-   * RSCALE (RFC 7529). struct icalrecurrencetype has a char *rscale
-   * owned by the RRULE property value, and -initWithICalComponent: copies
-   * the struct : the rule points into the component. -updateICalComponent:
-   * deletes the RRULE property and then copies the rule, reading freed
-   * memory (heap-use-after-free under AddressSanitizer)
+   * Finding 1 : RSCALE (RFC 7529). struct icalrecurrencetype has a
+   * char *rscale owned by the RRULE property value. A rule that pointed
+   * into the component read freed memory when -updateICalComponent:
+   * replaced the RRULE property (heap-use-after-free under
+   * AddressSanitizer) : RecurrenceRule now owns a copy
    */
-  testHopeful = YES;	/* Finding 1, not fixed yet */
   {
     icalcomponent *ic;
     icalproperty *prop;
@@ -90,8 +89,10 @@ int main()
     PASS(prop != NULL && exported.rscale != NULL && !strcmp(exported.rscale, "GREGORIAN"),
 	 "an event saved in its own component keeps its RSCALE");
     icalcomponent_free(ic);
+    rule = [[archived(event) rrule] iCalRRule];
+    PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
+	 "an archived rule keeps its RSCALE");
   }
-  testHopeful = NO;
 
   /*
    * A rule that never matches : the 53rd monday of a month. libical
@@ -114,11 +115,10 @@ int main()
   testHopeful = NO;
 
   /*
-   * RFC 5545 3.6.1 : a VEVENT with a DATE-TIME DTSTART and no DTEND or
-   * DURATION ends at its start. SimpleAgenda makes it an all day event and
-   * drops its time when it is saved
+   * Finding 3 : RFC 5545 3.6.1, a VEVENT with a DATE-TIME DTSTART and no
+   * DTEND or DURATION ends at its start. SimpleAgenda made it an all day
+   * event and dropped its time when it was saved
    */
-  testHopeful = YES;	/* Finding 3, not fixed yet */
   {
     icalcomponent *ic;
     struct icaltimetype start;
@@ -134,16 +134,33 @@ int main()
     start = icalcomponent_get_dtstart(ic);
     PASS(!start.is_date && icaltime_compare(start, icaltime_from_string("20240315T100000Z")) == 0,
 	 "an event with a start time and no end is exported with its start time");
+    PASS(icalcomponent_get_first_property(ic, ICAL_DTEND_PROPERTY) == NULL
+	 && icalcomponent_get_first_property(ic, ICAL_DURATION_PROPERTY) == NULL,
+	 "an event without duration is exported without end nor duration");
     icalcomponent_free(ic);
+
+    /* It is an instant, shown on the day of each occurrence */
+    event = eventFromString(VEVENT("DTSTART:20240315T100000\r\nRRULE:FREQ=WEEKLY;COUNT=3\r\n"));
+    PASS([event isScheduledForDay:dt("20240315")] && [event isScheduledForDay:dt("20240322")]
+	 && [event isScheduledForDay:dt("20240329")],
+	 "an event without duration is scheduled on the days of its occurrences");
+    PASS(![event isScheduledForDay:dt("20240316")] && ![event isScheduledForDay:dt("20240405")],
+	 "an event without duration isn't scheduled on other days");
+    PASS([event intersectionWithDay:dt("20240322")].location == 36000
+	 && [event intersectionWithDay:dt("20240322")].length == 0,
+	 "the intersection of an event without duration is empty, at its time");
+    PASS([archived(event) duration] == 0 && ![archived(event) allDay],
+	 "an archived event without duration stays without duration");
+    event = eventFromString(VEVENT("DTSTART:20240315T000000\r\n"));
+    PASS([event isScheduledForDay:dt("20240315")] && ![event isScheduledForDay:dt("20240314")],
+	 "an event without duration at midnight is only scheduled on its day");
   }
-  testHopeful = NO;
 
   /*
-   * -setAllDay: makes the start a date but keeps its timezone, which
-   * isn't archived. libical adds the hours of a sub-daily rule with DST,
-   * and without it once archived : occurrences can change day
+   * Finding 4 : -setAllDay: made the start a date but kept its timezone,
+   * which isn't archived. libical added the hours of a sub-daily rule
+   * with DST, and without it once archived : occurrences could change day
    */
-  testHopeful = YES;	/* Finding 4, not fixed yet */
   {
     Event *e;
 
@@ -152,13 +169,14 @@ int main()
     PASS([[e startDate] isDate] && [[e startDate] localICalTime].zone == NULL,
 	 "-setAllDay: gives a date without timezone");
 
-    event = eventFromString(VEVENT("DTSTART:20230430T030000\r\n"
+    /* Made all day like the appointment editor does */
+    event = eventFromString(VEVENT("DTSTART:20230430T030000\r\nDURATION:PT1H\r\n"
 				   "RRULE:FREQ=HOURLY;INTERVAL=7456;COUNT=5\r\n"));
+    [event setAllDay:YES];
     if (isDST("20230430T030000") != isDST("20251117T030000"))
       PASS_EQUAL(occurrences(archived(event), 10), occurrences(event, 10),
 		 "an archived all day event with a sub-daily rule has the same occurrences");
   }
-  testHopeful = NO;
 
   /* libical problems */
   testHopeful = YES;
