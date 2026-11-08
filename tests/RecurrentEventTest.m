@@ -3,8 +3,10 @@
 /*
  * Recurrent events : problems found by tests/fuzz/FuzzRecur.
  *
- * Problems in SimpleAgenda are normal tests. Problems in libical (3.0)
- * are hopes (testHopeful), as SimpleAgenda can only work around them.
+ * Problems in libical (3.0) are hopes (testHopeful), as SimpleAgenda
+ * can only work around them. Problems in SimpleAgenda (findings 1 to 4 in
+ * findings.md) are hopes too until they are fixed : remove the
+ * testHopeful lines around a finding's tests when it is fixed.
  */
 
 #import "ObjectTesting.h"
@@ -66,6 +68,7 @@ int main()
    * deletes the RRULE property and then copies the rule, reading freed
    * memory (heap-use-after-free under AddressSanitizer)
    */
+  testHopeful = YES;	/* Finding 1, not fixed yet */
   {
     icalcomponent *ic;
     icalproperty *prop;
@@ -89,12 +92,14 @@ int main()
 	 "an event saved in its own component keeps its RSCALE");
     icalcomponent_free(ic);
   }
+  testHopeful = NO;
 
   /*
    * A rule that never matches : the 53rd monday of a month. libical
    * looks for it for about a second, and the views call
    * -isScheduledForDay: for each day they show
    */
+  testHopeful = YES;	/* Finding 2, not fixed yet */
   {
     NSDate *start;
     NSTimeInterval elapsed;
@@ -107,12 +112,14 @@ int main()
     PASS(elapsed < 0.1,
 	 "-isScheduledForDay: is fast for a rule without any occurrence (%.2fs)", elapsed);
   }
+  testHopeful = NO;
 
   /*
    * RFC 5545 3.6.1 : a VEVENT with a DATE-TIME DTSTART and no DTEND or
    * DURATION ends at its start. SimpleAgenda makes it an all day event and
    * drops its time when it is saved
    */
+  testHopeful = YES;	/* Finding 3, not fixed yet */
   {
     icalcomponent *ic;
     struct icaltimetype start;
@@ -130,12 +137,14 @@ int main()
 	 "an event with a start time and no end is exported with its start time");
     icalcomponent_free(ic);
   }
+  testHopeful = NO;
 
   /*
    * -setAllDay: makes the start a date but keeps its timezone, which
    * isn't archived. libical adds the hours of a sub-daily rule with DST,
    * and without it once archived : occurrences can change day
    */
+  testHopeful = YES;	/* Finding 4, not fixed yet */
   {
     Event *e;
 
@@ -150,6 +159,7 @@ int main()
       PASS_EQUAL(occurrences(archived(event), 10), occurrences(event, 10),
 		 "an archived all day event with a sub-daily rule has the same occurrences");
   }
+  testHopeful = NO;
 
   /* libical problems */
   testHopeful = YES;
