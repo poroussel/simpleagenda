@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <string.h>
 #import "Event.h"
-#import "DateRange.h"
 
 @implementation Event(NSCoding)
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -67,6 +66,29 @@
 }
 
 /*
+ * Intersection of [start, start + length[ with day, in seconds from the
+ * start of the day. Dates are compared in local time (see
+ * -[Date timeIntervalSince1970]), so a day always has 86400 seconds
+ */
+static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange *range)
+{
+  NSCAssert([day isDate], @"This method expects a date, not a datetime");
+  NSTimeInterval s1 = [start timeIntervalSince1970];
+  NSTimeInterval e1 = s1 + length;
+  NSTimeInterval s2 = [day timeIntervalSince1970];
+  NSTimeInterval e2 = s2 + 86400;
+  NSTimeInterval s = MAX(s1, s2);
+  NSTimeInterval e = MIN(e1, e2);
+
+  if (e <= s) {
+    *range = NSMakeRange(0, 0);
+    return NO;
+  }
+  *range = NSMakeRange(s - s2, e - s);
+  return YES;
+}
+
+/*
  * Values are in seconds whereas time granularity in
  * all other Event methods is minute.
  * Worth changing ?
@@ -74,15 +96,19 @@
 - (NSRange)intersectionWithDay:(Date *)day
 {
   NSEnumerator *enumerator;
-  DateRange *range = AUTORELEASE([[DateRange alloc] initWithStart:_startDate duration:[self duration]*60]);
+  NSTimeInterval length = [self duration] * 60;
+  NSRange range;
+  Date *start;
 
-  if (!_rrule)
-    return [range intersectionWithDay:day];
-  enumerator = [_rrule enumeratorFromDate:_startDate length:[self duration]*60];
-  while ((range = [enumerator nextObject])) {
-    if ([range intersectsWithDay:day])
-      return [range intersectionWithDay:day];
-    if ([[range start] compare:day withTime:NO] > 0)
+  if (!_rrule) {
+    intersectsDay(_startDate, length, day, &range);
+    return range;
+  }
+  enumerator = [self occurrenceEnumerator];
+  while ((start = [enumerator nextObject])) {
+    if (intersectsDay(start, length, day, &range))
+      return range;
+    if ([start compare:day withTime:NO] > 0)
       break;
   }
   return NSMakeRange(0, 0);
@@ -187,9 +213,9 @@
   _sticky = sticky;
 }
 
-- (NSEnumerator *)dateRangeEnumerator
+- (NSEnumerator *)occurrenceEnumerator
 {
-  return [_rrule enumeratorFromDate:_startDate length:_allDay?86400:_duration*60];
+  return [_rrule enumeratorFromDate:_startDate];
 }
 @end
 

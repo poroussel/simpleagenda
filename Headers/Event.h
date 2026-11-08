@@ -34,7 +34,8 @@
 - (void)setRRule:(RecurrenceRule *)rrule;
 - (void)setSticky:(BOOL)sticky;
 
-- (NSEnumerator *)dateRangeEnumerator;
+/* The start date of each occurrence, nil if the event doesn't repeat */
+- (NSEnumerator *)occurrenceEnumerator;
 @end
 
 @interface Event(iCalendar)

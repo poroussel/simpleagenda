@@ -2,7 +2,6 @@
 
 #import "ObjectTesting.h"
 #import "RecurrenceRule.h"
-#import "DateRange.h"
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */
 static Date *dt(const char *string)
@@ -79,10 +78,6 @@ int main ()
   PASS_EXCEPTION(AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily until:dt("20240630T100000")]),
 		 NSInternalInconsistencyException,
 		 "-initWithFrequency:until: refuses a datetime");
-  rule = AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:1]);
-  PASS_EXCEPTION([rule enumeratorFromDate:dt("20240630T100000")],
-		 NSInternalInconsistencyException,
-		 "-enumeratorFromDate: refuses a datetime");
 
   /* Each frequency gives the expected dates */
   rule = AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:3]);
@@ -118,23 +113,22 @@ int main ()
     PASS(i == 1000, "a rule without limit doesn't stop");
   }
 
-  /* Date ranges */
+  /* Datetimes */
   {
     NSEnumerator *e;
-    DateRange *range;
+    Date *date;
     NSUInteger n = 0;
 
     rule = AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:2]);
-    e = [rule enumeratorFromDate:dt("20240615T143000") length:3600];
-    while ((range = [e nextObject])) {
+    e = [rule enumeratorFromDate:dt("20240615T143000")];
+    while ((date = [e nextObject])) {
       n++;
-      PASS([range isKindOfClass:[DateRange class]], "the enumerator returns date ranges");
-      PASS([range length] == 3600, "the ranges have the given length");
-      PASS(![[range start] isDate] && [[range start] minuteOfDay] == 870,
-	   "the ranges start at the time of the first date");
-      PASS([[range start] dayOfMonth] == (int)(14 + n), "the ranges follow the rule");
+      PASS([date isKindOfClass:[Date class]], "the enumerator returns dates");
+      PASS(![date isDate] && [date minuteOfDay] == 870,
+	   "the occurrences of a datetime are at its time");
+      PASS([date dayOfMonth] == (int)(14 + n), "the occurrences of a datetime follow the rule");
     }
-    PASS(n == 2, "the enumerator of ranges stops at the end of the rule");
+    PASS(n == 2, "the enumerator of datetimes stops at the end of the rule");
   }
 
   /* iCalendar */

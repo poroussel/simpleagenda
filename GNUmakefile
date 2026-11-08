@@ -62,7 +62,6 @@ Sources/AppointmentView.m \
 Sources/SelectionManager.m \
 Sources/RecurrenceRule.m \
 Sources/NSColor+SimpleAgenda.m \
-Sources/DateRange.m \
 Sources/Alarm.m \
 Sources/AlarmManager.m \
 Sources/NSString+SimpleAgenda.m \

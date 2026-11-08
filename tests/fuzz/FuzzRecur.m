@@ -2,7 +2,7 @@
  *
  * libFuzzer harness for recurrent events : RecurrenceRule, its
  * enumerators and Event's recurrence handling (-intersectionWithDay:,
- * -isScheduledForDay:, -dateRangeEnumerator), with invariant checks.
+ * -isScheduledForDay:, -occurrenceEnumerator), with invariant checks.
  *
  * Input format : text, up to three lines
  *
@@ -38,7 +38,6 @@
 #import "iCalTree.h"
 #import "Event.h"
 #import "Date.h"
-#import "DateRange.h"
 #import "RecurrenceRule.h"
 
 /* Occurrences enumerated per event, and checked with -isScheduledForDay: */
@@ -82,11 +81,11 @@ static BOOL checkable(Date *d)
 static NSArray *occurrences(Event *ev)
 {
   NSMutableArray *all = [NSMutableArray array];
-  NSEnumerator *e = [ev dateRangeEnumerator];
-  DateRange *r;
+  NSEnumerator *e = [ev occurrenceEnumerator];
+  Date *d;
 
-  while ([all count] < MAX_OCCURRENCES && (r = [e nextObject]))
-    [all addObject:r];
+  while ([all count] < MAX_OCCURRENCES && (d = [e nextObject]))
+    [all addObject:d];
   return all;
 }
 
@@ -98,8 +97,8 @@ static void sameOccurrences(Event *ev, NSArray *a, NSArray *b, NSString *what)
     failed([NSString stringWithFormat:@"%@ : %lu occurrences instead of %lu", what,
                      (unsigned long)[b count], (unsigned long)[a count]], ev, nil);
   for (i = 0; i < [a count]; i++) {
-    Date *da = [(DateRange *)[a objectAtIndex:i] start];
-    Date *db = [(DateRange *)[b objectAtIndex:i] start];
+    Date *da = [a objectAtIndex:i];
+    Date *db = [b objectAtIndex:i];
     if (checkable(da) && [da compare:db withTime:YES] != NSOrderedSame)
       failed([NSString stringWithFormat:@"%@ : occurrence %lu differs", what, (unsigned long)i],
              ev, [NSString stringWithFormat:@"%@ != %@", da, db]);
@@ -134,7 +133,7 @@ static void checkEvent(Event *ev)
     return;
 
   for (i = 0; i < [all count]; i++) {
-    Date *d = [(DateRange *)[all objectAtIndex:i] start];
+    Date *d = [all objectAtIndex:i];
 
     if (!checkable(d))
       break;
@@ -153,7 +152,7 @@ static void checkEvent(Event *ev)
   /* The event must be visible on the day of its occurrences */
   if ([ev allDay] || [ev duration] > 0) {
     for (i = 0; i < [all count] && i < MAX_SCHEDULED; i++) {
-      Date *d = [(DateRange *)[all objectAtIndex:i] start];
+      Date *d = [all objectAtIndex:i];
       Date *day = [Date dayWithDate:d];
 
       if (!checkable(d))

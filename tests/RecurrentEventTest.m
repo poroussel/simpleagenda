@@ -12,7 +12,6 @@
 #import "ObjectTesting.h"
 #import "Event.h"
 #import "Date.h"
-#import "DateRange.h"
 #import "RecurrenceRule.h"
 
 #define VEVENT(content) ("BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\n" content "END:VEVENT\r\n")
@@ -42,11 +41,11 @@ static Event *archived(Event *event)
 static NSString *occurrences(Event *event, int max)
 {
   NSMutableArray *dates = [NSMutableArray array];
-  NSEnumerator *enumerator = [event dateRangeEnumerator];
-  DateRange *range;
+  NSEnumerator *enumerator = [event occurrenceEnumerator];
+  Date *date;
 
-  while ([dates count] < max && (range = [enumerator nextObject]))
-    [dates addObject:[[range start] description]];
+  while ([dates count] < max && (date = [enumerator nextObject]))
+    [dates addObject:[date description]];
   return [dates componentsJoinedByString:@" "];
 }
 

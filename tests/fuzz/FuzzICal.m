@@ -33,7 +33,7 @@ static void exercise(Element *elt)
     [ev sticky];
     /* Recurrence expansion, bounded so infinite rules don't look like hangs */
     {
-      NSEnumerator *re = [ev dateRangeEnumerator];
+      NSEnumerator *re = [ev occurrenceEnumerator];
       int n = 0;
       while (n++ < 200 && [re nextObject])
         ;

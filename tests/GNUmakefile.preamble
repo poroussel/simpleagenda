@@ -14,7 +14,6 @@ DateFixedOffsetTest_OBJC_FILES += \
 ElementTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
@@ -24,7 +23,6 @@ MemoryStoreTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/ConfigManager.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
@@ -34,7 +32,6 @@ MemoryStoreTest_OBJC_FILES += \
 
 RecurrenceRuleTest_OBJC_FILES += \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/RecurrenceRule.m
 
 WebDAVTest_OBJC_FILES += \
@@ -45,7 +42,6 @@ WebDAVTest_OBJC_FILES += \
 EventTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
@@ -55,7 +51,6 @@ EventTest_OBJC_FILES += \
 RecurrentEventTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
@@ -65,21 +60,15 @@ RecurrentEventTest_OBJC_FILES += \
 TaskTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/HourFormatter.m \
 	../Sources/NSString+SimpleAgenda.m \
 	../Sources/RecurrenceRule.m \
 	../Sources/Task.m
 
-DateRangeTest_OBJC_FILES += \
-	../Sources/Date.m \
-	../Sources/DateRange.m
-
 iCalTreeTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
@@ -91,7 +80,6 @@ iCalTreeTest_OBJC_FILES += \
 LocalStoreTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \
@@ -105,7 +93,6 @@ iCalStoreTest_OBJC_FILES += \
 	../Sources/Alarm.m \
 	../Sources/ConfigManager.m \
 	../Sources/Date.m \
-	../Sources/DateRange.m \
 	../Sources/Element.m \
 	../Sources/Event.m \
 	../Sources/HourFormatter.m \

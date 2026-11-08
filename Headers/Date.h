@@ -15,8 +15,8 @@
  *   returns -1, -timeIntervalSinceDate: returns 0 between two of them
  *   (and a wrong value with a later date), -weekOfYear returns 1, and
  *   an enumerator from -enumeratorTo: never ends if both its start and
- *   end dates are before 1902. DateRange intersections are also wrong
- *   for these dates.
+ *   end dates are before 1902. -[Event intersectionWithDay:] is also
+ *   wrong for these dates.
  *
  * - Dates more than 68 years apart : -timeIntervalSinceDate: goes
  *   through icaldurationtype_as_int(), which overflows an int, so the

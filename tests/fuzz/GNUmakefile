@@ -34,7 +34,6 @@ TOOL_NAME = FuzzICal FuzzDAV FuzzDate FuzzRecur
 ICAL_FILES = \
 	../../Sources/Alarm.m \
 	../../Sources/Date.m \
-	../../Sources/DateRange.m \
 	../../Sources/Element.m \
 	../../Sources/Event.m \
 	../../Sources/HourFormatter.m \

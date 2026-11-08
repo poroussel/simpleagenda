@@ -5,12 +5,18 @@
 #import "Date.h"
 #import "RecurrenceRule.h"
 #import "Alarm.h"
-#import "DateRange.h"
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */
 static Date *dt(const char *string)
 {
   return AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string(string)]);
+}
+
+static BOOL sameRange(NSRange range, NSUInteger location, NSUInteger length)
+{
+  if (length == 0)
+    return range.length == 0;
+  return range.location == location && range.length == length;
 }
 
 static Event *eventFromString(const char *string)
@@ -153,15 +159,15 @@ int main ()
   PASS([ev isScheduledForDay:weekLater], "-isScheduledForDay: YES on weekly recurrence 7 days later");
   [rule release];
 
-  /* dateRangeEnumerator: should yield DateRanges for each occurrence */
+  /* occurrenceEnumerator: should yield a date for each occurrence */
   RecurrenceRule *rule2 = [[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceWeekly count:3];
   [ev setRRule:rule2];
-  NSEnumerator *rangeEnum = [ev dateRangeEnumerator];
-  int rangeCount = 0;
-  id rangeObj;
-  while ((rangeObj = [rangeEnum nextObject]))
-    rangeCount++;
-  PASS(rangeCount == 3, "-dateRangeEnumerator: yields correct number of ranges");
+  NSEnumerator *occurrenceEnum = [ev occurrenceEnumerator];
+  int occurrenceCount = 0;
+  id occurrence;
+  while ((occurrence = [occurrenceEnum nextObject]))
+    occurrenceCount++;
+  PASS(occurrenceCount == 3, "-occurrenceEnumerator: yields correct number of occurrences");
   [rule2 release];
 
   [ev release];
@@ -216,8 +222,79 @@ int main ()
   Event *allDay = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615") duration:0 title:@"All day"]);
   [allDay setAllDay:YES];
   [allDay setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:2])];
-  PASS([(DateRange *)[[allDay dateRangeEnumerator] nextObject] length] == 86400, "-dateRangeEnumerator of an all day event gives whole days");
+  PASS([allDay duration] == 1440, "an all day event lasts a whole day");
+  PASS([[[allDay occurrenceEnumerator] nextObject] isDate], "-occurrenceEnumerator of an all day event gives dates");
   PASS([allDay intersectionWithDay:dt("20240616")].length == 86400, "an all day recurrence covers the whole day");
+
+  /* Intersections with a day */
+  {
+    Event *e;
+    RecurrenceRule *r;
+
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615T230000") duration:120 title:@"Span"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 82800, 3600),
+	 "-intersectionWithDay: of an event spanning midnight stops at midnight");
+    PASS(sameRange([e intersectionWithDay:dt("20240616")], 0, 3600),
+	 "-intersectionWithDay: of an event spanning midnight starts at midnight the next day");
+    PASS(sameRange([e intersectionWithDay:dt("20240617")], 0, 0),
+	 "-intersectionWithDay: of an event spanning midnight is empty two days later");
+
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240614T120000") duration:3 * 1440 title:@"Long"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 0, 86400),
+	 "-intersectionWithDay: of a longer event is the whole day");
+
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615T220000") duration:120 title:@"Midnight"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 79200, 7200),
+	 "-intersectionWithDay: of an event ending at midnight");
+    PASS(sameRange([e intersectionWithDay:dt("20240616")], 0, 0),
+	 "an event ending at midnight doesn't intersect the next day");
+
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615T100000") duration:-60 title:@"Negative"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 0, 0),
+	 "an event with a negative duration doesn't intersect its day");
+    PASS_EXCEPTION([e intersectionWithDay:dt("20240615T100000")], NSInternalInconsistencyException,
+		   "-intersectionWithDay: raises an exception on a datetime");
+
+    /* Daily at 23h00 for 2 hours, 3 times : the 15th, 16th and 17th */
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615T230000") duration:120 title:@"Nightly"]);
+    [e setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily count:3])];
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 82800, 3600),
+	 "-intersectionWithDay: of the first occurrence");
+    PASS(sameRange([e intersectionWithDay:dt("20240616")], 0, 3600),
+	 "-intersectionWithDay: gives the first occurrence touching the day");
+    PASS(sameRange([e intersectionWithDay:dt("20240618")], 0, 3600),
+	 "-intersectionWithDay: gives the end of the last occurrence the next day");
+    PASS(sameRange([e intersectionWithDay:dt("20240619")], 0, 0),
+	 "-intersectionWithDay: is empty after the last occurrence");
+    PASS(sameRange([e intersectionWithDay:dt("20240614")], 0, 0),
+	 "-intersectionWithDay: is empty before the first occurrence");
+    PASS_EXCEPTION([e intersectionWithDay:dt("20240615T100000")], NSInternalInconsistencyException,
+		   "-intersectionWithDay: of a recurrent event raises an exception on a datetime");
+
+    [e setDuration:-60];
+    PASS(sameRange([e intersectionWithDay:dt("20240616")], 0, 0),
+	 "a recurrent event with a negative duration doesn't intersect its days");
+
+    /* A rule ending before the start */
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240615T100000") duration:60 title:@"Ended"]);
+    r = AUTORELEASE([[RecurrenceRule alloc] initWithFrequency:recurrenceFrequenceDaily until:dt("20240601")]);
+    [e setRRule:r];
+    PASS(sameRange([e intersectionWithDay:dt("20240615")], 0, 0),
+	 "an event whose rule ends before its start has no occurrence");
+    PASS(sameRange([e intersectionWithDay:dt("20240616")], 0, 0),
+	 "an event whose rule ends before its start isn't scheduled the next day");
+
+    /*
+     * Intersections use the local time without the timezone : days have 24
+     * hours, even when DST starts (Europe/Paris on 2024-03-31)
+     */
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240401T003000") duration:30 title:@"DST"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240331")], 0, 0),
+	 "an event doesn't intersect the previous day when DST starts");
+    e = AUTORELEASE([[Event alloc] initWithStartDate:dt("20240331T013000") duration:120 title:@"DST"]);
+    PASS(sameRange([e intersectionWithDay:dt("20240331")], 5400, 7200),
+	 "-intersectionWithDay: uses the local time when DST starts");
+  }
 
   /* iCalendar : round trip of all the properties */
   {
