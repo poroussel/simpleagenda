@@ -1,4 +1,4 @@
-version 0.50
+version 0.50 (2026/11/09)
 	* Date : fix crash when comparing a date with nil
 	* Element : make sure a UID is generated before encoding
 	* iCalendar parsing : only accept VCALENDAR as root component, fixes
