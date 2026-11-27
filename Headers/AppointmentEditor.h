@@ -3,6 +3,8 @@
 #import "Event.h"
 #import "StoreManager.h"
 
+@class NSButton;
+
 @interface AppointmentEditor : NSObject
 {
   id window;
@@ -14,9 +16,9 @@
   id endDate;
   id location;
   id store;
-  id allDay;
+  NSButton *allDay;
   id ok;
-  id until;
+  NSButton *until;
   id time;
   id timeText;
   Date *startDate;

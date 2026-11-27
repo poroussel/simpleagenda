@@ -17,10 +17,10 @@
   IBOutlet id storeColor;
   IBOutlet id storeTextColor;
   IBOutlet id defaultStorePopUp;
-  IBOutlet id storeDisplay;
-  IBOutlet id storeWritable;
-  IBOutlet id storeRefresh;
-  IBOutlet id storeEnabled;
+  IBOutlet NSButton *storeDisplay;
+  IBOutlet NSButton *storeWritable;
+  IBOutlet NSButton *storeRefresh;
+  IBOutlet NSButton *storeEnabled;
   IBOutlet id refreshInterval;
   IBOutlet id refreshIntervalText;
   IBOutlet id removeButton;
@@ -32,15 +32,15 @@
   IBOutlet id storePreferences;
   IBOutlet id storeFactory;
   IBOutlet id itemPopUp;
-  IBOutlet id showTooltip;
+  IBOutlet NSButton *showTooltip;
   IBOutlet id uiPreferences;
-  IBOutlet id showDateAppIcon;
-  IBOutlet id showTimeAppIcon;
+  IBOutlet NSButton *showDateAppIcon;
+  IBOutlet NSButton *showTimeAppIcon;
   IBOutlet id alarmPreferences;
-  IBOutlet id alarmEnabled;
+  IBOutlet NSButton *alarmEnabled;
   IBOutlet id alarmBackendPopUp;
-  IBOutlet id switchDayWeekAxis;
-  IBOutlet id useBiggerWeekend;
+  IBOutlet NSButton *switchDayWeekAxis;
+  IBOutlet NSButton *useBiggerWeekend;
   StoreManager *_sm;
 }
 
