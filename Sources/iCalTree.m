@@ -9,7 +9,7 @@ static NSString *logKey = @"iCalTree";
 {
   if ((self = [super init])) {
     root = icalcomponent_vanew(ICAL_VCALENDAR_COMPONENT, icalproperty_new_version("2.0"),
-                              icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), 0);
+                              icalproperty_new_prodid("-//Octets//NONSGML SimpleAgenda Calendar//EN"), NULL);
     if (!root)
       DESTROY(self);
   }
