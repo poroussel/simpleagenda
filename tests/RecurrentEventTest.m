@@ -17,6 +17,15 @@
 #define VEVENT(content) ("BEGIN:VEVENT\r\nUID:1\r\nSUMMARY:S\r\n" content "END:VEVENT\r\n")
 
 /* Builds a date or a datetime in the local timezone from an iCalendar string */
+static RecurrenceRule *ruleFromString(const char *string)
+{
+  struct icalrecurrencetype *r = sa_recur_from_string(string);
+  RecurrenceRule *rule = AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:r]);
+
+  sa_recur_free(r);
+  return rule;
+}
+
 static Date *dt(const char *string)
 {
   return AUTORELEASE([[Date alloc] initWithICalTime:icaltime_from_string(string)]);
@@ -70,27 +79,33 @@ int main()
   {
     icalcomponent *ic;
     icalproperty *prop;
-    struct icalrecurrencetype rule;
-    struct icalrecurrencetype exported;
+    const struct icalrecurrencetype *rule;
+    const struct icalrecurrencetype *exported;
+    const char *propRscale;
 
     ic = icalparser_parse_string(VEVENT("DTSTART:20240315T100000Z\r\nDURATION:PT1H\r\n"
 					"RRULE:RSCALE=GREGORIAN;FREQ=YEARLY\r\n"));
     prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
     event = AUTORELEASE([[Event alloc] initWithICalComponent:ic]);
     rule = [[event rrule] iCalRRule];
-    PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
+#ifdef SA_LIBICAL4
+    propRscale = icalproperty_get_rrule(prop)->rscale;
+#else
+    propRscale = icalproperty_get_rrule(prop).rscale;
+#endif
+    PASS(rule->rscale != NULL && !strcmp(rule->rscale, "GREGORIAN"),
 	 "an event reads the RSCALE of its rule");
-    PASS(rule.rscale != icalproperty_get_rrule(prop).rscale,
+    PASS(rule->rscale != propRscale,
 	 "the rule of an event doesn't share its RSCALE with the iCalendar component");
 
     PASS([event updateICalComponent:ic], "an event with an RSCALE can be saved");
     prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
-    exported = prop ? icalproperty_get_rrule(prop) : rule;
-    PASS(prop != NULL && exported.rscale != NULL && !strcmp(exported.rscale, "GREGORIAN"),
+    exported = prop ? [AUTORELEASE([[RecurrenceRule alloc] initWithICalProperty:prop]) iCalRRule] : rule;
+    PASS(prop != NULL && exported->rscale != NULL && !strcmp(exported->rscale, "GREGORIAN"),
 	 "an event saved in its own component keeps its RSCALE");
     icalcomponent_free(ic);
     rule = [[archived(event) rrule] iCalRRule];
-    PASS(rule.rscale != NULL && !strcmp(rule.rscale, "GREGORIAN"),
+    PASS(rule->rscale != NULL && !strcmp(rule->rscale, "GREGORIAN"),
 	 "an archived rule keeps its RSCALE");
   }
 
@@ -152,8 +167,7 @@ int main()
     [event setStartDate:dt("20240615T100000")];
     PASS(![event hasOccurrences], "-setStartDate: is taken into account");
     [event setStartDate:before];
-    [event setRRule:AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:
-				    icalrecurrencetype_from_string("FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53")])];
+    [event setRRule:ruleFromString("FREQ=MONTHLY;BYDAY=MO;BYSETPOS=53")];
     PASS(![event hasOccurrences], "-setRRule: is taken into account");
     [event setRRule:nil];
     PASS([event hasOccurrences], "an event that doesn't repeat has an occurrence");

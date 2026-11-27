@@ -301,18 +301,18 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
       diff = icalproperty_get_duration(pdur);
     else {
       end = icaltimeWithTZID(pend, icalproperty_get_dtend(pend));
-      /* icaltime_subtract() ignores timezones : subtract UTC times */
+      /* icalduration_from_times() ignores timezones : subtract UTC times */
       if (start.zone && end.zone)
-	diff = icaltime_subtract(icaltime_convert_to_zone(end, icaltimezone_get_utc_timezone()),
-				 icaltime_convert_to_zone(start, icaltimezone_get_utc_timezone()));
+	diff = icalduration_from_times(icaltime_convert_to_zone(end, icaltimezone_get_utc_timezone()),
+				       icaltime_convert_to_zone(start, icaltimezone_get_utc_timezone()));
       else
-	diff = icaltime_subtract(end, start);
+	diff = icalduration_from_times(end, start);
     }
-    [self setDuration:icaldurationtype_as_int(diff) / 60];
+    [self setDuration:icaldurationtype_as_utc_seconds(diff) / 60];
   }
   prop = icalcomponent_get_first_property(ic, ICAL_RRULE_PROPERTY);
   if (prop)
-    _rrule = [[RecurrenceRule alloc] initWithICalRRule:icalproperty_get_rrule(prop)];
+    _rrule = [[RecurrenceRule alloc] initWithICalProperty:prop];
   [date release];
   location = icalcomponent_get_location(ic);
   if (location)
@@ -350,7 +350,7 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
   [self deleteProperty:ICAL_DURATION_PROPERTY fromComponent:ic];
   /* Without DTEND nor DURATION, an event ends at its start (RFC 5545 3.6.1) */
   if (![self allDay] && _duration != 0)
-    icalcomponent_add_property(ic, icalproperty_new_dtend(icaltime_add([_startDate UTCICalTime], icaldurationtype_from_int(_duration * 60))));
+    icalcomponent_add_property(ic, icalproperty_new_dtend(icalduration_extend([_startDate UTCICalTime], icaldurationtype_from_seconds(_duration * 60))));
   else if ([self allDay]) {
     end = [_startDate copy];
     [end incrementDay];
@@ -386,7 +386,7 @@ static BOOL intersectsDay(Date *start, NSTimeInterval length, Date *day, NSRange
 
   [self deleteProperty:ICAL_RRULE_PROPERTY fromComponent:ic];
   if (_rrule)
-    icalcomponent_add_property(ic, icalproperty_new_rrule([_rrule iCalRRule]));
+    icalcomponent_add_property(ic, [_rrule asICalProperty]);
   return YES;
 }
 

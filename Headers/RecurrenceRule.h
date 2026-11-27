@@ -17,7 +17,8 @@ typedef enum
 
 @interface RecurrenceRule : NSObject
 {
-  struct icalrecurrencetype recur;
+  /* Owned by the receiver, see icalcompat.h */
+  struct icalrecurrencetype *recur;
 }
 
 - (id)initWithFrequency:(recurrenceFrequency)frequency;
@@ -38,10 +39,12 @@ typedef enum
 @end
 
 @interface RecurrenceRule(iCalendar)
-- (id)initWithICalRRule:(struct icalrecurrencetype)rrule;
-/*
- * The rscale of the returned rule belongs to the receiver : it is only
- * valid as long as the receiver is
- */
-- (struct icalrecurrencetype)iCalRRule;
+/* rrule is copied */
+- (id)initWithICalRRule:(const struct icalrecurrencetype *)rrule;
+/* A copy of the rule of a RRULE property */
+- (id)initWithICalProperty:(icalproperty *)prop;
+/* The returned rule belongs to the receiver : don't modify or free it */
+- (const struct icalrecurrencetype *)iCalRRule;
+/* A new RRULE property, owned by the caller */
+- (icalproperty *)asICalProperty;
 @end

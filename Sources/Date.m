@@ -243,7 +243,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
   d-> _time.is_date = 0;
   if (d->_time.zone == NULL)
     d->_time.zone = gl_tz;
-  d->_time = icaltime_add(d->_time, icaldurationtype_from_int(seconds));
+  d->_time = icalduration_extend(d->_time, icaldurationtype_from_seconds(seconds));
   [d setIsDate:!d->_time.hour && !d->_time.minute && !d->_time.second];
   return AUTORELEASE(d);
 }
@@ -348,7 +348,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 {
   NSAssert(!_time.is_date, @"Works only with datetimes");
   struct icaldurationtype dt = {0, 0, 0, 0, minute - [self minuteOfDay], 0};
-  _time = icaltime_add(_time, dt);
+  _time = icalduration_extend(_time, dt);
 }
 
 - (void)setDay:(int)day
@@ -372,7 +372,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 - (void)incrementDay
 {
   struct icaldurationtype dt = {0, 1, 0, 0, 0, 0};
-  _time = icaltime_add(_time, dt);
+  _time = icalduration_extend(_time, dt);
 }
 
 - (void)changeYearBy:(int)diff
@@ -384,13 +384,13 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 - (void)changeDayBy:(int)diff
 {
   struct icaldurationtype dt = {diff < 0, ABS(diff), 0, 0, 0, 0};
-  _time = icaltime_add(_time, dt);
+  _time = icalduration_extend(_time, dt);
 }
 
 - (void)changeMinuteBy:(int)diff
 {
   struct icaldurationtype dt = {diff < 0, 0, 0, 0, ABS(diff), 0};
-  _time = icaltime_add(_time, dt);
+  _time = icalduration_extend(_time, dt);
 }
 
 - (NSEnumerator *)enumeratorTo:(Date *)end
@@ -430,7 +430,7 @@ static icaltimezone *fixedOffsetTimezone(NSInteger offset)
 
 - (NSTimeInterval)timeIntervalSinceDate:(Date *)anotherDate
 {
-  return icaldurationtype_as_int(icaltime_subtract(_time, anotherDate->_time));
+  return icaldurationtype_as_utc_seconds(icalduration_from_times(_time, anotherDate->_time));
 }
 
 - (NSTimeInterval)timeIntervalSinceNow

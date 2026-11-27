@@ -19,7 +19,7 @@
  *   wrong for these dates.
  *
  * - Dates more than 68 years apart : -timeIntervalSinceDate: goes
- *   through icaldurationtype_as_int(), which overflows an int, so the
+ *   through icaldurationtype_as_utc_seconds(), which overflows an int, so the
  *   result is wrong and can have the wrong sign. -timeIntervalSince1970
  *   isn't affected.
  *

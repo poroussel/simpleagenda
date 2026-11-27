@@ -55,8 +55,7 @@ static void failed(NSString *what, Event *ev, NSString *more)
   NSString *rule = @"(none)";
 
   if ([ev rrule]) {
-    struct icalrecurrencetype r = [[ev rrule] iCalRRule];
-    char *s = icalrecurrencetype_as_string(&r);
+    char *s = icalrecurrencetype_as_string((struct icalrecurrencetype *)[[ev rrule] iCalRRule]);
     rule = s ? [NSString stringWithUTF8String:s] : @"(not printable)";
   }
   NSLog(@"Invariant failed : %@\n  start %@ allDay %d duration %d\n  rrule %@\n  %@",
@@ -66,13 +65,11 @@ static void failed(NSString *what, Event *ev, NSString *more)
 
 static NSString *ruleString(RecurrenceRule *rule)
 {
-  struct icalrecurrencetype r;
   char *s;
 
   if (rule == nil)
     return nil;
-  r = [rule iCalRRule];
-  s = icalrecurrencetype_as_string(&r);
+  s = icalrecurrencetype_as_string((struct icalrecurrencetype *)[rule iCalRRule]);
   return s ? [NSString stringWithUTF8String:s] : @"";
 }
 
@@ -111,14 +108,14 @@ static void sameOccurrences(Event *ev, NSArray *a, NSArray *b, NSString *what)
 static void checkEvent(Event *ev)
 {
   RecurrenceRule *rule = [ev rrule];
-  struct icalrecurrencetype r = [rule iCalRRule];
+  const struct icalrecurrencetype *r = [rule iCalRRule];
   NSArray *all = occurrences(ev);
   Date *start = [ev startDate];
   /*
    * -until normalizes an out of range UNTIL (20240400 is March 31st) but
    * libical uses it as is : only check UNTIL values that are valid
    */
-  Date *until = icaltime_compare(icaltime_normalize(r.until), r.until) ? nil : [rule until];
+  Date *until = icaltime_compare(icaltime_normalize(r->until), r->until) ? nil : [rule until];
   Date *previous = nil;
   NSUInteger i;
   /*
@@ -129,7 +126,7 @@ static void checkEvent(Event *ev)
    *   isn't archived or exported with a DATE value : libical adds the
    *   hours with or without DST and the occurrences can change day
    */
-  BOOL subDaily = [start isDate] && r.freq < ICAL_DAILY_RECURRENCE;
+  BOOL subDaily = [start isDate] && r->freq < ICAL_DAILY_RECURRENCE;
   NSComparisonResult worst = subDaily ? NSOrderedSame : NSOrderedAscending;
 
   if (!checkable(start))
@@ -137,7 +134,7 @@ static void checkEvent(Event *ev)
 
   /* A rule detected as never matching mustn't have any occurrence */
   if ([rule neverMatches]) {
-    icalrecur_iterator *it = icalrecur_iterator_new(r, [start localICalTime]);
+    icalrecur_iterator *it = sa_recur_iterator_new(r, [start localICalTime]);
 
     if (it && !icaltime_is_null_time(icalrecur_iterator_next(it)))
       failed(@"a rule detected as never matching has occurrences", ev, nil);
@@ -159,7 +156,7 @@ static void checkEvent(Event *ev)
       failed(@"occurrence after UNTIL", ev, [NSString stringWithFormat:@"%@ > %@", d, until]);
     previous = d;
   }
-  if (r.count > 0 && [all count] > (NSUInteger)r.count)
+  if (r->count > 0 && [all count] > (NSUInteger)r->count)
     failed(@"more occurrences than COUNT", ev, nil);
 
   /* The event must be visible on the day of its occurrences */

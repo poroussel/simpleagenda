@@ -1,9 +1,10 @@
 # -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.57)
+AC_PREREQ([2.71])
 
-AC_INIT(SimpleAgenda)
+AC_INIT
+AC_CONFIG_SRCDIR([SimpleAgenda])
 
 if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
@@ -30,7 +31,7 @@ if test "$CC" != "$MAKECC"; then
 fi
 
 AC_CONFIG_SRCDIR([Headers/MemoryStore.h])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 old_cppflags=$CPPFLAGS
 old_ldflags=$LDFLAGS
@@ -53,8 +54,7 @@ LDFLAGS=$old_ldflags
 AC_CHECK_ADDRESSES(have_addresses=yes, have_addresses=no)
 
 AC_ARG_ENABLE([dbuskit],
-	   [AC_HELP_STRING([--disable-dbuskit],
-                           [disable DBusKit based alarm notification])],
+	   [AS_HELP_STRING([--disable-dbuskit],[disable DBusKit based alarm notification])],
            [],
 	   [enable_dbuskit=yes])
 if test "x$enable_dbuskit" != xno; then
@@ -75,6 +75,7 @@ AH_BOTTOM([
 #else
 #include <ical.h>
 #endif
+#include "icalcompat.h"
 ])
 
 AC_CONFIG_FILES([local.make])

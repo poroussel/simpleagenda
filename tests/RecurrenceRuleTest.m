@@ -12,7 +12,11 @@ static Date *dt(const char *string)
 /* Compares what the enumerator returns to a list of dates separated by spaces */
 static RecurrenceRule *ruleFromString(const char *string)
 {
-  return AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:icalrecurrencetype_from_string(string)]);
+  struct icalrecurrencetype *r = sa_recur_from_string(string);
+  RecurrenceRule *rule = AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:r]);
+
+  sa_recur_free(r);
+  return rule;
 }
 
 static BOOL sameDates(NSEnumerator *enumerator, const char *expected)
@@ -160,12 +164,13 @@ int main ()
 	 "a rule that never matches has no occurrence");
     /* libical agrees (this one only takes 0.1s) */
     {
-      struct icalrecurrencetype r = icalrecurrencetype_from_string("FREQ=YEARLY;BYMONTH=4,6;BYMONTHDAY=31");
-      icalrecur_iterator *it = icalrecur_iterator_new(r, icaltime_from_string("20240101T080000"));
+      struct icalrecurrencetype *r = sa_recur_from_string("FREQ=YEARLY;BYMONTH=4,6;BYMONTHDAY=31");
+      icalrecur_iterator *it = sa_recur_iterator_new(r, icaltime_from_string("20240101T080000"));
 
       PASS(icaltime_is_null_time(icalrecur_iterator_next(it)),
 	   "libical finds no occurrence for a rule detected as never matching");
       icalrecur_iterator_free(it);
+      sa_recur_free(r);
     }
   }
 
@@ -192,18 +197,19 @@ int main ()
 
   /* iCalendar */
   {
-    struct icalrecurrencetype rrule = icalrecurrencetype_from_string("FREQ=WEEKLY;COUNT=3;BYDAY=MO,WE");
-    struct icalrecurrencetype back;
+    struct icalrecurrencetype *rrule = sa_recur_from_string("FREQ=WEEKLY;COUNT=3;BYDAY=MO,WE");
+    const struct icalrecurrencetype *back;
 
     rule = AUTORELEASE([[RecurrenceRule alloc] initWithICalRRule:rrule]);
+    sa_recur_free(rrule);
     PASS([rule frequency] == recurrenceFrequenceWeekly && [rule count] == 3,
 	 "-initWithICalRRule: works");
     /* 2024-06-17 is a monday */
     PASS(sameDates([rule enumeratorFromDate:dt("20240617")], "20240617 20240619 20240624"),
 	 "the rules libical understands are taken into account");
     back = [rule iCalRRule];
-    PASS(back.freq == ICAL_WEEKLY_RECURRENCE && back.count == 3
-	 && back.by_day[0] != ICAL_RECURRENCE_ARRAY_MAX, "-iCalRRule returns the rule");
+    PASS(back->freq == ICAL_WEEKLY_RECURRENCE && back->count == 3
+	 && sa_recur_by_count(back, ICAL_BY_DAY) == 2, "-iCalRRule returns the rule");
   }
 
   /* NSCoding */

@@ -21,7 +21,7 @@
  * before 1902, so Date's isEqual:, hash, timeIntervalSinceDate: and
  * weekOfYear are wrong for them (all such dates are equal, day enumeration
  * never ends). And timeIntervalSinceDate: goes through
- * icaldurationtype_as_int(), which overflows an int when the dates are
+ * icaldurationtype_as_utc_seconds(), which overflows an int when the dates are
  * more than 68 years apart. Finally, libical accepts out of range fields
  * (DTSTART;VALUE=DATE:20262311 or 20260230T120000) and initWithICalTime:
  * doesn't normalize dates and floating times, so these dates compare
