@@ -1,3 +1,11 @@
+version 0.51 (2026/11/27)
+	* Build with libical 4 as well as libical 3
+	* Recurrent events : with libical 4, rules that never match (the
+	  54th monday of a year, the 31st of february...) got occurrences
+	  centuries later and were looked for again on each displayed day
+	* Fix "Calling [NSButton -state] with incorrect signature" warnings
+	  printed when using the preferences and the appointment editor
+
 version 0.50 (2026/11/09)
 	* Date : fix crash when comparing a date with nil
 	* Element : make sure a UID is generated before encoding
