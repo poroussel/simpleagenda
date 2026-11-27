@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #if defined(ICAL_MAJOR_VERSION) && ICAL_MAJOR_VERSION >= 4
 #define SA_LIBICAL4
@@ -56,11 +57,28 @@ static inline icalproperty *sa_recur_new_property(const struct icalrecurrencetyp
 {
   return icalproperty_new_rrule((struct icalrecurrencetype *)r);
 }
-/* The iterator may use r : it must outlive the iterator */
+/*
+ * The iterator may use r : it must outlive the iterator.
+ *
+ * libical 4 (4.0.9) gives up looking for the next occurrence after
+ * ICAL_LIMIT_RECURRENCE_SEARCH candidates, and then returns the last
+ * candidate although it doesn't match the rule : FREQ=YEARLY;BYDAY=MO;
+ * BYSETPOS=54 gives mondays in 3940, 5857... and FREQ=DAILY;BYMONTH=2;
+ * BYMONTHDAY=31 gives 2297-10-17 (100000 days after DTSTART). Do as
+ * libical 3 : no limit, but stop at the end of 2582, libical 3's last
+ * year (and libical 4's without ICU, which looks up to the year 20000).
+ * A rule that never matches has no occurrence again
+ */
 static inline icalrecur_iterator *sa_recur_iterator_new(const struct icalrecurrencetype *r,
 							struct icaltimetype dtstart)
 {
-  return icalrecur_iterator_new((struct icalrecurrencetype *)r, dtstart);
+  icalrecur_iterator *it;
+
+  icallimit_set(ICAL_LIMIT_RECURRENCE_SEARCH, SIZE_MAX);
+  it = icalrecur_iterator_new((struct icalrecurrencetype *)r, dtstart);
+  if (it)
+    icalrecur_iterator_set_end(it, icaltime_from_day_of_year(1, 2583));
+  return it;
 }
 /* Number of values of a BY part (ICAL_BY_DAY...) and the i-th value */
 static inline int sa_recur_by_count(const struct icalrecurrencetype *r, icalrecurrencetype_byrule part)
